@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+from .jazzmin import *
+from .jazzmin import JAZZMIN_SETTINGS
+from decouple import config # ۱. ایمپورت کردن دکوپل
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,18 +24,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zjgf=hn29k_e6&8rzdsq4_zk)wu!jvlif3#8v^e2ft=lq4y4ch'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
-
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,9 +45,36 @@ INSTALLED_APPS = [
 
     # local apps
     'apps.accounts.apps.AccountsConfig',
+    'apps.home.apps.HomeConfig',
 
     'rest_framework',
+    "drf_spectacular",
     'corsheaders',
+    'ckeditor',
+]
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['Image'],
+            ['Source'],  # این خطرناکه - پایین توضیح میدم
+        ],
+    },
+}
+
+DEFAULT_THROTTLE_RATES = {
+    'login': '5/min',
+    'password_reset_request': '3/hour',  # جلوگیری از spam SMS/email — این هزینه واقعی داره
+    'password_reset_verify': '10/hour',  # چند بار تلاش غلط مجازه ولی نه بی‌نهایت
+    'password_reset_confirm': '5/hour',
+}
+AUTHENTICATION_BACKENDS = [
+    'apps.accounts.backends.UsernameOrMobileBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 LOGIN_URL = 'login'
@@ -52,15 +84,33 @@ LOGOUT_REDIRECT_URL = 'login'
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
+
     ] if not DEBUG else [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'login': '5/min',  #
+        'password_reset_request': '3/hour',  # جلوگیری از spam SMS/email — این هزینه واقعی داره
+        'password_reset_verify': '10/hour',  # چند بار تلاش غلط مجازه ولی نه بی‌نهایت
+        'password_reset_confirm': '5/hour',  # حداکثر ۵ تلاش لاگین در دقیقه به ازای هر IPپ
+        'change_password': '10/hour'
+
+    },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "My API",
+    "DESCRIPTION": "API documentation",
+    "VERSION": "1.0.0",
 }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -90,7 +140,7 @@ TEMPLATES = [
         },
     },
 ]
-
+LOGOUT_REDIRECT_URL = "/admin/"
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
@@ -98,8 +148,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 
@@ -123,8 +177,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
-
-LANGUAGE_CODE = 'fa-ir'
+LANGUAGES = [
+    ("en", _("English")),
+    ("fa", _("Persian")),
+]
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
@@ -135,9 +192,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============ Static files (CSS/JS/فونت - فایل‌های خودت) ============
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']       # جایی که تو dev خودت فایل می‌ذاری
+STATIC_ROOT = BASE_DIR / 'staticfiles'         # مقصد collectstatic برای production
+
+# ============ Media files (آپلودهای کاربر - عکس/mp3/pdf مقالات) ============
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

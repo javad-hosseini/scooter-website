@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>اسکوتیکس | Sidebar Component</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Font Awesome (used for icons in the sidebar) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- Bootstrap 5 RTL (only needed for the collapse component behavior/classes) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — required for sidebar only
+   ============================================================ */
+:root{
+  --navy:#0B1120;
+  --navy-deep:#070B16;
+  --blue:#2F6FED;
+  --purple:#7C5CFC;
+  --cyan:#22D3EE;
+
+  --grad-primary:linear-gradient(135deg,var(--blue) 0%,var(--purple) 100%);
+  --grad-current:linear-gradient(90deg,var(--cyan) 0%,var(--blue) 45%,var(--purple) 100%);
+
+  --font-display:'Vazirmatn',sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:var(--font-display);
+  letter-spacing:-.1px;
+  margin:0;
+}
+a{text-decoration:none;}
+
+/* Body scroll lock while mobile sidebar is open (does not affect desktop layout) */
+body.sidebar-open{
+  overflow:hidden;
+}
+
+/* scrollbar */
+.scroll-thin::-webkit-scrollbar{width:6px;}
+.scroll-thin::-webkit-scrollbar-thumb{background:rgba(11,17,32,.08);border-radius:10px;}
+
+/* ============================================================
+   SIDEBAR COMPONENT — DESKTOP (UNCHANGED)
+   ============================================================ */
+.sidebar{
+  width:272px;
+  flex-shrink:0;
+  background:radial-gradient(120% 140% at 0% 0%, #131B36 0%, var(--navy) 45%, var(--navy-deep) 100%);
+  color:#C9CEDD;
+  position:sticky;
+  top:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  z-index:40;
+  border-left:1px solid rgba(255,255,255,.05);
+}
+.sidebar-brand{
+  display:flex;align-items:center;gap:12px;
+  padding:26px 22px 22px;
+}
+.sidebar-brand .mark{
+  width:40px;height:40px;border-radius:12px;
+  background:var(--grad-primary);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 20px -6px rgba(124,92,252,.6);
+  position:relative;
+  flex-shrink:0;
+}
+.sidebar-brand .mark i{color:#fff;font-size:18px;}
+.sidebar-brand .name{font-weight:800;font-size:18px;color:#fff;line-height:1.1;}
+.sidebar-brand .name span{display:block;font-size:11px;font-weight:500;color:#8C93AE;letter-spacing:.5px;margin-top:2px;}
+
+.sidebar-section-title{
+  font-size:11px;font-weight:700;color:#5B6480;
+  text-transform:uppercase;letter-spacing:1px;
+  padding:18px 22px 8px;
+}
+.sidebar-nav{flex:1;overflow-y:auto;padding-bottom:10px;}
+.sidebar-nav .nav-link{
+  display:flex;align-items:center;gap:12px;
+  color:#AEB4CB;font-size:14.5px;font-weight:500;
+  padding:11px 22px;margin:2px 12px;border-radius:10px;
+  position:relative;transition:.2s ease;
+}
+.sidebar-nav .nav-link i.ico{width:18px;text-align:center;font-size:15px;color:#7E86A3;transition:.2s;}
+.sidebar-nav .nav-link:hover{background:rgba(255,255,255,.05);color:#fff;}
+.sidebar-nav .nav-link:hover i.ico{color:var(--cyan);}
+.sidebar-nav .nav-link.active{
+  background:linear-gradient(90deg,rgba(47,111,237,.18),rgba(124,92,252,.10));
+  color:#fff;
+}
+.sidebar-nav .nav-link.active i.ico{color:var(--cyan);}
+.sidebar-nav .nav-link.active::before{
+  content:'';position:absolute;right:0;top:8px;bottom:8px;width:3px;border-radius:3px;
+  background:var(--grad-current);
+  box-shadow:0 0 10px 1px rgba(34,211,238,.7);
+}
+.sidebar-nav .nav-link .chev{margin-right:auto;font-size:11px;transition:.25s;color:#5B6480;}
+.sidebar-nav .nav-link[aria-expanded="true"] .chev{transform:rotate(-90deg);color:var(--cyan);}
+.sidebar-sub{padding-right:18px;}
+.sidebar-sub .nav-link{font-size:13.5px;padding:9px 22px 9px 16px;color:#8B92AB;}
+.sidebar-sub .nav-link::before{content:'';width:5px;height:5px;border-radius:50%;background:#3A4262;margin-left:2px;}
+.sidebar-sub .nav-link:hover,.sidebar-sub .nav-link.active{color:#fff;background:rgba(255,255,255,.05);}
+.sidebar-sub .nav-link.active::before{background:var(--cyan);box-shadow:0 0 6px var(--cyan);}
+
+.sidebar-footer{
+  padding:16px 18px 20px;border-top:1px solid rgba(255,255,255,.06);
+}
+.battery-widget{
+  background:linear-gradient(135deg,rgba(47,111,237,.16),rgba(124,92,252,.10));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;padding:14px;
+}
+.battery-widget .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.battery-widget .top span{font-size:12px;color:#9AA1BD;font-weight:600;}
+.battery-widget .top b{color:#fff;font-size:13px;}
+.battery-track{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;}
+.battery-fill{height:100%;width:78%;border-radius:6px;background:var(--grad-current);
+  background-size:200% 100%;animation:currentFlow 3s linear infinite;}
+
+@keyframes currentFlow{0%{background-position:0% 0;}100%{background-position:200% 0;}}
+
+/* ============================================================
+   OVERLAY (hidden by default on all breakpoints)
+   ============================================================ */
+.sidebar-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:39;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .3s ease, visibility .3s ease;
+}
+.sidebar-backdrop.show{
+  display:block;
+  opacity:1;
+  visibility:visible;
+}
+
+/* Demo-only helper to show the toggle button outside of a real topbar.
+   Safe to remove once this component is embedded in the real layout that
+   already provides its own toggle trigger (e.g. #sbToggle in the topbar). */
+.demo-toggle-btn{
+  display:none;
+}
+@media (max-width:1199.98px){
+  .demo-toggle-btn{
+    display:flex;align-items:center;justify-content:center;
+    position:fixed;top:14px;right:14px;z-index:41;
+    width:40px;height:40px;border-radius:11px;border:1px solid rgba(11,17,32,.08);
+    background:#fff;color:#646E84;cursor:pointer;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE SIDEBAR (MOBILE / TABLET < 1200px)
+   ============================================================ */
+@media (max-width:1199.98px){
+  .sidebar{
+    position:fixed;
+    top:0;
+    right:0;
+    height:100dvh;
+    z-index:40;
+    transform:translateX(100%);
+    transition:transform .3s ease;
+    will-change:transform;
+    box-shadow:none;
+  }
+  .sidebar.show{
+    transform:translateX(0);
+    box-shadow:-24px 0 48px -16px rgba(0,0,0,.35);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar-backdrop" id="sbBackdrop"></div>
+
+<!-- Optional demo toggle button (only needed if this component is tested standalone
+     without a topbar. In the full Django layout, wire #sbToggle in the topbar instead). -->
+<button class="demo-toggle-btn" id="sbToggle" aria-label="باز کردن منو" aria-expanded="false" aria-controls="sidebar">
+  <i class="fa-solid fa-bars"></i>
+</button>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="mark"><i class="fa-solid fa-bolt"></i></div>
+    <div class="name">اسکوتیکس<span>پنل مدیریت فروشگاه</span></div>
+  </div>
+
+  <nav class="sidebar-nav scroll-thin">
+    <div class="sidebar-section-title">اصلی</div>
+    <a href="#" class="nav-link active"><i class="ico fa-solid fa-grid-2"></i> داشبورد</a>
+
+    <a class="nav-link" data-bs-toggle="collapse" href="#menuProducts" role="button" aria-expanded="false">
+      <i class="ico fa-solid fa-box-open"></i> محصولات <i class="chev fa-solid fa-chevron-left"></i>
+    </a>
+    <div class="collapse sidebar-sub" id="menuProducts">
+      <a href="#" class="nav-link">لیست محصولات</a>
+      <a href="#" class="nav-link">جزئیات محصول</a>
+    </div>
+
+    <a href="#" class="nav-link"><i class="ico fa-solid fa-cart-shopping"></i> سفارش‌ها
+      <span class="badge text-bg-primary rounded-pill ms-2" style="font-size:10px;">۱۲</span>
+    </a>
+
+    <a class="nav-link" data-bs-toggle="collapse" href="#menuVisitors" role="button" aria-expanded="false">
+      <i class="ico fa-solid fa-users"></i> بازدیدکنندگان <i class="chev fa-solid fa-chevron-left"></i>
+    </a>
+    <div class="collapse sidebar-sub" id="menuVisitors">
+      <a href="#" class="nav-link">لیست بازدیدکنندگان</a>
+      <a href="#" class="nav-link">جزئیات بازدیدکننده</a>
+    </div>
+
+    <a href="#" class="nav-link"><i class="ico fa-solid fa-star"></i> دیدگاه‌ها</a>
+    <a href="#" class="nav-link"><i class="ico fa-solid fa-chart-line"></i> درآمد</a>
+
+    <div class="sidebar-section-title">سیستم</div>
+    <a href="#" class="nav-link"><i class="ico fa-solid fa-gear"></i> تنظیمات</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="battery-widget">
+      <div class="top"><span>وضعیت سرور</span><b>۷۸٪</b></div>
+      <div class="battery-track"><div class="battery-fill"></div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Bootstrap JS bundle (required only for the built-in collapse component
+     used by the multi-level "محصولات" / "بازدیدکنندگان" submenus) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   MOBILE SIDEBAR — single source of truth
+   ============================================================ */
+(function () {
+  const sidebar   = document.getElementById('sidebar');
+  const backdrop  = document.getElementById('sbBackdrop');
+  const toggleBtn = document.getElementById('sbToggle');
+  const DESKTOP_BREAKPOINT = 1200; // matches the 1199.98px CSS breakpoint
+
+  function isMobile() {
+    return window.innerWidth < DESKTOP_BREAKPOINT;
+  }
+
+  function openSidebar() {
+    sidebar.classList.add('show');
+    backdrop.classList.add('show');
+    document.body.classList.add('sidebar-open');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('show');
+    backdrop.classList.remove('show');
+    document.body.classList.remove('sidebar-open');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleSidebar() {
+    if (sidebar.classList.contains('show')) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  }
+
+  // Open via hamburger button
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSidebar();
+    });
+  }
+
+  // Close on overlay click
+  backdrop.addEventListener('click', closeSidebar);
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('show')) {
+      closeSidebar();
+    }
+  });
+
+  // Close when a sidebar link is clicked (mobile only, ignore collapse toggles)
+  sidebar.addEventListener('click', (e) => {
+    const link = e.target.closest('.nav-link');
+    if (!link) return;
+    if (link.hasAttribute('data-bs-toggle')) return; // submenu opener, don't close
+    if (isMobile()) closeSidebar();
+  });
+
+  // Close automatically when resizing back to desktop
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (!isMobile()) closeSidebar();
+    }, 100);
+  });
+
+  // Ensure a clean state on initial load (never visible as a drawer on load)
+  closeSidebar();
+})();
+</script>
+</body>
+</html>

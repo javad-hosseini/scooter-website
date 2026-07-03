@@ -1,0 +1,1896 @@
+<!doctype html>
+{% load static %}
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="page-title">مجله VOLTEX</title>
+
+    <!-- SEO Meta Tags (توسط JavaScript پر می‌شوند) -->
+    <meta name="description" id="meta-description" content="" />
+    <link rel="canonical" id="meta-canonical" href="" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" id="og-title" content="" />
+    <meta property="og:description" id="og-description" content="" />
+    <meta property="og:image" id="og-image" content="" />
+    <meta property="og:url" id="og-url" content="" />
+    <meta property="og:site_name" content="VOLTEX" />
+    <meta property="og:locale" content="fa_IR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" id="twitter-title" content="" />
+    <meta name="twitter:description" id="twitter-description" content="" />
+    <meta name="twitter:image" id="twitter-image" content="" />
+
+    <!-- JSON-LD: BlogPosting (توسط JavaScript پر می‌شود) -->
+    <script id="json-ld-blog" type="application/ld+json"></script>
+
+    <!-- JSON-LD: BreadcrumbList (توسط JavaScript پر می‌شود) -->
+    <script id="json-ld-breadcrumb" type="application/ld+json"></script>
+
+    <!-- Preconnect / Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              black: "#050507",
+              deep: "#08080d",
+              surface: "#0c0c13",
+              card: "#101018",
+              cardhover: "#14141e",
+              white: "#f6f6f8",
+              neon: "#4fd8ff",
+              neon2: "#8b7bff",
+              neon3: "#ff6cc4",
+              gold: "#e9c97f",
+            },
+            fontFamily: {
+              display: ["Vazirmatn", "Space Grotesk", "sans-serif"],
+              body: ["Vazirmatn", "Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "Vazirmatn", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      /* ===== تمام استایل‌های قبلی را اینجا قرار دهید ===== */
+      :root {
+        --black: #050507;
+        --deep: #08080d;
+        --surface: #0c0c13;
+        --card: #101018;
+        --card-hover: #14141e;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-lit: rgba(125, 211, 252, 0.24);
+        --white: #f6f6f8;
+        --dim: rgba(246, 246, 248, 0.6);
+        --muted: rgba(246, 246, 248, 0.34);
+        --neon: #4fd8ff;
+        --neon2: #8b7bff;
+        --neon3: #ff6cc4;
+        --gold: #e9c97f;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-sm: cubic-bezier(0.4, 0, 0.2, 1);
+        --nav-h: 64px;
+        --r-sm: 10px;
+        --r-md: 14px;
+        --r-lg: 20px;
+        --r-xl: 28px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--black);
+        color: var(--white);
+        font-family: "Vazirmatn", "Inter", sans-serif;
+        font-weight: 300;
+        -webkit-font-smoothing: antialiased;
+      }
+      ::selection {
+        background: var(--neon);
+        color: var(--black);
+      }
+      :focus-visible {
+        outline: 1.5px solid var(--neon);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+      .numeric {
+        direction: ltr;
+        unicode-bidi: isolate;
+        font-family: "JetBrains Mono", "Vazirmatn", monospace;
+      }
+
+      /* ── progress bar ── */
+      #reading-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 0%;
+        background: linear-gradient(90deg, var(--neon), var(--neon2));
+        z-index: 9999;
+        transition: width 0.1s linear;
+      }
+
+      /* ── header ── */
+      header.site-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: var(--nav-h);
+        padding: 0 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(5, 5, 7, 0.8);
+        backdrop-filter: blur(22px) saturate(140%);
+        -webkit-backdrop-filter: blur(22px) saturate(140%);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-logo {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 0.22em;
+        color: var(--white);
+        direction: ltr;
+      }
+      .nav-links a {
+        font-size: 0.78rem;
+        color: var(--dim);
+        text-decoration: none;
+        transition: color 0.3s var(--ease-sm);
+        position: relative;
+      }
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        right: 0;
+        left: 0;
+        height: 1px;
+        background: var(--neon);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s var(--ease);
+      }
+      .nav-links a:hover {
+        color: var(--white);
+      }
+      .nav-links a:hover::after {
+        transform: scaleX(1);
+      }
+      @media (min-width: 1024px) {
+        body {
+          padding-top: 0;
+        }
+      }
+
+      /* ── hero ── */
+      .hero-cover {
+        position: relative;
+        height: 78vh;
+        min-height: 520px;
+        overflow: hidden;
+      }
+      .hero-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 40%;
+      }
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(5, 5, 7, 0.35) 0%,
+          rgba(5, 5, 7, 0.55) 55%,
+          var(--black) 100%
+        );
+      }
+      .hero-fade-in {
+        opacity: 0;
+        transform: translateY(26px);
+        animation: fadeUp 0.9s var(--ease) forwards;
+      }
+      #author-avatar {
+        width: 32px !important;
+        height: 32px !important;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      .d1 {
+        animation-delay: 0.05s;
+      }
+      .d2 {
+        animation-delay: 0.15s;
+      }
+      .d3 {
+        animation-delay: 0.26s;
+      }
+      .d4 {
+        animation-delay: 0.37s;
+      }
+      @keyframes fadeUp {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* ── article typography ── */
+      .prose-voltex {
+        font-family: "Vazirmatn", "Inter", sans-serif;
+        font-weight: 300;
+        color: var(--dim);
+        line-height: 2;
+        font-size: 1.05rem;
+      }
+      .prose-voltex h2 {
+        font-family: "Vazirmatn", sans-serif;
+        font-weight: 700;
+        font-size: 1.7rem;
+        color: var(--white);
+        margin: 2.6em 0 0.9em;
+        letter-spacing: 0;
+        scroll-margin-top: 96px;
+      }
+      .prose-voltex h3 {
+        font-family: "Vazirmatn", sans-serif;
+        font-weight: 600;
+        font-size: 1.28rem;
+        color: var(--white);
+        margin: 2em 0 0.7em;
+        scroll-margin-top: 96px;
+      }
+      .prose-voltex p {
+        margin-bottom: 1.5em;
+      }
+      .prose-voltex ul,
+      .prose-voltex ol {
+        margin: 1.4em 0;
+        padding-right: 1.4em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6em;
+      }
+      .prose-voltex li::marker {
+        color: var(--neon);
+      }
+      .prose-voltex a {
+        color: var(--neon);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(79, 216, 255, 0.3);
+        transition: border-color 0.25s;
+      }
+      .prose-voltex a:hover {
+        border-color: var(--neon);
+      }
+      .prose-voltex strong {
+        color: var(--white);
+        font-weight: 600;
+      }
+      .prose-voltex blockquote {
+        position: relative;
+        margin: 2.4em 0;
+        padding: 1.6em 1.8em;
+        background: var(--surface);
+        border-right: 2px solid var(--neon);
+        border-radius: var(--r-md);
+        font-style: normal;
+        color: var(--white);
+        font-size: 1.12rem;
+        line-height: 1.85;
+      }
+      .prose-voltex code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.82em;
+        background: rgba(79, 216, 255, 0.1);
+        color: var(--neon);
+        padding: 0.15em 0.45em;
+        border-radius: 5px;
+        direction: ltr;
+        display: inline-block;
+      }
+      .prose-voltex pre {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 1.3em 1.4em;
+        overflow-x: auto;
+        margin: 1.8em 0;
+        direction: ltr;
+        text-align: left;
+      }
+      .prose-voltex pre code {
+        background: none;
+        padding: 0;
+        color: #c9e9ff;
+      }
+      .prose-voltex table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2em 0;
+        font-size: 0.92rem;
+        border-radius: var(--r-md);
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .prose-voltex th {
+        background: var(--surface);
+        color: var(--white);
+        font-weight: 600;
+        padding: 0.9em 1em;
+        text-align: right;
+        font-family: "Vazirmatn", sans-serif;
+        font-size: 0.82rem;
+      }
+      .prose-voltex td {
+        padding: 0.85em 1em;
+        border-top: 1px solid var(--border);
+        color: var(--dim);
+      }
+      .prose-voltex figure {
+        margin: 2.2em 0;
+      }
+      .prose-voltex figcaption {
+        text-align: center;
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 0.7em;
+      }
+      .article-img {
+        width: 100%;
+        border-radius: var(--r-lg);
+        border: 1px solid var(--border);
+        transition: transform 0.6s var(--ease);
+        cursor: zoom-in;
+      }
+      .article-img:hover {
+        transform: scale(1.012);
+      }
+
+      /* ── TOC ── */
+      .toc-link {
+        display: block;
+        padding: 0.5em 0.9em;
+        font-size: 0.82rem;
+        color: var(--muted);
+        border-right: 2px solid transparent;
+        transition: all 0.3s var(--ease-sm);
+        text-decoration: none;
+      }
+      .toc-link:hover {
+        color: var(--dim);
+      }
+      .toc-link.active {
+        color: var(--neon);
+        border-color: var(--neon);
+        background: rgba(79, 216, 255, 0.05);
+      }
+
+      /* ── share buttons ── */
+      .share-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s var(--ease-sm);
+        flex-shrink: 0;
+      }
+      .share-btn:hover {
+        border-color: var(--border-lit);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px -10px rgba(79, 216, 255, 0.3);
+      }
+      .share-btn svg {
+        width: 17px;
+        height: 17px;
+        stroke: var(--dim);
+        fill: none;
+        stroke-width: 1.6;
+      }
+      .share-btn:hover svg {
+        stroke: var(--neon);
+      }
+      .copy-toast {
+        position: fixed;
+        bottom: 26px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: var(--card);
+        border: 1px solid var(--border-lit);
+        color: var(--white);
+        font-size: 0.82rem;
+        padding: 0.8em 1.4em;
+        border-radius: 100px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.35s var(--ease);
+        z-index: 9998;
+      }
+      .copy-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ── related / newsletter / comments ── */
+      .related-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        transition: all 0.5s var(--ease);
+        position: relative;
+      }
+      .related-card:hover {
+        border-color: var(--border-lit);
+        transform: translateY(-8px);
+        box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.7);
+      }
+      .related-card img {
+        transition: transform 0.8s var(--ease);
+      }
+      .related-card:hover img {
+        transform: scale(1.06);
+      }
+
+      .newsletter-box {
+        position: relative;
+        background: linear-gradient(
+          160deg,
+          rgba(79, 216, 255, 0.08),
+          rgba(139, 123, 255, 0.05) 60%,
+          var(--surface)
+        );
+        border: 1px solid var(--border-lit);
+        border-radius: var(--r-xl);
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+      }
+      .newsletter-box::before {
+        content: "";
+        position: absolute;
+        top: -40%;
+        left: -10%;
+        width: 60%;
+        height: 180%;
+        background: radial-gradient(
+          circle,
+          rgba(79, 216, 255, 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .comment-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 1.3em 1.4em;
+      }
+      .comment-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: var(--black);
+        flex-shrink: 0;
+        direction: ltr;
+      }
+      .reply-btn {
+        font-size: 0.72rem;
+        color: var(--muted);
+        transition: color 0.25s;
+      }
+      .reply-btn:hover {
+        color: var(--neon);
+      }
+
+      /* ── back to top ── */
+      #backToTop {
+        position: fixed;
+        bottom: 26px;
+        left: 26px;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: var(--card);
+        border: 1px solid var(--border-lit);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(12px);
+        transition: all 0.35s var(--ease);
+        z-index: 500;
+      }
+      #backToTop.show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+      }
+      #backToTop svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--neon);
+        fill: none;
+        stroke-width: 2;
+      }
+
+      /* ── lightbox ── */
+      #lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(5, 5, 7, 0.94);
+        backdrop-filter: blur(10px);
+        z-index: 9990;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 5vw;
+      }
+      #lightbox.open {
+        display: flex;
+      }
+      #lightbox img {
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: var(--r-md);
+        box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
+      }
+      #lightboxClose {
+        position: absolute;
+        top: 24px;
+        left: 24px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--card);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      /* ── mobile TOC drawer ── */
+      #tocDrawer {
+        position: fixed;
+        inset: 0;
+        background: rgba(5, 5, 7, 0.97);
+        backdrop-filter: blur(20px);
+        z-index: 997;
+        transform: translateY(100%);
+        transition: transform 0.5s var(--ease);
+        display: flex;
+        flex-direction: column;
+        padding: 26px 22px;
+        overflow-y: auto;
+      }
+      #tocDrawer.open {
+        transform: translateY(0);
+      }
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+      }
+      .loading-spinner::after {
+        content: "";
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--border);
+        border-top-color: var(--neon);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 1023px) {
+        .toc-desktop {
+          display: none;
+        }
+      }
+      @media (min-width: 1024px) {
+        #tocFab,
+        #tocDrawer {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <div id="reading-progress"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════
+     HEADER
+     ══════════════════════════════════════════════════════════════ -->
+    <header class="site-nav">
+      <a href="/" class="nav-logo">VOLTEX</a>
+      <ul class="nav-links hidden lg:flex items-center gap-9 list-none">
+        <li><a href="/models/">مدل‌ها</a></li>
+        <li><a href="/shop/">فروشگاه</a></li>
+        <li><a href="/blog/" style="color: var(--neon)">مجله</a></li>
+        <li><a href="/guide/">راهنما</a></li>
+        <li><a href="/about/">درباره ما</a></li>
+      </ul>
+      <div class="flex items-center gap-3">
+        <button
+          class="hidden md:inline-flex items-center text-xs font-semibold px-5 py-2.5 rounded-full"
+          style="background: var(--white); color: var(--black)"
+          onclick="location.href = '/register/'"
+        >
+          ثبت‌نام
+        </button>
+        <button
+          class="relative w-10 h-10 rounded-[10px] border flex items-center justify-center"
+          style="border-color: var(--border)"
+          aria-label="سبد خرید"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--dim)"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"
+            />
+            <circle cx="10" cy="20.5" r="1.4" />
+            <circle cx="17" cy="20.5" r="1.4" />
+          </svg>
+          <span
+            class="absolute -top-1 -left-1 min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center text-[10px] numeric"
+            style="background: var(--neon); color: var(--black)"
+            >3</span
+          >
+        </button>
+        <button
+          class="lg:hidden w-10 h-10 rounded-[10px] border flex items-center justify-center"
+          style="border-color: var(--border)"
+          aria-label="منو"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--dim)"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main style="padding-top: var(--nav-h)">
+      <!-- ══════════════════════════════════════════════════════════════
+       BREADCRUMB
+       ══════════════════════════════════════════════════════════════ -->
+      <nav
+        aria-label="مسیر صفحه"
+        class="max-w-[1400px] mx-auto px-5 md:px-9 py-5"
+      >
+        <ol
+          class="flex items-center gap-2 text-xs flex-wrap"
+          style="color: var(--muted)"
+        >
+          <li>
+            <a href="/" class="hover:text-white transition-colors">خانه</a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <a href="/blog/" class="hover:text-white transition-colors">مجله</a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li id="breadcrumb-current" style="color: var(--dim)">...</li>
+        </ol>
+      </nav>
+
+      <!-- ══════════════════════════════════════════════════════════════
+       LOADING / CONTENT
+       ══════════════════════════════════════════════════════════════ -->
+      <div id="loading-spinner" class="loading-spinner"></div>
+
+      <article
+        id="article-content"
+        itemscope
+        itemtype="https://schema.org/BlogPosting"
+        style="display: none"
+      >
+        <!-- ===== HERO ===== -->
+        <header class="hero-cover">
+          <img
+            id="cover-image"
+            src=""
+            alt=""
+            itemprop="image"
+            fetchpriority="high"
+            width="1920"
+            height="1080"
+          />
+          <div class="hero-overlay"></div>
+          <div class="absolute inset-0 flex items-end">
+            <div
+              class="max-w-[1400px] w-full mx-auto px-5 md:px-9 pb-12 md:pb-16"
+            >
+              <span
+                id="article-category"
+                class="hero-fade-in d1 inline-block text-[11px] tracking-wide font-mono font-semibold px-3.5 py-1.5 rounded-full mb-5"
+                style="
+                  background: rgba(79, 216, 255, 0.14);
+                  color: var(--neon);
+                  border: 1px solid rgba(79, 216, 255, 0.3);
+                "
+                >...</span
+              >
+              <h1
+                id="article-title"
+                itemprop="headline"
+                class="hero-fade-in d2 font-display font-extrabold text-white leading-[1.15] mb-5"
+                style="
+                  font-size: clamp(1.9rem, 5.2vw, 3.6rem);
+                  max-width: 900px;
+                "
+              >
+                ...
+              </h1>
+              <p
+                id="article-excerpt"
+                class="hero-fade-in d3 max-w-[620px] mb-7"
+                style="
+                  color: var(--dim);
+                  font-size: clamp(0.92rem, 1.6vw, 1.08rem);
+                  line-height: 1.8;
+                "
+                itemprop="description"
+              >
+                ...
+              </p>
+              <div
+                class="hero-fade-in d4 flex items-center flex-wrap gap-5 text-sm"
+                style="color: var(--muted)"
+              >
+                <div
+                  class="flex items-center gap-2.5"
+                  itemprop="author"
+                  itemscope
+                  itemtype="https://schema.org/Person"
+                >
+                  <img
+                    id="author-avatar"
+                    src=""
+                    alt=""
+                    class="w-8 h-8 rounded-full object-cover"
+                    width="32"
+                    height="32"
+                    loading="lazy"
+                  />
+                  <span
+                    id="author-name"
+                    itemprop="name"
+                    style="color: var(--dim)"
+                    >...</span
+                  >
+                </div>
+                <span
+                  class="w-1 h-1 rounded-full"
+                  style="background: var(--border-lit)"
+                ></span>
+                <time
+                  id="article-date"
+                  datetime=""
+                  itemprop="datePublished"
+                  class="numeric"
+                  >...</time
+                >
+                <span
+                  class="w-1 h-1 rounded-full"
+                  style="background: var(--border-lit)"
+                ></span>
+                <span class="flex items-center gap-1.5">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--muted)"
+                    stroke-width="1.7"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 3" />
+                  </svg>
+                  <span id="reading-time" class="numeric">...</span> دقیقه
+                  مطالعه
+                </span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- ===== BODY GRID ===== -->
+        <div
+          class="max-w-[1400px] mx-auto px-5 md:px-9 grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] gap-12 mt-4"
+        >
+          <!-- TOC (desktop) -->
+          <aside class="toc-desktop hidden lg:block">
+            <div class="sticky" style="top: calc(var(--nav-h) + 28px)">
+              <div
+                class="text-[11px] font-mono font-semibold tracking-wide mb-3"
+                style="color: var(--muted)"
+              >
+                فهرست مطالب
+              </div>
+              <nav
+                id="tocNavDesktop"
+                aria-label="فهرست مطالب مقاله"
+                class="flex flex-col border-r"
+                style="border-color: var(--border)"
+              ></nav>
+            </div>
+          </aside>
+
+          <!-- Main content -->
+          <div>
+            <div
+              id="article-body"
+              itemprop="articleBody"
+              class="prose-voltex max-w-[720px]"
+            >
+              <!-- محتوای مقاله از API اینجا قرار می‌گیرد -->
+            </div>
+
+            <!-- ===== SHARE ===== -->
+            <div
+              class="mt-14 pt-8 flex flex-wrap items-center gap-4"
+              style="border-top: 1px solid var(--border)"
+            >
+              <span class="text-xs font-semibold" style="color: var(--muted)"
+                >این مقاله را به اشتراک بگذارید</span
+              >
+              <div class="flex items-center gap-2.5">
+                <button
+                  class="share-btn"
+                  aria-label="کپی لینک"
+                  onclick="copyLink()"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"
+                    />
+                    <path
+                      d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.36-1.36"
+                    />
+                  </svg>
+                </button>
+                <a
+                  class="share-btn"
+                  aria-label="اشتراک در تلگرام"
+                  target="_blank"
+                  rel="noopener"
+                  id="share-telegram"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M21.9 4.3 2.7 11.6c-1.2.5-1.2 1.2-.2 1.5l4.9 1.5 1.9 5.8c.2.6.5.8 1 .8s.8-.2 1.1-.5l2.6-2.5 5.4 4c1 .5 1.7.3 2-.9l3.6-16.3c.3-1.4-.5-2-1.5-1.7z"
+                    />
+                  </svg>
+                </a>
+                <a
+                  class="share-btn"
+                  aria-label="اشتراک در واتس‌اپ"
+                  target="_blank"
+                  rel="noopener"
+                  id="share-whatsapp"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M20.5 3.5A11 11 0 0 0 3.6 17.3L2 22l4.9-1.5A11 11 0 1 0 20.5 3.5z"
+                    />
+                    <path
+                      d="M8.5 8.7c.3-.8.6-.8.9-.8h.7c.2 0 .5 0 .7.5s.9 2 1 2.1c.1.2.1.4 0 .6-.1.2-.2.3-.4.5s-.4.4-.2.7c.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.7 1.6.4.2.6.1.8-.1.2-.2.9-1 1.1-1.4.2-.3.5-.3.8-.2s2 1 2.4 1.1c.4.2.6.3.7.4.1.2.1 1-.3 1.9-.4.9-2 1.7-2.8 1.8-.7.1-1.6.2-5.2-1.1-4.4-1.6-7.2-6.1-7.4-6.4-.2-.3-1.8-2.4-1.8-4.5s1.1-3.2 1.5-3.6z"
+                      fill="#050507"
+                    />
+                  </svg>
+                </a>
+                <a
+                  class="share-btn"
+                  aria-label="اشتراک در ایکس"
+                  target="_blank"
+                  rel="noopener"
+                  id="share-twitter"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M4 4l7.5 9.6L4.2 20H7l5.4-5.8L17 20h3l-7.9-10L19.8 4H17l-5 5.4L8 4H4z"
+                      fill="currentColor"
+                      stroke="none"
+                    />
+                  </svg>
+                </a>
+                <a
+                  class="share-btn"
+                  aria-label="اشتراک در فیسبوک"
+                  target="_blank"
+                  rel="noopener"
+                  id="share-facebook"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                    />
+                  </svg>
+                </a>
+                <a
+                  class="share-btn"
+                  aria-label="اشتراک با ایمیل"
+                  id="share-email"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m22 6-10 7L2 6" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- ===== AUTHOR BOX ===== -->
+            <div
+              id="author-box"
+              class="mt-10 p-7 flex flex-col sm:flex-row gap-5 items-start"
+              style="
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--r-lg);
+              "
+            >
+              <img
+                id="author-box-avatar"
+                src=""
+                alt=""
+                width="72"
+                height="72"
+                loading="lazy"
+                class="w-[72px] h-[72px] rounded-full object-cover flex-shrink-0"
+              />
+              <div>
+                <div
+                  class="text-[11px] font-mono font-semibold mb-1"
+                  style="color: var(--neon)"
+                >
+                  نویسنده
+                </div>
+                <div
+                  id="author-box-name"
+                  class="font-display font-semibold text-lg text-white mb-2"
+                >
+                  ...
+                </div>
+                <p
+                  id="author-box-bio"
+                  class="text-sm mb-4"
+                  style="color: var(--dim); line-height: 1.8"
+                >
+                  ...
+                </p>
+                <div id="author-social-links" class="flex items-center gap-3">
+                  <!-- لینک‌های اجتماعی از API -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ══════════════════════════════════════════════════════════════
+       RELATED ARTICLES
+       ══════════════════════════════════════════════════════════════ -->
+      <section
+        id="related-section"
+        class="max-w-[1400px] mx-auto px-5 md:px-9 mt-24"
+        aria-labelledby="related-heading"
+        style="display: none"
+      >
+        <span
+          class="text-[11px] font-mono font-semibold tracking-wide"
+          style="color: var(--neon)"
+          >بیشتر بخوانید</span
+        >
+        <h2
+          id="related-heading"
+          class="font-display font-bold text-2xl md:text-3xl text-white mt-2 mb-8"
+        >
+          مقالات مرتبط
+        </h2>
+        <div
+          id="related-grid"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <!-- توسط JavaScript پر می‌شود -->
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+       NEWSLETTER
+       ══════════════════════════════════════════════════════════════ -->
+      <section class="max-w-[1400px] mx-auto px-5 md:px-9 mt-24">
+        <div
+          class="newsletter-box px-7 py-12 md:px-16 md:py-16 text-center relative z-10"
+        >
+          <span
+            class="text-[11px] font-mono font-semibold tracking-wide"
+            style="color: var(--neon)"
+            >خبرنامه مجله VOLTEX</span
+          >
+          <h2
+            class="font-display font-bold text-white mt-3 mb-3"
+            style="font-size: clamp(1.5rem, 3.4vw, 2.4rem)"
+          >
+            راهنماهای جدید را اول از همه بخوانید
+          </h2>
+          <p class="max-w-[480px] mx-auto mb-8" style="color: var(--dim)">
+            هر دو هفته، یک راهنمای عملی درباره رانندگی، نگهداری و انتخاب اسکوتر
+            برقی مستقیم به ایمیل شما.
+          </p>
+          <form
+            class="flex flex-col sm:flex-row gap-3 max-w-[440px] mx-auto"
+            onsubmit="
+              event.preventDefault();
+              this.querySelector('button').textContent = 'عضو شدید ✓';
+            "
+          >
+            <label for="newsletterEmail" class="sr-only">ایمیل شما</label>
+            <input
+              id="newsletterEmail"
+              type="email"
+              required
+              placeholder="ایمیل شما"
+              class="flex-1 min-w-0 px-5 py-3.5 rounded-full text-sm outline-none"
+              style="
+                background: var(--card);
+                border: 1px solid var(--border);
+                color: var(--white);
+              "
+            />
+            <button
+              type="submit"
+              class="px-7 py-3.5 rounded-full text-sm font-semibold whitespace-nowrap transition-transform active:scale-95"
+              style="background: var(--neon); color: var(--black)"
+            >
+              عضویت
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+       COMMENTS
+       ══════════════════════════════════════════════════════════════ -->
+      <section
+        class="max-w-[1400px] mx-auto px-5 md:px-9 mt-24 mb-24"
+        aria-labelledby="comments-heading"
+        id="comments"
+      >
+        <h2
+          id="comments-heading"
+          class="font-display font-bold text-2xl text-white mb-8"
+        >
+          نظرات
+          <span
+            id="comments-count"
+            class="numeric"
+            style="color: var(--muted); font-size: 1rem"
+            >(۰)</span
+          >
+        </h2>
+
+        <!-- Comment form -->
+        <form
+          id="comment-form"
+          class="mb-10 p-6"
+          style="
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+          "
+          onsubmit="submitComment(event)"
+        >
+          <label for="commentBody" class="sr-only">نظر شما</label>
+          <textarea
+            id="commentBody"
+            required
+            rows="3"
+            placeholder="نظر خود را بنویسید..."
+            class="w-full px-4 py-3 rounded-[10px] text-sm outline-none resize-none mb-3"
+            style="
+              background: var(--card);
+              border: 1px solid var(--border);
+              color: var(--white);
+            "
+          ></textarea>
+          <div
+            id="comment-error"
+            class="text-red-400 text-sm mb-3 hidden"
+          ></div>
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              class="px-6 py-2.5 rounded-full text-sm font-semibold"
+              style="background: var(--white); color: var(--black)"
+            >
+              ارسال نظر
+            </button>
+          </div>
+        </form>
+
+        <!-- Comments list -->
+        <div id="comments-list" class="flex flex-col gap-4">
+          <!-- توسط JavaScript پر می‌شود -->
+        </div>
+      </section>
+    </main>
+
+    <!-- ══════════════════════════════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════════════════════════════ -->
+    <footer
+      class="border-t py-10 px-5 md:px-9"
+      style="border-color: var(--border); background: var(--deep)"
+    >
+      <div
+        class="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs"
+        style="color: var(--muted)"
+      >
+        <span class="numeric">© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است.</span>
+        <div class="flex gap-5">
+          <a href="/privacy/" class="hover:text-white transition-colors"
+            >حریم خصوصی</a
+          >
+          <a href="/terms/" class="hover:text-white transition-colors"
+            >شرایط استفاده</a
+          >
+        </div>
+      </div>
+    </footer>
+
+    <!-- ══════ Mobile TOC FAB + Drawer ══════ -->
+    <button
+      id="tocFab"
+      class="fixed bottom-6 right-6 z-[600] w-14 h-14 rounded-full flex items-center justify-center shadow-2xl"
+      style="background: var(--neon); color: var(--black)"
+      aria-label="فهرست مطالب"
+      onclick="document.getElementById('tocDrawer').classList.add('open')"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <path d="M4 6h16M4 12h10M4 18h16" />
+      </svg>
+    </button>
+    <div id="tocDrawer">
+      <div class="flex items-center justify-between mb-6">
+        <span class="font-display font-semibold text-white">فهرست مطالب</span>
+        <button
+          onclick="
+            document.getElementById('tocDrawer').classList.remove('open')
+          "
+          class="w-9 h-9 rounded-full flex items-center justify-center"
+          style="background: var(--card); border: 1px solid var(--border)"
+          aria-label="بستن"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--dim)"
+            stroke-width="2"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <nav
+        id="tocNavMobile"
+        aria-label="فهرست مطالب موبایل"
+        class="flex flex-col gap-1"
+      ></nav>
+    </div>
+
+    <!-- back to top -->
+    <button
+      id="backToTop"
+      aria-label="بازگشت به بالا"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    >
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 15l-6-6-6 6" />
+      </svg>
+    </button>
+
+    <!-- lightbox -->
+    <div
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="نمایش بزرگ تصویر"
+    >
+      <button id="lightboxClose" aria-label="بستن" onclick="closeLightbox()">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--dim)"
+          stroke-width="2"
+        >
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+      <img id="lightboxImg" src="" alt="" />
+    </div>
+
+    <div id="copyToast" class="copy-toast">لینک کپی شد ✓</div>
+
+    <script>
+      /* ════════════════════════════════════
+   CSRF TOKEN
+   ════════════════════════════════════ */
+      function getCSRFToken() {
+        const cookieValue = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("csrftoken="))
+          ?.split("=")[1];
+        return cookieValue || "";
+      }
+
+      /* ════════════════════════════════════
+   CONFIG - دریافت اسلاگ از URL
+   ════════════════════════════════════ */
+      function getSlugFromUrl() {
+        let path = window.location.pathname;
+        if (path.endsWith("/")) {
+          path = path.slice(0, -1);
+        }
+        const parts = path.split("/");
+        const slug = parts[parts.length - 1];
+        try {
+          return decodeURIComponent(slug);
+        } catch (e) {
+          return slug;
+        }
+      }
+
+      const slug = getSlugFromUrl();
+      const API_BASE = "/home/api/";
+
+      console.log("🔍 Slug:", slug);
+      console.log("🔍 CSRF Token:", getCSRFToken());
+
+      /* ════════════════════════════════════
+   FETCH ARTICLE DATA
+   ════════════════════════════════════ */
+      async function loadArticle() {
+        const spinner = document.getElementById("loading-spinner");
+        const content = document.getElementById("article-content");
+
+        try {
+          const apiUrl = `${API_BASE}articles/${encodeURIComponent(slug)}/`;
+          console.log("📡 Fetching:", apiUrl);
+
+          const response = await fetch(apiUrl);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: مقاله یافت نشد`);
+          }
+
+          const article = await response.json();
+          console.log("✅ Article loaded:", article.title);
+
+          spinner.style.display = "none";
+          content.style.display = "block";
+          document.getElementById("related-section").style.display = "block";
+
+          renderArticle(article);
+          renderRelatedArticles(article.tags);
+          loadComments();
+        } catch (error) {
+          console.error("❌ Error:", error);
+          spinner.innerHTML = `
+            <div class="text-center" style="color:var(--dim)">
+                <p class="text-xl mb-4">😕 متأسفانه مقاله مورد نظر یافت نشد</p>
+                <p class="text-sm mb-4" style="color:var(--muted)">اسلاگ: ${slug}</p>
+                <a href="/home/articles/" class="text-sm inline-block px-6 py-3 rounded-full" style="background:var(--neon);color:var(--black)">بازگشت به مجله</a>
+            </div>
+        `;
+        }
+      }
+
+      /* ════════════════════════════════════
+   RENDER ARTICLE
+   ════════════════════════════════════ */
+      function renderArticle(article) {
+        const currentUrl = window.location.href;
+
+        document.title = `${article.title} | مجله VOLTEX`;
+        document.getElementById("page-title").textContent = document.title;
+
+        const metaDesc = article.meta_description || article.excerpt || "";
+        document.getElementById("meta-description").content = metaDesc;
+        document.getElementById("meta-canonical").href =
+          article.canonical_url || currentUrl;
+
+        document.getElementById("og-title").content = article.title;
+        document.getElementById("og-description").content = metaDesc;
+        document.getElementById("og-image").content =
+          article.cover_image_url || "";
+        document.getElementById("og-url").content =
+          article.canonical_url || currentUrl;
+
+        document.getElementById("twitter-title").content = article.title;
+        document.getElementById("twitter-description").content = metaDesc;
+        document.getElementById("twitter-image").content =
+          article.cover_image_url || "";
+
+        const blogJsonLd = {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: article.title,
+          description: metaDesc,
+          image: article.cover_image_url,
+          author: { "@type": "Person", name: article.author_name },
+          publisher: { "@type": "Organization", name: "VOLTEX" },
+          datePublished: article.published_at || article.created_at,
+          dateModified: article.updated_at,
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": article.canonical_url || currentUrl,
+          },
+        };
+        document.getElementById("json-ld-blog").textContent =
+          JSON.stringify(blogJsonLd);
+
+        const breadcrumbJsonLd = {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "خانه",
+              item: "https://voltex.example.com/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "مجله",
+              item: "https://voltex.example.com/blog/",
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: article.title,
+              item: currentUrl,
+            },
+          ],
+        };
+        document.getElementById("json-ld-breadcrumb").textContent =
+          JSON.stringify(breadcrumbJsonLd);
+
+        document.getElementById("breadcrumb-current").textContent =
+          article.title;
+
+        document.getElementById("cover-image").src =
+          article.cover_image_url || "/static/images/default-cover.jpg";
+        document.getElementById("cover-image").alt =
+          article.cover_alt_text || article.title;
+
+        const firstTag =
+          article.tags && article.tags.length > 0
+            ? article.tags[0].name
+            : "مقاله";
+        document.getElementById("article-category").textContent = firstTag;
+
+        document.getElementById("article-title").textContent = article.title;
+        document.getElementById("article-excerpt").textContent =
+          article.excerpt || article.meta_description || "";
+
+        document.getElementById("author-avatar").src =
+          article.author_profile_image || "/static/images/default-avatar.png";
+        document.getElementById("author-avatar").alt = article.author_name;
+        document.getElementById("author-name").textContent =
+          article.author_name;
+
+        const date = new Date(article.published_at || article.created_at);
+        document.getElementById("article-date").textContent = formatDate(date);
+        document.getElementById("article-date").datetime = date.toISOString();
+
+        document.getElementById("reading-time").textContent =
+          article.time_to_read || "۳";
+
+        document.getElementById("article-body").innerHTML = article.description;
+
+        document.getElementById("author-box-avatar").src =
+          article.author_profile_image || "/static/images/default-avatar.png";
+        document.getElementById("author-box-avatar").alt = article.author_name;
+        document.getElementById("author-box-name").textContent =
+          article.author_name;
+        document.getElementById("author-box-bio").textContent =
+          article.author_bio || "عضو تیم VOLTEX";
+
+        const shareUrl = encodeURIComponent(currentUrl);
+        const shareText = encodeURIComponent(article.title);
+
+        document.getElementById("share-telegram").href =
+          `https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
+        document.getElementById("share-whatsapp").href =
+          `https://wa.me/?text=${shareText}: ${shareUrl}`;
+        document.getElementById("share-twitter").href =
+          `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`;
+        document.getElementById("share-facebook").href =
+          `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+        document.getElementById("share-email").href =
+          `mailto:?subject=${shareText}&body=${shareUrl}`;
+
+        buildTOC(article.description);
+      }
+
+      /* ════════════════════════════════════
+   BUILD TOC
+   ════════════════════════════════════ */
+      function buildTOC(html) {
+        const temp = document.createElement("div");
+        temp.innerHTML = html;
+
+        const headings = temp.querySelectorAll("h2, h3");
+        const tocDesktop = document.getElementById("tocNavDesktop");
+        const tocMobile = document.getElementById("tocNavMobile");
+
+        tocDesktop.innerHTML = "";
+        tocMobile.innerHTML = "";
+
+        let headingIndex = 0;
+        headings.forEach((h) => {
+          if (!h.id) {
+            h.id = `section-${headingIndex}`;
+          }
+          headingIndex++;
+
+          [tocDesktop, tocMobile].forEach((container) => {
+            const a = document.createElement("a");
+            a.href = "#" + h.id;
+            a.textContent = h.textContent;
+            a.className =
+              "toc-link" + (h.tagName === "H3" ? " pr-7 text-[.76rem]" : "");
+            a.dataset.target = h.id;
+            if (container === tocMobile) {
+              a.addEventListener("click", () =>
+                document.getElementById("tocDrawer").classList.remove("open"),
+              );
+            }
+            container.appendChild(a);
+          });
+        });
+
+        const realBody = document.getElementById("article-body");
+        const realHeadings = realBody.querySelectorAll("h2, h3");
+        let idx = 0;
+        realHeadings.forEach((h) => {
+          if (!h.id) {
+            h.id = `section-${idx}`;
+          }
+          idx++;
+        });
+
+        setupScrollSpy();
+      }
+
+      /* ════════════════════════════════════
+   SCROLL SPY
+   ════════════════════════════════════ */
+      function setupScrollSpy() {
+        const tocLinks = document.querySelectorAll(".toc-link");
+        const headings = Array.from(
+          document.querySelectorAll("#article-body h2, #article-body h3"),
+        );
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                tocLinks.forEach((l) => {
+                  l.classList.toggle(
+                    "active",
+                    l.dataset.target === entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-20% 0px -70% 0px" },
+        );
+
+        headings.forEach((h) => observer.observe(h));
+      }
+
+      /* ════════════════════════════════════
+   RELATED ARTICLES
+   ════════════════════════════════════ */
+      async function renderRelatedArticles(tags) {
+        try {
+          if (tags && tags.length > 0) {
+            const response = await fetch(
+              `${API_BASE}articles/?tag=${encodeURIComponent(tags[0].slug)}`,
+            );
+            if (response.ok) {
+              const data = await response.json();
+              const related = data.results
+                ? data.results.filter((a) => a.slug !== slug)
+                : [];
+              displayRelatedArticles(related.slice(0, 3));
+              return;
+            }
+          }
+
+          const response = await fetch(`${API_BASE}articles/?page_size=3`);
+          if (response.ok) {
+            const data = await response.json();
+            const related = data.results
+              ? data.results.filter((a) => a.slug !== slug)
+              : [];
+            displayRelatedArticles(related);
+          }
+        } catch (error) {
+          console.error("Error loading related articles:", error);
+        }
+      }
+
+      function displayRelatedArticles(articles) {
+        const grid = document.getElementById("related-grid");
+        grid.innerHTML = "";
+
+        if (articles.length === 0) {
+          grid.innerHTML = `<p style="color:var(--muted)">هیچ مقاله مرتبطی یافت نشد.</p>`;
+          return;
+        }
+
+        articles.forEach((article) => {
+          const card = document.createElement("a");
+          card.href = `/home/articles/${article.slug}/`;
+          card.className = "related-card block";
+
+          const coverUrl =
+            article.cover_image_url || "/static/images/default-cover.jpg";
+          const tagName =
+            article.tags && article.tags.length > 0
+              ? article.tags[0].name
+              : "مقاله";
+          const date = new Date(article.published_at || article.created_at);
+
+          card.innerHTML = `
+            <div class="h-44 flex items-center justify-center overflow-hidden" style="background:linear-gradient(135deg,#100806,#1e1004)">
+                <img src="${coverUrl}" alt="${article.title}" loading="lazy" width="400" height="176" class="w-full h-full object-cover">
+            </div>
+            <div class="p-5">
+                <div class="text-[11px] font-mono mb-2" style="color:var(--neon)">${tagName}</div>
+                <h3 class="font-display font-semibold text-white text-base leading-snug mb-2">${article.title}</h3>
+                <time datetime="${date.toISOString()}" class="text-xs numeric" style="color:var(--muted)">${formatDate(date)}</time>
+            </div>
+        `;
+          grid.appendChild(card);
+        });
+      }
+
+      /* ════════════════════════════════════
+   COMMENTS
+   ════════════════════════════════════ */
+      async function loadComments() {
+        try {
+          const response = await fetch(`${API_BASE}articles/${slug}/comments/`);
+          if (response.ok) {
+            const comments = await response.json();
+            displayComments(comments);
+          }
+        } catch (error) {
+          console.error("Error loading comments:", error);
+        }
+      }
+
+      function displayComments(comments) {
+        const container = document.getElementById("comments-list");
+        const count = document.getElementById("comments-count");
+
+        count.textContent = `(${comments.length})`;
+
+        if (comments.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-8" style="color:var(--muted)">
+                <p>هنوز نظری ثبت نشده است. اولین نفری باشید که نظر می‌دهید!</p>
+            </div>
+        `;
+          return;
+        }
+
+        container.innerHTML = comments
+          .map((comment) => renderComment(comment))
+          .join("");
+      }
+
+      function renderComment(comment) {
+        const initials = comment.user_name
+          ? comment.user_name
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .toUpperCase()
+          : "??";
+        const avatarUrl = comment.user_profile_image || null;
+
+        let repliesHtml = "";
+        if (comment.replies && comment.replies.length > 0) {
+          repliesHtml = comment.replies
+            .map((reply) => renderComment(reply))
+            .join("");
+        }
+
+        return `
+        <div class="comment-card">
+            <div class="flex items-start gap-3">
+                <div class="comment-avatar" style="background:linear-gradient(135deg,var(--neon),var(--neon2))">
+                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${comment.user_name}" class="w-full h-full rounded-full object-cover">` : initials}
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-sm font-semibold text-white">${comment.user_name || "کاربر ناشناس"}</span>
+                        <time datetime="${comment.created_at}" class="text-xs numeric" style="color:var(--muted)">${formatDate(new Date(comment.created_at))}</time>
+                    </div>
+                    <p class="text-sm mb-2" style="color:var(--dim);line-height:1.8">${comment.content}</p>
+                    <button class="reply-btn" onclick="toggleReply('${comment.id}')">پاسخ</button>
+                    <form id="reply-form-${comment.id}" class="hidden mt-3" onsubmit="submitReply(event, '${comment.id}')">
+                        <textarea rows="2" placeholder="پاسخ شما..." class="w-full px-4 py-2.5 rounded-[10px] text-sm outline-none resize-none mb-2" style="background:var(--card);border:1px solid var(--border);color:var(--white)"></textarea>
+                        <button type="submit" class="px-5 py-2 rounded-full text-xs font-semibold" style="background:var(--neon);color:var(--black)">ارسال پاسخ</button>
+                    </form>
+                    ${repliesHtml ? `<div class="mt-4 mr-2 pr-4" style="border-right:2px solid var(--border)">${repliesHtml}</div>` : ""}
+                </div>
+            </div>
+        </div>
+    `;
+      }
+
+      function toggleReply(commentId) {
+        const form = document.getElementById(`reply-form-${commentId}`);
+        if (form) {
+          form.classList.toggle("hidden");
+        }
+      }
+
+      /* ════════════════════════════════════
+   SUBMIT COMMENT
+   ════════════════════════════════════ */
+      async function submitComment(event) {
+        event.preventDefault();
+        const content = document.getElementById("commentBody").value.trim();
+        const errorDiv = document.getElementById("comment-error");
+
+        if (!content) {
+          errorDiv.textContent = "لطفاً متن نظر را بنویسید.";
+          errorDiv.classList.remove("hidden");
+          return;
+        }
+
+        errorDiv.classList.add("hidden");
+
+        const csrfToken = getCSRFToken();
+        console.log("CSRF Token for comment:", csrfToken);
+
+        try {
+          const response = await fetch(
+            `${API_BASE}articles/${slug}/comments/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+              },
+              credentials: "same-origin",
+              body: JSON.stringify({ content }),
+            },
+          );
+
+          if (response.ok) {
+            document.getElementById("commentBody").value = "";
+            loadComments();
+          } else {
+            const data = await response.json();
+            errorDiv.textContent = data.detail || "خطا در ارسال نظر.";
+            errorDiv.classList.remove("hidden");
+          }
+        } catch (error) {
+          errorDiv.textContent = "خطا در ارتباط با سرور.";
+          errorDiv.classList.remove("hidden");
+        }
+      }
+
+      /* ════════════════════════════════════
+   SUBMIT REPLY
+   ════════════════════════════════════ */
+      async function submitReply(event, commentId) {
+        event.preventDefault();
+        const form = event.target;
+        const textarea = form.querySelector("textarea");
+        const content = textarea.value.trim();
+        const errorDiv = document.getElementById("comment-error");
+
+        if (!content) {
+          errorDiv.textContent = "لطفاً متن پاسخ را بنویسید.";
+          errorDiv.classList.remove("hidden");
+          return;
+        }
+
+        errorDiv.classList.add("hidden");
+
+        const csrfToken = getCSRFToken();
+        console.log("CSRF Token for reply:", csrfToken);
+
+        try {
+          const response = await fetch(
+            `${API_BASE}articles/${slug}/comments/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+              },
+              credentials: "same-origin",
+              body: JSON.stringify({ content, parent: commentId }),
+            },
+          );
+
+          if (response.ok) {
+            textarea.value = "";
+            form.classList.add("hidden");
+            loadComments();
+          } else {
+            const data = await response.json();
+            errorDiv.textContent = data.detail || "خطا در ارسال پاسخ.";
+            errorDiv.classList.remove("hidden");
+          }
+        } catch (error) {
+          errorDiv.textContent = "خطا در ارتباط با سرور.";
+          errorDiv.classList.remove("hidden");
+        }
+      }
+
+      /* ════════════════════════════════════
+   UTILITY FUNCTIONS
+   ════════════════════════════════════ */
+      function formatDate(date) {
+        return new Intl.DateTimeFormat("fa-IR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(date);
+      }
+
+      function copyLink() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          const toast = document.getElementById("copyToast");
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 2000);
+        });
+      }
+
+      function openLightbox(src) {
+        document.getElementById("lightboxImg").src = src;
+        document.getElementById("lightbox").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeLightbox() {
+        document.getElementById("lightbox").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      /* ════════════════════════════════════
+   BACK TO TOP
+   ════════════════════════════════════ */
+      const backBtn = document.getElementById("backToTop");
+      document.addEventListener(
+        "scroll",
+        () => {
+          backBtn.classList.toggle("show", window.scrollY > 700);
+        },
+        { passive: true },
+      );
+
+      /* ════════════════════════════════════
+   LIGHTBOX EVENTS
+   ════════════════════════════════════ */
+      document.getElementById("lightbox").addEventListener("click", (e) => {
+        if (e.target.id === "lightbox") closeLightbox();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeLightbox();
+      });
+
+      /* ════════════════════════════════════
+   READING PROGRESS
+   ════════════════════════════════════ */
+      const progressBar = document.getElementById("reading-progress");
+      function updateProgress() {
+        const article = document.getElementById("article-content");
+        if (!article || article.style.display === "none") return;
+        const rect = article.getBoundingClientRect();
+        const total = article.offsetHeight - window.innerHeight;
+        const scrolled = Math.min(Math.max(-rect.top, 0), total);
+        progressBar.style.width =
+          (total > 0 ? (scrolled / total) * 100 : 0) + "%";
+      }
+      document.addEventListener("scroll", updateProgress, { passive: true });
+
+      /* ════════════════════════════════════
+   START
+   ════════════════════════════════════ */
+      loadArticle();
+    </script>
+  </body>
+</html>

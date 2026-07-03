@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VOLTEX — Header Component</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════
+   DESIGN TOKENS — required only for the header
+══════════════════════════════════════════ */
+:root {
+  --black: #050507;
+  --white: #f6f6f8;
+  --dim: rgba(246,246,248,0.58);
+  --border: rgba(255,255,255,0.06);
+  --border-lit: rgba(125,211,252,0.22);
+  --neon: #4fd8ff;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-ui: 'Inter', sans-serif;
+  --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --nav-h: 64px;
+  --r-sm: 10px;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-ui);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Demo-only: gives the fixed header something to sit above.
+     Remove min-height once this component is placed inside the real page. */
+  min-height: 140vh;
+}
+::selection { background: var(--neon); color: var(--black); }
+:focus-visible { outline: 1.5px solid var(--neon); outline-offset: 3px; border-radius: 4px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: var(--nav-h);
+  padding: 0 22px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(5,5,7,0.78);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem; letter-spacing: 0.22em;
+  color: var(--white);
+  flex-shrink: 0;
+}
+.nav-links { display: none; }
+.nav-menu-btn {
+  width: 40px; height: 40px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px; cursor: pointer;
+  padding: 0;
+  transition: border-color 0.35s var(--ease-smooth), background 0.35s var(--ease-smooth);
+  flex-shrink: 0;
+}
+.nav-menu-btn:hover { border-color: var(--border-lit); background: rgba(255,255,255,0.02); }
+.nav-menu-btn span {
+  display: block; width: 16px; height: 1.5px;
+  background: var(--dim);
+  transition: all 0.35s var(--ease-luxury);
+}
+.nav-menu-btn.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.nav-menu-btn.open span:nth-child(2) { opacity: 0; }
+.nav-menu-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+.nav-cta {
+  font-family: var(--font-ui); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--white); color: var(--black);
+  padding: 9px 20px; border: none; cursor: pointer;
+  border-radius: 100px;
+  transition: transform 0.35s var(--ease-luxury), background 0.35s var(--ease-smooth);
+  flex-shrink: 0;
+}
+.nav-cta:hover { background: var(--neon); }
+.nav-cta:active { transform: scale(0.95); }
+
+/* ── Mobile drawer ── */
+.mobile-drawer {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(5,5,8,0.98);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  z-index: 999;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px;
+  transform: translateY(-100%);
+  transition: transform 0.6s var(--ease-luxury);
+  padding-top: 80px;
+}
+.mobile-drawer.open { transform: translateY(0); }
+.mobile-drawer a {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.9rem; letter-spacing: 0.02em;
+  color: var(--dim);
+  text-decoration: none;
+  padding: 12px 0;
+  transition: color 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth);
+  display: block;
+  text-align: center;
+}
+.mobile-drawer a:hover, .mobile-drawer a:active { color: var(--neon); transform: translateX(6px); }
+.mobile-drawer-cta {
+  margin-top: 26px;
+  font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--white); color: var(--black);
+  padding: 15px 46px; border: none; cursor: pointer;
+  border-radius: 100px;
+}
+
+/* ══════════════════════════════════════════
+   TABLET BREAKPOINT (768px–1023px)
+══════════════════════════════════════════ */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root { --nav-h: 68px; }
+  nav { padding: 0 36px; }
+  .nav-menu-btn { display: none; }
+  .nav-links { display: flex; gap: 24px; list-style: none; }
+  .nav-links a {
+    font-family: var(--font-ui); font-size: 0.74rem; font-weight: 500;
+    letter-spacing: 0.02em; color: var(--dim);
+    text-decoration: none; transition: color 0.3s var(--ease-smooth); position: relative;
+  }
+  .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; right: 0; height: 1px; background: var(--neon); transform: scaleX(0); transform-origin: left; transition: transform 0.4s var(--ease-luxury); }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+}
+
+/* ══════════════════════════════════════════
+   DESKTOP (1024px+)
+══════════════════════════════════════════ */
+@media (min-width: 1024px) {
+  :root { --nav-h: 76px; }
+  nav { padding: 0 64px; }
+  .nav-menu-btn { display: none; }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.01em; color: var(--dim); text-decoration: none; transition: color 0.3s var(--ease-smooth); position: relative; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; right: 0; height: 1px; background: var(--neon); transform: scaleX(0); transform-origin: left; transition: transform 0.45s var(--ease-luxury); }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-cta { font-size: 0.78rem; padding: 11px 26px; }
+}
+
+/* Ultra-wide (1920px+) */
+@media (min-width: 1920px) {
+  :root { --nav-h: 80px; }
+  nav { padding: 0 84px; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-logo">VOLTEX</div>
+  <ul class="nav-links">
+    <li><a href="#" data-slide="1" onclick="return handleNavClick(this,event);">Models</a></li>
+    <li><a href="#" data-slide="2" onclick="return handleNavClick(this,event);">Shop</a></li>
+    <li><a href="#" data-slide="3" onclick="return handleNavClick(this,event);">Reviews</a></li>
+    <li><a href="#" data-slide="4" onclick="return handleNavClick(this,event);">Guide</a></li>
+    <li><a href="#" data-slide="5" onclick="return handleNavClick(this,event);">About</a></li>
+  </ul>
+  <button class="nav-cta" data-slide="2" onclick="handleNavClick(this,event);">Shop Now</button>
+  <button class="nav-menu-btn" id="menuBtn" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false" aria-controls="mobileDrawer">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-drawer" id="mobileDrawer">
+  <a href="#" data-slide="0" onclick="closeMenu();return handleNavClick(this,event);">Home</a>
+  <a href="#" data-slide="1" onclick="closeMenu();return handleNavClick(this,event);">Models</a>
+  <a href="#" data-slide="2" onclick="closeMenu();return handleNavClick(this,event);">Shop</a>
+  <a href="#" data-slide="3" onclick="closeMenu();return handleNavClick(this,event);">Reviews</a>
+  <a href="#" data-slide="4" onclick="closeMenu();return handleNavClick(this,event);">Guide</a>
+  <a href="#" data-slide="5" onclick="closeMenu();return handleNavClick(this,event);">About</a>
+  <button class="mobile-drawer-cta" data-slide="2" onclick="closeMenu();handleNavClick(this,event);">Shop Now</button>
+</div>
+
+<script>
+/* ============================================================
+   MOBILE MENU — single source of truth
+   ============================================================ */
+function toggleMenu() {
+  const btn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('mobileDrawer');
+  const isOpen = drawer.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+function closeMenu() {
+  document.getElementById('menuBtn').classList.remove('open');
+  document.getElementById('mobileDrawer').classList.remove('open');
+  document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+}
+
+/*
+  handleNavClick: forwards nav clicks to the parent page's own
+  slide/section navigation (e.g. goToSlide()) when this header is
+  embedded inside the full VOLTEX one-page layout. If no such
+  function exists (e.g. this file is opened standalone, or the
+  header sits on a normal multi-page Django site), it simply lets
+  the link behave normally / does nothing instead of throwing.
+
+  In a Django setup, replace data-slide targets with real
+  {% url %} hrefs and delete this indirection.
+*/
+function handleNavClick(el, e) {
+  const target = el.getAttribute('data-slide');
+  if (typeof window.goToSlide === 'function' && target !== null) {
+    window.goToSlide(parseInt(target, 10));
+    if (e) e.preventDefault();
+    return false;
+  }
+  return true;
+}
+</script>
+</body>
+</html>
