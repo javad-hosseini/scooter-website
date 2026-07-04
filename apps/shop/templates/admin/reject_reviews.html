@@ -1,0 +1,30 @@
+<!-- templates/admin/reject_reviews.html -->
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div id="content-main">
+    <form method="post">
+        {% csrf_token %}
+        <div style="background:var(--card);padding:20px;border-radius:10px;margin-bottom:20px;">
+            <h3>رد کردن نظرات انتخاب‌شده</h3>
+            <p>تعداد نظرات انتخاب‌شده: {{ queryset.count }}</p>
+            <div style="margin-top:15px;">
+                <label for="rejection_reason" style="display:block;margin-bottom:5px;font-weight:bold;">دلیل رد
+                    کردن:</label>
+                <textarea name="rejection_reason" id="rejection_reason" rows="4"
+                          style="width:100%;padding:10px;border-radius:8px;background:var(--surface);color:var(--white);border:1px solid var(--border);"
+                          required></textarea>
+            </div>
+        </div>
+        <div style="display:flex;gap:12px;">
+            <button type="submit" name="apply" value="yes" class="button"
+                    style="background:#ef4444;color:white;padding:10px 24px;border:none;border-radius:8px;cursor:pointer;">
+                رد کردن
+            </button>
+            <a href="{% url 'admin:home_productreview_changelist' %}" class="button"
+               style="background:var(--surface);color:var(--white);padding:10px 24px;border:1px solid var(--border);border-radius:8px;text-decoration:none;">انصراف</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

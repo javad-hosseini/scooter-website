@@ -1,47 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>VOLTEX — Header Component</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<!--
+  ══════════════════════════════════════════════════════════════
+  VOLTEX — هدر مستقل (partial قابل استفاده مجدد)
+  ══════════════════════════════════════════════════════════════
+  نحوه استفاده در Django:
+    1) این فایل رو بذار داخل: templates/partials/header.html
+    2) داخل base.html، همون‌جایی که <body> شروع می‌شه:
+         {% include "partials/header.html" %}
+    3) فونت‌های گوگل (Vazirmatn / Space Grotesk / Inter / JetBrains Mono)
+       باید داخل <head> صفحه اصلی لود بشن — خط پایین رو به base.html اضافه کن:
+         <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    4) این هدر position:fixed هست، پس بدنه صفحه باید فاصله بالا داشته باشه.
+       متغیر --nav-h رو در همین فایل تعریف کردیم؛ روی هر صفحه‌ای که این
+       هدر رو include می‌کنی، به کانتینر اصلی محتوا این استایل رو بده:
+         padding-top: var(--nav-h);
+    5) لینک‌های ناوبری فعلاً با onclick="goToSlide(n)" کار می‌کنن چون از
+       صفحه اصلی (تک‌صفحه‌ای اسکرولی) کپی شدن. اگه این هدر رو روی صفحات
+       جدا (مثل صفحه محصول یا سبد خرید) استفاده می‌کنی، href هاشون رو به
+       آدرس واقعی صفحات جنگو تغییر بده، مثلاً:
+         <a href="{% url 'shop' %}">فروشگاه</a>
+    6) بج شمارنده سبد خرید (#navCartCount) رو با مقدار واقعی از Django پر کن:
+         {{ cart.item_count|default:0 }}
+       و اگه سبد خالیه، خصیصه hidden رو بهش اضافه کن.
+    7) وضعیت ورود/عدم ورود کاربر (بخش‌های auth-guest / auth-user و
+       drawer-auth-*) با {% if user.is_authenticated %} کنترل می‌شه —
+       کامنت‌های راهنما همون داخل کد گذاشته شده.
+  ══════════════════════════════════════════════════════════════
+-->
 
 <style>
-/* ══════════════════════════════════════════
-   DESIGN TOKENS — required only for the header
-══════════════════════════════════════════ */
+/* ── DESIGN TOKENS مورد نیاز هدر ──
+   این‌ها زیرمجموعه‌ای از توکن‌های کامل پروژه‌ان؛ اگه base.html خودش
+   یه :root کامل‌تر داره، همین مقادیر رو داخلش merge کن تا رنگ/فونت/گردی
+   گوشه‌ها با بقیه صفحه یکی بمونه. */
 :root {
   --black: #050507;
-  --white: #f6f6f8;
-  --dim: rgba(246,246,248,0.58);
+  --card: #101018;
   --border: rgba(255,255,255,0.06);
   --border-lit: rgba(125,211,252,0.22);
+  --white: #f6f6f8;
+  --dim: rgba(246,246,248,0.58);
   --neon: #4fd8ff;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-ui: 'Inter', sans-serif;
+  --font-display: 'Vazirmatn', 'Space Grotesk', sans-serif;
+  --font-ui: 'Vazirmatn', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Vazirmatn', monospace;
   --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --nav-h: 64px;
   --r-sm: 10px;
+  --r-md: 14px;
+  --shadow-lift: 0 30px 70px -24px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04) inset;
 }
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { font-size: 16px; }
-body {
-  background: var(--black);
-  color: var(--white);
-  font-family: var(--font-ui);
-  font-weight: 300;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  /* Demo-only: gives the fixed header something to sit above.
-     Remove min-height once this component is placed inside the real page. */
-  min-height: 140vh;
-}
-::selection { background: var(--neon); color: var(--black); }
-:focus-visible { outline: 1.5px solid var(--neon); outline-offset: 3px; border-radius: 4px; }
 
 /* ── NAV ── */
 nav {
@@ -56,11 +65,12 @@ nav {
   border-bottom: 1px solid var(--border);
 }
 .nav-logo {
-  font-family: var(--font-display);
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 1.25rem; letter-spacing: 0.22em;
   color: var(--white);
   flex-shrink: 0;
+  direction: ltr;
 }
 .nav-links { display: none; }
 .nav-menu-btn {
@@ -85,8 +95,8 @@ nav {
 .nav-menu-btn.open span:nth-child(2) { opacity: 0; }
 .nav-menu-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
 .nav-cta {
-  font-family: var(--font-ui); font-size: 0.68rem; font-weight: 600;
-  letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: var(--font-ui); font-size: 0.76rem; font-weight: 600;
+  letter-spacing: 0; text-transform: none;
   background: var(--white); color: var(--black);
   padding: 9px 20px; border: none; cursor: pointer;
   border-radius: 100px;
@@ -96,7 +106,108 @@ nav {
 .nav-cta:hover { background: var(--neon); }
 .nav-cta:active { transform: scale(0.95); }
 
-/* ── Mobile drawer ── */
+/* ── AUTH SECTION (header) ── */
+.nav-auth { display: none; align-items: center; gap: 14px; flex-shrink: 0; }
+.auth-guest { display: flex; align-items: center; gap: 16px; }
+.auth-link-login {
+  font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500;
+  color: var(--dim); text-decoration: none; position: relative;
+  transition: color 0.3s var(--ease-smooth);
+}
+.auth-link-login::after { content: ''; position: absolute; bottom: -5px; right: 0; left: 0; height: 1px; background: var(--neon); transform: scaleX(0); transform-origin: left; transition: transform 0.4s var(--ease-luxury); }
+.auth-link-login:hover { color: var(--white); }
+.auth-link-login:hover::after { transform: scaleX(1); }
+
+.auth-user { position: relative; }
+.auth-user-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 100px; padding: 6px 16px 6px 8px;
+  font-family: var(--font-ui); font-size: 0.76rem; font-weight: 600;
+  color: var(--white); cursor: pointer;
+  transition: border-color 0.3s var(--ease-smooth), background 0.3s var(--ease-smooth);
+}
+.auth-user-btn:hover { border-color: var(--border-lit); background: rgba(255,255,255,0.02); }
+.auth-user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(79,216,255,0.14);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; flex-shrink: 0; line-height: 1;
+}
+.auth-user-menu {
+  position: absolute; top: calc(100% + 12px); right: 0;
+  min-width: 190px;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md);
+  box-shadow: var(--shadow-lift);
+  padding: 8px; display: flex; flex-direction: column; gap: 2px;
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity 0.25s var(--ease-smooth), transform 0.25s var(--ease-smooth), visibility 0.25s;
+  z-index: 1001;
+}
+.auth-user-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.auth-user-menu a {
+  font-family: var(--font-ui); font-size: 0.78rem; color: var(--dim);
+  text-decoration: none; padding: 9px 12px; border-radius: var(--r-sm);
+  transition: background 0.2s var(--ease-smooth), color 0.2s var(--ease-smooth);
+}
+.auth-user-menu a:hover, .auth-user-menu a:focus-visible { background: rgba(255,255,255,0.05); color: var(--white); }
+.auth-user-menu a.auth-logout { color: #ff8a8a; border-top: 1px solid var(--border); margin-top: 4px; padding-top: 11px; }
+.auth-user-menu a.auth-logout:hover { background: rgba(255,108,108,0.08); }
+
+@media (min-width: 768px) {
+  .nav-auth { display: flex; }
+}
+
+/* ── CART BUTTON (header) ── */
+.nav-right-cluster { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.nav-cart-btn {
+  position: relative;
+  width: 40px; height: 40px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  transition: border-color 0.35s var(--ease-smooth), background 0.35s var(--ease-smooth);
+  flex-shrink: 0;
+}
+.nav-cart-btn:hover { border-color: var(--border-lit); background: rgba(255,255,255,0.02); }
+.nav-cart-btn:active { transform: scale(0.95); }
+.nav-cart-icon { width: 18px; height: 18px; stroke: var(--dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.3s var(--ease-smooth); }
+.nav-cart-btn:hover .nav-cart-icon { stroke: var(--white); }
+.nav-cart-badge {
+  position: absolute; top: -5px; left: -5px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  background: var(--neon); color: var(--black);
+  font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
+  border-radius: 100px;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1; direction: ltr;
+  box-shadow: 0 0 0 2px var(--black);
+}
+.nav-cart-badge[hidden] { display: none; }
+
+/* بلاک ورود/عضویت داخل drawer موبایل — چون نوار بالای موبایل جا نداره */
+.drawer-auth { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 22px; }
+.drawer-auth-link {
+  font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600;
+  color: var(--dim); text-decoration: none; padding: 12px 30px;
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 100px;
+  transition: all 0.35s var(--ease-smooth);
+}
+.drawer-auth-link:hover { border-color: var(--neon); color: var(--neon); }
+.drawer-auth-register {
+  font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600;
+  background: var(--white); color: var(--black);
+  padding: 15px 46px; border: none; cursor: pointer; border-radius: 100px;
+}
+.drawer-auth-user { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 22px; }
+.drawer-user-info { display: flex; align-items: center; gap: 8px; color: var(--white); font-family: var(--font-ui); font-weight: 600; font-size: 0.95rem; margin-bottom: 10px; }
+.drawer-auth-user a { font-family: var(--font-ui); font-size: 0.85rem; color: var(--dim); text-decoration: none; padding: 9px 0; transition: color 0.3s var(--ease-smooth); }
+.drawer-auth-user a:hover { color: var(--neon); }
+.drawer-auth-user a.auth-logout { color: #ff8a8a; }
+
+/* ── منوی کشویی موبایل ── */
 .mobile-drawer {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(5,5,8,0.98);
@@ -109,6 +220,7 @@ nav {
   transform: translateY(-100%);
   transition: transform 0.6s var(--ease-luxury);
   padding-top: 80px;
+  overflow-y: auto;
 }
 .mobile-drawer.open { transform: translateY(0); }
 .mobile-drawer a {
@@ -122,19 +234,16 @@ nav {
   display: block;
   text-align: center;
 }
-.mobile-drawer a:hover, .mobile-drawer a:active { color: var(--neon); transform: translateX(6px); }
+.mobile-drawer a:hover, .mobile-drawer a:active { color: var(--neon); transform: translateX(-6px); }
 .mobile-drawer-cta {
   margin-top: 26px;
   font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
   background: var(--white); color: var(--black);
   padding: 15px 46px; border: none; cursor: pointer;
   border-radius: 100px;
 }
 
-/* ══════════════════════════════════════════
-   TABLET BREAKPOINT (768px–1023px)
-══════════════════════════════════════════ */
+/* ── تبلت (768–1023px) ── */
 @media (min-width: 768px) and (max-width: 1023px) {
   :root { --nav-h: 68px; }
   nav { padding: 0 36px; }
@@ -142,67 +251,138 @@ nav {
   .nav-links { display: flex; gap: 24px; list-style: none; }
   .nav-links a {
     font-family: var(--font-ui); font-size: 0.74rem; font-weight: 500;
-    letter-spacing: 0.02em; color: var(--dim);
+    letter-spacing: 0; color: var(--dim);
     text-decoration: none; transition: color 0.3s var(--ease-smooth); position: relative;
   }
-  .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; right: 0; height: 1px; background: var(--neon); transform: scaleX(0); transform-origin: left; transition: transform 0.4s var(--ease-luxury); }
+  .nav-links a::after { content: ''; position: absolute; bottom: -5px; right: 0; left: 0; height: 1px; background: var(--neon); transform: scaleX(0); transform-origin: left; transition: transform 0.4s var(--ease-luxury); }
   .nav-links a:hover { color: var(--white); }
   .nav-links a:hover::after { transform: scaleX(1); }
 }
 
-/* ══════════════════════════════════════════
-   DESKTOP (1024px+)
-══════════════════════════════════════════ */
+/* ── دسکتاپ (min 1024px) ── */
 @media (min-width: 1024px) {
   :root { --nav-h: 76px; }
   nav { padding: 0 64px; }
   .nav-menu-btn { display: none; }
   .nav-links { display: flex; gap: 36px; list-style: none; }
-  .nav-links a { font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.01em; color: var(--dim); text-decoration: none; transition: color 0.3s var(--ease-smooth); position: relative; }
-  .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; right: 0; height: 1px; background: var(--neon); transform: scaleX(0); transform-origin: left; transition: transform 0.45s var(--ease-luxury); }
+  .nav-links a { font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500; letter-spacing: 0; color: var(--dim); text-decoration: none; transition: color 0.3s var(--ease-smooth); position: relative; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -5px; right: 0; left: 0; height: 1px; background: var(--neon); transform: scaleX(0); transform-origin: left; transition: transform 0.45s var(--ease-luxury); }
   .nav-links a:hover { color: var(--white); }
   .nav-links a:hover::after { transform: scaleX(1); }
   .nav-cta { font-size: 0.78rem; padding: 11px 26px; }
 }
 
-/* Ultra-wide (1920px+) */
+/* ── صفحه‌نمایش‌های بزرگ (min 1920px) ── */
 @media (min-width: 1920px) {
   :root { --nav-h: 80px; }
   nav { padding: 0 84px; }
 }
 </style>
-</head>
-<body>
 
 <nav id="nav">
   <div class="nav-logo">VOLTEX</div>
   <ul class="nav-links">
-    <li><a href="#" data-slide="1" onclick="return handleNavClick(this,event);">Models</a></li>
-    <li><a href="#" data-slide="2" onclick="return handleNavClick(this,event);">Shop</a></li>
-    <li><a href="#" data-slide="3" onclick="return handleNavClick(this,event);">Reviews</a></li>
-    <li><a href="#" data-slide="4" onclick="return handleNavClick(this,event);">Guide</a></li>
-    <li><a href="#" data-slide="5" onclick="return handleNavClick(this,event);">About</a></li>
+    <li><a href="#" onclick="goToSlide(1);return false;">مدل‌ها</a></li>
+    <li><a href="#" onclick="goToSlide(2);return false;">فروشگاه</a></li>
+    <li><a href="#" onclick="goToSlide(3);return false;">نظرات</a></li>
+    <li><a href="#" onclick="goToSlide(4);return false;">راهنما</a></li>
+    <li><a href="#" onclick="goToSlide(5);return false;">درباره ما</a></li>
   </ul>
-  <button class="nav-cta" data-slide="2" onclick="handleNavClick(this,event);">Shop Now</button>
-  <button class="nav-menu-btn" id="menuBtn" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false" aria-controls="mobileDrawer">
-    <span></span><span></span><span></span>
-  </button>
+
+  <!-- ============================================
+       AUTH SECTION + CART BUTTON — نقطه اتصال جنگو
+       Auth: {% if user.is_authenticated %} ... {% else %} ... {% endif %}
+       بج سبد خرید: مقدار #navCartCount رو با {{ cart.item_count }} پر کن
+  ============================================ -->
+  <div class="nav-right-cluster">
+    <div class="nav-auth" id="navAuth">
+
+      <!-- ==== حالت مهمان (کاربر لاگین نیست) ==== -->
+      <!-- {% if not user.is_authenticated %} -->
+      <div class="auth-guest" id="authGuest">
+        <a href="#" class="auth-link-login">ورود</a>
+        <button class="nav-cta">ثبت‌نام</button>
+      </div>
+      <!-- {% endif %} -->
+
+      <!-- ==== حالت لاگین‌شده ==== -->
+      <!-- {% if user.is_authenticated %} -->
+      <div class="auth-user" id="authUser" style="display:none;">
+        <button class="auth-user-btn" id="authUserBtn" onclick="toggleUserMenu(event)" aria-haspopup="true" aria-expanded="false" aria-controls="authUserMenu">
+          <span class="auth-user-avatar" aria-hidden="true">👤</span>
+          <!-- {{ user.get_full_name|default:user.username }} -->
+          <span class="auth-user-name">علی رضایی</span>
+        </button>
+        <div class="auth-user-menu" id="authUserMenu" role="menu">
+          <a href="#" role="menuitem">پروفایل</a>
+          <a href="#" role="menuitem">سفارش‌های من</a>
+          <a href="#" role="menuitem">علاقه‌مندی‌ها</a>
+          <a href="#" role="menuitem">تنظیمات حساب</a>
+          <a href="#" class="auth-logout" role="menuitem">خروج</a>
+        </div>
+      </div>
+      <!-- {% endif %} -->
+
+    </div>
+
+    <button class="nav-cart-btn" id="navCartBtn" aria-label="سبد خرید">
+      <svg class="nav-cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"></path>
+        <circle cx="10" cy="20.5" r="1.4"></circle>
+        <circle cx="17" cy="20.5" r="1.4"></circle>
+      </svg>
+      <span class="nav-cart-badge" id="navCartCount"><!-- {{ cart.item_count }} -->3</span>
+    </button>
+
+    <button class="nav-menu-btn" id="menuBtn" onclick="toggleMenu()" aria-label="منو" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </nav>
 
 <div class="mobile-drawer" id="mobileDrawer">
-  <a href="#" data-slide="0" onclick="closeMenu();return handleNavClick(this,event);">Home</a>
-  <a href="#" data-slide="1" onclick="closeMenu();return handleNavClick(this,event);">Models</a>
-  <a href="#" data-slide="2" onclick="closeMenu();return handleNavClick(this,event);">Shop</a>
-  <a href="#" data-slide="3" onclick="closeMenu();return handleNavClick(this,event);">Reviews</a>
-  <a href="#" data-slide="4" onclick="closeMenu();return handleNavClick(this,event);">Guide</a>
-  <a href="#" data-slide="5" onclick="closeMenu();return handleNavClick(this,event);">About</a>
-  <button class="mobile-drawer-cta" data-slide="2" onclick="closeMenu();handleNavClick(this,event);">Shop Now</button>
+  <a href="#" onclick="closeMenu();goToSlide(0);return false;">خانه</a>
+  <a href="#" onclick="closeMenu();goToSlide(1);return false;">مدل‌ها</a>
+  <a href="#" onclick="closeMenu();goToSlide(2);return false;">فروشگاه</a>
+  <a href="#" onclick="closeMenu();goToSlide(3);return false;">نظرات</a>
+  <a href="#" onclick="closeMenu();goToSlide(4);return false;">راهنما</a>
+  <a href="#" onclick="closeMenu();goToSlide(5);return false;">درباره ما</a>
+  <button class="mobile-drawer-cta" onclick="closeMenu();goToSlide(2)">خرید کنید</button>
+
+  <!-- Auth موبایل — نسخه آینه‌ای navAuth برای صفحه‌های کوچک -->
+  <!-- ==== حالت مهمان ==== -->
+  <!-- {% if not user.is_authenticated %} -->
+  <div class="drawer-auth" id="drawerAuthGuest">
+    <a href="#" class="drawer-auth-link">ورود</a>
+    <button class="drawer-auth-register">ثبت‌نام</button>
+  </div>
+  <!-- {% endif %} -->
+
+  <!-- ==== حالت لاگین‌شده ==== -->
+  <!-- {% if user.is_authenticated %} -->
+  <div class="drawer-auth-user" id="drawerAuthUser" style="display:none;">
+    <div class="drawer-user-info">
+      <span class="auth-user-avatar" aria-hidden="true">👤</span>
+      <span>علی رضایی</span>
+    </div>
+    <a href="#">پروفایل</a>
+    <a href="#">سفارش‌های من</a>
+    <a href="#">علاقه‌مندی‌ها</a>
+    <a href="#">تنظیمات حساب</a>
+    <a href="#" class="auth-logout">خروج</a>
+  </div>
+  <!-- {% endif %} -->
 </div>
 
 <script>
-/* ============================================================
-   MOBILE MENU — single source of truth
-   ============================================================ */
+/* ══════════════════════════════════════════════════════════════
+   منطق هدر — این‌ها به IDهای بالا وابسته‌ان (navAuth, authUserBtn,
+   menuBtn, mobileDrawer, authUserMenu). اگه توی base.html اسکریپت
+   دیگه‌ای هم داری، این بلاک رو بعد از include شدن هدر لود کن.
+   goToSlide(n) به این هدر تعلق نداره — اون تابعِ مکانیزم اسکرول
+   صفحه اصلیه؛ اگه این هدر رو روی صفحات جدا استفاده می‌کنی،
+   href/onclick لینک‌ها رو جایگزین کن (نکته ۵ در بالای فایل).
+   ══════════════════════════════════════════════════════════════ */
 function toggleMenu() {
   const btn = document.getElementById('menuBtn');
   const drawer = document.getElementById('mobileDrawer');
@@ -217,26 +397,32 @@ function closeMenu() {
   document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
 }
 
-/*
-  handleNavClick: forwards nav clicks to the parent page's own
-  slide/section navigation (e.g. goToSlide()) when this header is
-  embedded inside the full VOLTEX one-page layout. If no such
-  function exists (e.g. this file is opened standalone, or the
-  header sits on a normal multi-page Django site), it simply lets
-  the link behave normally / does nothing instead of throwing.
-
-  In a Django setup, replace data-slide targets with real
-  {% url %} hrefs and delete this indirection.
-*/
-function handleNavClick(el, e) {
-  const target = el.getAttribute('data-slide');
-  if (typeof window.goToSlide === 'function' && target !== null) {
-    window.goToSlide(parseInt(target, 10));
-    if (e) e.preventDefault();
-    return false;
-  }
-  return true;
+function toggleUserMenu(e) {
+  if (e) e.stopPropagation();
+  const btn = document.getElementById('authUserBtn');
+  const menu = document.getElementById('authUserMenu');
+  if (!btn || !menu) return;
+  const isOpen = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
+
+document.addEventListener('click', () => {
+  const menu = document.getElementById('authUserMenu');
+  const btn = document.getElementById('authUserBtn');
+  if (menu && menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const menu = document.getElementById('authUserMenu');
+    const btn = document.getElementById('authUserBtn');
+    if (menu && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+      if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.focus(); }
+    }
+  }
+});
 </script>
-</body>
-</html>

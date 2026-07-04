@@ -1,13 +1,44 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VOLTEX X9 — Built For The Future</title>
+<title id="page-title">محصول | VOLTEX</title>
+
+<!-- SEO Meta Tags -->
+<meta name="description" id="meta-description" content="">
+<link rel="canonical" id="meta-canonical" href="">
+
+<!-- Open Graph -->
+<meta property="og:type" content="product">
+<meta property="og:title" id="og-title" content="">
+<meta property="og:description" id="og-description" content="">
+<meta property="og:image" id="og-image" content="">
+<meta property="og:url" id="og-url" content="">
+<meta property="og:site_name" content="VOLTEX">
+<meta property="og:locale" content="fa_IR">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" id="twitter-title" content="">
+<meta name="twitter:description" id="twitter-description" content="">
+<meta name="twitter:image" id="twitter-image" content="">
+
+<!-- JSON-LD: Product -->
+<script id="json-ld-product" type="application/ld+json"></script>
+
+<!-- Preconnect / Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome for wishlist icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
+/* ===== تمام استایل‌های فایل product.html اینجا قرار می‌گیرند ===== */
+/* (همون استایل‌هایی که قبلاً دادی) */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -1401,22 +1432,83 @@ footer {
   .rv-name-row { flex-direction: column; align-items: flex-start; gap: 4px; }
   .rv-bar-label { width: 36px; font-size: 11px; }
 }
+/* اضافه کردن استایل برای دکمه علاقه‌مندی */
+.wishlist-btn {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  padding: 0 20px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid var(--card-border-gold);
+  background: rgba(255,255,255,.04);
+  color: var(--off-white);
+  backdrop-filter: blur(8px);
+  transition: all .25s;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  text-decoration: none;
+}
+.wishlist-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+  box-shadow: 0 0 24px rgba(201,168,76,.15);
+}
+.wishlist-btn:active { transform: scale(.97); }
+.wishlist-btn.in-wishlist {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.15);
+  color: var(--gold);
+}
+.wishlist-btn .fa-heart {
+  transition: all .3s;
+}
+.wishlist-btn.in-wishlist .fa-heart {
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(201,168,76,.5);
+}
+.wishlist-btn i {
+  font-size: 16px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+.loading-spinner::after {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,.1);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ===== NAV ===== -->
 <nav class="nav">
-  <div class="nav-logo">VOLT<span>EX</span></div>
+  <a href="/" class="nav-logo">VOLT<span>EX</span></a>
   <ul class="nav-links">
-    <li><a href="#hero">خانه</a></li>
-    <li><a href="#gallery">گالری</a></li>
-    <li><a href="#marketing">مشخصات</a></li>
+    <li><a href="/">خانه</a></li>
+    <li><a href="/products/">محصولات</a></li>
+    <li><a href="/blog/">مجله</a></li>
   </ul>
-  <button class="nav-reserve" onclick="alert('سفارش شما ثبت شد!')">سفارش دهید</button>
+  <button class="nav-reserve" onclick="location.href='/cart/'">سبد خرید</button>
 </nav>
 
-<!-- SECTION 1 — HERO -->
+<!-- ===== SECTION 1 — HERO ===== -->
 <section id="hero">
   <div class="bg-base"></div>
   <div class="bg-glow-gold"></div>
@@ -1426,225 +1518,92 @@ footer {
   <div class="bg-vignette"></div>
   <canvas id="hero-particles"></canvas>
 
-  <div class="hero-layout">
+  <div id="loading-spinner" class="loading-spinner"></div>
 
-    <div class="hero-copy">
-      <div class="hero-brand">Electric Precision — 2025</div>
-      <h1 class="hero-title">VOLT<span>EX</span><br>X9</h1>
-      <p class="hero-tagline">Built For The Future Of Urban Mobility</p>
-      <div class="hero-divider"></div>
-      <p class="hero-desc">
-        سرعت، برد و عملکردی بی‌نظیر در یک اسکوتر برقی پریمیوم — طراحی‌شده برای راکبان مدرنی که سازش را نمی‌پذیرند.
-      </p>
-      <div class="hero-btns">
-        <a href="#" class="btn btn-primary">خرید کنید</a>
-      </div>
+  <div id="product-content" style="display:none;">
+    <div class="hero-layout">
 
-      <div class="hero-specs">
-        <div class="spec-row">
-          <div class="spec-card">
-            <div class="spec-icon">⚡</div>
-            <div>
-              <div class="spec-val">1000W</div>
-              <div class="spec-lbl">Peak Motor</div>
-            </div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">🚀</div>
-            <div>
-              <div class="spec-val">45 km/h</div>
-              <div class="spec-lbl">Top Speed</div>
-            </div>
-          </div>
+      <div class="hero-copy">
+        <div class="hero-brand" id="product-category">...</div>
+        <h1 class="hero-title" id="product-name">...</h1>
+        <p class="hero-tagline" id="product-tagline">...</p>
+        <div class="hero-divider"></div>
+        <p class="hero-desc" id="product-description">...</p>
+        
+        <div class="hero-btns">
+          <a href="#" class="btn btn-primary" id="add-to-cart-btn">
+            <i class="fas fa-shopping-cart"></i> خرید کنید
+          </a>
+          <button class="wishlist-btn" id="wishlist-btn">
+            <i class="far fa-heart"></i> 
+            <span id="wishlist-text">علاقه‌مندی</span>
+          </button>
         </div>
-        <div class="spec-row">
-          <div class="spec-card">
-            <div class="spec-icon">🔋</div>
-            <div>
-              <div class="spec-val">65 km</div>
-              <div class="spec-lbl">Full Range</div>
-            </div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">⏱</div>
-            <div>
-              <div class="spec-val">4 hrs</div>
-              <div class="spec-lbl">Charge Time</div>
-            </div>
-          </div>
+
+        <div class="hero-specs" id="product-specs">
+          <!-- توسط JavaScript پر می‌شود -->
         </div>
       </div>
-    </div>
 
-    <div class="hero-visual">
-      <div style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:70%;height:30px;background:radial-gradient(ellipse at center,rgba(201,168,76,.18) 0%,transparent 70%);filter:blur(8px);animation:ground-glow 3s ease-in-out infinite alternate;"></div>
-      <div class="hero-img-wrap">
-        <img id="hero-img" src="images/1.jpeg" alt="VOLTEX X9"
-          style="width:100%;height:auto;display:block;filter:drop-shadow(0 20px 60px rgba(0,0,0,.7)) drop-shadow(0 0 40px rgba(201,168,76,.15));animation:scooterFloat 5s ease-in-out infinite;">
+      <div class="hero-visual">
+        <div style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:70%;height:30px;background:radial-gradient(ellipse at center,rgba(201,168,76,.18) 0%,transparent 70%);filter:blur(8px);animation:ground-glow 3s ease-in-out infinite alternate;"></div>
+        <div class="hero-img-wrap">
+          <img id="hero-img" src="" alt="" style="width:100%;height:auto;display:block;filter:drop-shadow(0 20px 60px rgba(0,0,0,.7)) drop-shadow(0 0 40px rgba(201,168,76,.15));animation:scooterFloat 5s ease-in-out infinite;">
+        </div>
       </div>
+
     </div>
 
-  </div>
+    <div class="trust-row" id="trust-row">
+      <!-- توسط JavaScript پر می‌شود -->
+    </div>
 
-  <div class="trust-row">
-    <div class="trust-badge">
-      <span class="trust-icon">⭐</span>
-      <div class="trust-text"><strong>4.9 / 5</strong>رضایت مشتری</div>
+    <div class="scroll-cue">
+      <div class="scroll-arrow"></div>
+      <span>اسکرول کنید</span>
     </div>
-    <div class="trust-badge">
-      <span class="trust-icon">🛡</span>
-      <div class="trust-text"><strong>۲ سال</strong>گارانتی کامل</div>
-    </div>
-    <div class="trust-badge">
-      <span class="trust-icon">👥</span>
-      <div class="trust-text"><strong>۱۰,۰۰۰+</strong>راکب فعال</div>
-    </div>
-    <div class="trust-badge">
-      <span class="trust-icon">🚚</span>
-      <div class="trust-text"><strong>ارسال رایگان</strong>سراسر کشور</div>
-    </div>
-  </div>
-
-  <div class="scroll-cue">
-    <div class="scroll-arrow"></div>
-    <span>اسکرول کنید</span>
   </div>
 </section>
 
-<!-- SECTION 2 — GALLERY (dynamic, color-filterable, Django-ready) -->
+<!-- ===== SECTION 2 — GALLERY ===== -->
 <section id="gallery">
   <div class="section-header" data-reveal>
     <span class="section-tag">Visual Tour</span>
     <div class="sec-line"></div>
     <h2 class="section-title">از هر زاویه</h2>
-    <p class="section-sub">رنگ مورد نظر خود را انتخاب کنید و تمام تصاویر VOLTEX X9 در آن رنگ را مشاهده کنید</p>
+    <p class="section-sub">رنگ مورد نظر خود را انتخاب کنید و تمام تصاویر را مشاهده کنید</p>
   </div>
 
-  <!-- Color filter bar: chips are generated entirely from gallery data, nothing hardcoded -->
   <div class="gallery-filter-wrap">
     <ul class="gallery-filter" id="gallery-filter" role="tablist" aria-label="فیلتر رنگ گالری تصاویر"></ul>
   </div>
 
-  <!-- Image grid: rendered dynamically, scales to any number of colors/images -->
   <div class="gallery-grid" id="gallery-grid" role="tabpanel" aria-live="polite"></div>
 </section>
 
-<!-- SECTION 3 — MARKETING -->
+<!-- ===== SECTION 3 — MARKETING ===== -->
 <section id="marketing">
   <div class="mkt-inner">
 
     <div class="section-header" data-reveal>
-      <span class="section-tag">Why VOLTEX X9</span>
+      <span class="section-tag">Why This Product</span>
       <div class="sec-line"></div>
-      <h2 class="section-title">چرا VOLTEX X9؟</h2>
-      <p class="section-sub">تجربه‌ای که فراتر از یک اسکوتر است — ترکیبی از فناوری، زیبایی و قدرت</p>
+      <h2 class="section-title" id="marketing-title">چرا این محصول؟</h2>
+      <p class="section-sub" id="marketing-sub">تجربه‌ای که فراتر از انتظار است</p>
     </div>
 
-    <div class="feature-row">
-      <div class="feature-card">
-        <span class="fcard-icon">⚡</span>
-        <div class="fcard-title">موتور ۱۰۰۰ واتی</div>
-        <p class="fcard-desc">موتور برراشلس با گشتاور بالا، شتابی فوری و پایدار در تمام سرعت‌ها ارائه می‌دهد. مناسب سطح‌های صاف تا سربالایی‌های شهری.</p>
-        <div class="fcard-accent">⚡</div>
-      </div>
-      <div class="feature-card">
-        <span class="fcard-icon">🔋</span>
-        <div class="fcard-title">باتری نسل جدید</div>
-        <p class="fcard-desc">باتری لیتیوم‌آیون ۴۸V با مدیریت هوشمند انرژی — ۶۵ کیلومتر برد در یک بار شارژ. سیستم BMS پیشرفته برای طول عمر بالا.</p>
-        <div class="fcard-accent">🔋</div>
-      </div>
-      <div class="feature-card">
-        <span class="fcard-icon">📱</span>
-        <div class="fcard-title">اتصال هوشمند</div>
-        <p class="fcard-desc">اپلیکیشن اختصاصی VOLTEX با اتصال بلوتوث — مسیریابی، آمار سفر، بلوک کردن از راه دور و به‌روزرسانی نرم‌افزار.</p>
-        <div class="fcard-accent">📱</div>
-      </div>
+    <div class="feature-row" id="feature-row">
+      <!-- توسط JavaScript پر می‌شود -->
     </div>
 
     <div class="stats-row" id="stats-row">
-      <div class="stat-cell">
-        <div class="stat-num"><span id="cnt1">0</span><span style="color:var(--gold)">+</span></div>
-        <div class="stat-label">مشتری راضی</div>
-      </div>
-      <div class="stat-cell">
-        <div class="stat-num"><span id="cnt2">0</span><span style="color:var(--gold)">km</span></div>
-        <div class="stat-label">برد تضمینی</div>
-      </div>
-      <div class="stat-cell">
-        <div class="stat-num"><span id="cnt3">0</span><span style="color:var(--gold)">W</span></div>
-        <div class="stat-label">توان موتور</div>
-      </div>
-      <div class="stat-cell">
-        <div class="stat-num"><span id="cnt4">0</span><span style="color:var(--gold)">سال</span></div>
-        <div class="stat-label">گارانتی</div>
-      </div>
-    </div>
-
-    <div class="warranty-block" id="warranty-block">
-      <div class="warranty-copy">
-        <div class="warranty-badge-row">
-          <span class="wbadge">🛡 گارانتی ۲ ساله</span>
-          <span class="wbadge">✓ تأیید CE</span>
-          <span class="wbadge">⭐ ISO 9001</span>
-        </div>
-        <h2 class="warranty-title">خیال‌تان<br>راحت <span>باشد</span></h2>
-        <p class="warranty-desc">
-          VOLTEX X9 با کامل‌ترین پوشش گارانتی در صنعت ارائه می‌شود. هر قطعه، هر سیستم، هر لحظه از رانندگی — تحت پوشش است.
-        </p>
-        <ul class="warranty-list">
-          <li>۲ سال گارانتی کامل موتور و باتری</li>
-          <li>۱ سال گارانتی قطعات الکترونیکی و داشبورد</li>
-          <li>پشتیبانی ۲۴/۷ از طریق اپ و تلفن</li>
-          <li>سرویس درب‌به‌درب در تمام استان‌ها</li>
-          <li>قطعات یدکی اصلی با ۱۰ سال تضمین تأمین</li>
-        </ul>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <a href="#" class="btn btn-primary">ثبت ضمانت‌نامه</a>
-          <a href="#" class="btn btn-secondary">مشاهده شرایط</a>
-        </div>
-      </div>
-
-      <div class="warranty-visual">
-        <div class="warranty-card">
-          <span class="wcard-icon">🏆</span>
-          <div class="wcard-title">گارانتی پریمیوم</div>
-          <div class="wcard-sub">Premium Protection Plan</div>
-          <div class="wcard-items">
-            <div class="wcard-item">
-              <span class="witem-icon">⚙️</span>
-              <div><div class="witem-label">موتور و درایو</div><div class="witem-val">۲۴ ماه</div></div>
-            </div>
-            <div class="wcard-item">
-              <span class="witem-icon">🔋</span>
-              <div><div class="witem-label">باتری</div><div class="witem-val">۲۴ ماه</div></div>
-            </div>
-            <div class="wcard-item">
-              <span class="witem-icon">💡</span>
-              <div><div class="witem-label">سیستم الکترونیک</div><div class="witem-val">۱۲ ماه</div></div>
-            </div>
-            <div class="wcard-item">
-              <span class="witem-icon">🔧</span>
-              <div><div class="witem-label">سرویس رایگان</div><div class="witem-val">اولین ۶ ماه</div></div>
-            </div>
-          </div>
-          <div class="wcard-bg-num">X9</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cta-bottom" id="cta-bottom">
-      <h2 class="cta-title">آماده‌اید تجربه کنید؟<br><span>VOLTEX X9</span></h2>
-      <p class="cta-sub">همین حالا سفارش دهید و رایگان تحویل بگیرید. موجودی محدود است.</p>
-      <div class="cta-btns">
-        <a href="#" class="btn btn-primary" style="font-size:15px;padding:0 40px;height:56px;">همین حالا خرید کنید</a>
-        <a href="#" class="btn btn-secondary" style="font-size:15px;padding:0 40px;height:56px;">مشاوره رایگان</a>
-      </div>
+      <!-- توسط JavaScript پر می‌شود -->
     </div>
 
   </div>
 </section>
 
-<!-- SECTION 4 — PRODUCT REVIEWS (new — added without touching existing sections) -->
+<!-- ===== SECTION 4 — PRODUCT REVIEWS ===== -->
 <section id="reviews" aria-labelledby="reviews-heading">
   <div class="reviews-inner">
 
@@ -1652,21 +1611,19 @@ footer {
       <span class="section-tag">Customer Voices</span>
       <div class="sec-line"></div>
       <h2 class="section-title" id="reviews-heading">نظرات مشتریان</h2>
-      <p class="section-sub">تجربه واقعی راکبان VOLTEX X9 را بخوانید و نظر خودتان را ثبت کنید</p>
+      <p class="section-sub">تجربه واقعی راکبان را بخوانید و نظر خودتان را ثبت کنید</p>
     </div>
 
     <div class="reviews-layout">
 
-      <!-- ═══ LEFT: REVIEW FORM ═══ -->
+      <!-- ===== REVIEW FORM ===== -->
       <header class="rv-form-card rv-glass" id="rv-form-card">
         <span class="rv-form-eyebrow">Write A Review</span>
         <h3 class="rv-form-title">نظر خود را بنویسید</h3>
-        <p class="rv-form-sub">تجربه‌تان از VOLTEX X9 به دیگران کمک می‌کند تصمیم بهتری بگیرند.</p>
+        <p class="rv-form-sub">تجربه‌تان به دیگران کمک می‌کند تصمیم بهتری بگیرند.</p>
 
-        <!-- method/action left Django-ready: {% url 'submit_review' product.id %} -->
-        <form id="rv-form" novalidate autocomplete="off" method="POST" action="#">
-          <!-- Django CSRF placeholder: {% csrf_token %} -->
-          <input type="hidden" name="csrfmiddlewaretoken" value="">
+        <form id="rv-form" novalidate autocomplete="off">
+          <input type="hidden" name="csrfmiddlewaretoken" id="csrf-token" value="">
 
           <div class="rv-field" id="rv-field-rating">
             <label class="rv-label" for="rv-star-5">امتیاز شما</label>
@@ -1682,20 +1639,14 @@ footer {
             <div class="rv-errmsg" role="alert">⚠ لطفاً یک امتیاز انتخاب کنید</div>
           </div>
 
-          <div class="rv-field" id="rv-field-name">
-            <label class="rv-label" for="rv-name">نام و نام خانوادگی</label>
-            <input class="rv-input" type="text" id="rv-name" name="name" placeholder="مثال: علی محمدی" maxlength="80">
-            <div class="rv-errmsg" role="alert">⚠ لطفاً نام خود را وارد کنید</div>
-          </div>
-
-          <div class="rv-field">
+          <div class="rv-field" id="rv-field-title">
             <label class="rv-label" for="rv-title">عنوان نظر <span class="rv-optional">(اختیاری)</span></label>
             <input class="rv-input" type="text" id="rv-title" name="title" placeholder="مثال: فراتر از انتظارم بود" maxlength="100">
           </div>
 
           <div class="rv-field" id="rv-field-text">
             <label class="rv-label" for="rv-text">متن نظر</label>
-            <textarea class="rv-textarea" id="rv-text" name="comment" placeholder="تجربه خود از VOLTEX X9 را بنویسید..." maxlength="800"></textarea>
+            <textarea class="rv-textarea" id="rv-text" name="comment" placeholder="تجربه خود را بنویسید..." maxlength="800"></textarea>
             <div class="rv-errmsg" role="alert">⚠ لطفاً متن نظر خود را بنویسید</div>
           </div>
 
@@ -1708,24 +1659,19 @@ footer {
         </form>
       </header>
 
-      <!-- ═══ RIGHT: SUMMARY + APPROVED REVIEWS ═══ -->
+      <!-- ===== SUMMARY + REVIEWS ===== -->
       <div>
-        <!-- Summary bar: values are placeholders, Django-ready -->
         <div class="rv-summary-card rv-glass" id="rv-summary-card">
           <div class="rv-summary-top">
-            <div class="rv-score-big" id="rv-score-big">4.8</div>
+            <div class="rv-score-big" id="rv-score-big">0.0</div>
             <div class="rv-score-meta">
               <div class="rv-stars-display" id="rv-stars-display" aria-hidden="true"></div>
-              <div class="rv-summary-count" id="rv-summary-count">بر اساس ۲۳۶ نظر</div>
+              <div class="rv-summary-count" id="rv-summary-count">بدون نظر</div>
             </div>
           </div>
           <div class="rv-bars" id="rv-bars"></div>
         </div>
 
-        <!-- Approved reviews list. In production this markup is rendered by Django, e.g.:
-             {% for review in approved_reviews %} ... {% endfor %}
-             The JS below renders an equivalent structure client-side using placeholder data
-             so the module works standalone; swap REVIEWS_DATA for the server-rendered queryset. -->
         <div class="rv-list-head">
           <h3 class="rv-list-title">نظرات تأیید‌شده</h3>
         </div>
@@ -1741,419 +1687,677 @@ footer {
   </div>
 </section>
 
+<!-- ===== FOOTER ===== -->
 <footer>
   <div class="footer-logo">VOLT<span>EX</span></div>
   <div class="footer-copy">© ۱۴۰۳ VOLTEX. تمامی حقوق محفوظ است.</div>
 </footer>
 
+<!-- ===== SCRIPTS ===== -->
 <script>
-// Particle system
-const canvas = document.getElementById('hero-particles');
-const ctx = canvas.getContext('2d');
-let W, H;
-const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
-resize(); window.addEventListener('resize', resize);
-
-// Fewer particles on mobile
-const isMobile = window.innerWidth <= 768;
-const particles = Array.from({length: isMobile ? 30 : 60}, () => ({
-  x: Math.random() * 2000 - 200,
-  y: Math.random() * H,
-  r: Math.random() * 1.4 + .3,
-  vx: (Math.random()-.5)*.18,
-  vy: -(Math.random()*.35+.1),
-  col: Math.random()<.5 ? 'rgba(201,168,76,' : Math.random()<.5 ? 'rgba(0,212,255,' : 'rgba(255,255,255,',
-  alpha: Math.random()*.45+.1,
-  pulse: Math.random()*Math.PI*2,
-  ps: Math.random()*.025+.01
-}));
-
-const drawParticles = () => {
-  ctx.clearRect(0,0,W,H);
-  for(const p of particles){
-    p.x+=p.vx; p.y+=p.vy; p.pulse+=p.ps;
-    if(p.y<-5){p.y=H+5;p.x=Math.random()*W;}
-    if(p.x<-50)p.x=W+50; if(p.x>W+50)p.x=-50;
-    const a = p.alpha*(0.65+0.35*Math.sin(p.pulse));
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle = p.col+a+')'; ctx.fill();
-  }
-  requestAnimationFrame(drawParticles);
-};
-drawParticles();
-
-// Scroll reveal
-const revealEls = document.querySelectorAll('[data-reveal], .gcard, .feature-card, .warranty-block, .stats-row, .cta-bottom');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: .1 });
-revealEls.forEach(el => observer.observe(el));
-
-// Counter animation
-const targets = {cnt1:10000, cnt2:65, cnt3:1000, cnt4:2};
-let countersStarted = false;
-const statsRow = document.getElementById('stats-row');
-const statsObs = new IntersectionObserver(entries => {
-  if(entries[0].isIntersecting && !countersStarted){
-    countersStarted = true;
-    Object.entries(targets).forEach(([id, target]) => {
-      const el = document.getElementById(id);
-      let current = 0;
-      const step = target / 60;
-      const timer = setInterval(() => {
-        current = Math.min(current + step, target);
-        el.textContent = Math.round(current).toLocaleString('fa-IR');
-        if(current >= target) clearInterval(timer);
-      }, 16);
-    });
-  }
-}, {threshold:.3});
-statsObs.observe(statsRow);
-
-/* ═══════════════════════════════════════════════════════════════
-   GALLERY — dynamic, color-filterable, Django-admin-ready
-   ---------------------------------------------------------------
-   Data shape mirrors a Django ProductImage model:
-     { id, image, color: {slug,label,hex}, alt, sortOrder }
-   In production this array is simply replaced by JSON rendered
-   from the Django view / REST endpoint — nothing else in this
-   file needs to change. No color or path is hardcoded in the
-   markup or CSS; everything below is generated from GALLERY_DATA.
-═══════════════════════════════════════════════════════════════ */
-const GALLERY_DATA = [
-  { id: 1, image: 'images/gallery-red-1.jpg',   color: { slug: 'red',   label: 'قرمز',  hex: '#D6483C' }, alt: 'VOLTEX X9 قرمز - نمای جانبی',  sortOrder: 1 },
-  { id: 2, image: 'images/gallery-red-2.jpg',   color: { slug: 'red',   label: 'قرمز',  hex: '#D6483C' }, alt: 'VOLTEX X9 قرمز - نمای جلو',    sortOrder: 2 },
-  { id: 3, image: 'images/gallery-white-1.jpg', color: { slug: 'white', label: 'سفید',  hex: '#F2F2F2' }, alt: 'VOLTEX X9 سفید - نمای جانبی',  sortOrder: 1 },
-  { id: 4, image: 'images/gallery-white-2.jpg', color: { slug: 'white', label: 'سفید',  hex: '#F2F2F2' }, alt: 'VOLTEX X9 سفید - داشبورد',    sortOrder: 2 },
-  { id: 5, image: 'images/gallery-black-1.jpg', color: { slug: 'black', label: 'مشکی',  hex: '#1A1A1A' }, alt: 'VOLTEX X9 مشکی - جزئیات موتور', sortOrder: 1 },
-  { id: 6, image: 'images/gallery-black-2.jpg', color: { slug: 'black', label: 'مشکی',  hex: '#1A1A1A' }, alt: 'VOLTEX X9 مشکی - نمای جلو',    sortOrder: 2 },
-  { id: 7, image: 'images/gallery-blue-1.jpg',  color: { slug: 'blue',  label: 'آبی',   hex: '#2F6FE0' }, alt: 'VOLTEX X9 آبی - نمای جانبی',   sortOrder: 1 },
-];
-
-(function initGallery(){
-  const filterEl = document.getElementById('gallery-filter');
-  const gridEl = document.getElementById('gallery-grid');
-  if (!filterEl || !gridEl) return;
-
-  // Build the ordered, de-duplicated list of colors present in the data.
-  const colorMap = new Map();
-  GALLERY_DATA.forEach(item => {
-    if (!colorMap.has(item.color.slug)) colorMap.set(item.color.slug, { ...item.color, count: 0 });
-    colorMap.get(item.color.slug).count++;
-  });
-  const colors = Array.from(colorMap.values());
-
-  let activeColor = 'all';
-
-  // ── Chips ──────────────────────────────────────────────
-  function renderChips() {
-    const allCount = GALLERY_DATA.length;
-    const chips = [
-      `<li>
-        <button type="button" class="color-chip all-chip" data-color="all"
-          role="tab" aria-pressed="${activeColor === 'all'}" aria-selected="${activeColor === 'all'}">
-          <span class="chip-dot" aria-hidden="true"></span>
-          <span>همه</span>
-          <span class="chip-count">(${allCount})</span>
-        </button>
-      </li>`,
-      ...colors.map(c => `
-      <li>
-        <button type="button" class="color-chip" data-color="${c.slug}"
-          role="tab" aria-pressed="${activeColor === c.slug}" aria-selected="${activeColor === c.slug}"
-          aria-label="فیلتر بر اساس رنگ ${c.label}, ${c.count} تصویر"
-          style="color:${activeColor === c.slug ? c.hex : ''}">
-          <span class="chip-dot" style="background:${c.hex};" aria-hidden="true"></span>
-          <span>${c.label}</span>
-          <span class="chip-count">(${c.count})</span>
-        </button>
-      </li>`)
-    ];
-    filterEl.innerHTML = chips.join('');
-  }
-
-  // ── Grid ───────────────────────────────────────────────
-  function renderGrid() {
-    const items = [...GALLERY_DATA]
-      .filter(item => activeColor === 'all' || item.color.slug === activeColor)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-
-    if (!items.length) {
-      gridEl.innerHTML = `<div class="gallery-empty">تصویری برای این رنگ ثبت نشده است</div>`;
-      return;
+/* ════════════════════════════════════
+   CONFIG
+   ════════════════════════════════════ */
+function getSlugFromUrl() {
+    let path = window.location.pathname;
+    if (path.endsWith("/")) {
+        path = path.slice(0, -1);
     }
+    const parts = path.split("/");
+    const slug = parts[parts.length - 1];
+    try {
+        return decodeURIComponent(slug);
+    } catch (e) {
+        return slug;
+    }
+}
 
-    gridEl.innerHTML = items.map((item, i) => `
-      <div class="gcard" id="gcard-${item.id}" tabindex="0" role="button"
-        aria-label="${item.alt}"
-        style="transition-delay:${Math.min(i, 8) * 0.05}s;">
-        <div class="gcard-img">
-          <img src="${item.image}" alt="${item.alt}" loading="lazy" decoding="async">
-        </div>
-        <div class="gcard-overlay">
-          <div class="overlay-label">
-            <span class="chip-dot" style="background:${item.color.hex};"></span>
-            ${item.color.label}
-          </div>
-          <div class="overlay-title">VOLTEX X9</div>
-        </div>
-      </div>
-    `).join('');
+const slug = getSlugFromUrl();
+const API_BASE = '/shop/api/';
+console.log("🔍 Slug:", slug);
 
-    // Re-run reveal animation + observer for freshly injected cards
-    requestAnimationFrame(() => {
-      const cards = gridEl.querySelectorAll('.gcard');
-      cards.forEach(card => {
-        observer.observe(card);
-        requestAnimationFrame(() => card.classList.add('visible'));
-      });
-    });
+/* ════════════════════════════════════
+   CSRF TOKEN
+   ════════════════════════════════════ */
+function getCSRFToken() {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+}
 
-    /* Hook point for future enhancement:
-       when activeColor changes, also update hero image / main product
-       image / thumbnail strip / product video by calling e.g.
-       updateHeroForColor(activeColor) here — no gallery redesign needed. */
-  }
+/* ════════════════════════════════════
+   UTILITY FUNCTIONS
+   ════════════════════════════════════ */
+function formatDate(date) {
+    return new Intl.DateTimeFormat('fa-IR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    }).format(date);
+}
 
-  function setActiveColor(slug) {
-    if (slug === activeColor) return;
-    activeColor = slug;
-    // smooth fade-out, then swap content, then fade back in
-    gridEl.style.transition = 'opacity .25s ease, transform .25s ease';
-    gridEl.style.opacity = '0';
-    gridEl.style.transform = 'scale(.98)';
-    window.setTimeout(() => {
-      renderChips();
-      renderGrid();
-      gridEl.style.opacity = '1';
-      gridEl.style.transform = 'scale(1)';
-    }, 220);
-  }
-
-  filterEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('.color-chip');
-    if (!btn) return;
-    setActiveColor(btn.dataset.color);
-  });
-
-  // Keyboard support: left/right arrow keys move focus between chips
-  filterEl.addEventListener('keydown', (e) => {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    const chipsArr = Array.from(filterEl.querySelectorAll('.color-chip'));
-    const idx = chipsArr.indexOf(document.activeElement);
-    if (idx === -1) return;
-    e.preventDefault();
-    const dir = e.key === 'ArrowRight' ? -1 : 1; // RTL layout
-    const next = chipsArr[(idx + dir + chipsArr.length) % chipsArr.length];
-    next.focus();
-  });
-
-  // Enter/Space opens focused gallery card the same as a click would (future lightbox hook)
-  gridEl.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const card = e.target.closest('.gcard');
-    if (card) { e.preventDefault(); card.click(); }
-  });
-
-  renderChips();
-  renderGrid();
-})();
-
-/* ═══════════════════════════════════════════════════════════════
-   PRODUCT REVIEWS — form + summary + approved reviews list
-   ---------------------------------------------------------------
-   Data shape mirrors a Django Review model:
-     { id, name, rating, title, comment, date, verified, helpfulCount }
-   In production REVIEWS_DATA is replaced by JSON rendered from the
-   Django view / REST endpoint (approved_reviews queryset) — the
-   card markup produced by renderReviewCard() mirrors what a
-   {% for review in approved_reviews %} loop would output, so the
-   template swap is a drop-in replacement.
-═══════════════════════════════════════════════════════════════ */
-const REVIEWS_DATA = [
-  { id: 1,  name: 'علی رضایی',      rating: 5, title: 'فراتر از انتظارم بود', comment: 'بعد از سه هفته استفاده روزانه، واقعاً از کیفیت ساخت و برد باتری راضی‌ام. سرعتش هم برای رفت‌وآمد شهری عالیه.', date: '2025-05-14', verified: true,  helpfulCount: 24 },
-  { id: 2,  name: 'سارا محمدی',     rating: 5, title: 'کیفیت پریمیوم واقعی', comment: 'طراحی داشبورد و اپلیکیشن خیلی شیک و کاربردیه. تحویل هم سریع‌تر از چیزی بود که فکر می‌کردم.', date: '2025-05-02', verified: true,  helpfulCount: 18 },
-  { id: 3,  name: 'محمد کریمی',     rating: 4, title: '', comment: 'به‌طور کلی راضی‌ام، فقط دوست داشتم زمان شارژ کمی کوتاه‌تر بود. ولی برد واقعی به تبلیغات نزدیکه.', date: '2025-04-27', verified: true,  helpfulCount: 11 },
-  { id: 4,  name: 'نگار حسینی',     rating: 5, title: 'بهترین خرید امسالم', comment: 'از نظر ارگونومی و راحتی سواری واقعاً نمونه‌ست. سرویس پس از فروش هم پاسخگو بود.', date: '2025-04-19', verified: false, helpfulCount: 7  },
-  { id: 5,  name: 'امیر صادقی',     rating: 4, title: 'ارزش خرید بالا', comment: 'نسبت به قیمتش امکانات خوبی داره. گارانتی دو ساله هم خیال آدم رو راحت می‌کنه.', date: '2025-04-08', verified: true,  helpfulCount: 9  },
-  { id: 6,  name: 'مریم اکبری',     rating: 5, title: '', comment: 'رنگ مشکیش فوق‌العاده شیکه و توی خیابون خیلی توجه جلب می‌کنه. راضی‌ام از خریدم.', date: '2025-03-30', verified: true,  helpfulCount: 15 },
-  { id: 7,  name: 'حسین طاهری',     rating: 3, title: 'خوب ولی قابل بهبود', comment: 'عملکرد موتور خوبه ولی اپلیکیشن گاهی کند می‌شه. امیدوارم با آپدیت بعدی حل بشه.', date: '2025-03-21', verified: false, helpfulCount: 5  },
-  { id: 8,  name: 'زهرا قاسمی',     rating: 5, title: 'پیشنهاد می‌کنم', comment: 'برای مسیرهای روزانه دانشگاه عالیه. سبک و جمع‌وجوره و راحت جا میشه.', date: '2025-03-10', verified: true,  helpfulCount: 21 },
-  { id: 9,  name: 'رضا نوروزی',     rating: 4, title: '', comment: 'کیفیت ترمزها و پایداری در سرعت بالا خیلی خوبه. فقط صندلی جانبی نداره که برام مهم نبود.', date: '2025-02-25', verified: true,  helpfulCount: 6  },
-];
-
-(function initReviews(){
-  const formCard   = document.getElementById('rv-form-card');
-  const summaryCard= document.getElementById('rv-summary-card');
-  const barsWrap   = document.getElementById('rv-bars');
-  const starsDisplay = document.getElementById('rv-stars-display');
-  const gridEl     = document.getElementById('rv-grid');
-  const loadMoreWrap = document.getElementById('rv-loadmore-wrap');
-  const loadMoreBtn  = document.getElementById('rv-loadmore-btn');
-  if (!gridEl) return;
-
-  const PAGE_SIZE = 6;
-  let visibleCount = 0;
-
-  /* ── star glyph helper ── */
-  function starGlyphs(rating, cls) {
+function starGlyphs(rating) {
     let html = '';
     for (let i = 1; i <= 5; i++) {
-      html += `<span class="${i <= rating ? 'rv-star-fill' : 'rv-star-empty'}">★</span>`;
+        html += `<span class="${i <= rating ? 'rv-star-fill' : 'rv-star-empty'}">★</span>`;
     }
     return html;
-  }
+}
 
-  /* ── summary bar (computed from REVIEWS_DATA; in Django this comes
-        from an aggregate query e.g. review_summary.percent_5, etc.) ── */
-  function renderSummary() {
-    const total = REVIEWS_DATA.length;
-    if (!total) return;
-    const avg = REVIEWS_DATA.reduce((s, r) => s + r.rating, 0) / total;
+/* ════════════════════════════════════
+   LOAD PRODUCT
+   ════════════════════════════════════ */
+async function loadProduct() {
+    const spinner = document.getElementById('loading-spinner');
+    const content = document.getElementById('product-content');
+
+    try {
+        const apiUrl = `${API_BASE}products/${encodeURIComponent(slug)}/`;
+        console.log('📡 Fetching:', apiUrl);
+
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: محصول یافت نشد`);
+
+        const product = await response.json();
+        console.log('✅ Product loaded:', product.name);
+
+        spinner.style.display = 'none';
+        content.style.display = 'block';
+
+        renderProduct(product);
+        document.getElementById('rv-form-card').classList.add('visible');
+        document.getElementById('rv-summary-card').classList.add('visible');
+        renderGallery(product.images);
+        renderMarketing(product.marketing_features, product.stat_features);
+        loadReviews();
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        spinner.innerHTML = `
+            <div class="text-center" style="color:var(--muted);padding:60px 20px;">
+                <p style="font-size:24px;margin-bottom:16px;">😕</p>
+                <p style="font-size:18px;margin-bottom:12px;">متأسفانه محصول مورد نظر یافت نشد</p>
+                <p style="font-size:13px;color:rgba(255,255,255,0.3);">اسلاگ: ${slug}</p>
+                <a href="/products/" style="display:inline-block;margin-top:20px;padding:12px 30px;background:var(--gold);color:#060810;border-radius:8px;text-decoration:none;font-weight:600;">بازگشت به محصولات</a>
+            </div>
+        `;
+    }
+}
+
+/* ════════════════════════════════════
+   RENDER PRODUCT
+   ════════════════════════════════════ */
+function renderProduct(product) {
+    const currentUrl = window.location.href;
+
+    // ===== SEO =====
+    document.title = `${product.name} | VOLTEX`;
+    document.getElementById('page-title').textContent = document.title;
+    document.getElementById('meta-description').content = product.meta_description || product.description.substring(0, 155);
+    document.getElementById('meta-canonical').href = currentUrl;
+
+    document.getElementById('og-title').content = product.name;
+    document.getElementById('og-description').content = product.meta_description || product.description.substring(0, 155);
+    document.getElementById('og-image').content = product.cover_image_url || '';
+    document.getElementById('og-url').content = currentUrl;
+
+    document.getElementById('twitter-title').content = product.name;
+    document.getElementById('twitter-description').content = product.meta_description || product.description.substring(0, 155);
+    document.getElementById('twitter-image').content = product.cover_image_url || '';
+
+    // ===== JSON-LD =====
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "description": product.description,
+        "image": product.cover_image_url,
+        "sku": product.slug,
+        "offers": {
+            "@type": "Offer",
+            "price": product.final_price,
+            "priceCurrency": "IRR",
+            "availability": product.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": product.average_rating || 0,
+            "reviewCount": product.reviews_count || 0
+        }
+    };
+    document.getElementById('json-ld-product').textContent = JSON.stringify(jsonLd);
+
+    // ===== Hero =====
+    // Category
+    document.getElementById('product-category').textContent = product.category ? product.category.name : 'محصول';
+
+    // Name
+    document.getElementById('product-name').innerHTML = product.name.replace(/\s/g, ' ');
+
+    // Tagline
+    document.getElementById('product-tagline').textContent = product.tagline || '';
+
+    // Description
+    document.getElementById('product-description').textContent = product.description;
+
+    // Hero Image
+    document.getElementById('hero-img').src = product.cover_image_url || '/static/images/default-product.jpg';
+    document.getElementById('hero-img').alt = product.cover_alt_text || product.name;
+
+    // ===== Specs =====
+    const specsContainer = document.getElementById('product-specs');
+    specsContainer.innerHTML = '';
+    if (product.specs && product.specs.length > 0) {
+        const rows = [];
+        for (let i = 0; i < product.specs.length; i += 2) {
+            const row = document.createElement('div');
+            row.className = 'spec-row';
+            const items = product.specs.slice(i, i + 2);
+            items.forEach(spec => {
+                const card = document.createElement('div');
+                card.className = 'spec-card';
+                card.innerHTML = `
+                    ${spec.icon ? `<div class="spec-icon">${spec.icon}</div>` : ''}
+                    <div>
+                        <div class="spec-val">${spec.value}</div>
+                        <div class="spec-lbl">${spec.label}</div>
+                    </div>
+                `;
+                row.appendChild(card);
+            });
+            specsContainer.appendChild(row);
+        }
+    }
+
+    // ===== Trust Badges =====
+    const trustContainer = document.getElementById('trust-row');
+    trustContainer.innerHTML = '';
+    if (product.trust_badges && product.trust_badges.length > 0) {
+        product.trust_badges.forEach(badge => {
+            const div = document.createElement('div');
+            div.className = 'trust-badge';
+            div.innerHTML = `
+                ${badge.icon ? `<span class="trust-icon">${badge.icon}</span>` : ''}
+                <div class="trust-text">
+                    ${badge.value ? `<strong>${badge.value}</strong>` : ''}
+                    ${badge.label}
+                </div>
+            `;
+            trustContainer.appendChild(div);
+        });
+    }
+
+    // ===== Wishlist =====
+    const wishlistBtn = document.getElementById('wishlist-btn');
+    const wishlistText = document.getElementById('wishlist-text');
+    if (product.is_in_wishlist) {
+        wishlistBtn.classList.add('in-wishlist');
+        wishlistBtn.querySelector('i').className = 'fas fa-heart';
+        wishlistText.textContent = 'حذف از علاقه‌مندی';
+    }
+
+    // ===== Add to Cart =====
+    document.getElementById('add-to-cart-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        addToCart(product.id, product.name);
+    });
+
+    // ===== Wishlist Toggle =====
+    wishlistBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleWishlist();
+    });
+}
+
+/* ════════════════════════════════════
+   ADD TO CART
+   ════════════════════════════════════ */
+function addToCart(productId, productName) {
+    // TEMP: فعلاً فقط alert می‌زنیم
+    // بعداً به API سبد خرید وصل می‌شود
+    alert(`✅ ${productName} به سبد خرید اضافه شد!`);
+    // TODO: بعداً به /api/cart/add/ وصل می‌شود
+}
+
+/* ════════════════════════════════════
+   WISHLIST TOGGLE
+   ════════════════════════════════════ */
+async function toggleWishlist() {
+    const btn = document.getElementById('wishlist-btn');
+    const icon = btn.querySelector('i');
+    const text = document.getElementById('wishlist-text');
+
+    try {
+        const csrfToken = getCSRFToken();
+        const response = await fetch(`${API_BASE}products/${encodeURIComponent(slug)}/wishlist/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            credentials: 'same-origin',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'added') {
+                btn.classList.add('in-wishlist');
+                icon.className = 'fas fa-heart';
+                text.textContent = 'حذف از علاقه‌مندی';
+            } else {
+                btn.classList.remove('in-wishlist');
+                icon.className = 'far fa-heart';
+                text.textContent = 'علاقه‌مندی';
+            }
+        } else {
+            alert('خطا در عملیات. لطفاً دوباره تلاش کنید.');
+        }
+    } catch (error) {
+        console.error('Wishlist error:', error);
+        alert('خطا در ارتباط با سرور.');
+    }
+}
+
+/* ════════════════════════════════════
+   RENDER GALLERY
+   ════════════════════════════════════ */
+function renderGallery(images) {
+    const filterEl = document.getElementById('gallery-filter');
+    const gridEl = document.getElementById('gallery-grid');
+
+    if (!images || images.length === 0) {
+        gridEl.innerHTML = `<div class="gallery-empty">تصویری برای این محصول ثبت نشده است</div>`;
+        return;
+    }
+
+    // Build color map
+    const colorMap = new Map();
+    images.forEach(item => {
+        const key = item.color_slug;
+        if (!colorMap.has(key)) {
+            colorMap.set(key, {
+                slug: key,
+                label: item.color_label,
+                hex: item.color_hex,
+                count: 0
+            });
+        }
+        colorMap.get(key).count++;
+    });
+    const colors = Array.from(colorMap.values());
+
+    let activeColor = 'all';
+
+    function renderChips() {
+        const allCount = images.length;
+        const chips = [
+            `<li>
+                <button type="button" class="color-chip all-chip" data-color="all"
+                    role="tab" aria-pressed="${activeColor === 'all'}" aria-selected="${activeColor === 'all'}">
+                    <span class="chip-dot" aria-hidden="true"></span>
+                    <span>همه</span>
+                    <span class="chip-count">(${allCount})</span>
+                </button>
+            </li>`,
+            ...colors.map(c => `
+            <li>
+                <button type="button" class="color-chip" data-color="${c.slug}"
+                    role="tab" aria-pressed="${activeColor === c.slug}" aria-selected="${activeColor === c.slug}"
+                    aria-label="فیلتر بر اساس رنگ ${c.label}, ${c.count} تصویر">
+                    <span class="chip-dot" style="background:${c.hex};" aria-hidden="true"></span>
+                    <span>${c.label}</span>
+                    <span class="chip-count">(${c.count})</span>
+                </button>
+            </li>`)
+        ];
+        filterEl.innerHTML = chips.join('');
+    }
+
+    function renderGrid() {
+        const items = [...images]
+            .filter(item => activeColor === 'all' || item.color_slug === activeColor)
+            .sort((a, b) => a.sort_order - b.sort_order);
+
+        if (!items.length) {
+            gridEl.innerHTML = `<div class="gallery-empty">تصویری برای این رنگ ثبت نشده است</div>`;
+            return;
+        }
+
+        gridEl.innerHTML = items.map((item, i) => `
+            <div class="gcard" tabindex="0" role="button"
+                aria-label="${item.alt_text || item.color_label}"
+                style="transition-delay:${Math.min(i, 8) * 0.05}s;">
+                <div class="gcard-img">
+                    <img src="${item.image_url}" alt="${item.alt_text || item.color_label}" loading="lazy" decoding="async">
+                </div>
+                <div class="gcard-overlay">
+                    <div class="overlay-label">
+                        <span class="chip-dot" style="background:${item.color_hex};"></span>
+                        ${item.color_label}
+                    </div>
+                    <div class="overlay-title">${document.getElementById('product-name').textContent}</div>
+                </div>
+            </div>
+        `).join('');
+
+        // Observe new cards
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: .1 });
+        gridEl.querySelectorAll('.gcard').forEach(card => {
+            observer.observe(card);
+            requestAnimationFrame(() => card.classList.add('visible'));
+        });
+    }
+
+    function setActiveColor(slug) {
+        if (slug === activeColor) return;
+        activeColor = slug;
+        gridEl.style.transition = 'opacity .25s ease, transform .25s ease';
+        gridEl.style.opacity = '0';
+        gridEl.style.transform = 'scale(.98)';
+        setTimeout(() => {
+            renderChips();
+            renderGrid();
+            gridEl.style.opacity = '1';
+            gridEl.style.transform = 'scale(1)';
+        }, 220);
+    }
+
+    filterEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.color-chip');
+        if (!btn) return;
+        setActiveColor(btn.dataset.color);
+    });
+
+    // Keyboard support
+    filterEl.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        const chipsArr = Array.from(filterEl.querySelectorAll('.color-chip'));
+        const idx = chipsArr.indexOf(document.activeElement);
+        if (idx === -1) return;
+        e.preventDefault();
+        const dir = e.key === 'ArrowRight' ? -1 : 1;
+        const next = chipsArr[(idx + dir + chipsArr.length) % chipsArr.length];
+        next.focus();
+    });
+
+    renderChips();
+    renderGrid();
+}
+
+/* ════════════════════════════════════
+   RENDER MARKETING
+   ════════════════════════════════════ */
+function renderMarketing(features, stats) {
+    // ===== Features =====
+    const featureRow = document.getElementById('feature-row');
+    featureRow.innerHTML = '';
+    if (features && features.length > 0) {
+        features.forEach((feature, index) => {
+            const card = document.createElement('div');
+            card.className = 'feature-card';
+            card.style.transitionDelay = `${index * 0.1}s`;
+            card.innerHTML = `
+                ${feature.icon ? `<span class="fcard-icon">${feature.icon}</span>` : ''}
+                <div class="fcard-title">${feature.title}</div>
+                <p class="fcard-desc">${feature.description}</p>
+                ${feature.accent ? `<div class="fcard-accent">${feature.accent}</div>` : ''}
+            `;
+            featureRow.appendChild(card);
+        });
+        // Observe feature cards
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: .1 });
+        featureRow.querySelectorAll('.feature-card').forEach(card => observer.observe(card));
+    }
+
+    // ===== Stats =====
+    const statsRow = document.getElementById('stats-row');
+    statsRow.innerHTML = '';
+    if (stats && stats.length > 0) {
+        stats.forEach((stat) => {
+            const cell = document.createElement('div');
+            cell.className = 'stat-cell';
+            cell.innerHTML = `
+                <div class="stat-num">
+                    <span>${stat.number}</span>
+                    ${stat.suffix ? `<span style="color:var(--gold)">${stat.suffix}</span>` : ''}
+                </div>
+                <div class="stat-label">${stat.label}</div>
+            `;
+            statsRow.appendChild(cell);
+        });
+        // Observe stats
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: .1 });
+        statsRow.querySelectorAll('.stat-cell').forEach(cell => observer.observe(cell));
+    }
+}
+
+/* ════════════════════════════════════
+   REVIEWS
+   ════════════════════════════════════ */
+let reviewsData = [];
+const PAGE_SIZE = 6;
+let visibleCount = 0;
+
+async function loadReviews() {
+    try {
+        const response = await fetch(`${API_BASE}products/${encodeURIComponent(slug)}/reviews/`);
+        if (response.ok) {
+            reviewsData = await response.json();
+            renderSummary(reviewsData);
+            renderReviews(true);
+        }
+    } catch (error) {
+        console.error('Error loading reviews:', error);
+    }
+}
+
+function renderSummary(reviews) {
+    const total = reviews.length;
+    if (total === 0) {
+        document.getElementById('rv-score-big').textContent = '0.0';
+        document.getElementById('rv-summary-count').textContent = 'بدون نظر';
+        document.getElementById('rv-stars-display').innerHTML = starGlyphs(0);
+        document.getElementById('rv-bars').innerHTML = '';
+        return;
+    }
+
+    const avg = reviews.reduce((s, r) => s + r.rating, 0) / total;
     document.getElementById('rv-score-big').textContent = avg.toFixed(1);
     document.getElementById('rv-summary-count').textContent = `بر اساس ${total.toLocaleString('fa-IR')} نظر`;
-    starsDisplay.innerHTML = starGlyphs(Math.round(avg));
+    document.getElementById('rv-stars-display').innerHTML = starGlyphs(Math.round(avg));
 
-    const counts = [5,4,3,2,1].map(star => REVIEWS_DATA.filter(r => r.rating === star).length);
-    barsWrap.innerHTML = [5,4,3,2,1].map((star, i) => {
-      const pct = total ? Math.round((counts[i] / total) * 100) : 0;
-      return `
-        <div class="rv-bar-row">
-          <span class="rv-bar-label">${star} ★</span>
-          <span class="rv-bar-track"><span class="rv-bar-fill" data-pct="${pct}"></span></span>
-          <span class="rv-bar-pct">${pct}%</span>
-        </div>`;
+    const counts = [5, 4, 3, 2, 1].map(star => reviews.filter(r => r.rating === star).length);
+    document.getElementById('rv-bars').innerHTML = [5, 4, 3, 2, 1].map((star, i) => {
+        const pct = total ? Math.round((counts[i] / total) * 100) : 0;
+        return `
+            <div class="rv-bar-row">
+                <span class="rv-bar-label">${star} ★</span>
+                <span class="rv-bar-track"><span class="rv-bar-fill" data-pct="${pct}"></span></span>
+                <span class="rv-bar-pct">${pct}%</span>
+            </div>
+        `;
     }).join('');
-  }
 
-  /* ── review card markup — mirrors the eventual Django loop ── */
-  function renderReviewCard(review) {
-    const initial = review.name ? review.name.trim().charAt(0) : '؟';
-    const formattedDate = new Date(review.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' });
-    return `
-      <article class="rv-card rv-glass" aria-label="نظر ${review.name}">
-        <div class="rv-card-head">
-          <div class="rv-avatar" aria-hidden="true">${initial}</div>
-          <div class="rv-card-headinfo">
-            <div class="rv-name-row">
-              <span class="rv-name">${review.name}</span>
-              ${review.verified ? '<span class="rv-verified">✓ خرید تأیید‌شده</span>' : ''}
+    // Animate bars
+    setTimeout(() => {
+        document.querySelectorAll('.rv-bar-fill').forEach(fill => {
+            fill.style.width = fill.dataset.pct + '%';
+        });
+    }, 300);
+}
+
+function renderReviews(reset) {
+    const grid = document.getElementById('rv-grid');
+    const loadMoreWrap = document.getElementById('rv-loadmore-wrap');
+    const loadMoreBtn = document.getElementById('rv-loadmore-btn');
+
+    if (reset) { grid.innerHTML = ''; visibleCount = 0; }
+
+    const approved = reviewsData.filter(r => r.status === 'approved');
+
+    if (approved.length === 0) {
+        grid.innerHTML = `
+            <div class="rv-empty">
+                <div class="rv-empty-illus" aria-hidden="true">🗒️</div>
+                <div class="rv-empty-title">هنوز نظری تأیید نشده است</div>
+                <div class="rv-empty-sub">اولین نفری باشید که نظرش را ثبت می‌کند</div>
             </div>
-            <div class="rv-card-sub">
-              <div class="rv-card-stars" aria-label="${review.rating} از ۵ ستاره">${starGlyphs(review.rating)}</div>
-              <time class="rv-date" datetime="${review.date}">${formattedDate}</time>
-            </div>
-          </div>
-        </div>
-        ${review.title ? `<h4 class="rv-card-title">${review.title}</h4>` : ''}
-        <p class="rv-card-text">${review.comment}</p>
-        <button type="button" class="rv-helpful-btn" data-id="${review.id}">
-          <span class="rv-helpful-icon">👍</span>
-          <span class="rv-helpful-label">مفید بود</span>
-          <span class="rv-helpful-count">(${review.helpfulCount})</span>
-        </button>
-      </article>`;
-  }
+        `;
+        loadMoreWrap.style.display = 'none';
+        return;
+    }
 
-  function renderEmptyState() {
-    gridEl.innerHTML = `
-      <div class="rv-empty">
-        <div class="rv-empty-illus" aria-hidden="true">🗒️</div>
-        <div class="rv-empty-title">هنوز نظری تأیید نشده است</div>
-        <div class="rv-empty-sub">اولین نفری باشید که نظرش را ثبت می‌کند</div>
-      </div>`;
-    loadMoreWrap.style.display = 'none';
-  }
-
-  function renderGrid(reset) {
-    if (!REVIEWS_DATA.length) { renderEmptyState(); return; }
-    if (reset) { gridEl.innerHTML = ''; visibleCount = 0; }
-
-    const nextCount = Math.min(visibleCount + PAGE_SIZE, REVIEWS_DATA.length);
-    const newItems = REVIEWS_DATA.slice(visibleCount, nextCount);
+    const nextCount = Math.min(visibleCount + PAGE_SIZE, approved.length);
+    const newItems = approved.slice(visibleCount, nextCount);
 
     newItems.forEach((review, i) => {
-      const wrap = document.createElement('div');
-      wrap.innerHTML = renderReviewCard(review);
-      const card = wrap.firstElementChild;
-      card.style.transitionDelay = `${Math.min(i, 5) * 0.06}s`;
-      gridEl.appendChild(card);
-      requestAnimationFrame(() => {
-        cardObserver.observe(card);
+        const card = document.createElement('article');
+        card.className = 'rv-card rv-glass';
+        card.style.transitionDelay = `${Math.min(i, 5) * 0.06}s`;
+
+        const initials = review.user_name ? review.user_name.trim().charAt(0) : '؟';
+        const avatarUrl = review.user_avatar || null;
+
+        card.innerHTML = `
+            <div class="rv-card-head">
+                <div class="rv-avatar" style="${avatarUrl ? 'background:transparent;padding:0;overflow:hidden;' : ''}">
+                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${review.user_name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials}
+                </div>
+                <div class="rv-card-headinfo">
+                    <div class="rv-name-row">
+                        <span class="rv-name">${review.user_name || 'کاربر ناشناس'}</span>
+                        ${review.is_verified_purchase ? '<span class="rv-verified">✓ خرید تأیید‌شده</span>' : ''}
+                    </div>
+                    <div class="rv-card-sub">
+                        <div class="rv-card-stars" aria-label="${review.rating} از ۵ ستاره">${starGlyphs(review.rating)}</div>
+                        <time class="rv-date" datetime="${review.created_at}">${formatDate(new Date(review.created_at))}</time>
+                    </div>
+                </div>
+            </div>
+            ${review.title ? `<h4 class="rv-card-title">${review.title}</h4>` : ''}
+            <p class="rv-card-text">${review.comment}</p>
+            <button type="button" class="rv-helpful-btn" data-id="${review.id}">
+                <span class="rv-helpful-icon">👍</span>
+                <span class="rv-helpful-label">مفید بود</span>
+                <span class="rv-helpful-count">(${review.helpful_count || 0})</span>
+            </button>
+        `;
+        grid.appendChild(card);
+
+        // Observe for animation
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: .08 });
+        observer.observe(card);
         requestAnimationFrame(() => card.classList.add('visible'));
-      });
     });
 
     visibleCount = nextCount;
     loadMoreBtn.disabled = false;
     loadMoreBtn.textContent = 'مشاهده نظرات بیشتر';
-    if (visibleCount >= REVIEWS_DATA.length) {
-      loadMoreWrap.style.display = REVIEWS_DATA.length <= PAGE_SIZE ? 'none' : 'block';
-      loadMoreBtn.disabled = true;
-      loadMoreBtn.textContent = 'همه نظرات نمایش داده شد';
+
+    if (visibleCount >= approved.length) {
+        loadMoreWrap.style.display = approved.length <= PAGE_SIZE ? 'none' : 'block';
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'همه نظرات نمایش داده شد';
     } else {
-      loadMoreWrap.style.display = 'block';
+        loadMoreWrap.style.display = 'block';
     }
-  }
+}
 
-  const cardObserver = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: .08 });
+/* ════════════════════════════════════
+   SUBMIT REVIEW
+   ════════════════════════════════════ */
+document.getElementById('rv-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const errorDiv = document.getElementById('rv-field-text').querySelector('.rv-errmsg');
+    const successBox = document.getElementById('rv-success');
 
-  loadMoreBtn && loadMoreBtn.addEventListener('click', () => renderGrid(false));
+    const rating = parseInt(document.getElementById('rv-rating-value').value);
+    const title = document.getElementById('rv-title').value.trim();
+    const comment = document.getElementById('rv-text').value.trim();
 
-  // "Helpful" toggle (client-side only placeholder — Django will POST/increment)
-  gridEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('.rv-helpful-btn');
-    if (!btn) return;
-    const countEl = btn.querySelector('.rv-helpful-count');
-    const isOn = btn.classList.toggle('rv-helpful-on');
-    const current = parseInt(countEl.textContent.replace(/[()]/g, ''), 10) || 0;
-    countEl.textContent = `(${isOn ? current + 1 : current - 1})`;
-  });
+    // Validation
+    let valid = true;
+    if (!rating) {
+        document.getElementById('rv-field-rating').classList.add('rv-error');
+        valid = false;
+    }
+    if (!comment) {
+        document.getElementById('rv-field-text').classList.add('rv-error');
+        valid = false;
+    }
+    if (!valid) return;
 
-  // Reveal on scroll for the sticky form + summary cards
-  [formCard, summaryCard].forEach(el => el && observer.observe(el));
+    try {
+        const csrfToken = getCSRFToken();
+        const response = await fetch(`${API_BASE}products/${encodeURIComponent(slug)}/reviews/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ rating, title, comment })
+        });
 
-  // Animate the summary bars once they enter view
-  const barsObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.querySelectorAll('.rv-bar-fill').forEach(fill => {
-        fill.style.width = fill.dataset.pct + '%';
-      });
-      barsObserver.unobserve(entry.target);
-    });
-  }, { threshold: .3 });
+        if (response.ok) {
+            successBox.classList.add('rv-show');
+            document.getElementById('rv-form').reset();
+            document.getElementById('rv-rating-value').value = '';
+            document.getElementById('rv-stars').querySelectorAll('.rv-star-btn').forEach(btn => {
+                btn.classList.remove('rv-star-active');
+            });
+            document.getElementById('rv-rating-hint').textContent = 'روی ستاره‌ها بزنید';
+            ['rv-field-rating', 'rv-field-text'].forEach(id => {
+                document.getElementById(id).classList.remove('rv-error');
+            });
+            setTimeout(() => successBox.classList.remove('rv-show'), 5000);
+            loadReviews();
+        } else {
+            const data = await response.json();
+            errorDiv.textContent = data.detail || 'خطا در ارسال نظر';
+            document.getElementById('rv-field-text').classList.add('rv-error');
+        }
+    } catch (error) {
+        errorDiv.textContent = 'خطا در ارتباط با سرور';
+        document.getElementById('rv-field-text').classList.add('rv-error');
+    }
+});
 
-  renderSummary();
-  renderGrid(true);
-  if (barsWrap) barsObserver.observe(barsWrap);
+/* ════════════════════════════════════
+   STAR RATING INPUT
+   ════════════════════════════════════ */
+const starsWrap = document.getElementById('rv-stars');
+const ratingInput = document.getElementById('rv-rating-value');
+const ratingHint = document.getElementById('rv-rating-hint');
+const ratingLabels = { 1: 'بسیار ضعیف', 2: 'ضعیف', 3: 'متوسط', 4: 'خوب', 5: 'عالی' };
+let currentRating = 0;
 
-  /* ── STAR RATING INPUT ── */
-  const starsWrap = document.getElementById('rv-stars');
-  const ratingInput = document.getElementById('rv-rating-value');
-  const ratingHint = document.getElementById('rv-rating-hint');
-  const ratingLabels = { 1: 'بسیار ضعیف', 2: 'ضعیف', 3: 'متوسط', 4: 'خوب', 5: 'عالی' };
-  let currentRating = 0;
-
-  function paintStars(value) {
+function paintStars(value) {
     const btns = starsWrap.querySelectorAll('.rv-star-btn');
     btns.forEach(btn => {
-      const v = parseInt(btn.dataset.value, 10);
-      btn.classList.toggle('rv-star-active', v <= value);
-      btn.setAttribute('aria-checked', v === currentRating ? 'true' : 'false');
+        const v = parseInt(btn.dataset.value, 10);
+        btn.classList.toggle('rv-star-active', v <= value);
     });
-  }
+}
 
-  starsWrap.addEventListener('mousemove', (e) => {
+starsWrap.addEventListener('mousemove', (e) => {
     const btn = e.target.closest('.rv-star-btn');
     if (!btn) return;
     paintStars(parseInt(btn.dataset.value, 10));
-  });
-  starsWrap.addEventListener('mouseleave', () => paintStars(currentRating));
+});
+starsWrap.addEventListener('mouseleave', () => paintStars(currentRating));
 
-  starsWrap.addEventListener('click', (e) => {
+starsWrap.addEventListener('click', (e) => {
     const btn = e.target.closest('.rv-star-btn');
     if (!btn) return;
     currentRating = parseInt(btn.dataset.value, 10);
@@ -2161,77 +2365,70 @@ const REVIEWS_DATA = [
     paintStars(currentRating);
     ratingHint.textContent = `امتیاز شما: ${ratingLabels[currentRating]} (${currentRating} از ۵)`;
     document.getElementById('rv-field-rating').classList.remove('rv-error');
-  });
+});
 
-  // Keyboard support: arrow keys move focus & selection between stars
-  starsWrap.addEventListener('keydown', (e) => {
-    if (!['ArrowRight','ArrowLeft'].includes(e.key)) return;
-    const btns = Array.from(starsWrap.querySelectorAll('.rv-star-btn'));
-    const idx = btns.indexOf(document.activeElement);
-    if (idx === -1) return;
-    e.preventDefault();
-    const dir = e.key === 'ArrowRight' ? 1 : -1; // stars laid out row-reverse (5→1)
-    const next = btns[(idx + dir + btns.length) % btns.length];
-    next.focus();
-  });
+/* ════════════════════════════════════
+   LOAD MORE REVIEWS
+   ════════════════════════════════════ */
+document.getElementById('rv-loadmore-btn').addEventListener('click', () => renderReviews(false));
 
-  /* ── FORM VALIDATION + SUBMIT (placeholder — no network call) ── */
-  const form = document.getElementById('rv-form');
-  const submitBtn = document.getElementById('rv-submit-btn');
-  const successBox = document.getElementById('rv-success');
-  const nameInput = document.getElementById('rv-name');
-  const textInput = document.getElementById('rv-text');
+/* ════════════════════════════════════
+   PARTICLES (همون کد قبلی)
+   ════════════════════════════════════ */
+const canvas = document.getElementById('hero-particles');
+const ctx = canvas.getContext('2d');
+let W, H;
+const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
+resize(); window.addEventListener('resize', resize);
 
-  function setFieldError(fieldId, hasError) {
-    document.getElementById(fieldId).classList.toggle('rv-error', hasError);
-  }
+const isMobile = window.innerWidth <= 768;
+const particles = Array.from({length: isMobile ? 30 : 60}, () => ({
+    x: Math.random() * 2000 - 200,
+    y: Math.random() * H,
+    r: Math.random() * 1.4 + .3,
+    vx: (Math.random() - .5) * .18,
+    vy: -(Math.random() * .35 + .1),
+    col: Math.random() < .5 ? 'rgba(201,168,76,' : Math.random() < .5 ? 'rgba(0,212,255,' : 'rgba(255,255,255,',
+    alpha: Math.random() * .45 + .1,
+    pulse: Math.random() * Math.PI * 2,
+    ps: Math.random() * .025 + .01
+}));
 
-  function validateForm() {
-    let valid = true;
-    if (!currentRating) { setFieldError('rv-field-rating', true); valid = false; }
-    if (!nameInput.value.trim()) { setFieldError('rv-field-name', true); valid = false; }
-    if (!textInput.value.trim()) { setFieldError('rv-field-text', true); valid = false; }
-    return valid;
-  }
+function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.pulse += p.ps;
+        if (p.y < -5) { p.y = H + 5; p.x = Math.random() * W; }
+        if (p.x < -50) p.x = W + 50;
+        if (p.x > W + 50) p.x = -50;
+        const a = p.alpha * (0.65 + 0.35 * Math.sin(p.pulse));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.col + a + ')';
+        ctx.fill();
+    }
+    requestAnimationFrame(drawParticles);
+}
+drawParticles();
 
-  [nameInput, textInput].forEach(input => {
-    input.addEventListener('input', () => {
-      const fieldId = input.closest('.rv-field').id;
-      if (input.value.trim()) setFieldError(fieldId, false);
-    });
-  });
+/* ════════════════════════════════════
+   SCROLL REVEAL
+   ════════════════════════════════════ */
+const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .1 });
 
-  submitBtn.addEventListener('click', function rippleFx(e) {
-    const rect = submitBtn.getBoundingClientRect();
-    const ripple = document.createElement('span');
-    const size = Math.max(rect.width, rect.height);
-    ripple.className = 'rv-ripple';
-    ripple.style.width = ripple.style.height = size + 'px';
-    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-    submitBtn.appendChild(ripple);
-    ripple.addEventListener('animationend', () => ripple.remove());
-  });
+document.querySelectorAll('[data-reveal], .gcard, .feature-card, .stats-row, .warranty-block, .cta-bottom').forEach(el => {
+    revealObserver.observe(el);
+});
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault(); // placeholder only — Django will handle the real POST
-    successBox.classList.remove('rv-show');
-
-    if (!validateForm()) return;
-
-    // Simulated success — in production this fires after the Django
-    // response confirms the review was received (pending approval).
-    successBox.classList.add('rv-show');
-    form.reset();
-    currentRating = 0;
-    ratingInput.value = '';
-    ratingHint.textContent = 'روی ستاره‌ها بزنید';
-    paintStars(0);
-    ['rv-field-rating','rv-field-name','rv-field-text'].forEach(id => setFieldError(id, false));
-
-    window.setTimeout(() => successBox.classList.remove('rv-show'), 6000);
-  });
-})();
+/* ════════════════════════════════════
+   START
+   ════════════════════════════════════ */
+loadProduct();
 </script>
+
 </body>
 </html>

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # local apps
     'apps.accounts.apps.AccountsConfig',
     'apps.home.apps.HomeConfig',
+    'apps.shop.apps.ShopConfig',
 
     'rest_framework',
     "drf_spectacular",

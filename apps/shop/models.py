@@ -1,3 +1,401 @@
-from django.db import models
+# apps/shop/models.py
 
-# Create your models here.
+from django.db import models
+from django.utils import timezone
+from django.utils.text import slugify
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
+from ckeditor.fields import RichTextField
+
+User = get_user_model()
+
+
+class Category(models.Model):
+    """دسته‌بندی محصولات"""
+    name = models.CharField(max_length=100, verbose_name="نام دسته‌بندی")
+    slug = models.SlugField(max_length=120, unique=True, verbose_name="اسلاگ")
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="آیکون",
+        help_text="آیکون فونت‌آ‌وسم یا ایموجی"
+    )
+    description = models.TextField(blank=True, verbose_name="توضیحات")
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children',
+        verbose_name="دسته‌بندی والد"
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "دسته‌بندی"
+        verbose_name_plural = "دسته‌بندی‌ها"
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+
+class ProductSpec(models.Model):
+    """ویژگی‌های محصول (برای بخش hero-specs)"""
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='specs'
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="آیکون",
+        help_text="آیکون فونت‌آ‌وسم یا ایموجی"
+    )
+    value = models.CharField(max_length=100, verbose_name="مقدار")
+    label = models.CharField(max_length=100, verbose_name="برچسب")
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
+
+    class Meta:
+        verbose_name = "ویژگی محصول"
+        verbose_name_plural = "ویژگی‌های محصول"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.label}: {self.value}"
+
+
+class TrustBadge(models.Model):
+    """نشان‌های اعتماد (بخش trust-row)"""
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='trust_badges'
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="آیکون",
+        help_text="آیکون فونت‌آ‌وسم یا ایموجی"
+    )
+    label = models.CharField(max_length=100, verbose_name="برچسب")
+    value = models.CharField(max_length=100, blank=True, verbose_name="مقدار")
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
+
+    class Meta:
+        verbose_name = "نشان اعتماد"
+        verbose_name_plural = "نشان‌های اعتماد"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.label
+
+
+class MarketingFeature(models.Model):
+    """ویژگی‌های بازاریابی (بخش marketing)"""
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='marketing_features'
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="آیکون",
+        help_text="آیکون فونت‌آ‌وسم یا ایموجی"
+    )
+    title = models.CharField(max_length=200, verbose_name="عنوان")
+    description = models.TextField(verbose_name="توضیحات")
+    accent = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="آیکون پس‌زمینه"
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
+
+    class Meta:
+        verbose_name = "ویژگی بازاریابی"
+        verbose_name_plural = "ویژگی‌های بازاریابی"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.title
+
+
+class StatFeature(models.Model):
+    """آمارهای محصول (بخش stats-row)"""
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='stat_features'
+    )
+    number = models.CharField(max_length=50, verbose_name="عدد/مقدار")
+    suffix = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name="پسوند",
+        help_text="مثلاً: +, km, W, سال"
+    )
+    label = models.CharField(max_length=100, verbose_name="برچسب")
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
+
+    class Meta:
+        verbose_name = "آمار محصول"
+        verbose_name_plural = "آمارهای محصول"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.label
+
+
+class ProductImage(models.Model):
+    """تصاویر محصول با رنگ‌بندی"""
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='images'
+    )
+    image = models.ImageField(
+        upload_to='products/gallery/',
+        verbose_name="تصویر"
+    )
+    color_slug = models.SlugField(
+        max_length=50,
+        verbose_name="اسلاگ رنگ",
+        help_text="مثلاً: red, white, black, blue"
+    )
+    color_label = models.CharField(
+        max_length=50,
+        verbose_name="نام رنگ",
+        help_text="مثلاً: قرمز, سفید, مشکی, آبی"
+    )
+    color_hex = models.CharField(
+        max_length=7,
+        verbose_name="کد رنگ (Hex)",
+        help_text="مثلاً: #D6483C",
+        default='#FFFFFF'
+    )
+    alt_text = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="متن جایگزین"
+    )
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="ترتیب")
+    is_primary = models.BooleanField(default=False, verbose_name="تصویر اصلی")
+
+    class Meta:
+        verbose_name = "تصویر محصول"
+        verbose_name_plural = "تصاویر محصول"
+        ordering = ['sort_order']
+
+    def __str__(self):
+        return f"{self.product.name} - {self.color_label}"
+
+
+class ProductReview(models.Model):
+    """نظرات محصولات"""
+    STATUS_CHOICES = (
+        ('pending', 'در انتظار تایید'),
+        ('approved', 'تایید شده'),
+        ('rejected', 'رد شده'),
+    )
+
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='product_reviews'
+    )
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name="امتیاز"
+    )
+    title = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="عنوان نظر"
+    )
+    comment = models.TextField(verbose_name="متن نظر")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="وضعیت"
+    )
+    rejection_reason = models.TextField(
+        blank=True,
+        verbose_name="دلیل رد شدن",
+        help_text="در صورت رد شدن نظر، دلیل آن را وارد کنید"
+    )
+    helpful_count = models.PositiveIntegerField(default=0, verbose_name="تعداد مفید بودن")
+    is_verified_purchase = models.BooleanField(default=False, verbose_name="خرید تایید شده")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "نظر محصول"
+        verbose_name_plural = "نظرات محصولات"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.fullname} - {self.product.name} ({self.rating}★)"
+
+
+class Wishlist(models.Model):
+    """لیست علاقه‌مندی‌ها"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='wishlist'
+    )
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='wishlisted_by'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "علاقه‌مندی"
+        verbose_name_plural = "علاقه‌مندی‌ها"
+        unique_together = ['user', 'product']
+
+    def __str__(self):
+        return f"{self.user.fullname} - {self.product.name}"
+
+
+class Product(models.Model):
+    """مدل اصلی محصول"""
+    # اطلاعات پایه
+    name = models.CharField(max_length=255, verbose_name="نام محصول")
+    slug = models.SlugField(max_length=280, unique=True, allow_unicode=True, verbose_name="اسلاگ")
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        related_name='products',
+        verbose_name="دسته‌بندی"
+    )
+
+    # محتوا
+    tagline = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="شعار",
+        help_text="یک عبارت کوتاه برای نمایش در هدر"
+    )
+    description = models.TextField(verbose_name="توضیحات")
+
+    # تصویر اصلی (کاور)
+    cover_image = models.ImageField(
+        upload_to='products/covers/',
+        verbose_name="تصویر کاور",
+        help_text="تصویر اصلی محصول که در هدر نمایش داده می‌شود"
+    )
+    cover_alt_text = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="متن جایگزین تصویر کاور"
+    )
+
+    # قیمت
+    price = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="قیمت (تومان)"
+    )
+    discount_price = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        blank=True,
+        null=True,
+        verbose_name="قیمت با تخفیف"
+    )
+
+    # موجودی
+    stock = models.PositiveIntegerField(default=0, verbose_name="موجودی")
+    is_available = models.BooleanField(default=True, verbose_name="موجود")
+
+    # وضعیت
+    is_published = models.BooleanField(default=True, verbose_name="منتشر شده")
+    is_featured = models.BooleanField(default=False, verbose_name="ویژه")
+
+    # متادیتا
+    meta_title = models.CharField(
+        max_length=60,
+        blank=True,
+        verbose_name="عنوان متا"
+    )
+    meta_description = models.CharField(
+        max_length=160,
+        blank=True,
+        verbose_name="توضیحات متا"
+    )
+
+    # آمار
+    view_count = models.PositiveIntegerField(default=0, verbose_name="تعداد بازدید")
+
+    # زمان
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "محصول"
+        verbose_name_plural = "محصولات"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('shop:product_detail', kwargs={'slug': self.slug})
+
+    @property
+    def reviews_count(self):
+        return self.reviews.filter(status='approved').count()
+
+    @property
+    def final_price(self):
+        """قیمت نهایی با احتساب تخفیف"""
+        return self.discount_price if self.discount_price else self.price
+
+    @property
+    def average_rating(self):
+        """میانگین امتیازات تایید شده"""
+        approved = self.reviews.filter(status='approved')
+        if approved.exists():
+            return round(approved.aggregate(models.Avg('rating'))['rating__avg'], 1)
+        return 0
+
+    @property
+    def reviews_count(self):
+        """تعداد نظرات تایید شده"""
+        return self.reviews.filter(status='approved').count()
+
+    @property
+    def rating_distribution(self):
+        """توزیع امتیازات"""
+        distribution = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+        approved = self.reviews.filter(status='approved')
+        if approved.exists():
+            for rating in range(1, 6):
+                distribution[rating] = approved.filter(rating=rating).count()
+        return distribution
