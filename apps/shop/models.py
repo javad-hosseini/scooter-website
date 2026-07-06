@@ -1,11 +1,9 @@
 # apps/shop/models.py
 
-from django.db import models
-from django.utils import timezone
-from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
-from ckeditor.fields import RichTextField
+from django.db import models
+from django.utils.text import slugify
 
 User = get_user_model()
 
@@ -399,3 +397,29 @@ class Product(models.Model):
             for rating in range(1, 6):
                 distribution[rating] = approved.filter(rating=rating).count()
         return distribution
+
+
+# apps/shop/models.py
+
+class CategoryHeroProduct(models.Model):
+    """محصولات نمایش داده شده در هیرو اسلایدر هر کتگوری"""
+    category = models.ForeignKey(
+        'Category',
+        on_delete=models.CASCADE,
+        related_name='hero_products'
+    )
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='hero_slides'
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
+
+    class Meta:
+        verbose_name = "محصول اسلایدر"
+        verbose_name_plural = "محصولات اسلایدر"
+        ordering = ['order']
+        unique_together = ['category', 'product']
+
+    def __str__(self):
+        return f"{self.category.name} - {self.product.name}"

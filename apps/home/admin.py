@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.utils.html import format_html
 from django.contrib.auth import get_user_model
 
 from .models import Article, Tag, Comment
@@ -215,3 +214,121 @@ class CommentAdmin(admin.ModelAdmin):
     def unapprove_comments(self, request, queryset):
         updated = queryset.update(is_approved=False)
         self.message_user(request, f'{updated} نظر از تایید خارج شد')
+
+
+# apps/home/admin.py (افزودن به ادمین موجود)
+
+from django.contrib import admin
+from django.utils.html import format_html
+from .models import (
+    IndexPageSettings, CategoryFeature, ProductCard,
+    Testimonial, Promise
+)
+
+
+@admin.register(IndexPageSettings)
+class IndexPageSettingsAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description')
+        }),
+        ('بخش هیرو', {
+            'fields': (
+                'hero_title_part1', 'hero_title_part2', 'hero_title_part3',
+                'hero_tag', 'hero_description', 'hero_btn_text', 'hero_btn_secondary_text',
+                'hero_image', 'hero_mobile_image', 'hero_image_alt'
+            )
+        }),
+        ('آمارهای هیرو', {
+            'fields': (
+                'hero_stat_1_value', 'hero_stat_1_unit', 'hero_stat_1_label',
+                'hero_stat_2_value', 'hero_stat_2_unit', 'hero_stat_2_label',
+                'hero_stat_3_value', 'hero_stat_3_unit', 'hero_stat_3_label',
+                'hero_stat_4_value', 'hero_stat_4_unit', 'hero_stat_4_label',
+            )
+        }),
+        ('بخش پرفروش‌ها', {
+            'fields': ('best_sellers_label', 'best_sellers_title')
+        }),
+        ('بخش نظرات', {
+            'fields': (
+                'testimonials_label', 'testimonials_title',
+                'testimonials_rating', 'testimonials_count',
+                'testimonials_count_label'
+            )
+        }),
+        ('بخش راهنما', {
+            'fields': ('guide_label', 'guide_title')
+        }),
+        ('بخش تعهدات', {
+            'fields': ('promise_label', 'promise_title')
+        }),
+        ('بیانیه پایانی', {
+            'fields': (
+                'statement_eyebrow', 'statement_title',
+                'statement_title_highlight', 'statement_description',
+                'statement_btn_text', 'statement_btn_secondary_text'
+            )
+        }),
+        ('فوتر', {
+            'fields': ('footer_tagline', 'footer_copyright')
+        }),
+    )
+
+    def has_add_permission(self, request):
+        # فقط یک رکورد مجاز است
+        if IndexPageSettings.objects.exists():
+            return False
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(CategoryFeature)
+class CategoryFeatureAdmin(admin.ModelAdmin):
+    list_display = ['category', 'label', 'value', 'unit', 'color', 'order']
+    list_filter = ['category', 'color']
+    list_editable = ['order']
+    ordering = ['category', 'order']
+
+
+@admin.register(ProductCard)
+class ProductCardAdmin(admin.ModelAdmin):
+    list_display = ['product', 'badge_text', 'color', 'order', 'is_active']
+    list_filter = ['color', 'is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['product__name']
+    ordering = ['order']
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "product":
+            kwargs["queryset"] = db_field.remote_field.model.objects.filter(is_published=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = ['name', 'avatar_preview', 'rating', 'is_featured', 'order', 'is_active']
+    list_filter = ['rating', 'is_featured', 'is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['name', 'quote']
+    ordering = ['order']
+
+    def avatar_preview(self, obj):
+        if obj.avatar_image:
+            return format_html(
+                '<img src="{}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" />',
+                obj.avatar_image.url
+            )
+        return '—'
+
+    avatar_preview.short_description = 'عکس'
+
+
+@admin.register(Promise)
+class PromiseAdmin(admin.ModelAdmin):
+    list_display = ['title', 'label', 'badge_value', 'color', 'order', 'is_active']
+    list_filter = ['color', 'is_active']
+    list_editable = ['order', 'is_active']
+    ordering = ['order']

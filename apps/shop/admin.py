@@ -8,7 +8,7 @@ from django.utils.html import format_html
 from .models import (
     Product, Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist
+    ProductReview, Wishlist, CategoryHeroProduct
 )
 
 
@@ -60,6 +60,14 @@ class ProductReviewInline(admin.TabularInline):
     comment_preview.short_description = 'متن نظر'
 
 
+class CategoryHeroProductInline(admin.TabularInline):
+    model = CategoryHeroProduct
+    extra = 1
+    fields = ['product', 'order']
+    ordering = ['order']
+    autocomplete_fields = ['product']
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'icon', 'product_count', 'is_active', 'order']
@@ -72,6 +80,7 @@ class CategoryAdmin(admin.ModelAdmin):
         return obj.products.filter(is_published=True).count()
 
     product_count.short_description = 'تعداد محصولات'
+    inlines = [CategoryHeroProductInline]
 
 
 @admin.register(Product)

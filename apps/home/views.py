@@ -131,3 +131,32 @@ class ArticleDetailPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['slug'] = self.kwargs.get('slug')
         return context
+
+
+# apps/home/views.py (افزودن به ویوهای موجود)
+
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from django.views.generic import TemplateView
+from .models import IndexPageSettings
+from .serializers import IndexPageSerializer
+
+
+class IndexPageAPIView(generics.RetrieveAPIView):
+    """API برای دریافت اطلاعات صفحه اصلی"""
+    permission_classes = [AllowAny]
+    serializer_class = IndexPageSerializer
+
+    def get_object(self):
+        # فقط یک رکورد وجود دارد
+        return IndexPageSettings.objects.first()
+
+
+class IndexPageView(TemplateView):
+    """صفحه اصلی سایت"""
+    template_name = 'home/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

@@ -8,12 +8,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAu
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+
 from .models import Product, Category, ProductReview, Wishlist
 from .pagination import ProductPagination
 from .serializers import (
-    ProductListSerializer, ProductDetailSerializer, 
+    ProductListSerializer, ProductDetailSerializer,
     ProductReviewSerializer, ProductReviewCreateSerializer,
-    WishlistSerializer, CategorySerializer
+    WishlistSerializer, CategorySerializer, CategoryDetailSerializer
 )
 
 
@@ -53,8 +54,19 @@ class ProductListAPIView(generics.ListAPIView):
         return qs
 
 
+class CategoryDetailAPIView(generics.RetrieveAPIView):
+    """API برای نمایش یک کتگوری با محصولات و اسلایدر"""
+    permission_classes = [AllowAny]
+    serializer_class = CategoryDetailSerializer
+    lookup_field = 'slug'
+    lookup_url_kwarg = 'slug'
+
+    def get_queryset(self):
+        return Category.objects.filter(is_active=True)
+
+
 class ProductDetailAPIView(generics.RetrieveAPIView):
-    """API برای جزئیات یک محصول"""
+    """API برای نمایش جزئیات یک محصول"""
     permission_classes = [AllowAny]
     serializer_class = ProductDetailSerializer
     lookup_field = 'slug'
@@ -64,10 +76,8 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        # افزایش بازدید
         instance.view_count += 1
         instance.save(update_fields=['view_count'])
-
         serializer = self.get_serializer(instance, context={'request': request})
         return Response(serializer.data)
 
@@ -134,8 +144,12 @@ class WishlistToggleAPIView(APIView):
     """API برای افزودن/حذف از علاقه‌مندی‌ها"""
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, slug):
-        product = get_object_or_404(Product, slug=slug, is_published=True)
+    def post(self, request):
+        product_id = request.data.get('product_id')
+        if not product_id:
+            return Response({'error': 'شناسه محصول الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+
+        product = get_object_or_404(Product, id=product_id, is_published=True)
 
         wishlist_item = Wishlist.objects.filter(user=request.user, product=product)
 
@@ -159,11 +173,31 @@ class WishlistListAPIView(generics.ListAPIView):
 
 class ProductListPageView(TemplateView):
     """صفحه لیست محصولات"""
-    template_name = 'shop/products.html'
+    template_name = 'shop/category_products.html'
 
 
 class ProductDetailPageView(TemplateView):
     """صفحه جزئیات محصول"""
+    template_name = 'shop/product_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['slug'] = self.kwargs.get('slug')
+        return context
+
+
+class CategoryPageView(TemplateView):
+    """صفحه نمایش محصولات یک کتگوری"""
+    template_name = 'shop/category_products.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['slug'] = self.kwargs.get('slug')
+        return context
+
+
+class ProductPageView(TemplateView):
+    """صفحه نمایش یک محصول"""
     template_name = 'shop/product_detail.html'
 
     def get_context_data(self, **kwargs):

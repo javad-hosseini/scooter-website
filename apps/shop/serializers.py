@@ -1,6 +1,7 @@
 # apps/shop/serializers.py
 
 from rest_framework import serializers
+
 from .models import (
     Product, Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
@@ -127,6 +128,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     reviews_count = serializers.IntegerField(read_only=True)
     rating_distribution = serializers.DictField(read_only=True)
     is_in_wishlist = serializers.SerializerMethodField()
+
     # is_verified = serializers.BooleanField(read_only=True)
 
     class Meta:
@@ -159,3 +161,67 @@ class WishlistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wishlist
         fields = ['id', 'product', 'created_at']
+
+
+# apps/shop/serializers.py
+
+from rest_framework import serializers
+from apps.home.models import CategoryFeature
+from .models import Category, CategoryHeroProduct, Wishlist
+
+
+class CategoryFeatureSerializer(serializers.ModelSerializer):
+    color_hex = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CategoryFeature
+        fields = ['color', 'color_hex']
+
+    def get_color_hex(self, obj):
+        return obj.get_color_hex()
+
+
+class CategoryHeroProductSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField(source='product.id')
+    product_name = serializers.CharField(source='product.name')
+    product_slug = serializers.CharField(source='product.slug')
+    product_price = serializers.DecimalField(source='product.price', max_digits=15, decimal_places=0)
+    product_discount_price = serializers.DecimalField(source='product.discount_price', max_digits=15, decimal_places=0,
+                                                      allow_null=True)
+    product_description = serializers.CharField(source='product.description')
+    product_tagline = serializers.CharField(source='product.tagline')
+    cover_image_url = serializers.SerializerMethodField()
+    cover_alt_text = serializers.CharField(source='product.cover_alt_text')
+
+    class Meta:
+        model = CategoryHeroProduct
+        fields = [
+            'product_id', 'product_name', 'product_slug', 'product_price',
+            'product_discount_price', 'product_description', 'product_tagline',
+            'cover_image_url', 'cover_alt_text', 'order'
+        ]
+
+    def get_cover_image_url(self, obj):
+        if obj.product and obj.product.cover_image:
+            return obj.product.cover_image.url
+        return None
+
+
+class CategoryDetailSerializer(serializers.ModelSerializer):  # ← این رو اضافه کن
+    hero_products = CategoryHeroProductSerializer(many=True, read_only=True)
+    color_hex = serializers.SerializerMethodField()
+    products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug', 'icon', 'description', 'color_hex', 'hero_products', 'products']
+
+    def get_color_hex(self, obj):
+        feature = CategoryFeature.objects.filter(category=obj).first()
+        if feature:
+            return feature.get_color_hex()
+        return '#4fd8ff'
+
+    def get_products(self, obj):
+        products = obj.products.filter(is_published=True, is_available=True)
+        return ProductListSerializer(products, many=True, context=self.context).data
