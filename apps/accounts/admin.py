@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .models import CustomUser, PasswordResetOTP
+from .models import CustomUser, PasswordResetOTP, Province, City, Address
 
 
 @admin.register(CustomUser)
@@ -136,3 +136,43 @@ class PasswordResetOTPAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """اجازه حذف OTP رو غیرفعال کن"""
         return False
+
+@admin.register(Province)
+class ProvinceAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ['name', 'province']
+    list_filter = ['province']
+    search_fields = ['name']
+
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ['user', 'recipient_name', 'province', 'city', 'is_active', 'created_at']
+    list_filter = ['province', 'city', 'is_active']
+    search_fields = ['user__fullname', 'recipient_name', 'address', 'postal_code']
+    readonly_fields = ['created_at', 'updated_at']
+    list_per_page = 25
+
+    fieldsets = (
+        ('اطلاعات گیرنده', {
+            'fields': ('user', 'recipient_name', 'recipient_phone')
+        }),
+        ('آدرس', {
+            'fields': ('province', 'city', 'address', 'postal_code', 'plaque', 'unit', 'floor')
+        }),
+        ('وضعیت', {
+            'fields': ('is_active',)
+        }),
+        ('توضیحات', {
+            'fields': ('description',)
+        }),
+        ('تاریخ', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )

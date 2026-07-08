@@ -204,3 +204,5 @@ class ProductPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['slug'] = self.kwargs.get('slug')
         return context
+
+

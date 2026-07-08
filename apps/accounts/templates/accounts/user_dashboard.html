@@ -1,869 +1,2040 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ user.full_name }} | پنل کاربری</title>
-<meta name="description" content="مدیریت سفارش‌ها، اطلاعات حساب، لیست علاقه‌مندی‌ها و امنیت حساب کاربری شما">
-<!-- SEO: breadcrumb structured data hook -->
-<!-- {% comment %} <script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script> {% endcomment %} -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="page-title">پنل کاربری | ولتکس</title>
+    <meta
+      name="description"
+      content="مدیریت سفارش‌ها، اطلاعات حساب، لیست علاقه‌مندی‌ها و امنیت حساب کاربری شما"
+    />
+    <!-- SEO: breadcrumb structured data hook -->
+    <!-- {% comment %} <script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script> {% endcomment %} -->
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
 
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        colors: {
-          bg: { DEFAULT:'#0A0A0F', surface:'#121218', elevated:'#1A1A23', line:'#26262F' },
-          gold: { DEFAULT:'#C9A961', dim:'#8F7A46', bright:'#E4C77E' },
-          cyan: { DEFAULT:'#4DD8E0', dim:'#2E8A90' },
-          ink: { DEFAULT:'#F2F1ED', muted:'#9C9BA6', faint:'#5F5E68' },
-          ok: '#4ADE80', warn:'#FBBF24', danger:'#F87171', info:'#60A5FA'
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              bg: {
+                DEFAULT: "#0A0A0F",
+                surface: "#121218",
+                elevated: "#1A1A23",
+                line: "#26262F",
+              },
+              gold: { DEFAULT: "#C9A961", dim: "#8F7A46", bright: "#E4C77E" },
+              cyan: { DEFAULT: "#4DD8E0", dim: "#2E8A90" },
+              ink: { DEFAULT: "#F2F1ED", muted: "#9C9BA6", faint: "#5F5E68" },
+              ok: "#4ADE80",
+              warn: "#FBBF24",
+              danger: "#F87171",
+              info: "#60A5FA",
+            },
+            fontFamily: {
+              display: ['"Space Grotesk"', "sans-serif"],
+              body: ["Inter", "sans-serif"],
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+            boxShadow: {
+              glow: "0 0 0 1px rgba(201,169,97,0.15), 0 8px 30px -8px rgba(201,169,97,0.25)",
+              card: "0 4px 24px -8px rgba(0,0,0,0.5)",
+            },
+          },
         },
-        fontFamily: {
-          display: ['"Space Grotesk"','sans-serif'],
-          body: ['Inter','sans-serif'],
-          mono: ['"JetBrains Mono"','monospace']
-        },
-        boxShadow: {
-          glow: '0 0 0 1px rgba(201,169,97,0.15), 0 8px 30px -8px rgba(201,169,97,0.25)',
-          card: '0 4px 24px -8px rgba(0,0,0,0.5)'
+      };
+    </script>
+    />
+
+    <!-- ============================================================
+   STYLES — تمام استایل‌های فایل user_dashboard.html رو اینجا کپی کن
+   (از <style> تا </style> فایل اصلی)
+   ============================================================ -->
+    <style>
+      :root {
+        --bg: #0a0a0f;
+        --surface: #121218;
+        --elevated: #1a1a23;
+        --line: #26262f;
+        --gold: #c9a961;
+        --gold-bright: #e4c77e;
+        --cyan: #4dd8e0;
+      }
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #2c2c36 transparent;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #2c2c36;
+        border-radius: 99px;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: #f2f1ed;
+      }
+      .font-display {
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .font-mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .glass {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.035),
+          rgba(255, 255, 255, 0.01)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(16px);
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+      }
+      .card-hover {
+        transition:
+          border-color 0.25s ease,
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      .card-hover:hover {
+        border-color: rgba(201, 169, 97, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.55);
+      }
+
+      .gold-grad {
+        background: linear-gradient(
+          135deg,
+          var(--gold-bright),
+          var(--gold) 60%,
+          #a9853f
+        );
+      }
+      .text-gold-grad {
+        background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+        color: #14140f;
+        font-weight: 600;
+        transition:
+          filter 0.2s ease,
+          transform 0.2s ease;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: #f2f1ed;
+        transition:
+          border-color 0.2s ease,
+          background 0.2s ease;
+      }
+      .btn-ghost:hover {
+        border-color: rgba(201, 169, 97, 0.5);
+        background: rgba(201, 169, 97, 0.06);
+      }
+      .btn-danger-ghost {
+        border: 1px solid rgba(248, 113, 113, 0.35);
+        color: #f87171;
+        transition: background 0.2s ease;
+      }
+      .btn-danger-ghost:hover {
+        background: rgba(248, 113, 113, 0.08);
+      }
+
+      .nav-item {
+        position: relative;
+        transition:
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+      .nav-item .dot {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      .nav-item.active {
+        background: linear-gradient(
+          90deg,
+          rgba(201, 169, 97, 0.14),
+          rgba(201, 169, 97, 0.02)
+        );
+        color: #e4c77e;
+      }
+      .nav-item.active .dot {
+        opacity: 1;
+      }
+      .nav-item.active svg {
+        color: #e4c77e;
+      }
+      .nav-item:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .fade-in {
+        animation: fadeIn 0.45s ease both;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
         }
       }
-    }
-  }
-</script>
+      .stagger > * {
+        animation: fadeIn 0.45s ease both;
+      }
+      .stagger > *:nth-child(1) {
+        animation-delay: 0.02s;
+      }
+      .stagger > *:nth-child(2) {
+        animation-delay: 0.07s;
+      }
+      .stagger > *:nth-child(3) {
+        animation-delay: 0.12s;
+      }
+      .stagger > *:nth-child(4) {
+        animation-delay: 0.17s;
+      }
+      .stagger > *:nth-child(5) {
+        animation-delay: 0.22s;
+      }
+      .stagger > *:nth-child(6) {
+        animation-delay: 0.27s;
+      }
 
-<style>
-  :root{
-    --bg:#0A0A0F; --surface:#121218; --elevated:#1A1A23; --line:#26262F;
-    --gold:#C9A961; --gold-bright:#E4C77E; --cyan:#4DD8E0;
-  }
-  *{ scrollbar-width: thin; scrollbar-color: #2c2c36 transparent; }
-  ::-webkit-scrollbar{ width:6px; height:6px; }
-  ::-webkit-scrollbar-thumb{ background:#2c2c36; border-radius:99px; }
-  html{ scroll-behavior:smooth; }
-  body{ font-family:'Inter', sans-serif; background:var(--bg); color:#F2F1ED; }
-  .font-display{ font-family:'Space Grotesk', sans-serif; }
-  .font-mono{ font-family:'JetBrains Mono', monospace; }
+      .skeleton {
+        position: relative;
+        overflow: hidden;
+        background: #1a1a23;
+      }
+      .skeleton::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.06),
+          transparent
+        );
+        animation: shimmer 1.4s infinite;
+      }
+      @keyframes shimmer {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(100%);
+        }
+      }
 
-  .glass{
-    background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
-    border: 1px solid rgba(255,255,255,0.07);
-    backdrop-filter: blur(16px);
-  }
-  .card{
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-  }
-  .card-hover{ transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease; }
-  .card-hover:hover{ border-color: rgba(201,169,97,0.35); transform: translateY(-2px); box-shadow: 0 12px 28px -10px rgba(0,0,0,0.55); }
+      .toggle {
+        width: 44px;
+        height: 24px;
+        border-radius: 99px;
+        background: #26262f;
+        position: relative;
+        transition: background 0.25s ease;
+        cursor: pointer;
+        border: 1px solid #2c2c38;
+      }
+      .toggle .knob {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #8a8996;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .toggle.on {
+        background: linear-gradient(
+          135deg,
+          rgba(201, 169, 97, 0.9),
+          rgba(201, 169, 97, 0.6)
+        );
+      }
+      .toggle.on .knob {
+        right: 22px;
+        background: #14140f;
+      }
 
-  .gold-grad{ background: linear-gradient(135deg, var(--gold-bright), var(--gold) 60%, #a9853f); }
-  .text-gold-grad{ background: linear-gradient(135deg, var(--gold-bright), var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 99px;
+        letter-spacing: 0.02em;
+      }
+      .badge-pending {
+        background: rgba(251, 191, 36, 0.12);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.25);
+      }
+      .badge-processing {
+        background: rgba(96, 165, 250, 0.12);
+        color: #60a5fa;
+        border: 1px solid rgba(96, 165, 250, 0.25);
+      }
+      .badge-shipping {
+        background: rgba(77, 216, 224, 0.12);
+        color: #4dd8e0;
+        border: 1px solid rgba(77, 216, 224, 0.25);
+      }
+      .badge-delivered {
+        background: rgba(74, 222, 128, 0.12);
+        color: #4ade80;
+        border: 1px solid rgba(74, 222, 128, 0.25);
+      }
+      .badge-cancelled {
+        background: rgba(248, 113, 113, 0.12);
+        color: #f87171;
+        border: 1px solid rgba(248, 113, 113, 0.25);
+      }
+      .badge-published {
+        background: rgba(74, 222, 128, 0.12);
+        color: #4ade80;
+        border: 1px solid rgba(74, 222, 128, 0.25);
+      }
+      .badge-rejected {
+        background: rgba(248, 113, 113, 0.12);
+        color: #f87171;
+        border: 1px solid rgba(248, 113, 113, 0.25);
+      }
 
-  .btn-primary{
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
-    color:#14140F; font-weight:600;
-    transition: filter .2s ease, transform .2s ease;
-  }
-  .btn-primary:hover{ filter: brightness(1.08); transform: translateY(-1px); }
-  .btn-primary:active{ transform: translateY(0); }
-  .btn-ghost{
-    background: transparent; border:1px solid var(--line); color:#F2F1ED;
-    transition: border-color .2s ease, background .2s ease;
-  }
-  .btn-ghost:hover{ border-color: rgba(201,169,97,0.5); background: rgba(201,169,97,0.06); }
-  .btn-danger-ghost{ border:1px solid rgba(248,113,113,0.35); color:#F87171; transition: background .2s ease; }
-  .btn-danger-ghost:hover{ background: rgba(248,113,113,0.08); }
+      .input {
+        width: 100%;
+        background: #0f0f14;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+        color: #f2f1ed;
+        font-size: 14px;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      .input::placeholder {
+        color: #5f5e68;
+      }
+      .input:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.12);
+      }
+      .label {
+        font-size: 12.5px;
+        color: #9c9ba6;
+        margin-bottom: 6px;
+        display: block;
+      }
 
-  .nav-item{ position:relative; transition: background .2s ease, color .2s ease; }
-  .nav-item .dot{ opacity:0; transition:opacity .2s ease; }
-  .nav-item.active{ background: linear-gradient(90deg, rgba(201,169,97,0.14), rgba(201,169,97,0.02)); color:#E4C77E; }
-  .nav-item.active .dot{ opacity:1; }
-  .nav-item.active svg{ color:#E4C77E; }
-  .nav-item:hover:not(.active){ background: rgba(255,255,255,0.03); }
+      .tab-btn {
+        transition:
+          color 0.2s ease,
+          border-color 0.2s ease;
+        border-bottom: 2px solid transparent;
+      }
+      .tab-btn.active {
+        color: #e4c77e;
+        border-color: #c9a961;
+      }
 
-  .fade-in{ animation: fadeIn .45s ease both; }
-  @keyframes fadeIn{ from{ opacity:0; transform: translateY(8px); } to{ opacity:1; transform:none; } }
-  .stagger > *{ animation: fadeIn .45s ease both; }
-  .stagger > *:nth-child(1){ animation-delay:.02s; } .stagger > *:nth-child(2){ animation-delay:.07s; }
-  .stagger > *:nth-child(3){ animation-delay:.12s; } .stagger > *:nth-child(4){ animation-delay:.17s; }
-  .stagger > *:nth-child(5){ animation-delay:.22s; } .stagger > *:nth-child(6){ animation-delay:.27s; }
+      .toast {
+        animation: toastIn 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
 
-  .skeleton{ position:relative; overflow:hidden; background:#1A1A23; }
-  .skeleton::after{
-    content:''; position:absolute; inset:0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-    animation: shimmer 1.4s infinite;
-  }
-  @keyframes shimmer{ from{ transform: translateX(-100%);} to{ transform: translateX(100%);} }
+      .modal-backdrop {
+        animation: fadeIn 0.2s ease both;
+      }
+      .modal-panel {
+        animation: modalIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+      }
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
 
-  .toggle{ width:44px; height:24px; border-radius:99px; background:#26262F; position:relative; transition: background .25s ease; cursor:pointer; border:1px solid #2c2c38; }
-  .toggle .knob{ position:absolute; top:2px; right:2px; width:18px; height:18px; border-radius:50%; background:#8a8996; transition: all .25s cubic-bezier(.4,0,.2,1); }
-  .toggle.on{ background: linear-gradient(135deg, rgba(201,169,97,0.9), rgba(201,169,97,0.6)); }
-  .toggle.on .knob{ right:22px; background:#14140F; }
+      .sidebar-drawer {
+        transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .focus-ring:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+        border-radius: 8px;
+      }
 
-  .badge{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; padding:4px 10px; border-radius:99px; letter-spacing:.02em; }
-  .badge-pending{ background: rgba(251,191,36,0.12); color:#FBBF24; border:1px solid rgba(251,191,36,0.25); }
-  .badge-processing{ background: rgba(96,165,250,0.12); color:#60A5FA; border:1px solid rgba(96,165,250,0.25); }
-  .badge-shipping{ background: rgba(77,216,224,0.12); color:#4DD8E0; border:1px solid rgba(77,216,224,0.25); }
-  .badge-delivered{ background: rgba(74,222,128,0.12); color:#4ADE80; border:1px solid rgba(74,222,128,0.25); }
-  .badge-cancelled{ background: rgba(248,113,113,0.12); color:#F87171; border:1px solid rgba(248,113,113,0.25); }
-  .badge-published{ background: rgba(74,222,128,0.12); color:#4ADE80; border:1px solid rgba(74,222,128,0.25); }
-  .badge-rejected{ background: rgba(248,113,113,0.12); color:#F87171; border:1px solid rgba(248,113,113,0.25); }
+      @keyframes ring {
+        to {
+          stroke-dashoffset: var(--offset);
+        }
+      }
+      .ring-progress {
+        stroke-dasharray: 251;
+        stroke-dashoffset: 251;
+        animation: ring 1.2s ease 0.3s forwards;
+      }
 
-  .input{
-    width:100%; background:#0F0F14; border:1px solid var(--line); border-radius:12px;
-    padding:12px 14px; color:#F2F1ED; font-size:14px; transition: border-color .2s ease, box-shadow .2s ease;
-  }
-  .input::placeholder{ color:#5F5E68; }
-  .input:focus{ outline:none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,97,0.12); }
-  .label{ font-size:12.5px; color:#9C9BA6; margin-bottom:6px; display:block; }
+      .hidden-section {
+        display: none;
+      }
 
-  .tab-btn{ transition: color .2s ease, border-color .2s ease; border-bottom:2px solid transparent; }
-  .tab-btn.active{ color:#E4C77E; border-color:#C9A961; }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-bg text-ink font-body antialiased">
+    <!-- ============ TOAST CONTAINER ============ -->
+    <div
+      id="toastContainer"
+      class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2 items-start"
+    ></div>
 
-  .toast{ animation: toastIn .35s cubic-bezier(.2,.9,.3,1.3) both; }
-  @keyframes toastIn{ from{ opacity:0; transform: translateY(12px) scale(.96);} to{ opacity:1; transform:none;} }
-
-  .modal-backdrop{ animation: fadeIn .2s ease both; }
-  .modal-panel{ animation: modalIn .28s cubic-bezier(.2,.9,.3,1.2) both; }
-  @keyframes modalIn{ from{ opacity:0; transform: translateY(14px) scale(.97);} to{ opacity:1; transform:none;} }
-
-  .sidebar-drawer{ transition: transform .32s cubic-bezier(.4,0,.2,1); }
-  .focus-ring:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; border-radius:8px; }
-
-  @keyframes ring{
-    to{ stroke-dashoffset: var(--offset); }
-  }
-  .ring-progress{ stroke-dasharray: 251; stroke-dashoffset:251; animation: ring 1.2s ease .3s forwards; }
-
-  .hidden-section{ display:none; }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
-  }
-</style>
-</head>
-<body class="bg-bg text-ink font-body antialiased">
-
-<!-- ============ TOAST CONTAINER ============ -->
-<div id="toastContainer" class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2 items-start"></div>
-
-<!-- ============ MOBILE TOP HEADER ============ -->
-<header class="lg:hidden sticky top-0 z-40 glass border-b border-line">
-  <div class="flex items-center justify-between px-4 py-3">
-    <button id="menuBtn" aria-label="باز کردن منو" class="focus-ring w-10 h-10 rounded-xl border border-line flex items-center justify-center active:scale-95 transition">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
-    <div class="font-display font-semibold text-sm tracking-wide">پنل کاربری <span class="text-gold-grad">{{ site_name }}</span></div>
-    <button aria-label="اعلان‌ها" class="focus-ring relative w-10 h-10 rounded-xl border border-line flex items-center justify-center">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span class="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-gold"></span>
-    </button>
-  </div>
-</header>
-
-<!-- ============ OVERLAY (mobile) ============ -->
-<div id="drawerOverlay" class="hidden fixed inset-0 bg-black/60 z-40 lg:hidden"></div>
-
-<div class="flex max-w-[1440px] mx-auto lg:gap-6 lg:px-6 lg:py-6">
-
-  <!-- ============ SIDEBAR ============ -->
-  <aside id="sidebar" class="sidebar-drawer fixed lg:sticky top-0 lg:top-6 h-screen lg:h-[calc(100vh-3rem)] w-[280px] shrink-0 z-50 lg:z-0 translate-x-full lg:translate-x-0 rtl:lg:translate-x-0 bg-bg-surface lg:bg-transparent card lg:rounded-2xl overflow-y-auto">
-    <div class="p-5 flex flex-col h-full">
-
-      <!-- brand + close (mobile) -->
-      <div class="flex items-center justify-between mb-6 lg:mb-8">
-        <a href="{{ url_home }}" class="font-display font-bold text-lg tracking-wide">{{ site_name|default:"فروشگاه" }}</a>
-        <button id="closeDrawer" class="lg:hidden focus-ring w-9 h-9 rounded-lg border border-line flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    <!-- ============ MOBILE TOP HEADER ============ -->
+    <header class="lg:hidden sticky top-0 z-40 glass border-b border-line">
+      <div class="flex items-center justify-between px-4 py-3">
+        <button
+          id="menuBtn"
+          aria-label="باز کردن منو"
+          class="focus-ring w-10 h-10 rounded-xl border border-line flex items-center justify-center active:scale-95 transition"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
         </button>
-      </div>
-
-      <!-- profile block -->
-      <div class="flex flex-col items-center text-center pb-6 mb-6 border-b border-line">
-        <div class="relative">
-          <div class="w-20 h-20 rounded-full p-[2px] gold-grad">
-            <img src="{{ user.avatar|default:'/static/img/avatar-placeholder.png' }}" alt="{{ user.full_name }}"
-                 class="w-full h-full rounded-full object-cover border-2 border-bg-surface">
-          </div>
-          <span class="absolute bottom-0 left-0 w-4 h-4 rounded-full bg-ok border-2 border-bg-surface" title="آنلاین"></span>
+        <div class="font-display font-semibold text-sm tracking-wide">
+          پنل کاربری <span class="text-gold-grad">ولتکس</span>
         </div>
-        <h2 class="font-display font-semibold mt-3 text-[15px]">{{ user.full_name }}</h2>
-        <p class="text-ink-faint text-xs font-mono mt-0.5">@{{ user.username }}</p>
-        <p class="text-ink-muted text-[11px] mt-2 flex items-center gap-1">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          عضو از {{ user.membership_date|default:"مهر ۱۴۰۲" }}
-        </p>
-        <button data-goto="personal" class="section-link mt-4 w-full btn-ghost rounded-xl py-2 text-xs font-medium focus-ring">
-          ویرایش پروفایل
+        <button
+          aria-label="اعلان‌ها"
+          class="focus-ring relative w-10 h-10 rounded-xl border border-line flex items-center justify-center"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span
+            class="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-gold"
+          ></span>
         </button>
       </div>
+    </header>
 
-      <!-- nav -->
-      <nav class="flex-1 space-y-1" aria-label="منوی حساب کاربری">
-        <button data-section="overview" class="nav-item active section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-          <span class="flex-1 text-right">داشبورد</span>
-          <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
-        </button>
-        <button data-section="personal" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
-          <span class="flex-1 text-right">اطلاعات شخصی</span>
-          <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
-        </button>
-        <button data-section="orders" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18l-1.5 12a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8L3 7Z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg>
-          <span class="flex-1 text-right">سفارش‌های من</span>
-          <span class="text-[10px] font-mono text-ink-faint">{{ user.orders_count }}</span>
-        </button>
-        <button data-section="comments" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4A9 9 0 0 1 3 12a8.4 8.4 0 0 1 8.9-8.5 8.5 8.5 0 0 1 9.1 8Z"/></svg>
-          <span class="flex-1 text-right">نظرات</span>
-          <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
-        </button>
-        <button data-section="wishlist" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
-          <span class="flex-1 text-right">علاقه‌مندی‌ها</span>
-          <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
-        </button>
-        <button data-section="addresses" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span class="flex-1 text-right">آدرس‌ها</span>
-          <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
-        </button>
-        <button data-section="notifications" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span class="flex-1 text-right">اعلان‌ها</span>
-          <span id="notifCountBadge" class="text-[10px] font-mono bg-gold/15 text-gold-bright px-1.5 py-0.5 rounded-full">3</span>
-        </button>
-        <button data-section="security" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"/></svg>
-          <span class="flex-1 text-right">امنیت حساب</span>
-          <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
-        </button>
-        <button data-section="settings" class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
-          <span class="flex-1 text-right">تنظیمات</span>
-        </button>
-      </nav>
+    <!-- ============ OVERLAY (mobile) ============ -->
+    <div
+      id="drawerOverlay"
+      class="hidden fixed inset-0 bg-black/60 z-40 lg:hidden"
+    ></div>
 
-      <!-- logout -->
-      <form action="{{ url_logout }}" method="post" class="pt-4 mt-4 border-t border-line">
-        <!-- {% csrf_token %} -->
-        <button type="submit" class="btn-danger-ghost w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm focus-ring">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-          خروج از حساب
-        </button>
-      </form>
+    <div class="flex max-w-[1440px] mx-auto lg:gap-6 lg:px-6 lg:py-6">
+      <!-- ============ SIDEBAR ============ -->
+      <aside
+        id="sidebar"
+        class="sidebar-drawer fixed lg:sticky top-0 lg:top-6 h-screen lg:h-[calc(100vh-3rem)] w-[280px] shrink-0 z-50 lg:z-0 translate-x-full lg:translate-x-0 rtl:lg:translate-x-0 bg-bg-surface lg:bg-transparent card lg:rounded-2xl overflow-y-auto"
+      >
+        <div class="p-5 flex flex-col h-full">
+          <div class="flex items-center justify-between mb-6 lg:mb-8">
+            <a href="/" class="font-display font-bold text-lg tracking-wide"
+              >ولتکس</a
+            >
+            <button
+              id="closeDrawer"
+              class="lg:hidden focus-ring w-9 h-9 rounded-lg border border-line flex items-center justify-center"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            class="flex flex-col items-center text-center pb-6 mb-6 border-b border-line"
+          >
+            <div class="relative">
+              <div class="w-20 h-20 rounded-full p-[2px] gold-grad">
+                <img
+                  id="sidebarAvatar"
+                  src="/static/img/avatar-placeholder.png"
+                  alt="تصویر پروفایل"
+                  class="w-full h-full rounded-full object-cover border-2 border-bg-surface"
+                />
+              </div>
+              <span
+                class="absolute bottom-0 left-0 w-4 h-4 rounded-full bg-ok border-2 border-bg-surface"
+                title="آنلاین"
+              ></span>
+            </div>
+            <h2
+              id="sidebarName"
+              class="font-display font-semibold mt-3 text-[15px]"
+            >
+              کاربر
+            </h2>
+            <p
+              id="sidebarUsername"
+              class="text-ink-faint text-xs font-mono mt-0.5"
+            >
+              @username
+            </p>
+            <p
+              id="sidebarMemberSince"
+              class="text-ink-muted text-[11px] mt-2 flex items-center gap-1"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
+              عضو از <span id="memberDate">مهر ۱۴۰۲</span>
+            </p>
+            <button
+              data-goto="personal"
+              class="section-link mt-4 w-full btn-ghost rounded-xl py-2 text-xs font-medium focus-ring"
+            >
+              ویرایش پروفایل
+            </button>
+          </div>
+
+          <nav class="flex-1 space-y-1" aria-label="منوی حساب کاربری">
+            <button
+              data-section="overview"
+              class="nav-item active section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                <rect x="3" y="16" width="7" height="5" rx="1.5" />
+              </svg>
+              <span class="flex-1 text-right">داشبورد</span>
+              <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
+            </button>
+            <button
+              data-section="personal"
+              class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+              </svg>
+              <span class="flex-1 text-right">اطلاعات شخصی</span>
+              <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
+            </button>
+            <button
+              data-section="orders"
+              class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path
+                  d="M3 7h18l-1.5 12a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8L3 7Z"
+                />
+                <path d="M8 7V5a4 4 0 0 1 8 0v2" />
+              </svg>
+              <span class="flex-1 text-right">سفارش‌های من</span>
+              <span
+                id="navOrdersCount"
+                class="text-[10px] font-mono text-ink-faint"
+                >۰</span
+              >
+            </button>
+            <button
+              data-section="comments"
+              class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path
+                  d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4A9 9 0 0 1 3 12a8.4 8.4 0 0 1 8.9-8.5 8.5 8.5 0 0 1 9.1 8Z"
+                />
+              </svg>
+              <span class="flex-1 text-right">نظرات</span>
+              <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
+            </button>
+            <button
+              data-section="wishlist"
+              class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path
+                  d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"
+                />
+              </svg>
+              <span class="flex-1 text-right">علاقه‌مندی‌ها</span>
+              <span
+                id="navWishlistCount"
+                class="text-[10px] font-mono text-ink-faint"
+                >۰</span
+              >
+            </button>
+            <button
+              data-section="addresses"
+              class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span class="flex-1 text-right">آدرس‌ها</span>
+              <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
+            </button>
+            <button
+              data-section="notifications"
+              class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <span class="flex-1 text-right">اعلان‌ها</span>
+              <span
+                id="notifCountBadge"
+                class="text-[10px] font-mono bg-gold/15 text-gold-bright px-1.5 py-0.5 rounded-full"
+                >۰</span
+              >
+            </button>
+            <button
+              data-section="security"
+              class="nav-item section-link w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-ink-muted focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path
+                  d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"
+                />
+              </svg>
+              <span class="flex-1 text-right">امنیت حساب</span>
+              <span class="dot w-1.5 h-1.5 rounded-full bg-gold"></span>
+            </button>
+          </nav>
+
+          <form
+            action="/logout/"
+            method="post"
+            class="pt-4 mt-4 border-t border-line"
+          >
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="btn-danger-ghost w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm focus-ring"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="M16 17l5-5-5-5" />
+                <path d="M21 12H9" />
+              </svg>
+              خروج از حساب
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      <!-- ============ MAIN CONTENT ============ -->
+      <main class="flex-1 min-w-0 px-4 py-5 lg:p-0">
+        <!-- ============ OVERVIEW ============ -->
+        <section id="section-overview" class="dashboard-section fade-in">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="font-display text-xl lg:text-2xl font-semibold">
+                سلام، <span id="greetingName">کاربر</span> 👋
+              </h1>
+              <p class="text-ink-muted text-sm mt-1">
+                خلاصه‌ای از فعالیت حساب شما
+              </p>
+            </div>
+            <a
+              href="/shop/"
+              class="hidden sm:flex btn-primary rounded-xl px-4 py-2.5 text-sm items-center gap-2 focus-ring"
+            >
+              ادامه خرید
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M14 5l-7 7 7 7" />
+              </svg>
+            </a>
+          </div>
+
+          <div
+            id="statCards"
+            class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4 stagger"
+          ></div>
+
+          <div class="grid lg:grid-cols-3 gap-5 mt-6">
+            <div class="lg:col-span-2 card p-5">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display font-semibold">آخرین سفارش‌ها</h3>
+                <button
+                  data-goto="orders"
+                  class="section-link text-xs text-gold-bright hover:underline focus-ring"
+                >
+                  مشاهده همه
+                </button>
+              </div>
+              <div id="recentOrders" class="space-y-3"></div>
+            </div>
+
+            <div class="card p-5">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display font-semibold">اعلان‌های اخیر</h3>
+                <button
+                  data-goto="notifications"
+                  class="section-link text-xs text-gold-bright hover:underline focus-ring"
+                >
+                  مشاهده همه
+                </button>
+              </div>
+              <div id="recentNotifs" class="space-y-4"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ PERSONAL INFORMATION ============ -->
+        <section id="section-personal" class="dashboard-section hidden-section">
+          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+            اطلاعات شخصی
+          </h1>
+          <p class="text-ink-muted text-sm mb-6">
+            اطلاعات حساب کاربری خود را ویرایش کنید
+          </p>
+
+          <form
+            id="personalForm"
+            class="card p-5 lg:p-7"
+            enctype="multipart/form-data"
+          >
+            {% csrf_token %}
+
+            <div
+              class="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-6 mb-6 border-b border-line"
+            >
+              <div class="relative shrink-0">
+                <div
+                  class="w-24 h-24 rounded-2xl overflow-hidden border border-line bg-elevated flex items-center justify-center"
+                >
+                  <img
+                    id="avatarPreview"
+                    src="/static/img/avatar-placeholder.png"
+                    class="w-full h-full object-cover"
+                    alt="تصویر پروفایل"
+                  />
+                </div>
+                <label
+                  for="avatarInput"
+                  class="absolute -bottom-2 -left-2 w-8 h-8 rounded-full btn-primary flex items-center justify-center cursor-pointer focus-ring"
+                  title="تغییر تصویر"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#14140F"
+                    stroke-width="2.2"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </label>
+                <input
+                  id="avatarInput"
+                  name="avatar"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                />
+              </div>
+              <div class="text-center sm:text-right">
+                <p class="text-sm font-medium mb-1">تصویر پروفایل</p>
+                <p class="text-ink-faint text-xs mb-3">
+                  فرمت PNG یا JPG — حداکثر ۲ مگابایت
+                </p>
+                <div class="flex gap-2 justify-center sm:justify-start">
+                  <label
+                    for="avatarInput"
+                    class="btn-ghost text-xs px-3 py-1.5 rounded-lg cursor-pointer focus-ring"
+                    >جایگزینی تصویر</label
+                  >
+                  <button
+                    type="button"
+                    id="removeAvatarBtn"
+                    class="btn-danger-ghost text-xs px-3 py-1.5 rounded-lg focus-ring"
+                  >
+                    حذف تصویر
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label class="label" for="fullName">نام و نام خانوادگی</label>
+                <input
+                  id="fullName"
+                  name="full_name"
+                  class="input"
+                  placeholder="نام کامل خود را وارد کنید"
+                />
+              </div>
+              <div>
+                <label class="label" for="username">نام کاربری</label>
+                <input
+                  id="username"
+                  name="username"
+                  class="input font-mono"
+                  placeholder="username"
+                />
+              </div>
+              <div>
+                <label class="label" for="mobile">شماره موبایل</label>
+                <div class="relative">
+                  <input
+                    id="mobile"
+                    name="mobile"
+                    class="input font-mono ps-11"
+                    placeholder="09xxxxxxxxx"
+                  />
+                  <svg
+                    class="absolute top-1/2 -translate-y-1/2 start-3.5"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#5F5E68"
+                    stroke-width="1.8"
+                  >
+                    <rect x="6" y="2" width="12" height="20" rx="2" />
+                    <path d="M11 18h2" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <label class="label" for="email">ایمیل</label>
+                <div class="relative">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    class="input ps-11"
+                    placeholder="you@example.com"
+                  />
+                  <svg
+                    class="absolute top-1/2 -translate-y-1/2 start-3.5"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#5F5E68"
+                    stroke-width="1.8"
+                  >
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m2 7 10 6 10-6" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <label class="label" for="nationalCode"
+                  >کد ملی <span class="text-ink-faint">(اختیاری)</span></label
+                >
+                <input
+                  id="nationalCode"
+                  name="national_code"
+                  class="input font-mono"
+                  placeholder="۱۰ رقم"
+                />
+              </div>
+              <div>
+                <label class="label" for="birthDate"
+                  >تاریخ تولد
+                  <span class="text-ink-faint">(اختیاری)</span></label
+                >
+                <input
+                  id="birthDate"
+                  name="birth_date"
+                  class="input font-mono"
+                  placeholder="۱۴۰۰/۰۱/۰۱"
+                />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="label"
+                  >جنسیت <span class="text-ink-faint">(اختیاری)</span></label
+                >
+                <div class="flex gap-3">
+                  <label
+                    class="flex-1 flex items-center gap-2 input cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="male"
+                      class="accent-gold"
+                    />
+                    مرد
+                  </label>
+                  <label
+                    class="flex-1 flex items-center gap-2 input cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="female"
+                      class="accent-gold"
+                    />
+                    زن
+                  </label>
+                  <label
+                    class="flex-1 flex items-center gap-2 input cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="none"
+                      class="accent-gold"
+                      checked
+                    />
+                    ترجیح می‌دهم نگویم
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 mt-7 pt-5 border-t border-line">
+              <button
+                type="submit"
+                class="btn-primary rounded-xl px-6 py-2.5 text-sm focus-ring"
+              >
+                ذخیره تغییرات
+              </button>
+              <button
+                type="reset"
+                class="btn-ghost rounded-xl px-6 py-2.5 text-sm focus-ring"
+              >
+                انصراف
+              </button>
+              <span
+                id="saveSuccessTick"
+                class="hidden items-center gap-1.5 text-ok text-xs font-medium"
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                ذخیره شد
+              </span>
+            </div>
+          </form>
+        </section>
+
+        <!-- ============ SECURITY ============ -->
+        <section id="section-security" class="dashboard-section hidden-section">
+          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+            امنیت حساب
+          </h1>
+          <p class="text-ink-muted text-sm mb-6">
+            رمز عبور و تنظیمات امنیتی حساب خود را مدیریت کنید
+          </p>
+
+          <form id="passForm" class="card p-5 lg:p-7 max-w-xl">
+            {% csrf_token %}
+            <div class="space-y-5">
+              <div>
+                <label class="label" for="curPass">رمز عبور فعلی</label>
+                <div class="relative">
+                  <input
+                    id="curPass"
+                    name="old_password"
+                    type="password"
+                    class="input pe-11"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    data-toggle="curPass"
+                    class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring"
+                  >
+                    <svg
+                      width="17"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    >
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="label" for="newPass">رمز عبور جدید</label>
+                <div class="relative">
+                  <input
+                    id="newPass"
+                    name="new_password1"
+                    type="password"
+                    class="input pe-11"
+                    placeholder="حداقل ۸ کاراکتر"
+                  />
+                  <button
+                    type="button"
+                    data-toggle="newPass"
+                    class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring"
+                  >
+                    <svg
+                      width="17"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    >
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex gap-1.5 mt-2.5" id="strengthBars">
+                  <span class="h-1 flex-1 rounded-full bg-line"></span>
+                  <span class="h-1 flex-1 rounded-full bg-line"></span>
+                  <span class="h-1 flex-1 rounded-full bg-line"></span>
+                  <span class="h-1 flex-1 rounded-full bg-line"></span>
+                </div>
+                <p id="strengthLabel" class="text-[11px] text-ink-faint mt-1.5">
+                  قدرت رمز عبور
+                </p>
+              </div>
+              <div>
+                <label class="label" for="confPass">تکرار رمز عبور جدید</label>
+                <div class="relative">
+                  <input
+                    id="confPass"
+                    name="new_password2"
+                    type="password"
+                    class="input pe-11"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    data-toggle="confPass"
+                    class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring"
+                  >
+                    <svg
+                      width="17"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    >
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+                <p id="matchMsg" class="text-[11px] mt-1.5 hidden"></p>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn-primary rounded-xl px-6 py-2.5 text-sm mt-6 focus-ring"
+            >
+              به‌روزرسانی رمز عبور
+            </button>
+          </form>
+
+          <div class="card p-5 lg:p-7 max-w-xl mt-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-medium text-sm">تأیید دو مرحله‌ای</h3>
+                <p class="text-ink-faint text-xs mt-1">
+                  امنیت حساب خود را با کد پیامکی افزایش دهید
+                </p>
+              </div>
+              <div class="toggle" data-toggle-switch></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ ORDERS ============ -->
+        <section id="section-orders" class="dashboard-section hidden-section">
+          <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+            <div>
+              <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+                سفارش‌های من
+              </h1>
+              <p class="text-ink-muted text-sm">
+                پیگیری و مشاهده جزئیات سفارش‌ها
+              </p>
+            </div>
+            <div class="relative">
+              <input
+                id="orderSearch"
+                class="input ps-10 w-56"
+                placeholder="جستجوی شماره سفارش..."
+              />
+              <svg
+                class="absolute top-1/2 -translate-y-1/2 start-3.5"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#5F5E68"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </div>
+          </div>
+
+          <div
+            id="orderTabs"
+            class="flex gap-1 overflow-x-auto mb-5 border-b border-line"
+            role="tablist"
+          ></div>
+          <div id="ordersList" class="space-y-4 stagger"></div>
+          <div id="ordersEmpty" class="hidden"></div>
+        </section>
+
+        <!-- ============ COMMENTS ============ -->
+        <section id="section-comments" class="dashboard-section hidden-section">
+          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+            نظرات من
+          </h1>
+          <p class="text-ink-muted text-sm mb-6">نظرات ثبت‌شده شما</p>
+          <div id="commentsList" class="space-y-4 stagger"></div>
+          <div id="commentsEmpty" class="hidden"></div>
+        </section>
+
+        <!-- ============ WISHLIST ============ -->
+        <section id="section-wishlist" class="dashboard-section hidden-section">
+          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+            علاقه‌مندی‌ها
+          </h1>
+          <p class="text-ink-muted text-sm mb-6">
+            محصولاتی که برای بعد ذخیره کرده‌اید
+          </p>
+          <div
+            id="wishlistGrid"
+            class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 stagger"
+          ></div>
+          <div id="wishlistEmpty" class="hidden"></div>
+        </section>
+
+        <!-- ============ ADDRESSES ============ -->
+        <section
+          id="section-addresses"
+          class="dashboard-section hidden-section"
+        >
+          <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <div>
+              <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+                آدرس‌های ذخیره‌شده
+              </h1>
+              <p class="text-ink-muted text-sm">
+                آدرس‌های تحویل سفارش خود را مدیریت کنید
+              </p>
+            </div>
+            <button
+              id="addAddressBtn"
+              class="btn-primary rounded-xl px-4 py-2.5 text-sm flex items-center gap-2 focus-ring"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#14140F"
+                stroke-width="2.4"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              آدرس جدید
+            </button>
+          </div>
+          <div
+            id="addressGrid"
+            class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 stagger"
+          ></div>
+          <div id="addressesEmpty" class="hidden"></div>
+        </section>
+
+        <!-- ============ NOTIFICATIONS ============ -->
+        <section
+          id="section-notifications"
+          class="dashboard-section hidden-section"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+                اعلان‌ها
+              </h1>
+              <p class="text-ink-muted text-sm">تازه‌ترین رویدادهای حساب شما</p>
+            </div>
+            <button
+              id="markAllReadBtn"
+              class="text-xs text-gold-bright hover:underline focus-ring"
+            >
+              علامت‌گذاری همه به‌عنوان خوانده‌شده
+            </button>
+          </div>
+          <div id="notifTimeline" class="card p-5 lg:p-7"></div>
+          <div id="notifEmpty" class="hidden"></div>
+        </section>
+
+        <!-- ============ SETTINGS ============ -->
+        <section id="section-settings" class="dashboard-section hidden-section">
+          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">
+            تنظیمات
+          </h1>
+          <p class="text-ink-muted text-sm mb-6">
+            ترجیحات نمایش و اطلاع‌رسانی خود را تنظیم کنید
+          </p>
+
+          <div class="card divide-y divide-line">
+            <div class="p-5 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium">زبان</h3>
+                <p class="text-ink-faint text-xs mt-1">زبان نمایش پنل کاربری</p>
+              </div>
+              <select class="input w-40">
+                <option>فارسی</option>
+                <option>English</option>
+              </select>
+            </div>
+            <div class="p-5 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium">حالت تاریک</h3>
+                <p class="text-ink-faint text-xs mt-1">
+                  همیشه فعال برای این پنل
+                </p>
+              </div>
+              <div class="toggle on" data-toggle-switch></div>
+            </div>
+            <div class="p-5 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium">اعلان‌های ایمیلی</h3>
+                <p class="text-ink-faint text-xs mt-1">
+                  دریافت به‌روزرسانی سفارش از طریق ایمیل
+                </p>
+              </div>
+              <div class="toggle on" data-toggle-switch></div>
+            </div>
+            <div class="p-5 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium">اعلان‌های پیامکی</h3>
+                <p class="text-ink-faint text-xs mt-1">
+                  دریافت کد رهگیری از طریق پیامک
+                </p>
+              </div>
+              <div class="toggle" data-toggle-switch></div>
+            </div>
+            <div class="p-5 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium">اعلان‌های تبلیغاتی</h3>
+                <p class="text-ink-faint text-xs mt-1">
+                  دریافت تخفیف‌ها و پیشنهادهای ویژه
+                </p>
+              </div>
+              <div class="toggle" data-toggle-switch></div>
+            </div>
+            <div class="p-5 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium">ورود خودکار</h3>
+                <p class="text-ink-faint text-xs mt-1">
+                  مرا در این دستگاه به خاطر بسپار
+                </p>
+              </div>
+              <div class="toggle on" data-toggle-switch></div>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
-  </aside>
 
-  <!-- ============ MAIN CONTENT ============ -->
-  <main class="flex-1 min-w-0 px-4 py-5 lg:p-0">
-
-    <!-- ============ OVERVIEW ============ -->
-    <section id="section-overview" class="dashboard-section fade-in">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h1 class="font-display text-xl lg:text-2xl font-semibold">سلام، {{ user.first_name|default:"کاربر" }} 👋</h1>
-          <p class="text-ink-muted text-sm mt-1">خلاصه‌ای از فعالیت حساب شما</p>
-        </div>
-        <a href="{{ url_shop }}" class="hidden sm:flex btn-primary rounded-xl px-4 py-2.5 text-sm items-center gap-2 focus-ring">
-          ادامه خرید
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 5l-7 7 7 7"/></svg>
-        </a>
+    <!-- ============ ORDER DETAILS MODAL ============ -->
+    <div
+      id="orderModal"
+      class="hidden fixed inset-0 z-[90] items-center justify-center p-4"
+    >
+      <div
+        class="modal-backdrop absolute inset-0 bg-black/70"
+        data-close-modal
+      ></div>
+      <div
+        class="modal-panel relative card w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6"
+      >
+        <button
+          data-close-modal
+          class="absolute top-5 left-5 w-8 h-8 rounded-lg border border-line flex items-center justify-center focus-ring"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <div id="orderModalBody"></div>
       </div>
+    </div>
 
-      <div id="statCards" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4 stagger"></div>
-
-      <div class="grid lg:grid-cols-3 gap-5 mt-6">
-        <div class="lg:col-span-2 card p-5">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-semibold">آخرین سفارش‌ها</h3>
-            <button data-goto="orders" class="section-link text-xs text-gold-bright hover:underline focus-ring">مشاهده همه</button>
-          </div>
-          <div id="recentOrders" class="space-y-3"></div>
+    <!-- ============ CONFIRM MODAL ============ -->
+    <div
+      id="confirmModal"
+      class="hidden fixed inset-0 z-[90] items-center justify-center p-4"
+    >
+      <div
+        class="modal-backdrop absolute inset-0 bg-black/70"
+        data-close-confirm
+      ></div>
+      <div class="modal-panel relative card w-full max-w-sm p-6 text-center">
+        <div
+          class="w-12 h-12 rounded-full bg-danger/10 border border-danger/25 flex items-center justify-center mx-auto mb-4"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#F87171"
+            stroke-width="2"
+          >
+            <path
+              d="M12 9v4M12 17h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+            />
+          </svg>
         </div>
-
-        <div class="card p-5">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-semibold">اعلان‌های اخیر</h3>
-            <button data-goto="notifications" class="section-link text-xs text-gold-bright hover:underline focus-ring">مشاهده همه</button>
-          </div>
-          <div id="recentNotifs" class="space-y-4"></div>
+        <h3 id="confirmTitle" class="font-display font-semibold mb-1.5">
+          حذف مورد انتخابی؟
+        </h3>
+        <p id="confirmDesc" class="text-ink-muted text-sm mb-6">
+          این عملیات قابل بازگشت نیست.
+        </p>
+        <div class="flex gap-3">
+          <button
+            id="confirmCancelBtn"
+            class="btn-ghost flex-1 rounded-xl py-2.5 text-sm focus-ring"
+          >
+            انصراف
+          </button>
+          <button
+            id="confirmOkBtn"
+            class="flex-1 rounded-xl py-2.5 text-sm font-medium bg-danger text-white focus-ring"
+          >
+            حذف کن
+          </button>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ============ PERSONAL INFORMATION ============ -->
-    <section id="section-personal" class="dashboard-section hidden-section">
-      <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">اطلاعات شخصی</h1>
-      <p class="text-ink-muted text-sm mb-6">اطلاعات حساب کاربری خود را ویرایش کنید</p>
-
-      <form id="personalForm" class="card p-5 lg:p-7">
-        <!-- {% comment %} action="{% url 'profile_update' %}" method="post" enctype="multipart/form-data" {% endcomment %} -->
-        <!-- {% csrf_token %} -->
-
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-6 mb-6 border-b border-line">
-          <div class="relative shrink-0">
-            <div class="w-24 h-24 rounded-2xl overflow-hidden border border-line bg-elevated flex items-center justify-center">
-              <img id="avatarPreview" src="{{ user.avatar|default:'/static/img/avatar-placeholder.png' }}" class="w-full h-full object-cover" alt="تصویر پروفایل">
-            </div>
-            <label for="avatarInput" class="absolute -bottom-2 -left-2 w-8 h-8 rounded-full btn-primary flex items-center justify-center cursor-pointer focus-ring" title="تغییر تصویر">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14140F" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
-            </label>
-            <input id="avatarInput" name="avatar" type="file" accept="image/*" class="hidden">
-          </div>
-          <div class="text-center sm:text-right">
-            <p class="text-sm font-medium mb-1">تصویر پروفایل</p>
-            <p class="text-ink-faint text-xs mb-3">فرمت PNG یا JPG — حداکثر ۲ مگابایت</p>
-            <div class="flex gap-2 justify-center sm:justify-start">
-              <label for="avatarInput" class="btn-ghost text-xs px-3 py-1.5 rounded-lg cursor-pointer focus-ring">جایگزینی تصویر</label>
-              <button type="button" id="removeAvatarBtn" class="btn-danger-ghost text-xs px-3 py-1.5 rounded-lg focus-ring">حذف تصویر</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-5">
-          <div>
-            <label class="label" for="fullName">نام و نام خانوادگی</label>
-            <input id="fullName" name="full_name" class="input" value="{{ user.full_name }}" placeholder="نام کامل خود را وارد کنید">
+    <!-- ============ ADD ADDRESS MODAL ============ -->
+    <div
+      id="addressModal"
+      class="hidden fixed inset-0 z-[90] items-center justify-center p-4"
+    >
+      <div
+        class="modal-backdrop absolute inset-0 bg-black/70"
+        data-close-address
+      ></div>
+      <div class="modal-panel relative card w-full max-w-lg p-6">
+        <h3 class="font-display font-semibold mb-5">افزودن آدرس جدید</h3>
+        <form id="addressForm" class="grid sm:grid-cols-2 gap-4">
+          {% csrf_token %}
+          <div class="sm:col-span-2">
+            <label class="label">نام گیرنده</label>
+            <input
+              name="recipient_name"
+              class="input"
+              placeholder="نام و نام خانوادگی"
+              required
+            />
           </div>
           <div>
-            <label class="label" for="username">نام کاربری</label>
-            <input id="username" name="username" class="input font-mono" value="{{ user.username }}" placeholder="username">
+            <label class="label">شماره تماس</label>
+            <input
+              name="recipient_phone"
+              class="input font-mono"
+              placeholder="09xxxxxxxxx"
+              required
+            />
           </div>
           <div>
-            <label class="label" for="mobile">شماره موبایل</label>
-            <div class="relative">
-              <input id="mobile" name="mobile" class="input font-mono ps-11" value="{{ user.mobile }}" placeholder="09xxxxxxxxx">
-              <svg class="absolute top-1/2 -translate-y-1/2 start-3.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5F5E68" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>
-            </div>
+            <label class="label">کد پستی</label>
+            <input
+              name="postal_code"
+              class="input font-mono"
+              placeholder="۱۰ رقمی"
+            />
           </div>
           <div>
-            <label class="label" for="email">ایمیل</label>
-            <div class="relative">
-              <input id="email" name="email" type="email" class="input ps-11" value="{{ user.email }}" placeholder="you@example.com">
-              <svg class="absolute top-1/2 -translate-y-1/2 start-3.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5F5E68" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
-            </div>
+            <label class="label">استان</label>
+            <select name="province" id="provinceSelect" class="input" required>
+              <option value="">انتخاب استان</option>
+            </select>
           </div>
           <div>
-            <label class="label" for="nationalCode">کد ملی <span class="text-ink-faint">(اختیاری)</span></label>
-            <input id="nationalCode" name="national_code" class="input font-mono" value="{{ user.national_code }}" placeholder="۱۰ رقم">
-          </div>
-          <div>
-            <label class="label" for="birthDate">تاریخ تولد <span class="text-ink-faint">(اختیاری)</span></label>
-            <input id="birthDate" name="birth_date" class="input font-mono" value="{{ user.birth_date }}" placeholder="۱۴۰۰/۰۱/۰۱">
+            <label class="label">شهر</label>
+            <select name="city" id="citySelect" class="input" required>
+              <option value="">انتخاب شهر</option>
+            </select>
           </div>
           <div class="sm:col-span-2">
-            <label class="label">جنسیت <span class="text-ink-faint">(اختیاری)</span></label>
-            <div class="flex gap-3">
-              <label class="flex-1 flex items-center gap-2 input cursor-pointer">
-                <input type="radio" name="gender" value="male" class="accent-gold"> زن
-              </label>
-              <label class="flex-1 flex items-center gap-2 input cursor-pointer">
-                <input type="radio" name="gender" value="female" class="accent-gold"> مرد
-              </label>
-              <label class="flex-1 flex items-center gap-2 input cursor-pointer">
-                <input type="radio" name="gender" value="none" class="accent-gold" checked> ترجیح می‌دهم نگویم
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3 mt-7 pt-5 border-t border-line">
-          <button type="submit" class="btn-primary rounded-xl px-6 py-2.5 text-sm focus-ring">ذخیره تغییرات</button>
-          <button type="reset" class="btn-ghost rounded-xl px-6 py-2.5 text-sm focus-ring">انصراف</button>
-          <span id="saveSuccessTick" class="hidden items-center gap-1.5 text-ok text-xs font-medium">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
-            ذخیره شد
-          </span>
-        </div>
-      </form>
-    </section>
-
-    <!-- ============ SECURITY ============ -->
-    <section id="section-security" class="dashboard-section hidden-section">
-      <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">امنیت حساب</h1>
-      <p class="text-ink-muted text-sm mb-6">رمز عبور و تنظیمات امنیتی حساب خود را مدیریت کنید</p>
-
-      <form id="passForm" class="card p-5 lg:p-7 max-w-xl">
-        <!-- {% comment %} action="{% url 'password_change' %}" method="post" {% endcomment %} -->
-        <!-- {% csrf_token %} -->
-        <div class="space-y-5">
-          <div>
-            <label class="label" for="curPass">رمز عبور فعلی</label>
-            <div class="relative">
-              <input id="curPass" type="password" class="input pe-11" placeholder="••••••••">
-              <button type="button" data-toggle="curPass" class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
+            <label class="label">آدرس کامل</label>
+            <textarea
+              name="address"
+              class="input"
+              rows="3"
+              placeholder="خیابان، کوچه، پلاک، واحد"
+              required
+            ></textarea>
           </div>
           <div>
-            <label class="label" for="newPass">رمز عبور جدید</label>
-            <div class="relative">
-              <input id="newPass" type="password" class="input pe-11" placeholder="حداقل ۸ کاراکتر">
-              <button type="button" data-toggle="newPass" class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-            <div class="flex gap-1.5 mt-2.5" id="strengthBars">
-              <span class="h-1 flex-1 rounded-full bg-line"></span>
-              <span class="h-1 flex-1 rounded-full bg-line"></span>
-              <span class="h-1 flex-1 rounded-full bg-line"></span>
-              <span class="h-1 flex-1 rounded-full bg-line"></span>
-            </div>
-            <p id="strengthLabel" class="text-[11px] text-ink-faint mt-1.5">قدرت رمز عبور</p>
+            <label class="label">پلاک</label>
+            <input name="plaque" class="input" placeholder="شماره پلاک" />
           </div>
           <div>
-            <label class="label" for="confPass">تکرار رمز عبور جدید</label>
-            <div class="relative">
-              <input id="confPass" type="password" class="input pe-11" placeholder="••••••••">
-              <button type="button" data-toggle="confPass" class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-            <p id="matchMsg" class="text-[11px] mt-1.5 hidden"></p>
+            <label class="label"
+              >واحد <span class="text-ink-faint">(اختیاری)</span></label
+            >
+            <input name="unit" class="input" placeholder="واحد" />
           </div>
-        </div>
-        <button type="submit" class="btn-primary rounded-xl px-6 py-2.5 text-sm mt-6 focus-ring">به‌روزرسانی رمز عبور</button>
-      </form>
-
-      <div class="card p-5 lg:p-7 max-w-xl mt-5">
-        <div class="flex items-center justify-between">
           <div>
-            <h3 class="font-medium text-sm">تأیید دو مرحله‌ای</h3>
-            <p class="text-ink-faint text-xs mt-1">امنیت حساب خود را با کد پیامکی افزایش دهید</p>
+            <label class="label"
+              >طبقه <span class="text-ink-faint">(اختیاری)</span></label
+            >
+            <input name="floor" class="input" placeholder="طبقه" />
           </div>
-          <div class="toggle" data-toggle-switch></div>
-        </div>
+          <div class="sm:col-span-2">
+            <label class="label"
+              >توضیحات <span class="text-ink-faint">(اختیاری)</span></label
+            >
+            <input
+              name="description"
+              class="input"
+              placeholder="توضیحات اضافی"
+            />
+          </div>
+          <div class="sm:col-span-2 flex gap-3 mt-2">
+            <button
+              type="submit"
+              class="btn-primary flex-1 rounded-xl py-2.5 text-sm focus-ring"
+            >
+              ذخیره آدرس
+            </button>
+            <button
+              type="button"
+              data-close-address
+              class="btn-ghost flex-1 rounded-xl py-2.5 text-sm focus-ring"
+            >
+              انصراف
+            </button>
+          </div>
+        </form>
       </div>
-    </section>
-
-    <!-- ============ ORDERS ============ -->
-    <section id="section-orders" class="dashboard-section hidden-section">
-      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
-        <div>
-          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">سفارش‌های من</h1>
-          <p class="text-ink-muted text-sm">پیگیری و مشاهده جزئیات سفارش‌ها</p>
-        </div>
-        <div class="relative">
-          <input id="orderSearch" class="input ps-10 w-56" placeholder="جستجوی شماره سفارش...">
-          <svg class="absolute top-1/2 -translate-y-1/2 start-3.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5F5E68" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        </div>
-      </div>
-
-      <div id="orderTabs" class="flex gap-1 overflow-x-auto mb-5 border-b border-line" role="tablist"></div>
-      <div id="ordersList" class="space-y-4 stagger"></div>
-      <div id="ordersEmpty" class="hidden"></div>
-    </section>
-
-    <!-- ============ COMMENTS ============ -->
-    <section id="section-comments" class="dashboard-section hidden-section">
-      <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">نظرات من</h1>
-      <p class="text-ink-muted text-sm mb-6">نظرات ثبت‌شده شما برای محصولات</p>
-      <div id="commentsList" class="space-y-4 stagger"></div>
-      <div id="commentsEmpty" class="hidden"></div>
-    </section>
-
-    <!-- ============ WISHLIST ============ -->
-    <section id="section-wishlist" class="dashboard-section hidden-section">
-      <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">علاقه‌مندی‌ها</h1>
-      <p class="text-ink-muted text-sm mb-6">محصولاتی که برای بعد ذخیره کرده‌اید</p>
-      <div id="wishlistGrid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 stagger"></div>
-      <div id="wishlistEmpty" class="hidden"></div>
-    </section>
-
-    <!-- ============ ADDRESSES ============ -->
-    <section id="section-addresses" class="dashboard-section hidden-section">
-      <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">آدرس‌های ذخیره‌شده</h1>
-          <p class="text-ink-muted text-sm">آدرس‌های تحویل سفارش خود را مدیریت کنید</p>
-        </div>
-        <button id="addAddressBtn" class="btn-primary rounded-xl px-4 py-2.5 text-sm flex items-center gap-2 focus-ring">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#14140F" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
-          آدرس جدید
-        </button>
-      </div>
-      <div id="addressGrid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 stagger"></div>
-      <div id="addressesEmpty" class="hidden"></div>
-    </section>
-
-    <!-- ============ NOTIFICATIONS ============ -->
-    <section id="section-notifications" class="dashboard-section hidden-section">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">اعلان‌ها</h1>
-          <p class="text-ink-muted text-sm">تازه‌ترین رویدادهای حساب شما</p>
-        </div>
-        <button id="markAllReadBtn" class="text-xs text-gold-bright hover:underline focus-ring">علامت‌گذاری همه به‌عنوان خوانده‌شده</button>
-      </div>
-      <div id="notifTimeline" class="card p-5 lg:p-7"></div>
-      <div id="notifEmpty" class="hidden"></div>
-    </section>
-
-    <!-- ============ SETTINGS ============ -->
-    <section id="section-settings" class="dashboard-section hidden-section">
-      <h1 class="font-display text-xl lg:text-2xl font-semibold mb-1">تنظیمات</h1>
-      <p class="text-ink-muted text-sm mb-6">ترجیحات نمایش و اطلاع‌رسانی خود را تنظیم کنید</p>
-
-      <div class="card divide-y divide-line">
-        <div class="p-5 flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-medium">زبان</h3>
-            <p class="text-ink-faint text-xs mt-1">زبان نمایش پنل کاربری</p>
-          </div>
-          <select class="input w-40">
-            <option>فارسی</option>
-            <option>English</option>
-          </select>
-        </div>
-        <div class="p-5 flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-medium">حالت تاریک</h3>
-            <p class="text-ink-faint text-xs mt-1">همیشه فعال برای این پنل</p>
-          </div>
-          <div class="toggle on" data-toggle-switch></div>
-        </div>
-        <div class="p-5 flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-medium">اعلان‌های ایمیلی</h3>
-            <p class="text-ink-faint text-xs mt-1">دریافت به‌روزرسانی سفارش از طریق ایمیل</p>
-          </div>
-          <div class="toggle on" data-toggle-switch></div>
-        </div>
-        <div class="p-5 flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-medium">اعلان‌های پیامکی</h3>
-            <p class="text-ink-faint text-xs mt-1">دریافت کد رهگیری از طریق پیامک</p>
-          </div>
-          <div class="toggle" data-toggle-switch></div>
-        </div>
-        <div class="p-5 flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-medium">اعلان‌های تبلیغاتی</h3>
-            <p class="text-ink-faint text-xs mt-1">دریافت تخفیف‌ها و پیشنهادهای ویژه</p>
-          </div>
-          <div class="toggle" data-toggle-switch></div>
-        </div>
-        <div class="p-5 flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-medium">ورود خودکار</h3>
-            <p class="text-ink-faint text-xs mt-1">مرا در این دستگاه به خاطر بسپار</p>
-          </div>
-          <div class="toggle on" data-toggle-switch></div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-<!-- ============ ORDER DETAILS MODAL ============ -->
-<div id="orderModal" class="hidden fixed inset-0 z-[90] items-center justify-center p-4">
-  <div class="modal-backdrop absolute inset-0 bg-black/70" data-close-modal></div>
-  <div class="modal-panel relative card w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6">
-    <button data-close-modal class="absolute top-5 left-5 w-8 h-8 rounded-lg border border-line flex items-center justify-center focus-ring">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>
-    <div id="orderModalBody"></div>
-  </div>
-</div>
-
-<!-- ============ CONFIRM MODAL (delete/remove actions) ============ -->
-<div id="confirmModal" class="hidden fixed inset-0 z-[90] items-center justify-center p-4">
-  <div class="modal-backdrop absolute inset-0 bg-black/70" data-close-confirm></div>
-  <div class="modal-panel relative card w-full max-w-sm p-6 text-center">
-    <div class="w-12 h-12 rounded-full bg-danger/10 border border-danger/25 flex items-center justify-center mx-auto mb-4">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
     </div>
-    <h3 id="confirmTitle" class="font-display font-semibold mb-1.5">حذف مورد انتخابی؟</h3>
-    <p id="confirmDesc" class="text-ink-muted text-sm mb-6">این عملیات قابل بازگشت نیست.</p>
-    <div class="flex gap-3">
-      <button id="confirmCancelBtn" class="btn-ghost flex-1 rounded-xl py-2.5 text-sm focus-ring">انصراف</button>
-      <button id="confirmOkBtn" class="flex-1 rounded-xl py-2.5 text-sm font-medium bg-danger text-white focus-ring">حذف کن</button>
-    </div>
-  </div>
-</div>
 
-<!-- ============ ADD ADDRESS MODAL ============ -->
-<div id="addressModal" class="hidden fixed inset-0 z-[90] items-center justify-center p-4">
-  <div class="modal-backdrop absolute inset-0 bg-black/70" data-close-address></div>
-  <div class="modal-panel relative card w-full max-w-lg p-6">
-    <h3 class="font-display font-semibold mb-5">افزودن آدرس جدید</h3>
-    <form id="addressForm" class="grid sm:grid-cols-2 gap-4">
-      <!-- {% comment %} action="{% url 'address_create' %}" method="post" {% endcomment %} -->
-      <!-- {% csrf_token %} -->
-      <div class="sm:col-span-2">
-        <label class="label">نام گیرنده</label>
-        <input class="input" placeholder="نام و نام خانوادگی" required>
-      </div>
-      <div>
-        <label class="label">شماره تماس</label>
-        <input class="input font-mono" placeholder="09xxxxxxxxx" required>
-      </div>
-      <div>
-        <label class="label">کد پستی</label>
-        <input class="input font-mono" placeholder="۱۰ رقمی">
-      </div>
-      <div>
-        <label class="label">استان</label>
-        <input class="input" placeholder="تهران">
-      </div>
-      <div>
-        <label class="label">شهر</label>
-        <input class="input" placeholder="تهران">
-      </div>
-      <div class="sm:col-span-2">
-        <label class="label">آدرس کامل</label>
-        <textarea class="input" rows="3" placeholder="خیابان، کوچه، پلاک، واحد"></textarea>
-      </div>
-      <div class="sm:col-span-2 flex gap-3 mt-2">
-        <button type="submit" class="btn-primary flex-1 rounded-xl py-2.5 text-sm focus-ring">ذخیره آدرس</button>
-        <button type="button" data-close-address class="btn-ghost flex-1 rounded-xl py-2.5 text-sm focus-ring">انصراف</button>
-      </div>
-    </form>
-  </div>
-</div>
+    <script>
+      /* ═══════════════════════════════════════
+   CONFIG & API
+═══════════════════════════════════════ */
+      const API_BASE = "/accounts/api/";
+      const CSRF_TOKEN = "{{ csrf_token }}";
 
-<script>
-/* =========================================================================
-   DEMO DATA — Django integration hook points
-   In production, replace these arrays with server-rendered context, e.g.:
-     {% for order in orders %} ... {% endfor %}
-   or hydrate via a JSON script tag: {{ orders_json|json_script:"orders-data" }}
-   ========================================================================= */
+      /* ═══════════════════════════════════════
+   UTILITY FUNCTIONS
+═══════════════════════════════════════ */
+      function toPersianNum(n) {
+        return String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
+      }
 
-const DEMO = {
-  stats: [
-    { label:'کل سفارش‌ها', value: 24, icon:'box', accent:'gold' },
-    { label:'تکمیل‌شده', value: 19, icon:'check', accent:'ok' },
-    { label:'در انتظار', value: 3, icon:'clock', accent:'warn' },
-    { label:'نظرات منتشرشده', value: 11, icon:'comment', accent:'cyan' },
-    { label:'در انتظار بررسی', value: 2, icon:'hourglass', accent:'warn' },
-    { label:'علاقه‌مندی‌ها', value: 8, icon:'heart', accent:'danger' },
-  ],
-  orders: [
-    { id:'VX-10432', date:'۱۴۰۳/۰۴/۱۲', total:'۱۲,۴۵۰,۰۰۰', payment:'پرداخت‌شده', status:'delivered', tracking:'IR-88213045',
-      items:[{name:'اسکوتر برقی VOLTEX X1', qty:1, price:'۱۱,۹۰۰,۰۰۰', img:'https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=200&auto=format&fit=crop'}],
-      shipping:'۱۵۰,۰۰۰', discount:'۴۰۰,۰۰۰', final:'۱۲,۴۵۰,۰۰۰' },
-    { id:'VX-10411', date:'۱۴۰۳/۰۴/۰۵', total:'۸۹۰,۰۰۰', payment:'پرداخت‌شده', status:'shipping', tracking:'IR-77102938',
-      items:[{name:'کلاه ایمنی مسابقه‌ای', qty:1, price:'۶۹۰,۰۰۰', img:'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?q=80&w=200&auto=format&fit=crop'},
-             {name:'دستکش محافظ', qty:1, price:'۲۰۰,۰۰۰', img:'https://images.unsplash.com/photo-1520975954732-35dd22299614?q=80&w=200&auto=format&fit=crop'}],
-      shipping:'۰', discount:'۰', final:'۸۹۰,۰۰۰' },
-    { id:'VX-10390', date:'۱۴۰۳/۰۳/۲۸', total:'۳,۲۰۰,۰۰۰', payment:'در انتظار پرداخت', status:'pending', tracking:'—',
-      items:[{name:'باتری یدک VOLTEX 48V', qty:1, price:'۳,۲۰۰,۰۰۰', img:'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=200&auto=format&fit=crop'}],
-      shipping:'۰', discount:'۰', final:'۳,۲۰۰,۰۰۰' },
-    { id:'VX-10355', date:'۱۴۰۳/۰۳/۱۰', total:'۴۵۰,۰۰۰', payment:'پرداخت‌شده', status:'processing', tracking:'—',
-      items:[{name:'قفل هوشمند GPS', qty:1, price:'۴۵۰,۰۰۰', img:'https://images.unsplash.com/photo-1622185135505-2d795003994a?q=80&w=200&auto=format&fit=crop'}],
-      shipping:'۰', discount:'۰', final:'۴۵۰,۰۰۰' },
-    { id:'VX-10201', date:'۱۴۰۳/۰۲/۰۱', total:'۲,۱۰۰,۰۰۰', payment:'بازگشت وجه', status:'cancelled', tracking:'—',
-      items:[{name:'کیف حمل اسکوتر', qty:1, price:'۲,۱۰۰,۰۰۰', img:'https://images.unsplash.com/photo-1622560481156-01a35186f6d6?q=80&w=200&auto=format&fit=crop'}],
-      shipping:'۰', discount:'۰', final:'۲,۱۰۰,۰۰۰' },
-  ],
-  comments: [
-    { product:'اسکوتر برقی VOLTEX X1', img:'https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=150&auto=format&fit=crop', date:'۱۴۰۳/۰۴/۱۵', rating:5,
-      text:'کیفیت ساخت واقعا عالیه و باتری هم اونطور که تبلیغ شده دووم میاره. پیشنهاد می‌کنم.', status:'published' },
-    { product:'کلاه ایمنی مسابقه‌ای', img:'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?q=80&w=150&auto=format&fit=crop', date:'۱۴۰۳/۰۴/۰۸', rating:4,
-      text:'راحته ولی سایزبندی یکم بزرگ‌تر از حد معموله، یک سایز کوچک‌تر سفارش بدید.', status:'pending' },
-    { product:'کیف حمل اسکوتر', img:'https://images.unsplash.com/photo-1622560481156-01a35186f6d6?q=80&w=150&auto=format&fit=crop', date:'۱۴۰۳/۰۲/۰۵', rating:2,
-      text:'دوخت کیف زود پاره شد و کیفیت پارچه پایین بود.', status:'rejected', rejectReason:'حاوی محتوای تبلیغاتی برای سایر فروشگاه‌ها بود.' },
-  ],
-  wishlist: [
-    { name:'اسکوتر برقی VOLTEX Pro', img:'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=300&auto=format&fit=crop', price:'۱۸,۵۰۰,۰۰۰', discount:'۱۵٪', inStock:true },
-    { name:'شارژر سریع VOLTEX', img:'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=300&auto=format&fit=crop', price:'۹۵۰,۰۰۰', discount:null, inStock:true },
-    { name:'لاستیک آفرود ۱۰ اینچ', img:'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=300&auto=format&fit=crop', price:'۶۲۰,۰۰۰', discount:'۱۰٪', inStock:false },
-    { name:'چراغ جلو LED هوشمند', img:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=300&auto=format&fit=crop', price:'۳۸۰,۰۰۰', discount:null, inStock:true },
-  ],
-  addresses: [
-    { name:'{{ user.full_name }}', phone:'۰۹۱۲۳۴۵۶۷۸۹', province:'تهران', city:'تهران', street:'خیابان ولیعصر، کوچه بهار، پلاک ۱۲', postal:'۱۴۵۸۹۳۶۲۱۱', isDefault:true },
-    { name:'علی محمدی', phone:'۰۹۳۵۱۱۲۲۳۳۴', province:'البرز', city:'کرج', street:'بلوار طالقانی، خیابان ۲۲ بهمن', postal:'۳۱۵۸۷۴۴۱۲۰', isDefault:false },
-  ],
-  notifications: [
-    { icon:'truck', title:'سفارش شما ارسال شد', desc:'سفارش VX-10411 تحویل پست شد', time:'۲ ساعت پیش', unread:true },
-    { icon:'check', title:'پرداخت موفق', desc:'پرداخت سفارش VX-10432 با موفقیت انجام شد', time:'دیروز', unread:true },
-    { icon:'comment', title:'نظر شما تایید شد', desc:'نظر شما برای «اسکوتر برقی VOLTEX X1» منتشر شد', time:'۳ روز پیش', unread:true },
-    { icon:'discount', title:'کد تخفیف دریافت کردید', desc:'۱۵٪ تخفیف ویژه اعضا برای خرید بعدی', time:'هفته گذشته', unread:false },
-  ]
-};
+      function formatPrice(price) {
+        if (!price) return "۰";
+        const num = Number(price);
+        if (isNaN(num)) return String(price);
+        return num.toLocaleString("fa-IR") + " تومان";
+      }
 
-const ICONS = {
-  box:'<path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
-  check:'<path d="M20 6 9 17l-5-5"/>',
-  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
-  comment:'<path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4A9 9 0 0 1 3 12a8.4 8.4 0 0 1 8.9-8.5 8.5 8.5 0 0 1 9.1 8Z"/>',
-  hourglass:'<path d="M5 2h14M5 22h14M6 2c0 5 12 5 12 10s-12 5-12 10M18 2c0 5-12 5-12 10s12 5 12 10"/>',
-  heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>',
-  truck:'<path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8Z"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="18.5" cy="18.5" r="1.5"/>',
-  discount:'<circle cx="12" cy="12" r="10"/><path d="m9 9 6 6M9.5 9h.01M14.5 15h.01"/>',
-};
-const ACCENTS = { gold:['#C9A961','rgba(201,169,97,0.12)'], ok:['#4ADE80','rgba(74,222,128,0.12)'], warn:['#FBBF24','rgba(251,191,36,0.12)'], cyan:['#4DD8E0','rgba(77,216,224,0.12)'], danger:['#F87171','rgba(248,113,113,0.12)'] };
-const STATUS_LABEL = { pending:'در انتظار', processing:'در حال پردازش', shipping:'در حال ارسال', delivered:'تحویل‌شده', cancelled:'لغوشده' };
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
+        try {
+          const d = new Date(dateStr);
+          return d.toLocaleDateString("fa-IR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+        } catch (e) {
+          return dateStr;
+        }
+      }
 
-function icon(name, size=16, color='currentColor', sw=2){
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
-}
+      function getCSRFToken() {
+        return (
+          CSRF_TOKEN ||
+          document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("csrftoken="))
+            ?.split("=")[1] ||
+          ""
+        );
+      }
 
-function starRow(n){
-  let s='';
-  for(let i=1;i<=5;i++){
-    s += `<svg width="14" height="14" viewBox="0 0 24 24" fill="${i<=n?'#E4C77E':'none'}" stroke="${i<=n?'#E4C77E':'#5F5E68'}" stroke-width="1.5"><path d="m12 2 3.1 6.6 7.2.9-5.3 5 1.4 7.2L12 18.3 5.6 21.7 7 14.5 1.7 9.5l7.2-.9L12 2Z"/></svg>`;
-  }
-  return `<div class="flex gap-0.5">${s}</div>`;
-}
+      /* ═══════════════════════════════════════
+   ICONS
+═══════════════════════════════════════ */
+      const ICONS = {
+        box: '<path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+        check: '<path d="M20 6 9 17l-5-5"/>',
+        clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+        comment:
+          '<path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4A9 9 0 0 1 3 12a8.4 8.4 0 0 1 8.9-8.5 8.5 8.5 0 0 1 9.1 8Z"/>',
+        hourglass:
+          '<path d="M5 2h14M5 22h14M6 2c0 5 12 5 12 10s-12 5-12 10M18 2c0 5-12 5-12 10s12 5 12 10"/>',
+        heart:
+          '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>',
+        truck:
+          '<path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8Z"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="18.5" cy="18.5" r="1.5"/>',
+        discount:
+          '<circle cx="12" cy="12" r="10"/><path d="m9 9 6 6M9.5 9h.01M14.5 15h.01"/>',
+        map: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+        bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+      };
 
-/* ---------- STAT CARDS ---------- */
-function renderStats(){
-  const el = document.getElementById('statCards');
-  el.innerHTML = DEMO.stats.map(s=>{
-    const [c,bg] = ACCENTS[s.accent];
-    return `
+      function icon(name, size = 16, color = "currentColor", sw = 2) {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ""}</svg>`;
+      }
+
+      function starRow(n) {
+        let s = "";
+        for (let i = 1; i <= 5; i++) {
+          s += `<svg width="14" height="14" viewBox="0 0 24 24" fill="${i <= n ? "#E4C77E" : "none"}" stroke="${i <= n ? "#E4C77E" : "#5F5E68"}" stroke-width="1.5"><path d="m12 2 3.1 6.6 7.2.9-5.3 5 1.4 7.2L12 18.3 5.6 21.7 7 14.5 1.7 9.5l7.2-.9L12 2Z"/></svg>`;
+        }
+        return `<div class="flex gap-0.5">${s}</div>`;
+      }
+
+      const ACCENTS = {
+        gold: ["#C9A961", "rgba(201,169,97,0.12)"],
+        ok: ["#4ADE80", "rgba(74,222,128,0.12)"],
+        warn: ["#FBBF24", "rgba(251,191,36,0.12)"],
+        cyan: ["#4DD8E0", "rgba(77,216,224,0.12)"],
+        danger: ["#F87171", "rgba(248,113,113,0.12)"],
+      };
+
+      const STATUS_LABEL = {
+        pending: "در انتظار",
+        processing: "در حال پردازش",
+        shipping: "در حال ارسال",
+        delivered: "تحویل‌شده",
+        cancelled: "لغوشده",
+      };
+
+      const STATUS_BADGE = {
+        pending: "badge-pending",
+        processing: "badge-processing",
+        shipping: "badge-shipping",
+        delivered: "badge-delivered",
+        cancelled: "badge-cancelled",
+      };
+
+      /* ═══════════════════════════════════════
+   LOAD DASHBOARD DATA
+═══════════════════════════════════════ */
+      let dashboardData = null;
+
+      async function loadDashboard() {
+        try {
+          const response = await fetch(API_BASE + "dashboard/");
+          if (!response.ok) throw new Error("Failed to load dashboard data");
+          dashboardData = await response.json();
+          console.log("✅ Dashboard loaded:", dashboardData);
+          renderAll();
+        } catch (error) {
+          console.error("❌ Error loading dashboard:", error);
+          showToast("خطا در بارگذاری اطلاعات", "danger");
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════ */
+      function renderAll() {
+        if (!dashboardData) return;
+        renderUserProfile();
+        renderStats();
+        renderRecentOrders();
+        renderRecentNotifs();
+        renderOrderTabs();
+        renderOrders();
+        renderComments();
+        renderWishlist();
+        renderAddresses();
+        renderNotifs();
+        updateBadges();
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER USER PROFILE
+═══════════════════════════════════════ */
+      function renderUserProfile() {
+        const user = dashboardData.user;
+        if (!user) return;
+
+        const avatar = user.avatar || "/static/img/avatar-placeholder.png";
+        document.getElementById("sidebarAvatar").src = avatar;
+        document.getElementById("avatarPreview").src = avatar;
+        document.getElementById("sidebarName").textContent =
+          user.full_name || "کاربر";
+        document.getElementById("sidebarUsername").textContent =
+          "@" + (user.username || "user");
+        document.getElementById("greetingName").textContent =
+          user.full_name || "کاربر";
+        document.getElementById("memberDate").textContent =
+          user.membership_date || "مهر ۱۴۰۲";
+
+        // Personal form
+        document.getElementById("fullName").value = user.full_name || "";
+        document.getElementById("username").value = user.username || "";
+        document.getElementById("mobile").value = user.mobile || "";
+        document.getElementById("email").value = user.email || "";
+        document.getElementById("nationalCode").value =
+          user.national_code || "";
+        document.getElementById("birthDate").value = user.birth_date || "";
+
+        // Gender
+        document.querySelectorAll('input[name="gender"]').forEach((el) => {
+          el.checked = el.value === user.gender;
+        });
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER STATS
+═══════════════════════════════════════ */
+      function renderStats() {
+        const stats = dashboardData.stats;
+        if (!stats) return;
+
+        const items = [
+          {
+            label: "کل سفارش‌ها",
+            value: stats.total_orders || 0,
+            icon: "box",
+            accent: "gold",
+          },
+          {
+            label: "تکمیل‌شده",
+            value: stats.delivered_orders || 0,
+            icon: "check",
+            accent: "ok",
+          },
+          {
+            label: "در انتظار",
+            value: stats.pending_orders || 0,
+            icon: "clock",
+            accent: "warn",
+          },
+          {
+            label: "نظرات منتشرشده",
+            value: stats.approved_comments || 0,
+            icon: "comment",
+            accent: "cyan",
+          },
+          {
+            label: "در انتظار بررسی",
+            value: stats.pending_comments || 0,
+            icon: "hourglass",
+            accent: "warn",
+          },
+          {
+            label: "علاقه‌مندی‌ها",
+            value: stats.wishlist_count || 0,
+            icon: "heart",
+            accent: "danger",
+          },
+        ];
+
+        const el = document.getElementById("statCards");
+        el.innerHTML = items
+          .map((s) => {
+            const [c, bg] = ACCENTS[s.accent];
+            return `
     <div class="card card-hover p-4">
       <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style="background:${bg}">
-        ${icon(s.icon,17,c)}
+        ${icon(s.icon, 17, c)}
       </div>
-      <p class="font-display text-xl font-semibold" data-count="${s.value}">0</p>
+      <p class="font-display text-xl font-semibold" data-count="${s.value}">${toPersianNum(s.value)}</p>
       <p class="text-ink-faint text-[11px] mt-0.5">${s.label}</p>
     </div>`;
-  }).join('');
-  // count-up animation
-  el.querySelectorAll('[data-count]').forEach(node=>{
-    const target = parseInt(node.dataset.count,10);
-    let cur = 0; const step = Math.max(1, Math.round(target/30));
-    const t = setInterval(()=>{ cur += step; if(cur>=target){ cur=target; clearInterval(t);} node.textContent = cur.toLocaleString('fa-IR'); }, 25);
-  });
-}
+          })
+          .join("");
+      }
 
-/* ---------- RECENT ORDERS (overview) ---------- */
-function renderRecentOrders(){
-  const el = document.getElementById('recentOrders');
-  el.innerHTML = DEMO.orders.slice(0,3).map(o=>`
+      /* ═══════════════════════════════════════
+   RENDER RECENT ORDERS
+═══════════════════════════════════════ */
+      function renderRecentOrders() {
+        const orders = dashboardData.recent_orders || [];
+        const el = document.getElementById("recentOrders");
+
+        if (orders.length === 0) {
+          el.innerHTML =
+            '<p class="text-ink-faint text-sm text-center py-4">هنوز سفارشی ثبت نشده است</p>';
+          return;
+        }
+
+        el.innerHTML = orders
+          .slice(0, 3)
+          .map((o) => {
+            const firstItem = o.items && o.items.length > 0 ? o.items[0] : null;
+            return `
     <div class="flex items-center gap-3 p-3 rounded-xl border border-line hover:border-gold/30 transition cursor-pointer" onclick="openOrderModal('${o.id}')">
-      <img src="${o.items[0].img}" class="w-12 h-12 rounded-lg object-cover shrink-0" alt="${o.items[0].name}" loading="lazy">
+      ${firstItem ? `<img src="${firstItem.product_image || "/static/img/default-product.jpg"}" class="w-12 h-12 rounded-lg object-cover shrink-0" alt="${firstItem.product_name}" loading="lazy">` : '<div class="w-12 h-12 rounded-lg bg-elevated shrink-0"></div>'}
       <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium truncate">${o.items[0].name}${o.items.length>1?` +${o.items.length-1} کالای دیگر`:''}</p>
-        <p class="text-ink-faint text-[11px] font-mono mt-0.5">${o.id} · ${o.date}</p>
+        <p class="text-sm font-medium truncate">${firstItem ? firstItem.product_name : "محصول"}</p>
+        <p class="text-ink-faint text-[11px] font-mono mt-0.5">${o.order_number || ""} · ${formatDate(o.created_at)}</p>
       </div>
-      <span class="badge badge-${o.status}">${STATUS_LABEL[o.status]}</span>
-    </div>`).join('');
-}
+      <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
+    </div>`;
+          })
+          .join("");
+      }
 
-/* ---------- RECENT NOTIFICATIONS (overview) ---------- */
-function renderRecentNotifs(){
-  const el = document.getElementById('recentNotifs');
-  el.innerHTML = DEMO.notifications.slice(0,4).map(n=>`
+      /* ═══════════════════════════════════════
+   RENDER RECENT NOTIFICATIONS
+═══════════════════════════════════════ */
+      function renderRecentNotifs() {
+        const notifs = dashboardData.notifications || [];
+        const el = document.getElementById("recentNotifs");
+
+        if (notifs.length === 0) {
+          el.innerHTML =
+            '<p class="text-ink-faint text-sm text-center py-4">هیچ اعلانی وجود ندارد</p>';
+          return;
+        }
+
+        el.innerHTML = notifs
+          .slice(0, 4)
+          .map(
+            (n) => `
     <div class="flex gap-3">
-      <div class="w-8 h-8 rounded-lg bg-elevated border border-line flex items-center justify-center shrink-0">${icon(n.icon,14,'#C9A961')}</div>
+      <div class="w-8 h-8 rounded-lg bg-elevated border border-line flex items-center justify-center shrink-0">${icon(n.icon || "bell", 14, "#C9A961")}</div>
       <div class="min-w-0">
         <p class="text-xs font-medium">${n.title}</p>
         <p class="text-ink-faint text-[11px] mt-0.5">${n.time}</p>
       </div>
-    </div>`).join('');
-}
+    </div>
+  `,
+          )
+          .join("");
+      }
 
-/* ---------- ORDERS SECTION ---------- */
-let activeOrderTab = 'all';
-const ORDER_TABS = [['all','همه'],['pending','در انتظار'],['processing','پردازش'],['shipping','ارسال'],['delivered','تحویل‌شده'],['cancelled','لغوشده']];
+      /* ═══════════════════════════════════════
+   ORDERS SECTION
+═══════════════════════════════════════ */
+      let activeOrderTab = "all";
+      const ORDER_TABS = [
+        ["all", "همه"],
+        ["pending", "در انتظار"],
+        ["processing", "پردازش"],
+        ["shipping", "ارسال"],
+        ["delivered", "تحویل‌شده"],
+        ["cancelled", "لغوشده"],
+      ];
 
-function renderOrderTabs(){
-  const el = document.getElementById('orderTabs');
-  el.innerHTML = ORDER_TABS.map(([key,label])=>`
-    <button data-tab="${key}" class="tab-btn ${key===activeOrderTab?'active':''} px-4 py-2.5 text-sm whitespace-nowrap text-ink-muted focus-ring" role="tab">${label}</button>
-  `).join('');
-  el.querySelectorAll('[data-tab]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{ activeOrderTab = btn.dataset.tab; renderOrderTabs(); renderOrders(); });
-  });
-}
+      function renderOrderTabs() {
+        const el = document.getElementById("orderTabs");
+        el.innerHTML = ORDER_TABS.map(
+          ([key, label]) => `
+    <button data-tab="${key}" class="tab-btn ${key === activeOrderTab ? "active" : ""} px-4 py-2.5 text-sm whitespace-nowrap text-ink-muted focus-ring" role="tab">${label}</button>
+  `,
+        ).join("");
 
-function renderOrders(){
-  const q = (document.getElementById('orderSearch').value||'').trim();
-  const listEl = document.getElementById('ordersList');
-  const emptyEl = document.getElementById('ordersEmpty');
-  let filtered = DEMO.orders.filter(o => activeOrderTab==='all' || o.status===activeOrderTab);
-  if(q) filtered = filtered.filter(o => o.id.includes(q));
+        el.querySelectorAll("[data-tab]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            activeOrderTab = btn.dataset.tab;
+            renderOrderTabs();
+            renderOrders();
+          });
+        });
+      }
 
-  if(filtered.length===0){
-    listEl.innerHTML=''; emptyEl.classList.remove('hidden');
-    emptyEl.innerHTML = emptyState('box','سفارشی یافت نشد','با تغییر فیلتر یا جستجو دوباره امتحان کنید.');
-    return;
-  }
-  emptyEl.classList.add('hidden');
+      function renderOrders() {
+        const orders = dashboardData.recent_orders || [];
+        const q = (document.getElementById("orderSearch")?.value || "").trim();
+        const listEl = document.getElementById("ordersList");
+        const emptyEl = document.getElementById("ordersEmpty");
 
-  listEl.innerHTML = filtered.map(o=>`
+        let filtered = orders.filter(
+          (o) => activeOrderTab === "all" || o.status === activeOrderTab,
+        );
+        if (q)
+          filtered = filtered.filter((o) => (o.order_number || "").includes(q));
+
+        if (filtered.length === 0) {
+          listEl.innerHTML = "";
+          emptyEl.classList.remove("hidden");
+          emptyEl.innerHTML = emptyState(
+            "box",
+            "سفارشی یافت نشد",
+            "با تغییر فیلتر یا جستجو دوباره امتحان کنید.",
+          );
+          return;
+        }
+        emptyEl.classList.add("hidden");
+
+        listEl.innerHTML = filtered
+          .map((o) => {
+            const items = o.items || [];
+            const discount = o.discount_amount || 0;
+            return `
     <div class="card p-4 lg:p-5">
       <div class="flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-3 min-w-0">
           <div class="flex -space-x-3 rtl:space-x-reverse">
-            ${o.items.slice(0,3).map(it=>`<img src="${it.img}" class="w-11 h-11 rounded-xl object-cover border-2 border-bg-surface" loading="lazy" alt="${it.name}">`).join('')}
+            ${items
+              .slice(0, 3)
+              .map(
+                (it) => `
+              <img src="${it.product_image || "/static/img/default-product.jpg"}" class="w-11 h-11 rounded-xl object-cover border-2 border-bg-surface" loading="lazy" alt="${it.product_name}">
+            `,
+              )
+              .join("")}
           </div>
           <div class="min-w-0">
-            <p class="text-sm font-medium font-mono">${o.id}</p>
-            <p class="text-ink-faint text-[11px] mt-0.5">${o.date} · ${o.items.length} کالا</p>
+            <p class="text-sm font-medium font-mono">${o.order_number || ""}</p>
+            <p class="text-ink-faint text-[11px] mt-0.5">${formatDate(o.created_at)} · ${items.length} کالا</p>
           </div>
         </div>
-        <span class="badge badge-${o.status}">${STATUS_LABEL[o.status]}</span>
-        <div class="text-sm font-mono font-medium">${o.total} <span class="text-ink-faint text-[11px]">تومان</span></div>
+        <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
+        <div class="text-sm font-mono font-medium">${formatPrice(o.total)}</div>
         <div class="flex items-center gap-2">
           <button onclick="openOrderModal('${o.id}')" class="btn-ghost text-xs px-3.5 py-2 rounded-lg focus-ring">مشاهده جزئیات</button>
         </div>
       </div>
       <button onclick="toggleExpand(this)" class="w-full flex items-center justify-center gap-1 text-ink-faint text-[11px] mt-3 pt-3 border-t border-line hover:text-gold-bright transition focus-ring">
-        کد رهگیری: <span class="font-mono">${o.tracking}</span>
+        کد رهگیری: <span class="font-mono">${o.tracking_code || "—"}</span>
         <svg class="expand-chev transition-transform" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
       </button>
       <div class="expand-panel hidden mt-3 pt-3 border-t border-line grid sm:grid-cols-2 gap-2 text-xs">
-        <div class="flex justify-between text-ink-muted"><span>وضعیت پرداخت</span><span class="text-ink">${o.payment}</span></div>
-        <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono text-ink">${o.shipping} تومان</span></div>
-        <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">${o.discount} تومان</span></div>
-        <div class="flex justify-between text-ink-muted"><span>مبلغ نهایی</span><span class="font-mono text-ink font-medium">${o.final} تومان</span></div>
+        <div class="flex justify-between text-ink-muted"><span>وضعیت پرداخت</span><span class="text-ink">${o.payment_label || o.payment_status || "—"}</span></div>
+        <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono text-ink">${formatPrice(o.shipping_cost || 0)}</span></div>
+        <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">${formatPrice(discount)}</span></div>
+        <div class="flex justify-between text-ink-muted"><span>مبلغ نهایی</span><span class="font-mono text-ink font-medium">${formatPrice(o.total)}</span></div>
       </div>
-    </div>`).join('');
-}
+    </div>`;
+          })
+          .join("");
+      }
 
-function toggleExpand(btn){
-  const panel = btn.nextElementSibling;
-  const chev = btn.querySelector('.expand-chev');
-  panel.classList.toggle('hidden');
-  chev.style.transform = panel.classList.contains('hidden') ? '' : 'rotate(180deg)';
-}
+      function toggleExpand(btn) {
+        const panel = btn.nextElementSibling;
+        const chev = btn.querySelector(".expand-chev");
+        panel.classList.toggle("hidden");
+        chev.style.transform = panel.classList.contains("hidden")
+          ? ""
+          : "rotate(180deg)";
+      }
 
-function openOrderModal(orderId){
-  const o = DEMO.orders.find(x=>x.id===orderId);
-  if(!o) return;
-  const body = document.getElementById('orderModalBody');
-  body.innerHTML = `
+      function openOrderModal(orderId) {
+        const orders = dashboardData.recent_orders || [];
+        const o = orders.find(
+          (x) => x.id === orderId || x.order_number === orderId,
+        );
+        if (!o) return;
+
+        const body = document.getElementById("orderModalBody");
+        const items = o.items || [];
+        const discount = o.discount_amount || 0;
+
+        body.innerHTML = `
     <div class="flex items-center justify-between mb-1 pe-10">
-      <h3 class="font-display font-semibold text-lg">سفارش ${o.id}</h3>
-      <span class="badge badge-${o.status}">${STATUS_LABEL[o.status]}</span>
+      <h3 class="font-display font-semibold text-lg">سفارش ${o.order_number || ""}</h3>
+      <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
     </div>
-    <p class="text-ink-faint text-xs mb-6">ثبت‌شده در ${o.date} · کد رهگیری: <span class="font-mono">${o.tracking}</span></p>
+    <p class="text-ink-faint text-xs mb-6">ثبت‌شده در ${formatDate(o.created_at)} · کد رهگیری: <span class="font-mono">${o.tracking_code || "—"}</span></p>
 
     <div class="space-y-3 mb-6">
-      ${o.items.map(it=>`
+      ${items
+        .map(
+          (it) => `
         <div class="flex items-center gap-3 p-3 rounded-xl border border-line">
-          <img src="${it.img}" class="w-14 h-14 rounded-lg object-cover" loading="lazy" alt="${it.name}">
+          <img src="${it.product_image || "/static/img/default-product.jpg"}" class="w-14 h-14 rounded-lg object-cover" loading="lazy" alt="${it.product_name}">
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate">${it.name}</p>
-            <p class="text-ink-faint text-[11px] mt-0.5">تعداد: ${it.qty}</p>
+            <p class="text-sm font-medium truncate">${it.product_name || "محصول"}</p>
+            <p class="text-ink-faint text-[11px] mt-0.5">تعداد: ${it.quantity || 1}</p>
           </div>
-          <div class="text-sm font-mono">${it.price}</div>
-        </div>`).join('')}
+          <div class="text-sm font-mono">${formatPrice(it.price || 0)}</div>
+        </div>
+      `,
+        )
+        .join("")}
     </div>
 
     <div class="border-t border-line pt-4 space-y-2 text-sm">
-      <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono">${o.shipping} تومان</span></div>
-      <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">-${o.discount} تومان</span></div>
-      <div class="flex justify-between font-medium text-base pt-2 border-t border-line mt-2"><span>مبلغ نهایی</span><span class="font-mono text-gold-bright">${o.final} تومان</span></div>
+      <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono">${formatPrice(o.shipping_cost || 0)}</span></div>
+      <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">-${formatPrice(discount)}</span></div>
+      <div class="flex justify-between font-medium text-base pt-2 border-t border-line mt-2"><span>مبلغ نهایی</span><span class="font-mono text-gold-bright">${formatPrice(o.total)}</span></div>
     </div>
 
     <div class="flex gap-3 mt-6">
@@ -871,307 +2042,671 @@ function openOrderModal(orderId){
       <button data-close-modal class="btn-ghost flex-1 rounded-xl py-2.5 text-sm focus-ring">بستن</button>
     </div>
   `;
-  showModal('orderModal');
-}
+        showModal("orderModal");
+      }
 
-/* ---------- COMMENTS ---------- */
-function renderComments(){
-  const listEl = document.getElementById('commentsList');
-  const emptyEl = document.getElementById('commentsEmpty');
-  if(DEMO.comments.length===0){
-    listEl.innerHTML=''; emptyEl.classList.remove('hidden');
-    emptyEl.innerHTML = emptyState('comment','هنوز نظری ثبت نکرده‌اید','بعد از خرید محصولات می‌توانید نظر خود را ثبت کنید.');
-    return;
-  }
-  emptyEl.classList.add('hidden');
-  const stMap = { published:['badge-published','منتشرشده'], pending:['badge-pending','در انتظار بررسی'], rejected:['badge-rejected','رد شده'] };
-  listEl.innerHTML = DEMO.comments.map((c,i)=>{
-    const [cls,label] = stMap[c.status];
-    return `
+      /* ═══════════════════════════════════════
+   COMMENTS
+═══════════════════════════════════════ */
+      function renderComments() {
+        const comments = dashboardData.comments || [];
+        const listEl = document.getElementById("commentsList");
+        const emptyEl = document.getElementById("commentsEmpty");
+
+        if (comments.length === 0) {
+          listEl.innerHTML = "";
+          emptyEl.classList.remove("hidden");
+          emptyEl.innerHTML = emptyState(
+            "comment",
+            "هنوز نظری ثبت نکرده‌اید",
+            "بعد از خرید محصولات یا مطالعه مقالات می‌توانید نظر خود را ثبت کنید.",
+          );
+          return;
+        }
+        emptyEl.classList.add("hidden");
+
+        const stMap = {
+          approved: ["badge-published", "منتشرشده"],
+          pending: ["badge-pending", "در انتظار بررسی"],
+          rejected: ["badge-rejected", "رد شده"],
+        };
+
+        listEl.innerHTML = comments
+          .map((c) => {
+            const [cls, label] = stMap[c.status] || [
+              "badge-pending",
+              "در انتظار",
+            ];
+            const typeLabel =
+              c.type === "product"
+                ? c.product_name || "محصول"
+                : c.article_title || "مقاله";
+            const imageUrl =
+              c.type === "product" ? c.product_image : c.article_image;
+
+            return `
     <div class="card p-4 lg:p-5">
       <div class="flex items-start gap-3">
-        <img src="${c.img}" class="w-12 h-12 rounded-xl object-cover shrink-0" loading="lazy" alt="${c.product}">
+        <img src="${imageUrl || "/static/img/default-product.jpg"}" class="w-12 h-12 rounded-xl object-cover shrink-0" loading="lazy" alt="${typeLabel}">
         <div class="flex-1 min-w-0">
           <div class="flex flex-wrap items-center gap-2 justify-between">
-            <p class="text-sm font-medium">${c.product}</p>
+            <p class="text-sm font-medium">${typeLabel}</p>
             <span class="badge ${cls}">${label}</span>
           </div>
           <div class="flex items-center gap-2 mt-1.5">
-            ${starRow(c.rating)}
-            <span class="text-ink-faint text-[11px]">${c.date}</span>
+            ${c.rating ? starRow(c.rating) : ""}
+            <span class="text-ink-faint text-[11px]">${formatDate(c.date)}</span>
           </div>
-          <p class="text-ink-muted text-sm mt-2 leading-relaxed">${c.text}</p>
-          ${c.status==='rejected' ? `<p class="text-danger text-[11px] mt-2 flex items-center gap-1">${icon('clock',12,'#F87171')} دلیل رد: ${c.rejectReason}</p>` : ''}
-          <div class="flex gap-2 mt-3">
-            <button class="btn-ghost text-xs px-3 py-1.5 rounded-lg focus-ring">ویرایش</button>
-            <button onclick="askConfirm('حذف نظر؟','این نظر برای همیشه حذف می‌شود.', ()=>removeAt('comments', ${i}))" class="btn-danger-ghost text-xs px-3 py-1.5 rounded-lg focus-ring">حذف</button>
-          </div>
+          <p class="text-ink-muted text-sm mt-2 leading-relaxed">${c.text || ""}</p>
+          ${c.status === "rejected" && c.reject_reason ? `<p class="text-danger text-[11px] mt-2 flex items-center gap-1">${icon("clock", 12, "#F87171")} دلیل رد: ${c.reject_reason}</p>` : ""}
         </div>
       </div>
     </div>`;
-  }).join('');
-}
+          })
+          .join("");
+      }
 
-/* ---------- WISHLIST ---------- */
-function renderWishlist(){
-  const el = document.getElementById('wishlistGrid');
-  const emptyEl = document.getElementById('wishlistEmpty');
-  if(DEMO.wishlist.length===0){
-    el.innerHTML=''; emptyEl.classList.remove('hidden');
-    emptyEl.innerHTML = emptyState('heart','لیست علاقه‌مندی خالی است','محصولات مورد علاقه خود را اینجا ذخیره کنید.');
-    return;
-  }
-  emptyEl.classList.add('hidden');
-  el.innerHTML = DEMO.wishlist.map((p,i)=>`
+      /* ═══════════════════════════════════════
+   WISHLIST
+═══════════════════════════════════════ */
+      function renderWishlist() {
+        const wishlist = dashboardData.wishlist || [];
+        const el = document.getElementById("wishlistGrid");
+        const emptyEl = document.getElementById("wishlistEmpty");
+        const countEl = document.getElementById("navWishlistCount");
+
+        countEl.textContent = wishlist.length;
+
+        if (wishlist.length === 0) {
+          el.innerHTML = "";
+          emptyEl.classList.remove("hidden");
+          emptyEl.innerHTML = emptyState(
+            "heart",
+            "لیست علاقه‌مندی خالی است",
+            "محصولات مورد علاقه خود را اینجا ذخیره کنید.",
+          );
+          return;
+        }
+        emptyEl.classList.add("hidden");
+
+        el.innerHTML = wishlist
+          .map(
+            (p) => `
     <div class="card card-hover overflow-hidden group">
       <div class="relative aspect-square overflow-hidden bg-elevated">
-        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" alt="${p.name}">
-        ${p.discount ? `<span class="absolute top-2 right-2 badge bg-danger/90 text-white border-0">${p.discount}-</span>` : ''}
-        <button onclick="removeAt('wishlist', ${i})" aria-label="حذف از علاقه‌مندی" class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur flex items-center justify-center focus-ring hover:bg-danger/80 transition">
+        <img src="${p.product_image || "/static/img/default-product.jpg"}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" alt="${p.product_name}">
+        ${p.discount_price ? `<span class="absolute top-2 right-2 badge bg-danger/90 text-white border-0">${Math.round(((p.price - p.discount_price) / p.price) * 100)}%-</span>` : ""}
+        <button onclick="removeFromWishlist(${p.product_id})" aria-label="حذف از علاقه‌مندی" class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur flex items-center justify-center focus-ring hover:bg-danger/80 transition">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
-        ${!p.inStock ? `<div class="absolute inset-0 bg-black/55 flex items-center justify-center"><span class="text-[11px] text-white/90">ناموجود</span></div>` : ''}
+        ${!p.in_stock ? `<div class="absolute inset-0 bg-black/55 flex items-center justify-center"><span class="text-[11px] text-white/90">ناموجود</span></div>` : ""}
       </div>
       <div class="p-3">
-        <p class="text-xs font-medium truncate">${p.name}</p>
-        <p class="font-mono text-sm mt-1.5 text-gold-bright">${p.price} <span class="text-ink-faint text-[10px]">تومان</span></p>
+        <p class="text-xs font-medium truncate">${p.product_name || ""}</p>
+        <p class="font-mono text-sm mt-1.5 text-gold-bright">${formatPrice(p.final_price || p.price)}</p>
         <div class="flex gap-1.5 mt-2.5">
-          <button ${!p.inStock?'disabled':''} class="flex-1 btn-primary text-[11px] py-1.5 rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">افزودن به سبد</button>
-          <button class="btn-ghost text-[11px] px-2.5 py-1.5 rounded-lg focus-ring">مشاهده</button>
+          <button ${!p.in_stock ? "disabled" : ""} class="flex-1 btn-primary text-[11px] py-1.5 rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">افزودن به سبد</button>
+          <a href="/shop/product/${p.product_slug}/" class="btn-ghost text-[11px] px-2.5 py-1.5 rounded-lg focus-ring">مشاهده</a>
         </div>
       </div>
-    </div>`).join('');
-}
+    </div>
+  `,
+          )
+          .join("");
+      }
 
-/* ---------- ADDRESSES ---------- */
-function renderAddresses(){
-  const el = document.getElementById('addressGrid');
-  const emptyEl = document.getElementById('addressesEmpty');
-  if(DEMO.addresses.length===0){
-    el.innerHTML=''; emptyEl.classList.remove('hidden');
-    emptyEl.innerHTML = emptyState('map','آدرسی ثبت نشده','برای تحویل سریع‌تر سفارش، یک آدرس اضافه کنید.');
-    return;
-  }
-  emptyEl.classList.add('hidden');
-  el.innerHTML = DEMO.addresses.map((a,i)=>`
-    <div class="card p-4 relative ${a.isDefault?'border-gold/40':''}">
-      ${a.isDefault ? `<span class="badge bg-gold/12 text-gold-bright border border-gold/30 absolute top-4 left-4">پیش‌فرض</span>` : ''}
-      <p class="text-sm font-medium">${a.name}</p>
-      <p class="text-ink-faint text-xs font-mono mt-1">${a.phone}</p>
-      <p class="text-ink-muted text-xs mt-3 leading-relaxed">${a.province}، ${a.city}<br>${a.street}</p>
-      <p class="text-ink-faint text-[11px] font-mono mt-2">کد پستی: ${a.postal}</p>
+      async function removeFromWishlist(productId) {
+        try {
+          const response = await fetch("/shop/api/wishlist/toggle/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCSRFToken(),
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({ product_id: productId }),
+          });
+
+          if (response.ok) {
+            showToast("محصول از علاقه‌مندی‌ها حذف شد", "ok");
+            loadDashboard();
+          }
+        } catch (error) {
+          showToast("خطا در حذف", "danger");
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   ADDRESSES
+═══════════════════════════════════════ */
+      function renderAddresses() {
+        const addresses = dashboardData.addresses || [];
+        const el = document.getElementById("addressGrid");
+        const emptyEl = document.getElementById("addressesEmpty");
+
+        if (addresses.length === 0) {
+          el.innerHTML = "";
+          emptyEl.classList.remove("hidden");
+          emptyEl.innerHTML = emptyState(
+            "map",
+            "آدرسی ثبت نشده",
+            "برای تحویل سریع‌تر سفارش، یک آدرس اضافه کنید.",
+          );
+          return;
+        }
+        emptyEl.classList.add("hidden");
+
+        el.innerHTML = addresses
+          .map(
+            (a) => `
+    <div class="card p-4">
+      <p class="text-sm font-medium">${a.recipient_name || ""}</p>
+      <p class="text-ink-faint text-xs font-mono mt-1">${a.recipient_phone || ""}</p>
+      <p class="text-ink-muted text-xs mt-3 leading-relaxed">${a.province_name || ""}، ${a.city_name || ""}<br>${a.address || ""}</p>
+      <p class="text-ink-faint text-[11px] font-mono mt-2">کد پستی: ${a.postal_code || ""}</p>
       <div class="flex gap-2 mt-4 pt-3 border-t border-line">
-        <button class="btn-ghost text-xs px-3 py-1.5 rounded-lg flex-1 focus-ring">ویرایش</button>
-        ${!a.isDefault ? `<button class="btn-ghost text-xs px-3 py-1.5 rounded-lg flex-1 focus-ring">پیش‌فرض</button>` : ''}
-        <button onclick="askConfirm('حذف آدرس؟','این آدرس از لیست شما حذف می‌شود.', ()=>removeAt('addresses', ${i}))" class="btn-danger-ghost text-xs px-3 py-1.5 rounded-lg focus-ring">حذف</button>
+        <button onclick="deleteAddress(${a.id})" class="btn-danger-ghost text-xs px-3 py-1.5 rounded-lg focus-ring">حذف</button>
       </div>
-    </div>`).join('');
-}
+    </div>
+  `,
+          )
+          .join("");
+      }
 
-/* ---------- NOTIFICATIONS ---------- */
-function renderNotifs(){
-  const el = document.getElementById('notifTimeline');
-  const emptyEl = document.getElementById('notifEmpty');
-  if(DEMO.notifications.length===0){
-    el.classList.add('hidden'); emptyEl.classList.remove('hidden');
-    emptyEl.innerHTML = emptyState('bell','اعلانی وجود ندارد','رویدادهای مربوط به سفارش‌ها و حساب شما اینجا نمایش داده می‌شود.');
-    return;
-  }
-  el.classList.remove('hidden'); emptyEl.classList.add('hidden');
-  el.innerHTML = `<div class="space-y-0">` + DEMO.notifications.map((n,i)=>`
-    <div class="flex gap-4 relative pb-6 ${i===DEMO.notifications.length-1?'':'border-r-2 border-line mr-[19px]'}">
-      <div class="w-10 h-10 rounded-full ${n.unread?'bg-gold/15 border border-gold/30':'bg-elevated border border-line'} flex items-center justify-center shrink-0 -mr-5 z-10">
-        ${icon(n.icon,16, n.unread?'#E4C77E':'#9C9BA6')}
+      async function deleteAddress(addressId) {
+        try {
+          const response = await fetch(
+            `${API_BASE}addresses/${addressId}/delete/`,
+            {
+              method: "DELETE",
+              headers: {
+                "X-CSRFToken": getCSRFToken(),
+              },
+              credentials: "same-origin",
+            },
+          );
+
+          if (response.ok) {
+            showToast("آدرس با موفقیت حذف شد", "ok");
+            loadDashboard();
+          }
+        } catch (error) {
+          showToast("خطا در حذف آدرس", "danger");
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   NOTIFICATIONS
+═══════════════════════════════════════ */
+      function renderNotifs() {
+        const notifs = dashboardData.notifications || [];
+        const el = document.getElementById("notifTimeline");
+        const emptyEl = document.getElementById("notifEmpty");
+        const badge = document.getElementById("notifCountBadge");
+
+        const unreadCount = notifs.filter((n) => n.unread).length;
+        badge.textContent = unreadCount;
+
+        if (notifs.length === 0) {
+          el.classList.add("hidden");
+          emptyEl.classList.remove("hidden");
+          emptyEl.innerHTML = emptyState(
+            "bell",
+            "اعلانی وجود ندارد",
+            "رویدادهای مربوط به سفارش‌ها و حساب شما اینجا نمایش داده می‌شود.",
+          );
+          return;
+        }
+        el.classList.remove("hidden");
+        emptyEl.classList.add("hidden");
+
+        el.innerHTML =
+          `<div class="space-y-0">` +
+          notifs
+            .map(
+              (n, i) => `
+    <div class="flex gap-4 relative pb-6 ${i === notifs.length - 1 ? "" : "border-r-2 border-line mr-[19px]"}">
+      <div class="w-10 h-10 rounded-full ${n.unread ? "bg-gold/15 border border-gold/30" : "bg-elevated border border-line"} flex items-center justify-center shrink-0 -mr-5 z-10">
+        ${icon(n.icon || "bell", 16, n.unread ? "#E4C77E" : "#9C9BA6")}
       </div>
       <div class="flex-1 pt-1.5">
         <div class="flex items-center gap-2">
-          <p class="text-sm font-medium">${n.title}</p>
-          ${n.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-gold"></span>' : ''}
+          <p class="text-sm font-medium">${n.title || ""}</p>
+          ${n.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-gold"></span>' : ""}
         </div>
-        <p class="text-ink-muted text-xs mt-1">${n.desc}</p>
-        <p class="text-ink-faint text-[11px] mt-1.5">${n.time}</p>
+        <p class="text-ink-muted text-xs mt-1">${n.desc || ""}</p>
+        <p class="text-ink-faint text-[11px] mt-1.5">${n.time || ""}</p>
       </div>
-    </div>`).join('') + `</div>`;
-}
+    </div>
+  `,
+            )
+            .join("") +
+          `</div>`;
+      }
 
-function emptyState(iconName, title, desc){
-  return `
+      /* ═══════════════════════════════════════
+   UPDATE BADGES
+═══════════════════════════════════════ */
+      function updateBadges() {
+        const stats = dashboardData.stats || {};
+        document.getElementById("navOrdersCount").textContent =
+          stats.total_orders || 0;
+        document.getElementById("navWishlistCount").textContent =
+          stats.wishlist_count || 0;
+      }
+
+      /* ═══════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════ */
+      function emptyState(iconName, title, desc) {
+        return `
   <div class="card flex flex-col items-center text-center py-14 px-6">
     <div class="w-16 h-16 rounded-2xl bg-elevated border border-line flex items-center justify-center mb-4">
-      ${icon(iconName,28,'#5F5E68',1.5)}
+      ${icon(iconName, 28, "#5F5E68", 1.5)}
     </div>
     <h3 class="font-display font-medium">${title}</h3>
     <p class="text-ink-faint text-sm mt-1.5 max-w-xs">${desc}</p>
   </div>`;
-}
+      }
 
-function removeAt(key, idx){
-  DEMO[key].splice(idx,1);
-  ({comments:renderComments, wishlist:renderWishlist, addresses:renderAddresses})[key]();
-  showToast('با موفقیت حذف شد', 'ok');
-}
-
-/* =========================================================================
+      /* ═══════════════════════════════════════
    NAVIGATION
-   ========================================================================= */
-const sections = ['overview','personal','security','orders','comments','wishlist','addresses','notifications','settings'];
-function goToSection(name){
-  sections.forEach(s=>{
-    const el = document.getElementById('section-'+s);
-    if(s===name){ el.classList.remove('hidden-section'); el.classList.add('fade-in'); }
-    else{ el.classList.add('hidden-section'); }
-  });
-  document.querySelectorAll('.nav-item[data-section]').forEach(btn=>{
-    btn.classList.toggle('active', btn.dataset.section===name);
-  });
-  closeDrawer();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-document.querySelectorAll('.section-link').forEach(btn=>{
-  btn.addEventListener('click', ()=> goToSection(btn.dataset.section || btn.dataset.goto));
-});
+═══════════════════════════════════════ */
+      const sections = [
+        "overview",
+        "personal",
+        "security",
+        "orders",
+        "comments",
+        "wishlist",
+        "addresses",
+        "notifications",
+        "settings",
+      ];
 
-/* mobile drawer */
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('drawerOverlay');
-function openDrawer(){ sidebar.classList.remove('translate-x-full'); overlay.classList.remove('hidden'); }
-function closeDrawer(){ if(window.innerWidth<1024){ sidebar.classList.add('translate-x-full'); overlay.classList.add('hidden'); } }
-document.getElementById('menuBtn').addEventListener('click', openDrawer);
-document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
-overlay.addEventListener('click', closeDrawer);
+      function goToSection(name) {
+        sections.forEach((s) => {
+          const el = document.getElementById("section-" + s);
+          if (s === name) {
+            el.classList.remove("hidden-section");
+            el.classList.add("fade-in");
+          } else {
+            el.classList.add("hidden-section");
+          }
+        });
+        document.querySelectorAll(".nav-item[data-section]").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.section === name);
+        });
+        closeDrawer();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
 
-/* =========================================================================
+      document.querySelectorAll(".section-link").forEach((btn) => {
+        btn.addEventListener("click", () =>
+          goToSection(btn.dataset.section || btn.dataset.goto),
+        );
+      });
+
+      /* mobile drawer */
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("drawerOverlay");
+
+      function openDrawer() {
+        sidebar.classList.remove("translate-x-full");
+        overlay.classList.remove("hidden");
+      }
+
+      function closeDrawer() {
+        if (window.innerWidth < 1024) {
+          sidebar.classList.add("translate-x-full");
+          overlay.classList.add("hidden");
+        }
+      }
+
+      document.getElementById("menuBtn").addEventListener("click", openDrawer);
+      document
+        .getElementById("closeDrawer")
+        .addEventListener("click", closeDrawer);
+      overlay.addEventListener("click", closeDrawer);
+
+      /* ═══════════════════════════════════════
    MODALS / TOASTS
-   ========================================================================= */
-function showModal(id){ const m=document.getElementById(id); m.classList.remove('hidden'); m.classList.add('flex'); document.body.style.overflow='hidden'; }
-function hideModal(id){ const m=document.getElementById(id); m.classList.add('hidden'); m.classList.remove('flex'); document.body.style.overflow=''; }
-document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click', ()=>hideModal('orderModal')));
-document.querySelectorAll('[data-close-confirm]').forEach(el=>el.addEventListener('click', ()=>hideModal('confirmModal')));
-document.getElementById('confirmCancelBtn').addEventListener('click', ()=>hideModal('confirmModal'));
-document.querySelectorAll('[data-close-address]').forEach(el=>el.addEventListener('click', ()=>hideModal('addressModal')));
-document.getElementById('addAddressBtn').addEventListener('click', ()=>showModal('addressModal'));
+═══════════════════════════════════════ */
+      function showModal(id) {
+        const m = document.getElementById(id);
+        m.classList.remove("hidden");
+        m.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      }
 
-let confirmCallback = null;
-function askConfirm(title, desc, cb){
-  document.getElementById('confirmTitle').textContent = title;
-  document.getElementById('confirmDesc').textContent = desc;
-  confirmCallback = cb;
-  showModal('confirmModal');
-}
-document.getElementById('confirmOkBtn').addEventListener('click', ()=>{
-  if(confirmCallback) confirmCallback();
-  hideModal('confirmModal');
-});
+      function hideModal(id) {
+        const m = document.getElementById(id);
+        m.classList.add("hidden");
+        m.classList.remove("flex");
+        document.body.style.overflow = "";
+      }
 
-function showToast(msg, type='ok'){
-  const colors = { ok:'#4ADE80', danger:'#F87171', info:'#60A5FA' };
-  const el = document.createElement('div');
-  el.className = 'toast glass rounded-xl px-4 py-3 flex items-center gap-2.5 text-sm shadow-card min-w-[220px]';
-  el.innerHTML = `<span style="color:${colors[type]}">${icon(type==='ok'?'check':'clock',16,colors[type])}</span>${msg}`;
-  document.getElementById('toastContainer').appendChild(el);
-  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(8px)'; el.style.transition='all .3s ease'; setTimeout(()=>el.remove(), 300); }, 3200);
-}
+      document
+        .querySelectorAll("[data-close-modal]")
+        .forEach((el) =>
+          el.addEventListener("click", () => hideModal("orderModal")),
+        );
+      document
+        .querySelectorAll("[data-close-confirm]")
+        .forEach((el) =>
+          el.addEventListener("click", () => hideModal("confirmModal")),
+        );
+      document
+        .getElementById("confirmCancelBtn")
+        .addEventListener("click", () => hideModal("confirmModal"));
+      document
+        .querySelectorAll("[data-close-address]")
+        .forEach((el) =>
+          el.addEventListener("click", () => hideModal("addressModal")),
+        );
+      document
+        .getElementById("addAddressBtn")
+        .addEventListener("click", () => showModal("addressModal"));
 
-/* address form submit */
-document.getElementById('addressForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  hideModal('addressModal');
-  showToast('آدرس جدید ذخیره شد', 'ok');
-  e.target.reset();
-});
+      let confirmCallback = null;
 
-/* =========================================================================
+      function askConfirm(title, desc, cb) {
+        document.getElementById("confirmTitle").textContent = title;
+        document.getElementById("confirmDesc").textContent = desc;
+        confirmCallback = cb;
+        showModal("confirmModal");
+      }
+
+      document.getElementById("confirmOkBtn").addEventListener("click", () => {
+        if (confirmCallback) confirmCallback();
+        hideModal("confirmModal");
+      });
+
+      function showToast(msg, type = "ok") {
+        const colors = { ok: "#4ADE80", danger: "#F87171", info: "#60A5FA" };
+        const el = document.createElement("div");
+        el.className =
+          "toast glass rounded-xl px-4 py-3 flex items-center gap-2.5 text-sm shadow-card min-w-[220px]";
+        el.innerHTML = `<span style="color:${colors[type]}">${icon(type === "ok" ? "check" : "clock", 16, colors[type])}</span>${msg}`;
+        document.getElementById("toastContainer").appendChild(el);
+        setTimeout(() => {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(8px)";
+          el.style.transition = "all .3s ease";
+          setTimeout(() => el.remove(), 300);
+        }, 3200);
+      }
+
+      /* ═══════════════════════════════════════
+   ADDRESS FORM
+═══════════════════════════════════════ */
+      async function loadProvinces() {
+        try {
+          const response = await fetch(API_BASE + "provinces/");
+          if (response.ok) {
+            const provinces = await response.json();
+            const select = document.getElementById("provinceSelect");
+            provinces.forEach((p) => {
+              const opt = document.createElement("option");
+              opt.value = p.id;
+              opt.textContent = p.name;
+              select.appendChild(opt);
+            });
+          }
+        } catch (error) {
+          console.error("Error loading provinces:", error);
+        }
+      }
+
+      document
+        .getElementById("provinceSelect")
+        ?.addEventListener("change", async function () {
+          const citySelect = document.getElementById("citySelect");
+          citySelect.innerHTML = '<option value="">انتخاب شهر</option>';
+          if (!this.value) return;
+
+          try {
+            const response = await fetch(
+              `${API_BASE}cities/?province=${this.value}`,
+            );
+            if (response.ok) {
+              const cities = await response.json();
+              cities.forEach((c) => {
+                const opt = document.createElement("option");
+                opt.value = c.id;
+                opt.textContent = c.name;
+                citySelect.appendChild(opt);
+              });
+            }
+          } catch (error) {
+            console.error("Error loading cities:", error);
+          }
+        });
+
+      document
+        .getElementById("addressForm")
+        ?.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = Object.fromEntries(formData.entries());
+
+          try {
+            const response = await fetch(API_BASE + "addresses/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+              },
+              credentials: "same-origin",
+              body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+              hideModal("addressModal");
+              showToast("آدرس جدید ذخیره شد", "ok");
+              this.reset();
+              loadDashboard();
+            } else {
+              showToast("خطا در ذخیره آدرس", "danger");
+            }
+          } catch (error) {
+            showToast("خطا در ارتباط با سرور", "danger");
+          }
+        });
+
+      /* ═══════════════════════════════════════
    PERSONAL INFO — avatar upload + form
-   ========================================================================= */
-const avatarInput = document.getElementById('avatarInput');
-const avatarPreview = document.getElementById('avatarPreview');
-avatarInput.addEventListener('change', e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => { avatarPreview.src = ev.target.result; };
-  reader.readAsDataURL(file);
-});
-document.getElementById('removeAvatarBtn').addEventListener('click', ()=>{
-  avatarPreview.src = '/static/img/avatar-placeholder.png';
-  avatarInput.value = '';
-});
-document.getElementById('personalForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const tick = document.getElementById('saveSuccessTick');
-  tick.classList.remove('hidden'); tick.classList.add('flex');
-  showToast('اطلاعات با موفقیت ذخیره شد', 'ok');
-  setTimeout(()=>{ tick.classList.add('hidden'); tick.classList.remove('flex'); }, 2500);
-});
+═══════════════════════════════════════ */
+      const avatarInput = document.getElementById("avatarInput");
+      const avatarPreview = document.getElementById("avatarPreview");
 
-/* =========================================================================
+      avatarInput?.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          avatarPreview.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document
+        .getElementById("removeAvatarBtn")
+        ?.addEventListener("click", () => {
+          avatarPreview.src = "/static/img/avatar-placeholder.png";
+          avatarInput.value = "";
+        });
+
+      document
+        .getElementById("personalForm")
+        ?.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+
+          try {
+            const response = await fetch(API_BASE + "profile/update/", {
+              method: "PUT", // یا 'POST'
+              headers: {
+                "X-CSRFToken": getCSRFToken(),
+                // ❌ حذف 'Content-Type': 'application/json' ← این رو نذار
+              },
+              credentials: "same-origin",
+              body: formData, // ← FormData ارسال کن
+            });
+
+            if (response.ok) {
+              const tick = document.getElementById("saveSuccessTick");
+              tick.classList.remove("hidden");
+              tick.classList.add("flex");
+              showToast("اطلاعات با موفقیت ذخیره شد", "ok");
+              setTimeout(() => {
+                tick.classList.add("hidden");
+                tick.classList.remove("flex");
+              }, 2500);
+              loadDashboard();
+            } else {
+              const err = await response.json();
+              showToast(err.detail || "خطا در ذخیره اطلاعات", "danger");
+            }
+          } catch (error) {
+            showToast("خطا در ارتباط با سرور", "danger");
+          }
+        });
+      /* ═══════════════════════════════════════
    SECURITY — password visibility + strength meter
-   ========================================================================= */
-document.querySelectorAll('.pw-toggle').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const input = document.getElementById(btn.dataset.toggle);
-    input.type = input.type==='password' ? 'text' : 'password';
-  });
-});
+═══════════════════════════════════════ */
+      document.querySelectorAll(".pw-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const input = document.getElementById(btn.dataset.toggle);
+          input.type = input.type === "password" ? "text" : "password";
+        });
+      });
 
-function passwordScore(pw){
-  let score = 0;
-  if(pw.length>=8) score++;
-  if(/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
-  if(/\d/.test(pw)) score++;
-  if(/[^A-Za-z0-9]/.test(pw)) score++;
-  return score;
-}
-const strengthColors = ['#F87171','#FBBF24','#4DD8E0','#4ADE80'];
-const strengthLabels = ['ضعیف','متوسط','خوب','قوی'];
-document.getElementById('newPass').addEventListener('input', e=>{
-  const score = passwordScore(e.target.value);
-  const bars = document.querySelectorAll('#strengthBars span');
-  bars.forEach((bar,i)=>{ bar.style.background = i<score ? strengthColors[score-1] : '#26262F'; });
-  document.getElementById('strengthLabel').textContent = e.target.value ? `قدرت رمز عبور: ${strengthLabels[Math.max(score-1,0)]}` : 'قدرت رمز عبور';
-});
-document.getElementById('confPass').addEventListener('input', e=>{
-  const newPass = document.getElementById('newPass').value;
-  const msg = document.getElementById('matchMsg');
-  if(!e.target.value){ msg.classList.add('hidden'); return; }
-  msg.classList.remove('hidden');
-  if(e.target.value === newPass){ msg.textContent='رمز عبور مطابقت دارد'; msg.className='text-[11px] mt-1.5 text-ok'; }
-  else{ msg.textContent='رمز عبور مطابقت ندارد'; msg.className='text-[11px] mt-1.5 text-danger'; }
-});
-document.getElementById('passForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const n = document.getElementById('newPass').value, c = document.getElementById('confPass').value;
-  if(n !== c){ showToast('رمز عبور و تکرار آن یکسان نیستند', 'danger'); return; }
-  if(passwordScore(n) < 2){ showToast('رمز عبور باید قوی‌تر باشد', 'danger'); return; }
-  showToast('رمز عبور با موفقیت به‌روزرسانی شد', 'ok');
-  e.target.reset();
-  document.querySelectorAll('#strengthBars span').forEach(b=>b.style.background='#26262F');
-  document.getElementById('strengthLabel').textContent = 'قدرت رمز عبور';
-});
+      function passwordScore(pw) {
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+        if (/\d/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        return score;
+      }
 
-/* generic toggle switches (settings / 2FA) */
-document.querySelectorAll('[data-toggle-switch]').forEach(t=>{
-  t.addEventListener('click', ()=> t.classList.toggle('on'));
-});
+      const strengthColors = ["#F87171", "#FBBF24", "#4DD8E0", "#4ADE80"];
+      const strengthLabels = ["ضعیف", "متوسط", "خوب", "قوی"];
 
-/* order search live filter */
-document.getElementById('orderSearch').addEventListener('input', renderOrders);
+      document
+        .getElementById("newPass")
+        ?.addEventListener("input", function () {
+          const score = passwordScore(this.value);
+          const bars = document.querySelectorAll("#strengthBars span");
+          bars.forEach((bar, i) => {
+            bar.style.background =
+              i < score ? strengthColors[score - 1] : "#26262F";
+          });
+          document.getElementById("strengthLabel").textContent = this.value
+            ? `قدرت رمز عبور: ${strengthLabels[Math.max(score - 1, 0)]}`
+            : "قدرت رمز عبور";
+        });
 
-/* =========================================================================
+      document
+        .getElementById("confPass")
+        ?.addEventListener("input", function () {
+          const newPass = document.getElementById("newPass").value;
+          const msg = document.getElementById("matchMsg");
+          if (!this.value) {
+            msg.classList.add("hidden");
+            return;
+          }
+          msg.classList.remove("hidden");
+          if (this.value === newPass) {
+            msg.textContent = "رمز عبور مطابقت دارد";
+            msg.className = "text-[11px] mt-1.5 text-ok";
+          } else {
+            msg.textContent = "رمز عبور مطابقت ندارد";
+            msg.className = "text-[11px] mt-1.5 text-danger";
+          }
+        });
+
+      document
+        .getElementById("passForm")
+        ?.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const n = document.getElementById("newPass").value;
+          const c = document.getElementById("confPass").value;
+          const old = document.getElementById("curPass").value;
+
+          if (n !== c) {
+            showToast("رمز عبور و تکرار آن یکسان نیستند", "danger");
+            return;
+          }
+          if (passwordScore(n) < 2) {
+            showToast("رمز عبور باید قوی‌تر باشد", "danger");
+            return;
+          }
+
+          try {
+            const response = await fetch(API_BASE + "password/change/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+              },
+              credentials: "same-origin",
+              body: JSON.stringify({
+                old_password: old,
+                new_password1: n,
+                new_password2: c,
+              }),
+            });
+
+            if (response.ok) {
+              showToast("رمز عبور با موفقیت به‌روزرسانی شد", "ok");
+              this.reset();
+              document
+                .querySelectorAll("#strengthBars span")
+                .forEach((b) => (b.style.background = "#26262F"));
+              document.getElementById("strengthLabel").textContent =
+                "قدرت رمز عبور";
+            } else {
+              const err = await response.json();
+              showToast(err.detail || "خطا در تغییر رمز عبور", "danger");
+            }
+          } catch (error) {
+            showToast("خطا در ارتباط با سرور", "danger");
+          }
+        });
+
+      /* generic toggle switches */
+      document.querySelectorAll("[data-toggle-switch]").forEach((t) => {
+        t.addEventListener("click", () => t.classList.toggle("on"));
+      });
+
+      /* order search live filter */
+      document
+        .getElementById("orderSearch")
+        ?.addEventListener("input", renderOrders);
+
+      /* ═══════════════════════════════════════
+   MARK ALL NOTIFICATIONS READ
+═══════════════════════════════════════ */
+      document
+        .getElementById("markAllReadBtn")
+        ?.addEventListener("click", () => {
+          if (dashboardData && dashboardData.notifications) {
+            dashboardData.notifications.forEach((n) => (n.unread = false));
+            renderNotifs();
+            showToast(
+              "همه اعلان‌ها به‌عنوان خوانده‌شده علامت‌گذاری شدند",
+              "ok",
+            );
+          }
+        });
+
+      /* ═══════════════════════════════════════
    INIT
-   ========================================================================= */
-function init(){
-  renderStats();
-  renderRecentOrders();
-  renderRecentNotifs();
-  renderOrderTabs();
-  renderOrders();
-  renderComments();
-  renderWishlist();
-  renderAddresses();
-  renderNotifs();
-}
-init();
-</script>
-</body>
+═══════════════════════════════════════ */
+      loadProvinces();
+      loadDashboard();
+    </script>
+  </body>
 </html>

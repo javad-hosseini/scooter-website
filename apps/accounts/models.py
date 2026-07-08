@@ -1,11 +1,12 @@
 # accounts/models.py
 
 import hashlib
-import secrets
 import os
+import secrets
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinLengthValidator, RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -40,6 +41,30 @@ class CustomUser(AbstractUser):
         blank=True,
         null=True,
         help_text="توضیحات درباره نویسنده برای نمایش در انتهای مقاله"
+    )
+
+    national_code = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        validators=[MinLengthValidator(10)],
+        verbose_name="کد ملی"
+    )
+    birth_date = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        verbose_name="تاریخ تولد"
+    )
+    gender = models.CharField(
+        max_length=10,
+        choices=[
+            ('male', 'مرد'),
+            ('female', 'زن'),
+            ('none', 'ترجیح می‌دهم نگویم')
+        ],
+        default='none',
+        verbose_name="جنسیت"
     )
 
     groups = models.ManyToManyField(
@@ -96,3 +121,83 @@ class PasswordResetOTP(models.Model):
 
     def is_locked(self) -> bool:
         return self.attempts >= self.MAX_ATTEMPTS
+
+
+class Province(models.Model):
+    """استان"""
+    name = models.CharField(max_length=100, unique=True, verbose_name="نام استان")
+
+    class Meta:
+        verbose_name = "استان"
+        verbose_name_plural = "استان‌ها"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    """شهر"""
+    province = models.ForeignKey(
+        Province,
+        on_delete=models.CASCADE,
+        related_name='cities',
+        verbose_name="استان"
+    )
+    name = models.CharField(max_length=100, verbose_name="نام شهر")
+
+    class Meta:
+        verbose_name = "شهر"
+        verbose_name_plural = "شهرها"
+        ordering = ['name']
+        unique_together = ['province', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.province.name})"
+
+
+class Address(models.Model):
+    """آدرس کاربر"""
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='addresses',
+        verbose_name="کاربر"
+    )
+    recipient_name = models.CharField(max_length=100, verbose_name="نام گیرنده")
+    recipient_phone = models.CharField(
+        max_length=11,
+        validators=[RegexValidator(r'^09\d{9}$', 'شماره موبایل معتبر نیست')],
+        verbose_name="شماره موبایل گیرنده"
+    )
+    province = models.ForeignKey(
+        Province,
+        on_delete=models.PROTECT,
+        verbose_name="استان"
+    )
+    city = models.ForeignKey(
+        City,
+        on_delete=models.PROTECT,
+        verbose_name="شهر"
+    )
+    address = models.TextField(verbose_name="آدرس کامل")
+    postal_code = models.CharField(
+        max_length=10,
+        validators=[MinLengthValidator(10)],
+        verbose_name="کد پستی"
+    )
+    plaque = models.CharField(max_length=20, verbose_name="پلاک")
+    unit = models.CharField(max_length=20, blank=True, verbose_name="واحد")
+    floor = models.CharField(max_length=20, blank=True, verbose_name="طبقه")
+    description = models.TextField(blank=True, verbose_name="توضیحات اضافی")
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "آدرس"
+        verbose_name_plural = "آدرس‌ها"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.recipient_name} - {self.city.name}"

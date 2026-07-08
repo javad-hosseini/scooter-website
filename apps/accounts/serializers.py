@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError
 from rest_framework import serializers
 
+from apps.accounts.models import Province, City, Address
+
 User = get_user_model()
 
 
@@ -216,3 +218,74 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({'new_password1': list(e.messages)})
 
         return data
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(source='fullname')
+    avatar = serializers.SerializerMethodField()
+    membership_date = serializers.SerializerMethodField()
+    orders_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'full_name', 'email', 'mobile', 'bio',
+            'avatar', 'profile_image', 'national_code', 'birth_date',
+            'gender', 'is_verified', 'membership_date', 'orders_count'
+        ]
+
+    def get_avatar(self, obj):
+        if obj.profile_image:
+            return obj.profile_image.url
+        return '/static/img/avatar-placeholder.png'
+
+    def get_membership_date(self, obj):
+        if obj.date_joined:
+            # تبدیل به تاریخ شمسی
+            return obj.date_joined.strftime('%B %Y')
+        return None
+
+    def get_orders_count(self, obj):
+        return obj.orders.count()
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(source='fullname', required=False)
+    profile_image = serializers.ImageField(required=False)
+
+    class Meta:
+        model = User
+        fields = ['full_name', 'username', 'email', 'mobile', 'national_code',
+                  'birth_date', 'gender', 'bio', 'profile_image']
+
+    def validate_mobile(self, value):
+        import re
+        if not re.match(r'^09\d{9}$', value):
+            raise serializers.ValidationError('شماره موبایل معتبر نیست')
+        return value
+
+
+class ProvinceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Province
+        fields = ['id', 'name']
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['id', 'name', 'province']
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    province_name = serializers.CharField(source='province.name', read_only=True)
+    city_name = serializers.CharField(source='city.name', read_only=True)
+
+    class Meta:
+        model = Address
+        fields = [
+            'id', 'recipient_name', 'recipient_phone', 'province', 'province_name',
+            'city', 'city_name', 'address', 'postal_code', 'plaque',
+            'unit', 'floor', 'description', 'is_active', 'created_at'
+        ]
+        read_only_fields = ['user', 'created_at']

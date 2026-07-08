@@ -1,9 +1,13 @@
 # apps/shop/models.py
+import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.text import slugify
+
+from apps.accounts.models import CustomUser, Address
 
 User = get_user_model()
 
@@ -246,7 +250,7 @@ class ProductReview(models.Model):
     class Meta:
         verbose_name = "نظر محصول"
         verbose_name_plural = "نظرات محصولات"
-        ordering = ['-created_at']
+        ordering  = ['-created_at']
 
     def __str__(self):
         return f"{self.user.fullname} - {self.product.name} ({self.rating}★)"
@@ -423,3 +427,152 @@ class CategoryHeroProduct(models.Model):
 
     def __str__(self):
         return f"{self.category.name} - {self.product.name}"
+
+
+class Order(models.Model):
+    """مدل سفارشات"""
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار پرداخت'),
+        ('processing', 'در حال پردازش'),
+        ('shipping', 'ارسال شده'),
+        ('delivered', 'تحویل داده شده'),
+        ('cancelled', 'لغو شده'),
+    ]
+
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'در انتظار پرداخت'),
+        ('paid', 'پرداخت شده'),
+        ('failed', 'ناموفق'),
+        ('refunded', 'بازگشت وجه'),
+    ]
+
+    # اطلاعات اصلی
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        verbose_name="کاربر"
+    )
+    order_number = models.CharField(
+        max_length=20,
+        unique=True,
+        editable=False,
+        verbose_name="شماره سفارش"
+    )
+    tracking_code = models.CharField(
+        max_length=20,
+        blank=True,
+        unique=True,
+        verbose_name="کد پیگیری"
+    )
+
+    # آدرس
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.PROTECT,
+        related_name='orders',
+        verbose_name="آدرس ارسال"
+    )
+
+    # وضعیت
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="وضعیت سفارش"
+    )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='pending',
+        verbose_name="وضعیت پرداخت"
+    )
+
+    # قیمت‌ها
+    subtotal = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="جمع کل"
+    )
+    discount_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="تخفیف"
+    )
+    shipping_cost = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="هزینه ارسال"
+    )
+    total = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="مبلغ نهایی"
+    )
+
+    # زمان
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    paid_at = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ پرداخت")
+    delivered_at = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ تحویل")
+
+    # اطلاعات اضافی
+    notes = models.TextField(blank=True, verbose_name="یادداشت")
+
+    class Meta:
+        verbose_name = "سفارش"
+        verbose_name_plural = "سفارش‌ها"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.order_number} - {self.user.fullname}"
+
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            # تولید شماره سفارش یکتا
+            self.order_number = f"VX-{timezone.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+        if not self.tracking_code:
+            # تولید کد پیگیری یکتا
+            self.tracking_code = f"IR-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
+
+
+class OrderItem(models.Model):
+    """آیتم‌های هر سفارش"""
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='items',
+        verbose_name="سفارش"
+    )
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.PROTECT,
+        related_name='order_items',
+        verbose_name="محصول"
+    )
+    quantity = models.PositiveIntegerField(default=1, verbose_name="تعداد")
+    price = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="قیمت واحد هنگام خرید"
+    )
+    discount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="تخفیف واحد"
+    )
+
+    class Meta:
+        verbose_name = "آیتم سفارش"
+        verbose_name_plural = "آیتم‌های سفارش"
+
+    def __str__(self):
+        return f"{self.product.name} x{self.quantity}"
+
+    @property
+    def total(self):
+        return (self.price - self.discount) * self.quantity

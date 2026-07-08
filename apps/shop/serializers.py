@@ -5,8 +5,9 @@ from rest_framework import serializers
 from .models import (
     Product, Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist
+    ProductReview, Wishlist, OrderItem, Order
 )
+from ..accounts.serializers import UserProfileSerializer, AddressSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -225,3 +226,63 @@ class CategoryDetailSerializer(serializers.ModelSerializer):  # ← این رو 
     def get_products(self, obj):
         products = obj.products.filter(is_published=True, is_available=True)
         return ProductListSerializer(products, many=True, context=self.context).data
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_slug = serializers.CharField(source='product.slug', read_only=True)
+    product_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'product_name', 'product_slug', 'product_image',
+                  'quantity', 'price', 'discount', 'total']
+
+    def get_product_image(self, obj):
+        if obj.product and obj.product.cover_image:
+            return obj.product.cover_image.url
+        return None
+
+
+class OrderListSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+    status_label = serializers.SerializerMethodField()
+    payment_label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = [
+            'id', 'order_number', 'tracking_code', 'status', 'status_label',
+            'payment_status', 'payment_label', 'total', 'discount_amount',
+            'shipping_cost', 'created_at', 'paid_at', 'delivered_at', 'items'
+        ]
+
+    def get_status_label(self, obj):
+        labels = {
+            'pending': 'در انتظار',
+            'processing': 'در حال پردازش',
+            'shipping': 'ارسال شده',
+            'delivered': 'تحویل‌شده',
+            'cancelled': 'لغوشده'
+        }
+        return labels.get(obj.status, obj.status)
+
+    def get_payment_label(self, obj):
+        labels = {
+            'pending': 'در انتظار پرداخت',
+            'paid': 'پرداخت‌شده',
+            'failed': 'ناموفق',
+            'refunded': 'بازگشت وجه'
+        }
+        return labels.get(obj.payment_status, obj.payment_status)
+
+
+class DashboardSerializer(serializers.Serializer):
+    """سریالایزر برای دیتای داشبورد"""
+    user = UserProfileSerializer()
+    stats = serializers.DictField()
+    recent_orders = OrderListSerializer(many=True)
+    comments = serializers.ListField()
+    wishlist = serializers.ListField()
+    addresses = AddressSerializer(many=True)
+    notifications = serializers.ListField()
