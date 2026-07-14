@@ -1359,7 +1359,7 @@
             <div class="text-center" style="color:var(--dim)">
                 <p class="text-xl mb-4">😕 متأسفانه مقاله مورد نظر یافت نشد</p>
                 <p class="text-sm mb-4" style="color:var(--muted)">اسلاگ: ${slug}</p>
-                <a href="/home/articles/" class="text-sm inline-block px-6 py-3 rounded-full" style="background:var(--neon);color:var(--black)">بازگشت به مجله</a>
+                <a href=/articles/" class="text-sm inline-block px-6 py-3 rounded-full" style="background:var(--neon);color:var(--black)">بازگشت به مجله</a>
             </div>
         `;
         }
@@ -1615,7 +1615,7 @@
 
         articles.forEach((article) => {
           const card = document.createElement("a");
-          card.href = `/home/articles/${article.slug}/`;
+          card.href = `/articles/${article.slug}/`;
           card.className = "related-card block";
 
           const coverUrl =

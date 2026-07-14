@@ -1047,6 +1047,14 @@ SLIDE 0: HERO
         animation-delay: 0.3s;
         opacity: 0.28;
       }
+      @keyframes testimonialScroll {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
       @keyframes chevronBounce {
         0%,
         100% {
@@ -1292,6 +1300,26 @@ SLIDE 2: BEST SELLERS — MOBILE
       }
       .bs-carousel::-webkit-scrollbar {
         display: none;
+      }
+      .testi-carousel-m {
+        display: flex;
+        align-items: stretch;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 10px 18px 18px;
+        gap: 14px;
+      }
+      .testi-carousel-m::-webkit-scrollbar {
+        display: none;
+      }
+      .testi-card-m {
+        scroll-snap-align: start;
+        flex: 0 0 auto;
+        width: 85%; /* یا هر عرضی که با طراحیت جور باشه */
       }
       .pc-card-m {
         flex: 0 0 min(82vw, 320px);
@@ -2754,6 +2782,7 @@ TABLET BREAKPOINT (768px–1023px)
           overflow: hidden;
           position: relative;
           width: 100%;
+          direction: ltr;
         }
         .testimonials-track {
           display: flex;
@@ -2761,17 +2790,10 @@ TABLET BREAKPOINT (768px–1023px)
           padding: 10px 36px 18px;
           animation: testimonialScroll 38s linear infinite;
           width: max-content;
+          direction: ltr;
         }
         .testimonials-track:hover {
           animation-play-state: paused;
-        }
-        @keyframes testimonialScroll {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-50%);
-          }
         }
         .testimonial-card-d {
           flex: 0 0 300px;
@@ -2782,6 +2804,7 @@ TABLET BREAKPOINT (768px–1023px)
           transition: all 0.45s var(--ease-luxury);
           position: relative;
           overflow: hidden;
+
           box-shadow: var(--shadow-card);
         }
         .testimonial-card-d:hover {
@@ -4441,6 +4464,7 @@ DESKTOP (1024px+)
         }
         .stmt-desktop {
           flex: 1;
+          min-height: 0;
           padding: 0 64px;
           text-align: center;
           border-bottom: 1px solid var(--border);
@@ -5077,22 +5101,40 @@ DESKTOP (1024px+)
      ============================================================ -->
     <script>
       /* ════════════════════════════════════
-   CONFIG
-   ════════════════════════════════════ */
+         CONFIG
+         ════════════════════════════════════ */
       const API_BASE = "/api/";
       const API_URL = API_BASE + "index/";
 
       /* ════════════════════════════════════
-   LOAD DATA
-   ════════════════════════════════════ */
+         LOAD DATA
+         ════════════════════════════════════ */
       let pageData = null;
+
+      /* تابع فرمت قیمت */
+      function formatPrice(val) {
+        if (!val) return "0 تومان";
+        const num = parseFloat(val);
+        if (isNaN(num)) return val;
+        // کلمه تومان + عدد جدا شده
+        return "تومان " + num.toLocaleString("fa-IR");
+      }
 
       async function loadIndexData() {
         try {
           const response = await fetch(API_URL);
           if (!response.ok) throw new Error("Failed to fetch index data");
-          pageData = await response.json();
-          console.log("✅ Index data loaded:", pageData);
+          const data = await response.json();
+
+          // ✅ pageData رو با دیتا پر کن
+          pageData = data;
+
+          // 🔍 دیباگ: ببین دیتا چی هست
+          console.log("📦 Full API Response:", pageData);
+          console.log("📂 Categories:", pageData.categories);
+          console.log("📂 Categories type:", typeof pageData.categories);
+          console.log("📂 Is Array:", Array.isArray(pageData.categories));
+
           renderAll();
           setTimeout(() => {
             document.getElementById("loader").classList.add("done");
@@ -5101,35 +5143,37 @@ DESKTOP (1024px+)
         } catch (error) {
           console.error("❌ Error loading index data:", error);
           document.getElementById("loader").innerHTML = `
-      <div style="text-align:center;color:var(--muted);">
-        <p style="font-size:1.2rem;margin-bottom:12px;">⚠️ خطا در بارگذاری اطلاعات</p>
-        <p style="font-size:0.85rem;">لطفاً صفحه را دوباره بارگذاری کنید</p>
-        <button onclick="location.reload()" style="margin-top:16px;padding:10px 30px;background:var(--neon);color:var(--black);border:none;border-radius:100px;cursor:pointer;">بارگذاری مجدد</button>
-      </div>
-    `;
+            <div style="text-align:center;color:var(--muted);">
+              <p style="font-size:1.2rem;margin-bottom:12px;">⚠️ خطا در بارگذاری اطلاعات</p>
+              <p style="font-size:0.85rem;">لطفاً صفحه را دوباره بارگذاری کنید</p>
+              <button onclick="location.reload()" style="margin-top:16px;padding:10px 30px;background:var(--neon);color:var(--black);border:none;border-radius:100px;cursor:pointer;">بارگذاری مجدد</button>
+            </div>
+          `;
         }
       }
 
       /* ════════════════════════════════════
-   RENDER ALL SECTIONS
-   ════════════════════════════════════ */
+         RENDER ALL SECTIONS
+         ════════════════════════════════════ */
       function renderAll() {
-        if (!pageData) return;
+        if (!pageData) {
+          console.warn("⚠️ renderAll: pageData is null, skipping");
+          return;
+        }
 
+        console.log("🔄 Rendering all sections...");
         renderHero(pageData);
         renderCategories(pageData);
         renderBestSellers(pageData);
         renderTestimonials(pageData);
         renderGuide(pageData);
         renderFinal(pageData);
-
-        // بروزرسانی SEO
         updateSEO(pageData);
       }
 
       /* ════════════════════════════════════
-   RENDER HERO
-   ════════════════════════════════════ */
+         RENDER HERO
+         ════════════════════════════════════ */
       function renderHero(data) {
         const container = document.getElementById("hero-inner");
         if (!container) return;
@@ -5159,10 +5203,10 @@ DESKTOP (1024px+)
         const title = document.createElement("h1");
         title.className = "hero-title";
         title.innerHTML = `
-    <div class="word-reveal"><span class="word"><span style="transition-delay:0.15s">${h.hero_title_part1 || "متفاوت"}</span></span></div>
-    <div class="word-reveal"><span class="word"><span class="line-grad" style="transition-delay:0.28s">${h.hero_title_part2 || "برقی"}</span></span></div>
-    <div class="word-reveal"><span class="word"><span style="transition-delay:0.41s">${h.hero_title_part3 || "برانید"}</span></span></div>
-  `;
+          <div class="word-reveal"><span class="word"><span style="transition-delay:0.15s">${h.hero_title_part1 || "متفاوت"}</span></span></div>
+          <div class="word-reveal"><span class="word"><span class="line-grad" style="transition-delay:0.28s">${h.hero_title_part2 || "برقی"}</span></span></div>
+          <div class="word-reveal"><span class="word"><span style="transition-delay:0.41s">${h.hero_title_part3 || "برانید"}</span></span></div>
+        `;
 
         // آمارها
         const stats = document.createElement("div");
@@ -5193,9 +5237,9 @@ DESKTOP (1024px+)
           const stat = document.createElement("div");
           stat.className = "hero-mini-stat";
           stat.innerHTML = `
-      <div class="hero-mini-stat-val">${s.val}<span class="hero-mini-stat-unit">${s.unit}</span></div>
-      <div class="hero-mini-stat-label">${s.label}</div>
-    `;
+            <div class="hero-mini-stat-val">${s.val}<span class="hero-mini-stat-unit">${s.unit}</span></div>
+            <div class="hero-mini-stat-label">${s.label}</div>
+          `;
           stats.appendChild(stat);
         });
 
@@ -5210,9 +5254,9 @@ DESKTOP (1024px+)
         const btns = document.createElement("div");
         btns.className = "hero-btns slide-anim d-6";
         btns.innerHTML = `
-    <button class="btn-primary" onclick="goToSlide(2)">${h.hero_btn_text || "مشاهده مجموعه"}</button>
-    <button class="btn-secondary" onclick="goToSlide(1)">${h.hero_btn_secondary_text || "کاوش مدل‌ها"}</button>
-  `;
+          <button class="btn-primary" onclick="goToSlide(2)">${h.hero_btn_text || "مشاهده مجموعه"}</button>
+          <button class="btn-secondary" onclick="goToSlide(1)">${h.hero_btn_secondary_text || "کاوش مدل‌ها"}</button>
+        `;
 
         header.appendChild(tag);
         header.appendChild(mobileImgWrap);
@@ -5235,22 +5279,63 @@ DESKTOP (1024px+)
       }
 
       /* ════════════════════════════════════
-   RENDER CATEGORIES
-   ════════════════════════════════════ */
+         RENDER CATEGORIES
+         ════════════════════════════════════ */
       function renderCategories(data) {
-        const categories = data.categories || [];
-        if (!categories.length) return;
+        console.log("🔄 renderCategories called with data:", data);
+
+        // ✅ چک کن data وجود دارد
+        if (!data) {
+          console.error("❌ data is undefined or null");
+          return;
+        }
+
+        // ✅ چک کن categories وجود دارد
+        if (!data.categories) {
+          console.error("❌ data.categories is undefined");
+          return;
+        }
+
+        // ✅ اطمینان از اینکه categories آرایه است
+        let categories = data.categories;
+        if (!Array.isArray(categories)) {
+          console.warn("⚠️ categories is not an array, converting...");
+          if (typeof categories === "object") {
+            categories = Object.values(categories);
+          } else {
+            categories = [];
+          }
+        }
+
+        console.log("📂 Final categories:", categories);
+        console.log("📂 Categories length:", categories.length);
+
+        if (!categories.length) {
+          console.warn("⚠️ هیچ دسته‌بندی برای نمایش وجود ندارد");
+          const desktopWrap = document.getElementById("cat-desktop-wrap");
+          if (desktopWrap) {
+            desktopWrap.innerHTML = `
+              <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">
+                <p>هیچ دسته‌بندی برای نمایش وجود ندارد</p>
+              </div>
+            `;
+          }
+          return;
+        }
 
         // ===== MOBILE =====
         const mobileWrap = document.getElementById("cat-mobile-wrap");
         if (mobileWrap) {
+          mobileWrap.innerHTML = "";
+
           // تب‌ها
           const tabsStrip = document.createElement("div");
           tabsStrip.className = "cat-tabs-strip";
+          tabsStrip.id = "catTabsM";
           categories.forEach((cat, idx) => {
             const btn = document.createElement("button");
             btn.className = `cat-tab-m${idx === 0 ? " active" : ""}`;
-            btn.textContent = cat.name;
+            btn.textContent = cat.name || "دسته‌بندی";
             btn.onclick = () => switchCat(idx);
             if (idx === 0) {
               btn.style.background = cat.color_hex || "var(--neon)";
@@ -5258,73 +5343,89 @@ DESKTOP (1024px+)
             }
             tabsStrip.appendChild(btn);
           });
+          mobileWrap.appendChild(tabsStrip);
 
           // ناحیه تصویر
           const imgArea = document.createElement("div");
           imgArea.className = "cat-img-area";
+          imgArea.id = "catImgArea";
+          const firstCat = categories[0];
           const img = document.createElement("img");
           img.id = "catScooterImgM";
-          img.src = categories[0]?.image || "/images/1.png";
+          img.src = firstCat?.image || "/static/images/default-category.jpg";
           img.alt = "تصویر دسته‌بندی اسکوتر";
           img.className = "visible";
+
           const metrics = document.createElement("div");
           metrics.className = "cat-img-metrics";
-          const firstCat = categories[0];
+          metrics.id = "catMetricsM";
           const features = firstCat?.features || [];
+          // در تابع renderCategories بخش دسکتاپ، قسمت features:
           const defaultFeatures = [
             { label: "سرعت", value: "45", unit: "km/h" },
             { label: "برد", value: "80", unit: "km" },
             { label: "وزن", value: "19", unit: "kg" },
+            {
+              label: "شروع از",
+              value: formatPrice("1299000").replace(
+                " <small>تومان</small>",
+                "",
+              ),
+              unit: "تومان",
+            }, // نمونه عددی
           ];
           const displayFeatures = features.length ? features : defaultFeatures;
-          displayFeatures.slice(0, 3).forEach((f, i) => {
+          displayFeatures.forEach((f) => {
             const metric = document.createElement("div");
             metric.className = "cat-img-metric";
             metric.innerHTML = `
-        <div class="cat-img-metric-val" id="catMV${i + 1}">${f.value}<span class="cat-img-metric-unit"> ${f.unit}</span></div>
-        <div class="cat-img-metric-label">${f.label}</div>
-      `;
+              <div class="cat-img-metric-val">${f.value || "0"}<span class="cat-img-metric-unit"> ${f.unit || ""}</span></div>
+              <div class="cat-img-metric-label">${f.label || ""}</div>
+            `;
             metrics.appendChild(metric);
           });
+
           imgArea.appendChild(img);
           imgArea.appendChild(metrics);
+          mobileWrap.appendChild(imgArea);
 
           // محتوا
           const content = document.createElement("div");
           content.className = "cat-content-m";
           content.innerHTML = `
-      <div class="cat-name-m" id="catNameM">${firstCat?.name || "دسته‌بندی"}</div>
-      <div class="cat-sub-m" id="catSubM">${firstCat?.description || ""}</div>
-      <div class="cat-btns-m">
-        <button class="cat-btn-m primary" onclick="goToSlide(2)">مشاهده مجموعه</button>
-        <button class="cat-btn-m ghost">مقایسه</button>
-      </div>
-      <div class="cat-dots-m">
-        ${categories.map((_, idx) => `<div class="cat-dot-m${idx === 0 ? " active" : ""}" onclick="switchCat(${idx})" style="${idx === 0 ? "background:" + (categories[0]?.color_hex || "var(--neon)") : ""}"></div>`).join("")}
-      </div>
-    `;
-
-          mobileWrap.appendChild(tabsStrip);
-          mobileWrap.appendChild(imgArea);
+            <div class="cat-name-m" id="catNameM">${firstCat?.name || "دسته‌بندی"}</div>
+            <div class="cat-sub-m" id="catSubM">${firstCat?.description || ""}</div>
+            <div class="cat-btns-m">
+              <button class="cat-btn-m primary" onclick="goToSlide(2)" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
+            </div>
+            <div class="cat-dots-m" id="catDotsM">
+              ${categories.map((_, idx) => `<div class="cat-dot-m${idx === 0 ? " active" : ""}" onclick="switchCat(${idx})" style="${idx === 0 ? "background:" + (firstCat?.color_hex || "var(--neon)") : ""}"></div>`).join("")}
+            </div>
+          `;
           mobileWrap.appendChild(content);
         }
 
         // ===== DESKTOP =====
         const desktopWrap = document.getElementById("cat-desktop-wrap");
         if (desktopWrap) {
+          desktopWrap.innerHTML = "";
+
+          const firstCat = categories[0]; // ← اینجا categories تعریف شده
+
           // پنل تصویر
           const visualPanel = document.createElement("div");
           visualPanel.className = "cat-visual-panel-d";
           visualPanel.id = "catPanelBgD";
           visualPanel.style.background =
-            categories[0]?.bg ||
+            firstCat?.bg ||
             "radial-gradient(ellipse 80% 70% at 50% 55%, rgba(79,216,255,0.1) 0%, transparent 60%), linear-gradient(180deg,#05050b,#08081c)";
           visualPanel.innerHTML = `
-      <div class="cat-d-grid"></div>
-      <div class="cat-d-scooter">
-        <img id="catScooterImgD" src="${categories[0]?.image || "/images/1.png"}" alt="تصویر دسته‌بندی اسکوتر" class="visible">
-      </div>
-    `;
+            <div class="cat-d-grid"></div>
+            <div class="cat-d-scooter">
+              <img id="catScooterImgD" src="${firstCat?.image || "/static/images/default-category.jpg"}" alt="تصویر دسته‌بندی اسکوتر" class="visible">
+            </div>
+          `;
+          desktopWrap.appendChild(visualPanel);
 
           // پنل محتوا
           const contentPanel = document.createElement("div");
@@ -5333,10 +5434,11 @@ DESKTOP (1024px+)
           // تب‌ها
           const tabsD = document.createElement("div");
           tabsD.className = "cat-tabs-d";
+          tabsD.id = "catTabsD";
           categories.forEach((cat, idx) => {
             const btn = document.createElement("button");
             btn.className = `cat-tab-d${idx === 0 ? " active" : ""}`;
-            btn.textContent = cat.name;
+            btn.textContent = cat.name || "دسته‌بندی";
             btn.onclick = () => switchCat(idx);
             if (idx === 0) {
               btn.style.background = cat.color_hex || "var(--neon)";
@@ -5344,9 +5446,9 @@ DESKTOP (1024px+)
             }
             tabsD.appendChild(btn);
           });
+          contentPanel.appendChild(tabsD);
 
           // سایر محتوا
-          const firstCat = categories[0];
           const features = firstCat?.features || [];
           const defaultFeatures = [
             { label: "سرعت", value: "45", unit: "km/h" },
@@ -5356,30 +5458,27 @@ DESKTOP (1024px+)
           ];
           const displayFeatures = features.length ? features : defaultFeatures;
 
-          contentPanel.innerHTML = `
-      <span class="section-label" id="catLabelD">${firstCat?.name || "دسته‌بندی"}</span>
-      <div class="cat-heading-d" id="catHeadingD">${firstCat?.name || ""}</div>
-      <div class="cat-sub-d" id="catSubD">${firstCat?.description || ""}</div>
-      <div class="cat-spec-row-d">
-        ${displayFeatures
-          .slice(0, 4)
-          .map(
-            (f, i) => `
-          <div class="cat-spec-d">
-            <div class="cat-spec-val-d" id="catDSV${i + 1}">${f.value}<span class="cat-spec-unit-d" style="color:${firstCat?.color_hex || "var(--neon)"}"> ${f.unit}</span></div>
-            <div class="cat-spec-label-d">${f.label}</div>
-          </div>
-        `,
-          )
-          .join("")}
-      </div>
-      <div class="cat-btns-d">
-        <button class="cat-btn-primary-d" onclick="goToSlide(2)" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
-      </div>
-    `;
-
-          // ترکیب
-          desktopWrap.appendChild(visualPanel);
+          const contentHTML = `
+            <span class="section-label" id="catLabelD" style="color:${firstCat?.color_hex || "var(--neon)"}">${firstCat?.name || "دسته‌بندی"}</span>
+            <div class="cat-heading-d" id="catHeadingD">${firstCat?.name || ""}</div>
+            <div class="cat-sub-d" id="catSubD">${firstCat?.description || ""}</div>
+            <div class="cat-spec-row-d" id="catSpecRowD">
+              ${displayFeatures
+                .map(
+                  (f) => `
+                <div class="cat-spec-d">
+                  <div class="cat-spec-val-d">${f.value || "0"}<span class="cat-spec-unit-d" style="color:${firstCat?.color_hex || "var(--neon)"}"> ${f.unit || ""}</span></div>
+                  <div class="cat-spec-label-d">${f.label || ""}</div>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+            <div class="cat-btns-d">
+              <button class="cat-btn-primary-d" id="catBtnD" onclick="goToSlide(2)" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
+            </div>
+          `;
+          contentPanel.insertAdjacentHTML("beforeend", contentHTML);
           desktopWrap.appendChild(contentPanel);
         }
 
@@ -5388,27 +5487,22 @@ DESKTOP (1024px+)
       }
 
       /* ════════════════════════════════════
-   SWITCH CATEGORY
-   ════════════════════════════════════ */
+         SWITCH CATEGORY
+         ════════════════════════════════════ */
       function switchCat(idx) {
         const categories = window._catData || [];
-        if (!categories.length || idx >= categories.length) return;
+        if (!categories.length || idx >= categories.length) {
+          console.warn("⚠️ switchCat: invalid index or empty categories");
+          return;
+        }
         const cat = categories[idx];
-        if (!cat) return;
+        if (!cat) {
+          console.warn("⚠️ switchCat: category not found at index", idx);
+          return;
+        }
 
-        // بروزرسانی تب‌ها
-        document.querySelectorAll(".cat-tab-m").forEach((btn, i) => {
-          if (i === idx) {
-            btn.classList.add("active");
-            btn.style.background = cat.color_hex || "var(--neon)";
-            btn.style.color = "var(--black)";
-          } else {
-            btn.classList.remove("active");
-            btn.style.background = "";
-            btn.style.color = "";
-          }
-        });
-        document.querySelectorAll(".cat-tab-d").forEach((btn, i) => {
+        // بروزرسانی تب‌ها (موبایل)
+        document.querySelectorAll("#catTabsM .cat-tab-m").forEach((btn, i) => {
           if (i === idx) {
             btn.classList.add("active");
             btn.style.background = cat.color_hex || "var(--neon)";
@@ -5420,8 +5514,21 @@ DESKTOP (1024px+)
           }
         });
 
-        // بروزرسانی دات‌ها
-        document.querySelectorAll(".cat-dot-m").forEach((dot, i) => {
+        // بروزرسانی تب‌ها (دسکتاپ)
+        document.querySelectorAll("#catTabsD .cat-tab-d").forEach((btn, i) => {
+          if (i === idx) {
+            btn.classList.add("active");
+            btn.style.background = cat.color_hex || "var(--neon)";
+            btn.style.color = "var(--black)";
+          } else {
+            btn.classList.remove("active");
+            btn.style.background = "";
+            btn.style.color = "";
+          }
+        });
+
+        // بروزرسانی دات‌ها (موبایل)
+        document.querySelectorAll("#catDotsM .cat-dot-m").forEach((dot, i) => {
           dot.style.background =
             i === idx ? cat.color_hex || "var(--neon)" : "";
           dot.style.width = i === idx ? "28px" : "";
@@ -5440,17 +5547,26 @@ DESKTOP (1024px+)
           }
         });
 
-        // بروزرسانی محتوا
+        // بروزرسانی محتوای موبایل
         const nameM = document.getElementById("catNameM");
-        if (nameM) nameM.textContent = cat.name;
+        if (nameM) nameM.textContent = cat.name || "";
         const subM = document.getElementById("catSubM");
         if (subM) subM.textContent = cat.description || "";
+        const btnM = document.getElementById("catBtnM");
+        if (btnM) btnM.style.background = cat.color_hex || "var(--neon)";
+
+        // بروزرسانی محتوای دسکتاپ
         const labelD = document.getElementById("catLabelD");
-        if (labelD) labelD.textContent = cat.name;
+        if (labelD) {
+          labelD.textContent = cat.name || "";
+          labelD.style.color = cat.color_hex || "var(--neon)";
+        }
         const headingD = document.getElementById("catHeadingD");
-        if (headingD) headingD.textContent = cat.name;
+        if (headingD) headingD.textContent = cat.name || "";
         const subD = document.getElementById("catSubD");
         if (subD) subD.textContent = cat.description || "";
+        const btnD = document.getElementById("catBtnD");
+        if (btnD) btnD.style.background = cat.color_hex || "var(--neon)";
 
         // بروزرسانی ویژگی‌ها
         const features = cat.features || [];
@@ -5462,31 +5578,42 @@ DESKTOP (1024px+)
         ];
         const displayFeatures = features.length ? features : defaultFeatures;
 
-        displayFeatures.slice(0, 4).forEach((f, i) => {
-          const el = document.getElementById(`catDSV${i + 1}`);
-          if (el) {
-            el.innerHTML = `${f.value}<span class="cat-spec-unit-d" style="color:${cat.color_hex || "var(--neon)"}"> ${f.unit}</span>`;
-          }
-          const mv = document.getElementById(`catMV${i + 1}`);
-          if (mv) {
-            mv.innerHTML = `${f.value}<span class="cat-img-metric-unit"> ${f.unit}</span>`;
-          }
-        });
+        const specRowD = document.getElementById("catSpecRowD");
+        if (specRowD) {
+          specRowD.innerHTML = displayFeatures
+            .map(
+              (f) => `
+              <div class="cat-spec-d">
+                <div class="cat-spec-val-d">${f.value || "0"}<span class="cat-spec-unit-d" style="color:${cat.color_hex || "var(--neon)"}"> ${f.unit || ""}</span></div>
+                <div class="cat-spec-label-d">${f.label || ""}</div>
+              </div>
+            `,
+            )
+            .join("");
+        }
+
+        const metricsM = document.getElementById("catMetricsM");
+        if (metricsM) {
+          metricsM.innerHTML = displayFeatures
+            .map(
+              (f) => `
+              <div class="cat-img-metric">
+                <div class="cat-img-metric-val">${f.value || "0"}<span class="cat-img-metric-unit"> ${f.unit || ""}</span></div>
+                <div class="cat-img-metric-label">${f.label || ""}</div>
+              </div>
+            `,
+            )
+            .join("");
+        }
 
         // بروزرسانی رنگ پس‌زمینه
         const bgD = document.getElementById("catPanelBgD");
         if (bgD && cat.bg) bgD.style.background = cat.bg;
-
-        const btnM = document.getElementById("catBtnM");
-        if (btnM) btnM.style.background = cat.color_hex || "var(--neon)";
-
-        const btnD = document.getElementById("catBtnD");
-        if (btnD) btnD.style.background = cat.color_hex || "var(--neon)";
       }
 
       /* ════════════════════════════════════
-   RENDER BEST SELLERS
-   ════════════════════════════════════ */
+         RENDER BEST SELLERS
+         ════════════════════════════════════ */
       function renderBestSellers(data) {
         const cards = data.product_cards || [];
         if (!cards.length) return;
@@ -5503,54 +5630,57 @@ DESKTOP (1024px+)
         const mobileWrap = document.getElementById("bs-mobile-wrap");
         if (mobileWrap) {
           mobileWrap.innerHTML = `
-      <div class="bs-header-m">
-        <div class="section-label">${data.best_sellers_label || "پرفروش‌ترین‌ها"}</div>
-        <div class="section-title">${data.best_sellers_title || "برترین انتخاب‌ها"}</div>
-      </div>
-      <div class="bs-carousel" id="bsCarousel">
-        ${cards
-          .map((card, idx) => {
-            const color = colors[card.color] || "#4fd8ff";
-            const specs = card.product_specs || [];
-            return `
-            <div class="pc-card-m visible" style="--pc-color:${color}">
-              <div class="pc-accent-bar-m"></div>
-              <div class="pc-img-m">
-                <div class="pc-img-m-bg" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
-                ${card.product_cover ? `<img class="pc-scooter-img-m" src="${card.product_cover}" alt="${card.product_name}">` : ""}
-                ${card.badge_text ? `<div class="pc-badge-m">${card.badge_text}</div>` : ""}
-              </div>
-              <div class="pc-body-m">
-                <div class="pc-brand-m" style="color:${color}">Voltex</div>
-                <div class="pc-name-m">${card.product_name || "محصول"}</div>
-                <div class="pc-desc-m">${card.product_description || ""}</div>
-                <div class="pc-specs-m">
-                  ${specs
-                    .slice(0, 3)
-                    .map(
-                      (s) => `
-                    <div class="pc-spec-m">
-                      <div class="pc-spec-val-m">${s.value}<span class="pc-spec-unit-m" style="color:${color}">${s.unit || ""}</span></div>
-                      <div class="pc-spec-label-m">${s.label}</div>
+            <div class="bs-header-m">
+              <div class="section-label">${data.best_sellers_label || "پرفروش‌ترین‌ها"}</div>
+              <div class="section-title">${data.best_sellers_title || "برترین انتخاب‌ها"}</div>
+            </div>
+            <div class="bs-carousel" id="bsCarousel">
+              ${cards
+                .map((card, idx) => {
+                  const color = colors[card.color] || "#4fd8ff";
+                  const specs = card.product_specs || [];
+                  return `
+                  <div class="pc-card-m visible" style="--pc-color:${color}">
+                    <div class="pc-accent-bar-m"></div>
+                    <div class="pc-img-m">
+                      <div class="pc-img-m-bg" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
+                      ${card.product_cover ? `<img class="pc-scooter-img-m" src="${card.product_cover}" alt="${card.product_name}">` : ""}
+                      ${card.badge_text ? `<div class="pc-badge-m">${card.badge_text}</div>` : ""}
                     </div>
-                  `,
-                    )
-                    .join("")}
-                </div>
-                <div class="pc-footer-m">
-                  <div class="pc-price-m">${card.product_price || "0"}<small>شروع قیمت از</small></div>
-                  <button class="pc-cta-m" style="background:${color}" onclick="location.href='/shop/${card.product_slug}/'">خرید کنید</button>
-                </div>
-              </div>
+                    <div class="pc-body-m">
+                      <div class="pc-brand-m" style="color:${color}">Voltex</div>
+                      <div class="pc-name-m">${card.product_name || "محصول"}</div>
+                      <div class="pc-desc-m">${card.product_description || ""}</div>
+                      <div class="pc-specs-m">
+                        ${specs
+                          .slice(0, 3)
+                          .map(
+                            (s) => `
+                          <div class="pc-spec-m">
+                            <div class="pc-spec-val-m">${s.value}<span class="pc-spec-unit-m" style="color:${color}">${s.unit || ""}</span></div>
+                            <div class="pc-spec-label-m">${s.label}</div>
+                          </div>
+                        `,
+                          )
+                          .join("")}
+                      </div>
+                      <div class="pc-footer-m">
+                        <div class="pc-price-m">
+                            ${formatPrice(card.product_price)} 
+                            <small>شروع قیمت از</small>
+                        </div>
+                        <button class="pc-cta-m" style="background:${color}" onclick="location.href='/shop/${card.product_slug}/'">خرید کنید</button>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                })
+                .join("")}
+            </div>
+            <div class="bs-scroll-indicator">
+              ${cards.map((_, i) => `<div class="bs-scroll-dot${i === 0 ? " active" : ""}" id="bsDot${i}"></div>`).join("")}
             </div>
           `;
-          })
-          .join("")}
-      </div>
-      <div class="bs-scroll-indicator">
-        ${cards.map((_, i) => `<div class="bs-scroll-dot${i === 0 ? " active" : ""}" id="bsDot${i}"></div>`).join("")}
-      </div>
-    `;
 
           // اسکرول ایندیکیتور
           const carousel = document.getElementById("bsCarousel");
@@ -5576,63 +5706,66 @@ DESKTOP (1024px+)
         }
 
         // ===== DESKTOP =====
+
         const desktopWrap = document.getElementById("bs-desktop-wrap");
         if (desktopWrap) {
           desktopWrap.innerHTML = `
-      <div class="bs-desktop-header">
-        <div>
-          <div class="section-label">${data.best_sellers_label || "پرفروش‌ترین‌ها"}</div>
-          <div class="section-title">${data.best_sellers_title || "برترین انتخاب‌های این فصل"}</div>
-        </div>
-        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">${cards.length} مدل ویژه</div>
-      </div>
-      <div class="bs-desktop-grid">
-        ${cards
-          .map((card) => {
-            const color = colors[card.color] || "#4fd8ff";
-            const specs = card.product_specs || [];
-            return `
-            <div class="pc-large-d visible" style="--pc-color:${color};--pc-glow:rgba(79,216,255,0.1)">
-              <div class="pc-accent-bar-d" style="background:${color}"></div>
-              <div class="pc-img-d">
-                <div class="pc-img-bg-d" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
-                ${card.product_cover ? `<img class="pc-scooter-img-d" src="${card.product_cover}" alt="${card.product_name}">` : ""}
-                ${card.badge_text ? `<div class="pc-badge-d" style="background:${color}">${card.badge_text}</div>` : ""}
+            <div class="bs-desktop-header">
+              <div>
+                <div class="section-label">${data.best_sellers_label || "پرفروش‌ترین‌ها"}</div>
+                <div class="section-title">${data.best_sellers_title || "برترین انتخاب‌های این فصل"}</div>
               </div>
-              <div class="pc-body-d">
-                <div class="pc-brand-d" style="color:${color}">Voltex</div>
-                <div class="pc-name-d">${card.product_name || "محصول"}</div>
-                <div class="pc-desc-d">${card.product_description || ""}</div>
-                <div class="pc-specs-d">
-                  ${specs
-                    .slice(0, 3)
-                    .map(
-                      (s) => `
-                    <div class="pc-spec-d">
-                      <div class="pc-spec-val-d">${s.value}<span class="pc-spec-unit-d" style="color:${color}">${s.unit || ""}</span></div>
-                      <div class="pc-spec-label-d">${s.label}</div>
+              <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">${cards.length} مدل ویژه</div>
+            </div>
+            <div class="bs-desktop-grid">
+              ${cards
+                .map((card) => {
+                  const color = colors[card.color] || "#4fd8ff";
+                  const specs = card.product_specs || [];
+                  return `
+                  <div class="pc-large-d visible" style="--pc-color:${color};--pc-glow:rgba(79,216,255,0.1)">
+                    <div class="pc-accent-bar-d" style="background:${color}"></div>
+                    <div class="pc-img-d">
+                      <div class="pc-img-bg-d" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
+                      ${card.product_cover ? `<img class="pc-scooter-img-d" src="${card.product_cover}" alt="${card.product_name}">` : ""}
+                      ${card.badge_text ? `<div class="pc-badge-d" style="background:${color}">${card.badge_text}</div>` : ""}
                     </div>
-                  `,
-                    )
-                    .join("")}
-                </div>
-                <div class="pc-footer-d">
-                  <div class="pc-price-d">${card.product_price || "0"}<small>شروع قیمت از</small></div>
-                  <button class="pc-cta-d" style="background:${color}" onclick="location.href='/shop/${card.product_slug}/'">خرید کنید</button>
-                </div>
-              </div>
+                    <div class="pc-body-d">
+                      <div class="pc-brand-d" style="color:${color}">Voltex</div>
+                      <div class="pc-name-d">${card.product_name || "محصول"}</div>
+                      <div class="pc-desc-d">${card.product_description || ""}</div>
+                      <div class="pc-specs-d">
+                        ${specs
+                          .slice(0, 3)
+                          .map(
+                            (s) => `
+                          <div class="pc-spec-d">
+                            <div class="pc-spec-val-d">${s.value}<span class="pc-spec-unit-d" style="color:${color}">${s.unit || ""}</span></div>
+                            <div class="pc-spec-label-d">${s.label}</div>
+                          </div>
+                        `,
+                          )
+                          .join("")}
+                      </div>
+                      <div class="pc-footer-d">
+                        <div class="pc-price-m">
+                            ${formatPrice(card.product_price)} 
+                            <small>شروع قیمت از</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                })
+                .join("")}
             </div>
           `;
-          })
-          .join("")}
-      </div>
-    `;
         }
       }
 
       /* ════════════════════════════════════
-   RENDER TESTIMONIALS
-   ════════════════════════════════════ */
+         RENDER TESTIMONIALS
+         ════════════════════════════════════ */
       function renderTestimonials(data) {
         const testimonials = data.testimonials || [];
 
@@ -5648,48 +5781,48 @@ DESKTOP (1024px+)
           // Featured
           if (featured) {
             gridHtml += `
-        <div class="testi-card-m featured">
-          <div class="stars-m">${'<div class="star-m"></div>'.repeat(featured.rating)}</div>
-          <div class="testi-quote-m">«${featured.quote}»</div>
-          <div class="testi-author-m">
-            <div class="testi-avatar-m" style="background:linear-gradient(135deg,${featured.color_start_hex || "var(--neon)"},${featured.color_end_hex || "var(--neon2)"})">${featured.initials || "??"}</div>
-            <div><div class="testi-name-m">${featured.name}</div></div>
-          </div>
-        </div>
-      `;
+              <div class="testi-card-m featured">
+                <div class="stars-m">${'<div class="star-m"></div>'.repeat(featured.rating)}</div>
+                <div class="testi-quote-m">«${featured.quote}»</div>
+                <div class="testi-author-m">
+                  <div class="testi-avatar-m" style="background:linear-gradient(135deg,${featured.color_start_hex || "var(--neon)"},${featured.color_end_hex || "var(--neon2)"})">${featured.initials || "??"}</div>
+                  <div><div class="testi-name-m">${featured.name}</div></div>
+                </div>
+              </div>
+            `;
           }
 
           // Others
           others.forEach((t) => {
             gridHtml += `
-        <div class="testi-card-m">
-          <div class="stars-m">${'<div class="star-m"></div>'.repeat(t.rating)}</div>
-          <div class="testi-quote-m">«${t.quote}»</div>
-          <div class="testi-author-m">
-            <div class="testi-avatar-m" style="background:linear-gradient(135deg,${t.color_start_hex || "var(--neon3)"},${t.color_end_hex || "var(--neon2)"})">${t.initials || "??"}</div>
-            <div><div class="testi-name-m">${t.name}</div></div>
-          </div>
-        </div>
-      `;
+              <div class="testi-card-m">
+                <div class="stars-m">${'<div class="star-m"></div>'.repeat(t.rating)}</div>
+                <div class="testi-quote-m">«${t.quote}»</div>
+                <div class="testi-author-m">
+                  <div class="testi-avatar-m" style="background:linear-gradient(135deg,${t.color_start_hex || "var(--neon3)"},${t.color_end_hex || "var(--neon2)"})">${t.initials || "??"}</div>
+                  <div><div class="testi-name-m">${t.name}</div></div>
+                </div>
+              </div>
+            `;
           });
 
           // کارت آمار
           gridHtml += `
-      <div class="testi-card-m" style="background:linear-gradient(135deg,rgba(79,216,255,0.06),var(--card));border-color:var(--border-lit)">
-        <div class="testi-count-badge">${data.testimonials_rating || "4.9"}<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--gold);stroke:none;margin-right:3px;display:inline-block;vertical-align:middle"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-        <div class="testi-count-label">میانگین امتیاز</div>
-        <div style="font-family:var(--font-mono);font-weight:500;font-size:1.7rem;color:var(--white);line-height:1;margin-top:6px">${data.testimonials_count || "40k"}<span style="color:var(--neon);font-size:1.05rem">+</span></div>
-        <div class="testi-count-label">${data.testimonials_count_label || "کاربران راضی"}</div>
-      </div>
-    `;
+            <div class="testi-card-m" style="background:linear-gradient(135deg,rgba(79,216,255,0.06),var(--card));border-color:var(--border-lit)">
+              <div class="testi-count-badge">${data.testimonials_rating || "4.9"}<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--gold);stroke:none;margin-right:3px;display:inline-block;vertical-align:middle"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div class="testi-count-label">میانگین امتیاز</div>
+              <div style="font-family:var(--font-mono);font-weight:500;font-size:1.7rem;color:var(--white);line-height:1;margin-top:6px">${data.testimonials_count || "40k"}<span style="color:var(--neon);font-size:1.05rem">+</span></div>
+              <div class="testi-count-label">${data.testimonials_count_label || "کاربران راضی"}</div>
+            </div>
+          `;
 
           mobileWrap.innerHTML = `
-      <div class="testi-header-m">
-        <div class="section-label">${data.testimonials_label || "نظرات"}</div>
-        <div class="section-title">${data.testimonials_title || "کاربران چه می‌گویند"}</div>
-      </div>
-      <div class="testi-grid-m">${gridHtml}</div>
-    `;
+            <div class="testi-header-m">
+              <div class="section-label">${data.testimonials_label || "نظرات"}</div>
+              <div class="section-title">${data.testimonials_title || "کاربران چه می‌گویند"}</div>
+            </div>
+            <div class="testi-carousel-m">${gridHtml}</div>
+          `;
         }
 
         // ===== DESKTOP =====
@@ -5712,40 +5845,40 @@ DESKTOP (1024px+)
           const doubled = [...allTestimonials, ...allTestimonials];
 
           desktopWrap.innerHTML = `
-      <div class="testi-desktop-header">
-        <div class="section-label">${data.testimonials_label || "نظرات"}</div>
-        <div class="section-title">${data.testimonials_title || "نظر کاربران درباره ما"}</div>
-      </div>
-      <div class="testimonials-track-wrap">
-        <div class="testimonials-track">
-          ${doubled
-            .map(
-              (t) => `
-            <div class="testimonial-card-d">
-              <div class="stars-m" style="margin-bottom:14px">${'<div class="star-m"></div>'.repeat(t.rating)}</div>
-              <div class="testi-quote-d">«${t.quote}»</div>
-              <div class="testi-author-d">
-${
-  t.avatar_url
-    ? `<div class="testi-avatar-d" style="background:transparent;padding:0;overflow:hidden;border:2px solid var(--gold);">
-    <img src="${t.avatar_url}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-   </div>`
-    : `<div class="testi-avatar-d" style="background:linear-gradient(135deg,${t.color_start_hex || "var(--neon)"},${t.color_end_hex || "var(--neon2)"})">${t.initials || "??"}</div>`
-}                <div><div class="testi-name-d">${t.name}</div></div>
+            <div class="testi-desktop-header">
+              <div class="section-label">${data.testimonials_label || "نظرات"}</div>
+              <div class="section-title">${data.testimonials_title || "نظر کاربران درباره ما"}</div>
+            </div>
+            <div class="testimonials-track-wrap">
+              <div class="testimonials-track">
+                ${doubled
+                  .map(
+                    (t) => `
+                  <div class="testimonial-card-d">
+                    <div class="stars-m" style="margin-bottom:14px">${'<div class="star-m"></div>'.repeat(t.rating)}</div>
+                    <div class="testi-quote-d">«${t.quote}»</div>
+                    <div class="testi-author-d">
+      ${
+        t.avatar_url
+          ? `<div class="testi-avatar-d" style="background:transparent;padding:0;overflow:hidden;border:2px solid var(--gold);">
+          <img src="${t.avatar_url}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+         </div>`
+          : `<div class="testi-avatar-d" style="background:linear-gradient(135deg,${t.color_start_hex || "var(--neon)"},${t.color_end_hex || "var(--neon2)"})">${t.initials || "??"}</div>`
+      }                <div><div class="testi-name-d">${t.name}</div></div>
+                    </div>
+                  </div>
+                `,
+                  )
+                  .join("")}
               </div>
             </div>
-          `,
-            )
-            .join("")}
-        </div>
-      </div>
-    `;
+          `;
         }
       }
 
       /* ════════════════════════════════════
-   RENDER GUIDE
-   ════════════════════════════════════ */
+         RENDER GUIDE
+         ════════════════════════════════════ */
       function renderGuide(data) {
         const articles = data.recent_articles || [];
         const colors = [
@@ -5758,87 +5891,87 @@ ${
         const mobileWrap = document.getElementById("guide-mobile-wrap");
         if (mobileWrap) {
           mobileWrap.innerHTML = `
-      <div class="guide-header-m">
-        <div class="section-label">${data.guide_label || "منابع"}</div>
-        <div class="section-title">${data.guide_title || "راهنمای خرید"}</div>
-      </div>
-      <div class="guide-list">
-        ${articles
-          .map((article, i) => {
-            const tag =
-              article.tags_list && article.tags_list.length
-                ? article.tags_list[0].name
-                : "راهنما";
-            return `
-            <a href="/home/articles/${article.slug}/" class="guide-card-m">
-              <div class="guide-img-m ${article.cover_url ? "" : "placeholder"}">
-                ${article.cover_url ? `<img src="${article.cover_url}" alt="${article.title}">` : `<div class="guide-placeholder-icon">📄</div>`}
-              </div>
-              <div class="guide-content-m">
-                <div class="guide-cat-m">${tag}</div>
-                <div class="guide-title-m">${article.title}</div>
-                <div class="guide-excerpt-m">${article.excerpt || ""}</div>
-              </div>
-            </a>
+            <div class="guide-header-m">
+              <div class="section-label">${data.guide_label || "منابع"}</div>
+              <div class="section-title">${data.guide_title || "راهنمای خرید"}</div>
+            </div>
+            <div class="guide-list">
+              ${articles
+                .map((article, i) => {
+                  const tag =
+                    article.tags_list && article.tags_list.length
+                      ? article.tags_list[0].name
+                      : "راهنما";
+                  return `
+                  <a href="/articles/${article.slug}/" class="guide-card-m">
+                    <div class="guide-img-m ${article.cover_url ? "" : "placeholder"}">
+                      ${article.cover_url ? `<img src="${article.cover_url}" alt="${article.title}">` : `<div class="guide-placeholder-icon">📄</div>`}
+                    </div>
+                    <div class="guide-content-m">
+                      <div class="guide-cat-m">${tag}</div>
+                      <div class="guide-title-m">${article.title}</div>
+                      <div class="guide-excerpt-m">${article.excerpt || ""}</div>
+                    </div>
+                  </a>
+                `;
+                })
+                .join("")}
+            </div>
           `;
-          })
-          .join("")}
-      </div>
-    `;
         }
 
         // ===== DESKTOP =====
         const desktopWrap = document.getElementById("guide-desktop-wrap");
         if (desktopWrap) {
           desktopWrap.innerHTML = `
-      <span class="section-label slide-anim">${data.guide_label || "منابع"}</span>
-      <div class="section-title slide-anim d-1">${data.guide_title || "راهنمای کامل خرید"}</div>
-      <div class="guide-grid-d">
-        ${articles
-          .map((article, i) => {
-            const c = colors[i] || colors[0];
-            const tag =
-              article.tags_list && article.tags_list.length
-                ? article.tags_list[0].name
-                : "راهنما";
-            const emojis = ["⚡", "🔧", "🛡️"];
-            return `
-            <a href="/home/articles/${article.slug}/" class="guide-card-d slide-anim d-${i + 2}" style="--guide-color:${c.color};--guide-glow:${c.glow}">
-              <div class="guide-img-d">
-                <div class="guide-img-overlay"></div>
-                <div class="guide-img-inner-d" style="background:linear-gradient(135deg,#040d18,#081828)">
-                  ${
-                    article.cover_url
-                      ? `<img src="${article.cover_url}" alt="${article.title}" style="width:100%;height:100%;object-fit:cover;">`
-                      : `
-                    <div class="guide-img-placeholder">
-                      <div class="guide-placeholder-emoji">${emojis[i] || "📄"}</div>
-                      <div style="font-family:var(--font-mono);font-size:0.7rem;color:rgba(79,216,255,0.3)">${tag}</div>
+            <span class="section-label slide-anim">${data.guide_label || "منابع"}</span>
+            <div class="section-title slide-anim d-1">${data.guide_title || "راهنمای کامل خرید"}</div>
+            <div class="guide-grid-d">
+              ${articles
+                .map((article, i) => {
+                  const c = colors[i] || colors[0];
+                  const tag =
+                    article.tags_list && article.tags_list.length
+                      ? article.tags_list[0].name
+                      : "راهنما";
+                  const emojis = ["⚡", "🔧", "🛡️"];
+                  return `
+                  <a href="/articles/${article.slug}/" class="guide-card-d slide-anim d-${i + 2}" style="--guide-color:${c.color};--guide-glow:${c.glow}">
+                    <div class="guide-img-d">
+                      <div class="guide-img-overlay"></div>
+                      <div class="guide-img-inner-d" style="background:linear-gradient(135deg,#040d18,#081828)">
+                        ${
+                          article.cover_url
+                            ? `<img src="${article.cover_url}" alt="${article.title}" style="width:100%;height:100%;object-fit:cover;">`
+                            : `
+                          <div class="guide-img-placeholder">
+                            <div class="guide-placeholder-emoji">${emojis[i] || "📄"}</div>
+                            <div style="font-family:var(--font-mono);font-size:0.7rem;color:rgba(79,216,255,0.3)">${tag}</div>
+                          </div>
+                        `
+                        }
+                      </div>
                     </div>
-                  `
-                  }
-                </div>
-              </div>
-              <div class="guide-content-d">
-                <div class="guide-cat-d" style="color:${c.color}">${tag}</div>
-                <div class="guide-title-d">${article.title}</div>
-                <div class="guide-excerpt-d">${article.excerpt || ""}</div>
-                <div class="guide-read-more" style="color:${c.color}">
-                  مطالعه مقاله <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-              </div>
-            </a>
+                    <div class="guide-content-d">
+                      <div class="guide-cat-d" style="color:${c.color}">${tag}</div>
+                      <div class="guide-title-d">${article.title}</div>
+                      <div class="guide-excerpt-d">${article.excerpt || ""}</div>
+                      <div class="guide-read-more" style="color:${c.color}">
+                        مطالعه مقاله <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </div>
+                    </div>
+                  </a>
+                `;
+                })
+                .join("")}
+            </div>
           `;
-          })
-          .join("")}
-      </div>
-    `;
         }
       }
 
       /* ════════════════════════════════════
-   RENDER FINAL (PROMISES + STATEMENT + FOOTER)
-   ════════════════════════════════════ */
+         RENDER FINAL (PROMISES + STATEMENT + FOOTER)
+         ════════════════════════════════════ */
       function renderFinal(data) {
         const promises = data.promises || [];
         const colors = {
@@ -5853,138 +5986,114 @@ ${
         const mobileWrap = document.getElementById("final-mobile-wrap");
         if (mobileWrap) {
           mobileWrap.innerHTML = `
-      <div class="promise-header-m">
-        <span class="section-label">${data.promise_label || "چرا VOLTEX"}</span>
-        <h3>${data.promise_title || "تعهد VOLTEX"}</h3>
-      </div>
-      <div class="promise-list-m">
-        ${promises
-          .map((p) => {
-            const c = colors[p.color] || colors["neon"];
-            return `
-            <div class="promise-strip-m" style="--pc:${c.hex};--pc-rgb:${c.rgb}">
-              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(${c.rgb},0.16) 0%,rgba(${c.rgb},0.03) 70%);border-color:rgba(${c.rgb},0.22)">
-                ${p.icon_svg || `<svg viewBox="0 0 24 24" fill="none" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}
+            <div class="promise-header-m">
+              <span class="section-label">${data.promise_label || "چرا VOLTEX"}</span>
+              <h3>${data.promise_title || "تعهد VOLTEX"}</h3>
+            </div>
+            <div class="promise-list-m">
+              ${promises
+                .map((p) => {
+                  const c = colors[p.color] || colors["neon"];
+                  return `
+                  <div class="promise-strip-m" style="--pc:${c.hex};--pc-rgb:${c.rgb}">
+                    <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(${c.rgb},0.16) 0%,rgba(${c.rgb},0.03) 70%);border-color:rgba(${c.rgb},0.22)">
+                      ${p.icon_svg || `<svg viewBox="0 0 24 24" fill="none" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}
+                    </div>
+                    <div class="ps-content-m">
+                      <div class="ps-label-m">${p.label || ""}</div>
+                      <div class="ps-title-m">${p.title || ""}</div>
+                      <div class="ps-desc-m">${p.description || ""}</div>
+                    </div>
+                    <div class="ps-badge-m" style="color:${c.hex}">${p.badge_value || ""}<span class="ps-badge-unit-m" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
+                  </div>
+                `;
+                })
+                .join("")}
+            </div>
+            <div class="footer-m">
+              <div class="footer-brand-row-m">
+                <div class="footer-brand-m">
+                  <span class="footer-logo-m">VOLTEX</span>
+                  <p class="footer-tagline-m">${data.footer_tagline || "اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند."}</p>
+                  <div class="footer-social-m">
+                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
+                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
+                  </div>
+                </div>
               </div>
-              <div class="ps-content-m">
-                <div class="ps-label-m">${p.label || ""}</div>
-                <div class="ps-title-m">${p.title || ""}</div>
-                <div class="ps-desc-m">${p.description || ""}</div>
+              <div class="footer-nav-m">
+                <div>
+                  <span class="footer-nav-title-m">محصولات</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">اسکوترهای شهری</a></li><li><a href="#">آفرود</a></li><li><a href="#">تاشو</a></li><li><a href="#">پرفورمنس</a></li></ul>
+                  <span class="footer-nav-title-m">شرکت</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">درباره Voltex</a></li><li><a href="#">فرصت‌های شغلی</a></li><li><a href="#">رسانه</a></li></ul>
+                </div>
+                <div>
+                  <span class="footer-nav-title-m">پشتیبانی</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">مرکز راهنمایی</a></li><li><a href="#">پیگیری سفارش</a></li><li><a href="#">بازگشت کالا</a></li><li><a href="#">گارانتی</a></li></ul>
+                  <span class="footer-nav-title-m">قوانین</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">حریم خصوصی</a></li><li><a href="#">شرایط استفاده</a></li><li><a href="#">کوکی‌ها</a></li></ul>
+                </div>
               </div>
-              <div class="ps-badge-m" style="color:${c.hex}">${p.badge_value || ""}<span class="ps-badge-unit-m" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
+              <div class="newsletter-wrap-m">
+                <span class="newsletter-label-m">خبرنامه</span>
+                <div class="newsletter-row-m">
+                  <input class="newsletter-input-m" type="email" placeholder="ایمیل شما">
+                  <button class="newsletter-btn-m"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <div class="footer-copy-m">${data.footer_copyright || "© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است."}</div>
+              </div>
             </div>
           `;
-          })
-          .join("")}
-      </div>
-      <div class="footer-m">
-        <div class="footer-brand-row-m">
-          <div class="footer-brand-m">
-            <span class="footer-logo-m">VOLTEX</span>
-            <p class="footer-tagline-m">${data.footer_tagline || "اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند."}</p>
-            <div class="footer-social-m">
-              <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
-              <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
-              <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
-            </div>
-          </div>
-        </div>
-        <div class="footer-nav-m">
-          <div>
-            <span class="footer-nav-title-m">محصولات</span>
-            <ul class="footer-nav-links-m"><li><a href="#">اسکوترهای شهری</a></li><li><a href="#">آفرود</a></li><li><a href="#">تاشو</a></li><li><a href="#">پرفورمنس</a></li></ul>
-            <span class="footer-nav-title-m">شرکت</span>
-            <ul class="footer-nav-links-m"><li><a href="#">درباره Voltex</a></li><li><a href="#">فرصت‌های شغلی</a></li><li><a href="#">رسانه</a></li></ul>
-          </div>
-          <div>
-            <span class="footer-nav-title-m">پشتیبانی</span>
-            <ul class="footer-nav-links-m"><li><a href="#">مرکز راهنمایی</a></li><li><a href="#">پیگیری سفارش</a></li><li><a href="#">بازگشت کالا</a></li><li><a href="#">گارانتی</a></li></ul>
-            <span class="footer-nav-title-m">قوانین</span>
-            <ul class="footer-nav-links-m"><li><a href="#">حریم خصوصی</a></li><li><a href="#">شرایط استفاده</a></li><li><a href="#">کوکی‌ها</a></li></ul>
-          </div>
-        </div>
-        <div class="newsletter-wrap-m">
-          <span class="newsletter-label-m">خبرنامه</span>
-          <div class="newsletter-row-m">
-            <input class="newsletter-input-m" type="email" placeholder="ایمیل شما">
-            <button class="newsletter-btn-m"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-          </div>
-          <div class="footer-copy-m">${data.footer_copyright || "© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است."}</div>
-        </div>
-      </div>
-    `;
         }
 
         // ===== DESKTOP =====
         const desktopWrap = document.getElementById("final-desktop-wrap");
         if (desktopWrap) {
           desktopWrap.innerHTML = `
-      <div class="promise-section-d fs-anim d-1">
-        <div class="section-label">${data.promise_label || "چرا VOLTEX"}</div>
-        <h2 class="fs-anim d-2">${data.promise_title || "تعهد VOLTEX"}</h2>
-        <div class="promise-grid-d">
-          ${promises
-            .map((p, i) => {
-              const c = colors[p.color] || colors["neon"];
-              return `
-              <div class="promise-card-d fs-anim d-${i + 3}" style="--pc:${c.hex};--pc-glow:rgba(${c.rgb},0.12)">
-                <div class="promise-icon-d" style="border-color:rgba(${c.rgb},0.3)">${p.icon_svg || `<svg viewBox="0 0 24 24" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}</div>
-                <div class="promise-card-text">
-                  <div class="promise-big-d">${p.badge_value || ""}<span class="promise-big-unit-d" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
-                  <div class="promise-title-d">${p.title || ""}</div>
-                  <div class="promise-desc-d">${p.description || ""}</div>
+            <div class="promise-section-d fs-anim d-1">
+              <div class="section-label">${data.promise_label || "چرا VOLTEX"}</div>
+              <h2 class="fs-anim d-2">${data.promise_title || "تعهد VOLTEX"}</h2>
+              <div class="promise-grid-d">
+                ${promises
+                  .map((p, i) => {
+                    const c = colors[p.color] || colors["neon"];
+                    return `
+                    <div class="promise-card-d fs-anim d-${i + 3}" style="--pc:${c.hex};--pc-glow:rgba(${c.rgb},0.12)">
+                      <div class="promise-icon-d" style="border-color:rgba(${c.rgb},0.3)">${p.icon_svg || `<svg viewBox="0 0 24 24" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}</div>
+                      <div class="promise-card-text">
+                        <div class="promise-big-d">${p.badge_value || ""}<span class="promise-big-unit-d" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
+                        <div class="promise-title-d">${p.title || ""}</div>
+                        <div class="promise-desc-d">${p.description || ""}</div>
+                      </div>
+                    </div>
+                  `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+            <div class="stmt-desktop fs-anim d-2">
+              <div class="stmt-ring"></div>
+              <div class="stmt-ring"></div>
+              <div class="stmt-inner-d">
+                <span class="stmt-eyebrow-d fs-anim d-2">${data.statement_eyebrow || "سفر شما از اینجا آغاز می‌شود"}</span>
+                <div class="stmt-desktop-title fs-anim d-3">${data.statement_title || "امروز"} <em>${data.statement_title_highlight || "جلوتر"}</em> برو</div>
+                <p class="stmt-desktop-desc fs-anim d-4">${data.statement_description || "به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند."}</p>
+                <div class="stmt-desktop-btns fs-anim d-5">
+                  <button class="stmt-btn-p-d" onclick="goToSlide(2)">${data.statement_btn_text || "مشاهده همه مدل‌ها"}</button>
+                  <button class="stmt-btn-s-d" onclick="goToSlide(1)">${data.statement_btn_secondary_text || "کاوش مجموعه‌ها"}</button>
                 </div>
               </div>
-            `;
-            })
-            .join("")}
-        </div>
-      </div>
-      <div class="stmt-desktop fs-anim d-2">
-        <div class="stmt-ring"></div>
-        <div class="stmt-ring"></div>
-        <div class="stmt-inner-d">
-          <span class="stmt-eyebrow-d fs-anim d-2">${data.statement_eyebrow || "سفر شما از اینجا آغاز می‌شود"}</span>
-          <div class="stmt-desktop-title fs-anim d-3">${data.statement_title || "امروز"} <em>${data.statement_title_highlight || "جلوتر"}</em> برو</div>
-          <p class="stmt-desktop-desc fs-anim d-4">${data.statement_description || "به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند."}</p>
-          <div class="stmt-desktop-btns fs-anim d-5">
-            <button class="stmt-btn-p-d" onclick="goToSlide(2)">${data.statement_btn_text || "مشاهده همه مدل‌ها"}</button>
-            <button class="stmt-btn-s-d" onclick="goToSlide(1)">${data.statement_btn_secondary_text || "کاوش مجموعه‌ها"}</button>
-          </div>
-        </div>
-      </div>
-      <div class="footer-desktop fs-anim d-6">
-        <div class="footer-d-top">
-          <div>
-            <span class="footer-logo-d">VOLTEX</span>
-            <p class="footer-tagline-d">${data.footer_tagline || "اسکوترهای برقی پریمیوم برای کسانی که بیشتر می‌خواهند."}</p>
-            <div class="footer-social-d">
-              <a href="#" class="social-link-d"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
-              <a href="#" class="social-link-d"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
-              <a href="#" class="social-link-d"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
             </div>
-          </div>
-          <div><div class="footer-col-title-d">محصولات</div><ul class="footer-links-d"><li><a href="#">اسکوترهای شهری</a></li><li><a href="#">آفرود</a></li><li><a href="#">تاشو</a></li><li><a href="#">پرفورمنس</a></li><li><a href="#">لوازم جانبی</a></li></ul></div>
-          <div><div class="footer-col-title-d">شرکت</div><ul class="footer-links-d"><li><a href="#">درباره Voltex</a></li><li><a href="#">فرصت‌های شغلی</a></li><li><a href="#">رسانه</a></li><li><a href="#">پایداری</a></li></ul></div>
-          <div><div class="footer-col-title-d">پشتیبانی</div><ul class="footer-links-d"><li><a href="#">مرکز راهنمایی</a></li><li><a href="#">پیگیری سفارش</a></li><li><a href="#">بازگشت کالا</a></li><li><a href="#">گارانتی</a></li></ul></div>
-          <div>
-            <div class="footer-col-title-d">خبرنامه</div>
-            <p style="font-size:0.7rem;color:var(--muted);line-height:1.6;margin-bottom:8px">از تخفیف‌های ویژه و مدل‌های جدید باخبر شوید.</p>
-            <div class="footer-newsletter-d"><input class="footer-ni-d" type="email" placeholder="ایمیل شما"><button class="footer-nb-d"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
-          </div>
-        </div>
-        <div class="footer-d-bottom">
-          <div class="footer-copy-d">${data.footer_copyright || "© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است."}</div>
-          <div class="footer-legal-d"><a href="#">حریم خصوصی</a><a href="#">شرایط استفاده</a><a href="#">کوکی‌ها</a></div>
-        </div>
-      </div>
-    `;
+          
+          `;
         }
       }
 
       /* ════════════════════════════════════
-   UPDATE SEO
-   ════════════════════════════════════ */
+         UPDATE SEO
+         ════════════════════════════════════ */
       function updateSEO(data) {
         const title = data.meta_title || "VOLTEX — اسکوترهای برقی پریمیوم";
         const desc =
@@ -6025,8 +6134,8 @@ ${
       }
 
       /* ════════════════════════════════════
-   SLIDE NAVIGATION
-   ════════════════════════════════════ */
+         SLIDE NAVIGATION
+         ════════════════════════════════════ */
       const slides = Array.from(document.querySelectorAll(".slide"));
       const wrapper = document.getElementById("sections-wrapper");
       const totalSlides = slides.length;
@@ -6179,8 +6288,8 @@ ${
       });
 
       /* ════════════════════════════════════
-   START
-   ════════════════════════════════════ */
+         START
+         ════════════════════════════════════ */
       loadIndexData();
     </script>
   </body>

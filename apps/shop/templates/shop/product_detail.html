@@ -1,1781 +1,2960 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="page-title">محصول | VOLTEX</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="page-title">محصول | VOLTEX</title>
 
-<!-- SEO Meta Tags -->
-<meta name="description" id="meta-description" content="">
-<link rel="canonical" id="meta-canonical" href="">
+    <!-- SEO Meta Tags -->
+    <meta name="description" id="meta-description" content="" />
+    <link rel="canonical" id="meta-canonical" href="" />
 
-<!-- Open Graph -->
-<meta property="og:type" content="product">
-<meta property="og:title" id="og-title" content="">
-<meta property="og:description" id="og-description" content="">
-<meta property="og:image" id="og-image" content="">
-<meta property="og:url" id="og-url" content="">
-<meta property="og:site_name" content="VOLTEX">
-<meta property="og:locale" content="fa_IR">
+    <!-- Open Graph -->
+    <meta property="og:type" content="product" />
+    <meta property="og:title" id="og-title" content="" />
+    <meta property="og:description" id="og-description" content="" />
+    <meta property="og:image" id="og-image" content="" />
+    <meta property="og:url" id="og-url" content="" />
+    <meta property="og:site_name" content="VOLTEX" />
+    <meta property="og:locale" content="fa_IR" />
 
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" id="twitter-title" content="">
-<meta name="twitter:description" id="twitter-description" content="">
-<meta name="twitter:image" id="twitter-image" content="">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" id="twitter-title" content="" />
+    <meta name="twitter:description" id="twitter-description" content="" />
+    <meta name="twitter:image" id="twitter-image" content="" />
 
-<!-- JSON-LD: Product -->
-<script id="json-ld-product" type="application/ld+json"></script>
+    <!-- JSON-LD: Product -->
+    <script id="json-ld-product" type="application/ld+json"></script>
 
-<!-- Preconnect / Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Preconnect / Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
 
-<!-- Font Awesome for wishlist icon -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Font Awesome for wishlist icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
 
-<style>
-/* ===== تمام استایل‌های فایل product.html اینجا قرار می‌گیرند ===== */
-/* (همون استایل‌هایی که قبلاً دادی) */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    <style>
+      /* ===== تمام استایل‌های فایل product.html اینجا قرار می‌گیرند ===== */
+      /* (همون استایل‌هایی که قبلاً دادی) */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-:root {
-  --gold: #C9A84C;
-  --gold-light: #E8C96B;
-  --gold-dim: rgba(201,168,76,0.15);
-  --cyan: #00D4FF;
-  --white: #FFFFFF;
-  --off-white: #E0E0E0;
-  --muted: rgba(255,255,255,0.45);
-  --bg-deep: #04060A;
-  --bg-mid: #070C14;
-  --card-bg: rgba(255,255,255,0.04);
-  --card-border: rgba(255,255,255,0.07);
-  --card-border-gold: rgba(201,168,76,0.3);
-}
+      :root {
+        --gold: #c9a84c;
+        --gold-light: #e8c96b;
+        --gold-dim: rgba(201, 168, 76, 0.15);
+        --cyan: #00d4ff;
+        --white: #ffffff;
+        --off-white: #e0e0e0;
+        --muted: rgba(255, 255, 255, 0.45);
+        --bg-deep: #04060a;
+        --bg-mid: #070c14;
+        --card-bg: rgba(255, 255, 255, 0.04);
+        --card-border: rgba(255, 255, 255, 0.07);
+        --card-border-gold: rgba(201, 168, 76, 0.3);
+      }
 
-html { scroll-behavior: smooth; overflow-x: hidden; }
-body {
-  font-family: 'Vazirmatn', sans-serif;
-  background: var(--bg-deep);
-  color: var(--white);
-  overflow-x: hidden;
-}
+      html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+      }
+      body {
+        font-family: "Vazirmatn", sans-serif;
+        background: var(--bg-deep);
+        color: var(--white);
+        overflow-x: hidden;
+      }
 
-/* ═══════════════════════════════════
+      /* ═══════════════════════════════════
    NAV
 ═══════════════════════════════════ */
-.nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 16px 5%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(180deg, rgba(4,6,10,0.97) 0%, transparent 100%);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(201,168,76,0.08);
-}
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 16px 5%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(
+          180deg,
+          rgba(4, 6, 10, 0.97) 0%,
+          transparent 100%
+        );
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(201, 168, 76, 0.08);
+      }
 
-.nav-logo {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--white);
-  letter-spacing: 0.15em;
-}
-.nav-logo span { color: var(--gold); }
+      .nav-logo {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--white);
+        letter-spacing: 0.15em;
+      }
+      .nav-logo span {
+        color: var(--gold);
+      }
 
-.nav-links {
-  display: flex;
-  gap: 20px;
-  list-style: none;
-  direction: ltr;
-}
-.nav-links a {
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.15em;
-  color: var(--muted);
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--gold); }
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        list-style: none;
+        direction: ltr;
+      }
+      .nav-links a {
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.15em;
+        color: var(--muted);
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--gold);
+      }
 
-.nav-reserve {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  border: 1px solid rgba(201,168,76,0.4);
-  padding: 8px 16px;
-  background: none;
-  cursor: pointer;
-  transition: all 0.25s;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  white-space: nowrap;
-}
-.nav-reserve:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+      .nav-reserve {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(201, 168, 76, 0.4);
+        padding: 8px 16px;
+        background: none;
+        cursor: pointer;
+        transition: all 0.25s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 8px) 0,
+          100% 8px,
+          100% 100%,
+          8px 100%,
+          0 calc(100% - 8px)
+        );
+        white-space: nowrap;
+      }
+      .nav-reserve:hover {
+        background: rgba(201, 168, 76, 0.1);
+        border-color: var(--gold);
+      }
 
-/* ═══════════════════════════════════
+      /* ═══════════════════════════════════
    SECTION 1 — HERO
 ═══════════════════════════════════ */
-#hero {
-  position: relative;
-  width: 100%;
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  padding-top: 70px;
-}
+      #hero {
+        position: relative;
+        width: 100%;
+        min-height: 100svh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        padding-top: 70px;
+      }
 
-.bg-base {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 55% 50%, #0A1628 0%, #04060A 70%);
-  z-index: 0;
-}
-.bg-glow-gold {
-  position: absolute; inset: 0; z-index: 1;
-  background: radial-gradient(ellipse 55% 45% at 55% 55%, rgba(201,168,76,0.09) 0%, transparent 70%);
-  animation: pulse-gold 6s ease-in-out infinite;
-}
-.bg-glow-cyan {
-  position: absolute; inset: 0; z-index: 1;
-  background: radial-gradient(ellipse 30% 40% at 80% 35%, rgba(0,212,255,0.05) 0%, transparent 65%);
-  animation: pulse-cyan 9s ease-in-out infinite alternate;
-}
-.bg-grid {
-  position: absolute; inset: 0; z-index: 1;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
-  background-size: 60px 60px;
-  animation: grid-drift 30s linear infinite;
-}
-.bg-floor {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 40%; z-index: 1; overflow: hidden;
-}
-.bg-floor::before {
-  content: '';
-  position: absolute; bottom: 0; left: -50%; right: -50%;
-  height: 100%;
-  background-image:
-    repeating-linear-gradient(90deg, rgba(201,168,76,0.07) 0, rgba(201,168,76,0.07) 1px, transparent 1px, transparent 70px),
-    repeating-linear-gradient(180deg, rgba(201,168,76,0.04) 0, rgba(201,168,76,0.04) 1px, transparent 1px, transparent 55px);
-  transform: perspective(500px) rotateX(55deg);
-  transform-origin: bottom center;
-}
-.bg-vignette {
-  position: absolute; inset: 0; z-index: 2;
-  background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 30%, rgba(0,0,0,0.65) 100%);
-}
-#hero-particles {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none;
-}
+      .bg-base {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 55% 50%,
+          #0a1628 0%,
+          #04060a 70%
+        );
+        z-index: 0;
+      }
+      .bg-glow-gold {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: radial-gradient(
+          ellipse 55% 45% at 55% 55%,
+          rgba(201, 168, 76, 0.09) 0%,
+          transparent 70%
+        );
+        animation: pulse-gold 6s ease-in-out infinite;
+      }
+      .bg-glow-cyan {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: radial-gradient(
+          ellipse 30% 40% at 80% 35%,
+          rgba(0, 212, 255, 0.05) 0%,
+          transparent 65%
+        );
+        animation: pulse-cyan 9s ease-in-out infinite alternate;
+      }
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.022) 1px,
+            transparent 1px
+          );
+        background-size: 60px 60px;
+        animation: grid-drift 30s linear infinite;
+      }
+      .bg-floor {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40%;
+        z-index: 1;
+        overflow: hidden;
+      }
+      .bg-floor::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: -50%;
+        right: -50%;
+        height: 100%;
+        background-image:
+          repeating-linear-gradient(
+            90deg,
+            rgba(201, 168, 76, 0.07) 0,
+            rgba(201, 168, 76, 0.07) 1px,
+            transparent 1px,
+            transparent 70px
+          ),
+          repeating-linear-gradient(
+            180deg,
+            rgba(201, 168, 76, 0.04) 0,
+            rgba(201, 168, 76, 0.04) 1px,
+            transparent 1px,
+            transparent 55px
+          );
+        transform: perspective(500px) rotateX(55deg);
+        transform-origin: bottom center;
+      }
+      .bg-vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: radial-gradient(
+          ellipse 100% 100% at 50% 50%,
+          transparent 30%,
+          rgba(0, 0, 0, 0.65) 100%
+        );
+      }
+      #hero-particles {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+      }
 
-@keyframes pulse-gold { 0%,100%{opacity:.6} 50%{opacity:1} }
-@keyframes pulse-cyan { 0%{opacity:.3} 100%{opacity:.8} }
-@keyframes grid-drift { 0%{background-position:0 0} 100%{background-position:60px 60px} }
+      @keyframes pulse-gold {
+        0%,
+        100% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      @keyframes pulse-cyan {
+        0% {
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 0.8;
+        }
+      }
+      @keyframes grid-drift {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 60px 60px;
+        }
+      }
 
-/* ─── Hero layout: DESKTOP two-col ─── */
-.hero-layout {
-  position: relative; z-index: 10;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  padding: 60px 6% 120px;
-  gap: 4%;
-}
+      /* ─── Hero layout: DESKTOP two-col ─── */
+      .hero-layout {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        padding: 60px 6% 120px;
+        gap: 4%;
+      }
 
-/* Left / copy side */
-.hero-copy { display: flex; flex-direction: column; gap: 0; }
+      /* Left / copy side */
+      .hero-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
 
-.hero-brand {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.45em;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  opacity: 0;
-  animation: slideUp .8s cubic-bezier(.16,1,.3,1) .5s forwards;
-}
+      .hero-brand {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.45em;
+        color: var(--gold);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        opacity: 0;
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+      }
 
-.hero-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(56px, 7vw, 96px);
-  font-weight: 700;
-  line-height: .9;
-  letter-spacing: -.02em;
-  text-transform: uppercase;
-  color: var(--white);
-  margin-bottom: 8px;
-  opacity: 0;
-  animation: slideUp .9s cubic-bezier(.16,1,.3,1) .7s forwards;
-}
-.hero-title span {
-  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, #A07830 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+      .hero-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: clamp(56px, 7vw, 96px);
+        font-weight: 700;
+        line-height: 0.9;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        color: var(--white);
+        margin-bottom: 8px;
+        opacity: 0;
+        animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+      }
+      .hero-title span {
+        background: linear-gradient(
+          135deg,
+          var(--gold-light) 0%,
+          var(--gold) 50%,
+          #a07830 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-.hero-tagline {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(12px, 1.3vw, 16px);
-  font-weight: 400;
-  letter-spacing: .14em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 26px;
-  opacity: 0;
-  animation: slideUp .8s cubic-bezier(.16,1,.3,1) .9s forwards;
-}
+      .hero-tagline {
+        font-family: "Rajdhani", sans-serif;
+        font-size: clamp(12px, 1.3vw, 16px);
+        font-weight: 400;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 26px;
+        opacity: 0;
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+      }
 
-.hero-divider {
-  width: 48px; height: 1px;
-  background: linear-gradient(90deg, var(--gold), transparent);
-  margin-bottom: 20px;
-  opacity: 0;
-  animation: slideUp .7s ease 1.05s forwards;
-}
+      .hero-divider {
+        width: 48px;
+        height: 1px;
+        background: linear-gradient(90deg, var(--gold), transparent);
+        margin-bottom: 20px;
+        opacity: 0;
+        animation: slideUp 0.7s ease 1.05s forwards;
+      }
 
-.hero-desc {
-  font-size: clamp(13px, 1vw, 15px);
-  font-weight: 300;
-  color: var(--muted);
-  line-height: 1.75;
-  max-width: 380px;
-  margin-bottom: 34px;
-  opacity: 0;
-  animation: slideUp .9s cubic-bezier(.16,1,.3,1) 1.1s forwards;
-  direction: rtl;
-}
+      .hero-desc {
+        font-size: clamp(13px, 1vw, 15px);
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.75;
+        max-width: 380px;
+        margin-bottom: 34px;
+        opacity: 0;
+        animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards;
+        direction: rtl;
+      }
 
-.hero-btns {
-  display: flex; gap: 14px; flex-wrap: wrap;
-  opacity: 0;
-  animation: slideUp .8s cubic-bezier(.16,1,.3,1) 1.3s forwards;
-}
+      .hero-btns {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        opacity: 0;
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
+      }
 
-.btn {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  padding: 0 30px;
-  height: 48px;
-  display: flex; align-items: center; gap: 8px;
-  cursor: pointer;
-  border: none;
-  position: relative; overflow: hidden;
-  transition: transform .2s, box-shadow .2s;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-  text-decoration: none;
-}
-.btn-primary {
-  background: linear-gradient(135deg, var(--gold) 0%, #9A6E1E 100%);
-  color: #060810;
-}
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,.4); }
-.btn-secondary {
-  background: rgba(255,255,255,.04);
-  color: var(--off-white);
-  border: 1px solid var(--card-border-gold);
-  backdrop-filter: blur(8px);
-}
-.btn-secondary:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: 0 0 24px rgba(201,168,76,.15); }
-.btn:active { transform: scale(.97); }
+      .btn {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 0 30px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        border: none;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 10px) 0,
+          100% 10px,
+          100% 100%,
+          10px 100%,
+          0 calc(100% - 10px)
+        );
+        text-decoration: none;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--gold) 0%, #9a6e1e 100%);
+        color: #060810;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(201, 168, 76, 0.4);
+      }
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--off-white);
+        border: 1px solid var(--card-border-gold);
+        backdrop-filter: blur(8px);
+      }
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        border-color: var(--gold);
+        box-shadow: 0 0 24px rgba(201, 168, 76, 0.15);
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
 
-/* Spec cards */
-.hero-specs {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: flex-start;
-  margin-top: 28px;
-}
+      /* Spec cards */
+      .hero-specs {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: flex-start;
+        margin-top: 28px;
+      }
 
-.spec-row {
-  display: flex; gap: 14px; flex-wrap: wrap;
-  opacity: 0;
-}
-.spec-row:nth-child(1) { animation: slideLeft .7s cubic-bezier(.16,1,.3,1) 1.6s forwards; }
-.spec-row:nth-child(2) { animation: slideLeft .7s cubic-bezier(.16,1,.3,1) 1.8s forwards; }
+      .spec-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        opacity: 0;
+      }
+      .spec-row:nth-child(1) {
+        animation: slideLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards;
+      }
+      .spec-row:nth-child(2) {
+        animation: slideLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+      }
 
-.spec-card {
-  background: rgba(7,12,20,0.78);
-  border: 1px solid var(--card-border-gold);
-  backdrop-filter: blur(18px);
-  padding: 14px 20px;
-  display: flex; align-items: center; gap: 14px;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  transition: transform .3s, box-shadow .3s, border-color .3s;
-  animation: float-soft 4s ease-in-out infinite;
-}
-.spec-card:nth-child(2) { animation-delay: 1.5s; }
-.spec-card:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 10px 40px rgba(201,168,76,.22);
-  border-color: rgba(201,168,76,.6);
-}
+      .spec-card {
+        background: rgba(7, 12, 20, 0.78);
+        border: 1px solid var(--card-border-gold);
+        backdrop-filter: blur(18px);
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 8px) 0,
+          100% 8px,
+          100% 100%,
+          8px 100%,
+          0 calc(100% - 8px)
+        );
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s,
+          border-color 0.3s;
+        animation: float-soft 4s ease-in-out infinite;
+      }
+      .spec-card:nth-child(2) {
+        animation-delay: 1.5s;
+      }
+      .spec-card:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 10px 40px rgba(201, 168, 76, 0.22);
+        border-color: rgba(201, 168, 76, 0.6);
+      }
 
-.spec-icon { font-size: 22px; }
-.spec-val {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--white);
-  line-height: 1;
-}
-.spec-lbl {
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: .15em;
-  color: var(--gold);
-  text-transform: uppercase;
-}
+      .spec-icon {
+        font-size: 22px;
+      }
+      .spec-val {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--white);
+        line-height: 1;
+      }
+      .spec-lbl {
+        font-size: 10px;
+        font-weight: 400;
+        letter-spacing: 0.15em;
+        color: var(--gold);
+        text-transform: uppercase;
+      }
 
-/* Hero image area */
-.hero-visual {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+      /* Hero image area */
+      .hero-visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-.hero-img-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 580px;
-  opacity: 0;
-  transform: translateX(-40px) scale(.93);
-  animation: heroImgIn 1.2s cubic-bezier(.16,1,.3,1) .2s forwards;
-}
+      .hero-img-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 580px;
+        opacity: 0;
+        transform: translateX(-40px) scale(0.93);
+        animation: heroImgIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+      }
 
-@keyframes heroImgIn {
-  to { opacity:1; transform: translateX(0) scale(1); }
-}
-@keyframes scooterFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes ground-glow {
-  0% { opacity:.5; transform: translateX(-50%) scaleX(.9); }
-  100% { opacity:1; transform: translateX(-50%) scaleX(1.08); }
-}
+      @keyframes heroImgIn {
+        to {
+          opacity: 1;
+          transform: translateX(0) scale(1);
+        }
+      }
+      @keyframes scooterFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      @keyframes ground-glow {
+        0% {
+          opacity: 0.5;
+          transform: translateX(-50%) scaleX(0.9);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(-50%) scaleX(1.08);
+        }
+      }
 
-/* Trust badges row */
-.trust-row {
-  position: absolute;
-  bottom: 24px;
-  left: 0; right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  z-index: 10;
-  opacity: 0;
-  animation: slideUp .8s ease 2.6s forwards;
-  flex-wrap: wrap;
-  padding: 0 4%;
-}
-.trust-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.06);
-  backdrop-filter: blur(8px);
-  padding: 8px 14px;
-}
-.trust-icon { font-size: 14px; }
-.trust-text { font-size: 11px; color: rgba(255,255,255,.55); }
-.trust-text strong { display: block; font-size: 12px; font-weight: 600; color: var(--white); }
+      /* Trust badges row */
+      .trust-row {
+        position: absolute;
+        bottom: 24px;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        z-index: 10;
+        opacity: 0;
+        animation: slideUp 0.8s ease 2.6s forwards;
+        flex-wrap: wrap;
+        padding: 0 4%;
+      }
+      .trust-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(8px);
+        padding: 8px 14px;
+      }
+      .trust-icon {
+        font-size: 14px;
+      }
+      .trust-text {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .trust-text strong {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--white);
+      }
 
-/* Scroll hint */
-.scroll-cue {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  opacity: 0;
-  animation: slideUp .7s ease 3s forwards;
-  z-index: 20;
-}
-.scroll-cue span { font-size: 9px; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.2); }
-.scroll-arrow {
-  width: 18px; height: 18px;
-  border-right: 1px solid rgba(255,255,255,.2);
-  border-bottom: 1px solid rgba(255,255,255,.2);
-  transform: rotate(45deg);
-  animation: bounce-arr 2s ease-in-out infinite;
-}
-@keyframes bounce-arr { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(4px)} }
+      /* Scroll hint */
+      .scroll-cue {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        opacity: 0;
+        animation: slideUp 0.7s ease 3s forwards;
+        z-index: 20;
+      }
+      .scroll-cue span {
+        font-size: 9px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.2);
+      }
+      .scroll-arrow {
+        width: 18px;
+        height: 18px;
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        transform: rotate(45deg);
+        animation: bounce-arr 2s ease-in-out infinite;
+      }
+      @keyframes bounce-arr {
+        0%,
+        100% {
+          transform: rotate(45deg) translateY(0);
+        }
+        50% {
+          transform: rotate(45deg) translateY(4px);
+        }
+      }
 
-@keyframes slideUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
-@keyframes slideLeft { from{opacity:0;transform:translateX(22px)} to{opacity:1;transform:translateX(0)} }
-@keyframes float-soft { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(22px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slideLeft {
+        from {
+          opacity: 0;
+          transform: translateX(22px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes float-soft {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
 
-/* ═══════════════════════════════════
+      /* ═══════════════════════════════════
    SECTION 2 — GALLERY
 ═══════════════════════════════════ */
-#gallery {
-  position: relative;
-  padding: 100px 6%;
-  overflow: hidden;
-}
+      #gallery {
+        position: relative;
+        padding: 100px 6%;
+        overflow: hidden;
+      }
 
-#gallery::before {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,168,76,.06) 0%, transparent 60%),
-    linear-gradient(180deg, var(--bg-deep) 0%, #060A10 50%, var(--bg-deep) 100%);
-}
+      #gallery::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 60% 50% at 50% 0%,
+            rgba(201, 168, 76, 0.06) 0%,
+            transparent 60%
+          ),
+          linear-gradient(
+            180deg,
+            var(--bg-deep) 0%,
+            #060a10 50%,
+            var(--bg-deep) 100%
+          );
+      }
 
-.section-header {
-  position: relative;
-  text-align: center;
-  margin-bottom: 60px;
-}
-.section-tag {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .4em;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  display: block;
-}
-.section-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(28px, 4vw, 52px);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: -.01em;
-  color: var(--white);
-  margin-bottom: 16px;
-}
-.section-sub {
-  font-size: 14px;
-  font-weight: 300;
-  color: var(--muted);
-  max-width: 500px;
-  margin: 0 auto;
-  line-height: 1.7;
-  direction: rtl;
-}
+      .section-header {
+        position: relative;
+        text-align: center;
+        margin-bottom: 60px;
+      }
+      .section-tag {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.4em;
+        color: var(--gold);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        display: block;
+      }
+      .section-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: clamp(28px, 4vw, 52px);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        color: var(--white);
+        margin-bottom: 16px;
+      }
+      .section-sub {
+        font-size: 14px;
+        font-weight: 300;
+        color: var(--muted);
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.7;
+        direction: rtl;
+      }
 
-/* ─── Color filter bar ─── */
-.gallery-filter-wrap {
-  position: relative;
-  margin-bottom: 40px;
-}
-.gallery-filter {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-  list-style: none;
-}
-.color-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px 10px 14px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  color: var(--off-white);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-  transition: transform .25s cubic-bezier(.16,1,.3,1), border-color .25s, box-shadow .25s, background .25s;
-}
-.color-chip:hover {
-  transform: translateY(-2px);
-  border-color: rgba(201,168,76,.4);
-  background: rgba(255,255,255,.06);
-}
-.color-chip:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-.color-chip .chip-dot {
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,.35);
-  box-shadow: inset 0 0 3px rgba(0,0,0,.4);
-}
-.color-chip .chip-count {
-  color: var(--muted);
-  font-size: 11px;
-}
-.color-chip[aria-pressed="true"] {
-  border-color: var(--gold);
-  background: rgba(201,168,76,.08);
-  box-shadow: 0 0 0 1px rgba(201,168,76,.25), 0 6px 24px rgba(201,168,76,.22);
-  color: var(--white);
-  animation: chip-pulse-in .4s cubic-bezier(.16,1,.3,1);
-}
-.color-chip[aria-pressed="true"] .chip-dot {
-  box-shadow: 0 0 10px 1px currentColor, inset 0 0 3px rgba(0,0,0,.4);
-}
-@keyframes chip-pulse-in {
-  0% { transform: scale(.94); }
-  60% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
-.color-chip.all-chip .chip-dot {
-  background: conic-gradient(from 0deg, var(--gold), var(--cyan), var(--gold-light), var(--gold));
-}
+      /* ─── Color filter bar ─── */
+      .gallery-filter-wrap {
+        position: relative;
+        margin-bottom: 40px;
+      }
+      .gallery-filter {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        list-style: none;
+      }
+      .color-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px 10px 14px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        color: var(--off-white);
+        font-family: "Vazirmatn", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        clip-path: polygon(
+          0 0,
+          calc(100% - 10px) 0,
+          100% 10px,
+          100% 100%,
+          10px 100%,
+          0 calc(100% - 10px)
+        );
+        transition:
+          transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.25s,
+          box-shadow 0.25s,
+          background 0.25s;
+      }
+      .color-chip:hover {
+        transform: translateY(-2px);
+        border-color: rgba(201, 168, 76, 0.4);
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .color-chip:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+      }
+      .color-chip .chip-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.4);
+      }
+      .color-chip .chip-count {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .color-chip[aria-pressed="true"] {
+        border-color: var(--gold);
+        background: rgba(201, 168, 76, 0.08);
+        box-shadow:
+          0 0 0 1px rgba(201, 168, 76, 0.25),
+          0 6px 24px rgba(201, 168, 76, 0.22);
+        color: var(--white);
+        animation: chip-pulse-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .color-chip[aria-pressed="true"] .chip-dot {
+        box-shadow:
+          0 0 10px 1px currentColor,
+          inset 0 0 3px rgba(0, 0, 0, 0.4);
+      }
+      @keyframes chip-pulse-in {
+        0% {
+          transform: scale(0.94);
+        }
+        60% {
+          transform: scale(1.03);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .color-chip.all-chip .chip-dot {
+        background: conic-gradient(
+          from 0deg,
+          var(--gold),
+          var(--cyan),
+          var(--gold-light),
+          var(--gold)
+        );
+      }
 
-/* ─── Dynamic image grid ─── */
-.gallery-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
+      /* ─── Dynamic image grid ─── */
+      .gallery-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
 
-.gcard {
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  opacity: 0;
-  transform: translateY(24px) scale(.97);
-  transition: transform .45s cubic-bezier(.16,1,.3,1), box-shadow .4s, opacity .4s;
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-}
-.gcard.visible { opacity: 1; transform: translateY(0) scale(1); }
-.gcard.gcard-hidden {
-  opacity: 0 !important;
-  transform: scale(.9) !important;
-  pointer-events: none;
-  position: absolute;
-  width: 0; height: 0;
-  overflow: hidden;
-  margin: 0; padding: 0; border: 0;
-}
+      .gcard {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(24px) scale(0.97);
+        transition:
+          transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 0.4s,
+          opacity 0.4s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 16px) 0,
+          100% 16px,
+          100% 100%,
+          16px 100%,
+          0 calc(100% - 16px)
+        );
+      }
+      .gcard.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .gcard.gcard-hidden {
+        opacity: 0 !important;
+        transform: scale(0.9) !important;
+        pointer-events: none;
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
 
-.gcard-img { width:100%; aspect-ratio:4/3; overflow:hidden; position:relative; background:#0C1018; }
-.gcard-img img { width:100%; height:100%; object-fit:cover; transition:transform .6s cubic-bezier(.16,1,.3,1); display:block; }
-.gcard:hover .gcard-img img { transform:scale(1.06); }
+      .gcard-img {
+        width: 100%;
+        aspect-ratio: 4/3;
+        overflow: hidden;
+        position: relative;
+        background: #0c1018;
+      }
+      .gcard-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        display: block;
+      }
+      .gcard:hover .gcard-img img {
+        transform: scale(1.06);
+      }
 
-.gcard-overlay {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: flex-start; justify-content: flex-end;
-  padding: 20px;
-  opacity: 0; transition: opacity .4s; z-index: 3;
-  background: linear-gradient(0deg, rgba(4,6,10,.85) 0%, rgba(4,6,10,.15) 55%, transparent 100%);
-}
-.gcard:hover .gcard-overlay, .gcard:focus-visible .gcard-overlay { opacity: 1; }
+      .gcard-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.4s;
+        z-index: 3;
+        background: linear-gradient(
+          0deg,
+          rgba(4, 6, 10, 0.85) 0%,
+          rgba(4, 6, 10, 0.15) 55%,
+          transparent 100%
+        );
+      }
+      .gcard:hover .gcard-overlay,
+      .gcard:focus-visible .gcard-overlay {
+        opacity: 1;
+      }
 
-.overlay-label {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 10px; font-weight: 600; letter-spacing: .3em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 4px;
-  display: flex; align-items: center; gap: 8px;
-}
-.overlay-label .chip-dot {
-  width: 9px; height: 9px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.4);
-}
-.overlay-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 18px; font-weight: 700; color: var(--white); letter-spacing: .03em;
-}
+      .overlay-label {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .overlay-label .chip-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+      .overlay-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--white);
+        letter-spacing: 0.03em;
+      }
 
-.gcard::after {
-  content: ''; position: absolute; inset: 0;
-  opacity: 0; transition: opacity .4s; pointer-events: none; z-index: 4;
-  box-shadow: inset 0 0 0 1.5px rgba(201,168,76,.5);
-}
-.gcard:hover::after, .gcard:focus-visible::after { opacity: 1; }
-.gcard:hover { box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-.gcard:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+      .gcard::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.4s;
+        pointer-events: none;
+        z-index: 4;
+        box-shadow: inset 0 0 0 1.5px rgba(201, 168, 76, 0.5);
+      }
+      .gcard:hover::after,
+      .gcard:focus-visible::after {
+        opacity: 1;
+      }
+      .gcard:hover {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      .gcard:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+      }
 
-.gallery-empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--muted);
-  font-size: 13px;
-  border: 1px dashed var(--card-border);
-}
+      .gallery-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--muted);
+        font-size: 13px;
+        border: 1px dashed var(--card-border);
+      }
 
-/* ═══════════════════════════════════
+      /* ═══════════════════════════════════
    SECTION 3 — MARKETING
 ═══════════════════════════════════ */
-#marketing {
-  position: relative;
-  padding: 100px 6% 80px;
-  overflow: hidden;
-}
+      #marketing {
+        position: relative;
+        padding: 100px 6% 80px;
+        overflow: hidden;
+      }
 
-#marketing::before {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 50% 60% at 20% 50%, rgba(201,168,76,.05) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(0,212,255,.04) 0%, transparent 55%);
-}
-#marketing::after {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
+      #marketing::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 50% 60% at 20% 50%,
+            rgba(201, 168, 76, 0.05) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 40% 40% at 80% 20%,
+            rgba(0, 212, 255, 0.04) 0%,
+            transparent 55%
+          );
+      }
+      #marketing::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+          );
+        background-size: 48px 48px;
+      }
 
-.mkt-inner { position: relative; z-index: 2; }
+      .mkt-inner {
+        position: relative;
+        z-index: 2;
+      }
 
-.feature-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 60px;
-}
+      .feature-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 60px;
+      }
 
-.feature-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  padding: 28px 22px;
-  position: relative; overflow: hidden;
-  opacity: 0; transform: translateY(24px);
-  transition: all .4s cubic-bezier(.16,1,.3,1), opacity .4s, transform .4s;
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-}
-.feature-card.visible { opacity: 1; transform: translateY(0); }
-.feature-card:nth-child(2) { transition-delay: .1s; }
-.feature-card:nth-child(3) { transition-delay: .2s; }
+      .feature-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        padding: 28px 22px;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          all 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 0.4s,
+          transform 0.4s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 12px) 0,
+          100% 12px,
+          100% 100%,
+          12px 100%,
+          0 calc(100% - 12px)
+        );
+      }
+      .feature-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .feature-card:nth-child(2) {
+        transition-delay: 0.1s;
+      }
+      .feature-card:nth-child(3) {
+        transition-delay: 0.2s;
+      }
 
-.feature-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  opacity: 0; transition: opacity .3s;
-}
-.feature-card:hover::before { opacity: 1; }
-.feature-card:hover {
-  background: rgba(255,255,255,.06);
-  border-color: rgba(201,168,76,.25);
-  transform: translateY(-4px);
-  box-shadow: 0 16px 48px rgba(0,0,0,.3);
-}
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .feature-card:hover::before {
+        opacity: 1;
+      }
+      .feature-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(201, 168, 76, 0.25);
+        transform: translateY(-4px);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+      }
 
-.fcard-icon { font-size: 32px; margin-bottom: 16px; display: block; }
-.fcard-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 18px; font-weight: 700; letter-spacing: .04em;
-  color: var(--white); margin-bottom: 10px;
-}
-.fcard-desc {
-  font-size: 13px; font-weight: 300;
-  color: var(--muted); line-height: 1.75; direction: rtl;
-}
-.fcard-accent {
-  position: absolute; bottom: 0; right: 0;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 60px; font-weight: 700;
-  color: rgba(201,168,76,.04); line-height: 1; pointer-events: none;
-}
+      .fcard-icon {
+        font-size: 32px;
+        margin-bottom: 16px;
+        display: block;
+      }
+      .fcard-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--white);
+        margin-bottom: 10px;
+      }
+      .fcard-desc {
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.75;
+        direction: rtl;
+      }
+      .fcard-accent {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-family: "Rajdhani", sans-serif;
+        font-size: 60px;
+        font-weight: 700;
+        color: rgba(201, 168, 76, 0.04);
+        line-height: 1;
+        pointer-events: none;
+      }
 
-/* Warranty block */
-.warranty-block {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 40px;
-  align-items: center;
-  margin-bottom: 60px;
-  opacity: 0; transform: translateY(28px);
-  transition: all .5s cubic-bezier(.16,1,.3,1);
-}
-.warranty-block.visible { opacity: 1; transform: translateY(0); }
+      /* Warranty block */
+      .warranty-block {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 40px;
+        align-items: center;
+        margin-bottom: 60px;
+        opacity: 0;
+        transform: translateY(28px);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .warranty-block.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-.warranty-badge-row {
-  display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
-}
-.wbadge {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px; font-weight: 600; letter-spacing: .2em;
-  text-transform: uppercase; padding: 6px 12px;
-  border: 1px solid rgba(201,168,76,.35);
-  color: var(--gold); background: rgba(201,168,76,.06);
-}
+      .warranty-badge-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .wbadge {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 6px 12px;
+        border: 1px solid rgba(201, 168, 76, 0.35);
+        color: var(--gold);
+        background: rgba(201, 168, 76, 0.06);
+      }
 
-.warranty-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(26px, 3.5vw, 48px); font-weight: 700;
-  text-transform: uppercase; color: var(--white);
-  line-height: 1; margin-bottom: 18px; letter-spacing: -.01em;
-}
-.warranty-title span { color: var(--gold); }
+      .warranty-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: clamp(26px, 3.5vw, 48px);
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--white);
+        line-height: 1;
+        margin-bottom: 18px;
+        letter-spacing: -0.01em;
+      }
+      .warranty-title span {
+        color: var(--gold);
+      }
 
-.warranty-desc {
-  font-size: 14px; font-weight: 300; color: var(--muted);
-  line-height: 1.8; margin-bottom: 26px; max-width: 480px; direction: rtl;
-}
+      .warranty-desc {
+        font-size: 14px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.8;
+        margin-bottom: 26px;
+        max-width: 480px;
+        direction: rtl;
+      }
 
-.warranty-list {
-  list-style: none; display: flex; flex-direction: column;
-  gap: 10px; margin-bottom: 30px;
-}
-.warranty-list li {
-  display: flex; align-items: flex-start; gap: 12px;
-  font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.5;
-}
-.warranty-list li::before {
-  content: '';
-  flex-shrink: 0;
-  width: 18px; height: 18px;
-  border: 1px solid var(--gold);
-  background: rgba(201,168,76,.1);
-  margin-top: 1px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpolyline points='2,6 5,9 10,3' fill='none' stroke='%23C9A84C' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-size: 10px; background-position: center; background-repeat: no-repeat;
-}
+      .warranty-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+      .warranty-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.5;
+      }
+      .warranty-list li::before {
+        content: "";
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border: 1px solid var(--gold);
+        background: rgba(201, 168, 76, 0.1);
+        margin-top: 1px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpolyline points='2,6 5,9 10,3' fill='none' stroke='%23C9A84C' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-size: 10px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
 
-.warranty-card {
-  background: linear-gradient(135deg, #0C1018 0%, #101820 100%);
-  border: 1px solid var(--card-border-gold);
-  padding: 36px 28px; position: relative; overflow: hidden;
-  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
-}
-.warranty-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,.08) 0%, transparent 60%);
-}
+      .warranty-card {
+        background: linear-gradient(135deg, #0c1018 0%, #101820 100%);
+        border: 1px solid var(--card-border-gold);
+        padding: 36px 28px;
+        position: relative;
+        overflow: hidden;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 20px) 0,
+          100% 20px,
+          100% 100%,
+          20px 100%,
+          0 calc(100% - 20px)
+        );
+      }
+      .warranty-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          rgba(201, 168, 76, 0.08) 0%,
+          transparent 60%
+        );
+      }
 
-.wcard-icon { font-size: 42px; margin-bottom: 16px; display: block; position: relative; z-index: 1; }
-.wcard-title {
-  font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700;
-  color: var(--white); margin-bottom: 4px; position: relative; z-index: 1;
-}
-.wcard-sub {
-  font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 24px; position: relative; z-index: 1;
-}
+      .wcard-icon {
+        font-size: 42px;
+        margin-bottom: 16px;
+        display: block;
+        position: relative;
+        z-index: 1;
+      }
+      .wcard-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 4px;
+        position: relative;
+        z-index: 1;
+      }
+      .wcard-sub {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 24px;
+        position: relative;
+        z-index: 1;
+      }
 
-.wcard-items { display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
-.wcard-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 12px 14px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.06);
-  border-right: 2px solid var(--gold);
-}
-.witem-icon { font-size: 18px; }
-.witem-label { font-size: 11px; color: rgba(255,255,255,.35); letter-spacing: .1em; text-transform: uppercase; }
-.witem-val { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); }
+      .wcard-items {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: relative;
+        z-index: 1;
+      }
+      .wcard-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-right: 2px solid var(--gold);
+      }
+      .witem-icon {
+        font-size: 18px;
+      }
+      .witem-label {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .witem-val {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--white);
+      }
 
-.wcard-bg-num {
-  position: absolute; bottom: -10px; left: 20px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 100px; font-weight: 700;
-  color: rgba(201,168,76,.04); line-height: 1; pointer-events: none;
-}
+      .wcard-bg-num {
+        position: absolute;
+        bottom: -10px;
+        left: 20px;
+        font-family: "Rajdhani", sans-serif;
+        font-size: 100px;
+        font-weight: 700;
+        color: rgba(201, 168, 76, 0.04);
+        line-height: 1;
+        pointer-events: none;
+      }
 
-/* Stats row */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.06);
-  margin-bottom: 60px;
-  opacity: 0; transform: translateY(24px);
-  transition: all .5s cubic-bezier(.16,1,.3,1);
-}
-.stats-row.visible { opacity: 1; transform: translateY(0); }
+      /* Stats row */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 60px;
+        opacity: 0;
+        transform: translateY(24px);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .stats-row.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-.stat-cell {
-  background: var(--bg-deep); padding: 28px 20px;
-  text-align: center; position: relative; transition: background .3s;
-}
-.stat-cell:hover { background: rgba(255,255,255,.03); }
-.stat-cell::before {
-  content: ''; position: absolute; top: 0; left: 20%; right: 20%;
-  height: 2px; background: var(--gold);
-  transform: scaleX(0); transition: transform .4s;
-}
-.stat-cell:hover::before { transform: scaleX(1); }
+      .stat-cell {
+        background: var(--bg-deep);
+        padding: 28px 20px;
+        text-align: center;
+        position: relative;
+        transition: background 0.3s;
+      }
+      .stat-cell:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .stat-cell::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 20%;
+        right: 20%;
+        height: 2px;
+        background: var(--gold);
+        transform: scaleX(0);
+        transition: transform 0.4s;
+      }
+      .stat-cell:hover::before {
+        transform: scaleX(1);
+      }
 
-.stat-num {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(26px, 3.5vw, 48px); font-weight: 700;
-  color: var(--white); line-height: 1; margin-bottom: 8px;
-}
-.stat-num span { color: var(--gold); }
-.stat-label { font-size: 11px; color: var(--muted); letter-spacing: .1em; }
+      .stat-num {
+        font-family: "Rajdhani", sans-serif;
+        font-size: clamp(26px, 3.5vw, 48px);
+        font-weight: 700;
+        color: var(--white);
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .stat-num span {
+        color: var(--gold);
+      }
+      .stat-label {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+      }
 
-/* CTA bottom */
-.cta-bottom {
-  text-align: center; opacity: 0; transform: translateY(24px);
-  transition: all .5s cubic-bezier(.16,1,.3,1);
-}
-.cta-bottom.visible { opacity: 1; transform: translateY(0); }
+      /* CTA bottom */
+      .cta-bottom {
+        text-align: center;
+        opacity: 0;
+        transform: translateY(24px);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .cta-bottom.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-.cta-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(26px, 4vw, 54px); font-weight: 700;
-  text-transform: uppercase; color: var(--white);
-  margin-bottom: 14px; letter-spacing: -.01em;
-}
-.cta-title span { color: var(--gold); }
-.cta-sub {
-  font-size: 14px; font-weight: 300; color: var(--muted);
-  margin-bottom: 32px; max-width: 460px;
-  margin-left: auto; margin-right: auto; line-height: 1.7;
-}
-.cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+      .cta-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: clamp(26px, 4vw, 54px);
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--white);
+        margin-bottom: 14px;
+        letter-spacing: -0.01em;
+      }
+      .cta-title span {
+        color: var(--gold);
+      }
+      .cta-sub {
+        font-size: 14px;
+        font-weight: 300;
+        color: var(--muted);
+        margin-bottom: 32px;
+        max-width: 460px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.7;
+      }
+      .cta-btns {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
 
-/* FOOTER */
-footer {
-  padding: 36px 6%;
-  border-top: 1px solid rgba(255,255,255,.06);
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(255,255,255,.015);
-  flex-wrap: wrap; gap: 12px;
-}
-.footer-logo {
-  font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700;
-  color: rgba(255,255,255,.3); letter-spacing: .15em;
-}
-.footer-logo span { color: rgba(201,168,76,.5); }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,.2); letter-spacing: .05em; }
+      /* FOOTER */
+      footer {
+        padding: 36px 6%;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.015);
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .footer-logo {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.3);
+        letter-spacing: 0.15em;
+      }
+      .footer-logo span {
+        color: rgba(201, 168, 76, 0.5);
+      }
+      .footer-copy {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.2);
+        letter-spacing: 0.05em;
+      }
 
-.sec-line {
-  width: 60px; height: 1px;
-  background: linear-gradient(90deg, var(--gold), transparent);
-  margin: 0 auto 28px;
-}
+      .sec-line {
+        width: 60px;
+        height: 1px;
+        background: linear-gradient(90deg, var(--gold), transparent);
+        margin: 0 auto 28px;
+      }
 
-[data-reveal] {
-  opacity: 0; transform: translateY(30px);
-  transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
-}
-[data-reveal].visible { opacity: 1; transform: translateY(0); }
+      [data-reveal] {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      [data-reveal].visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-/* ═══════════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════════
    MOBILE RESPONSIVE — <= 768px
 ════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+      @media (max-width: 768px) {
+        /* NAV */
+        .nav {
+          padding: 14px 4%;
+        }
+        .nav-links {
+          display: none;
+        }
+        .nav-logo {
+          font-size: 20px;
+        }
+        .nav-reserve {
+          font-size: 10px;
+          padding: 7px 12px;
+        }
 
-  /* NAV */
-  .nav {
-    padding: 14px 4%;
-  }
-  .nav-links { display: none; }
-  .nav-logo { font-size: 20px; }
-  .nav-reserve { font-size: 10px; padding: 7px 12px; }
+        /* HERO — single column, image first then copy */
+        #hero {
+          min-height: 100svh;
+          align-items: flex-start;
+        }
 
-  /* HERO — single column, image first then copy */
-  #hero {
-    min-height: 100svh;
-    align-items: flex-start;
-  }
+        .hero-layout {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto;
+          padding: 80px 5% 180px;
+          gap: 0;
+        }
 
-  .hero-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    padding: 80px 5% 180px;
-    gap: 0;
-  }
+        /* Image comes FIRST on mobile */
+        .hero-visual {
+          order: -1;
+          margin-bottom: 28px;
+        }
 
-  /* Image comes FIRST on mobile */
-  .hero-visual {
-    order: -1;
-    margin-bottom: 28px;
-  }
+        .hero-img-wrap {
+          max-width: 100%;
+          transform: translateX(0) scale(0.93);
+          animation: heroImgIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
 
-  .hero-img-wrap {
-    max-width: 100%;
-    transform: translateX(0) scale(.93);
-    animation: heroImgIn 1.2s cubic-bezier(.16,1,.3,1) .2s forwards;
-  }
+        .hero-copy {
+          align-items: flex-start;
+        }
 
-  .hero-copy { align-items: flex-start; }
+        .hero-brand {
+          font-size: 10px;
+          letter-spacing: 0.3em;
+        }
 
-  .hero-brand { font-size: 10px; letter-spacing: .3em; }
+        .hero-title {
+          font-size: clamp(52px, 16vw, 72px);
+          margin-bottom: 6px;
+        }
 
-  .hero-title {
-    font-size: clamp(52px, 16vw, 72px);
-    margin-bottom: 6px;
-  }
+        .hero-tagline {
+          font-size: 11px;
+          letter-spacing: 0.1em;
+          margin-bottom: 18px;
+        }
 
-  .hero-tagline {
-    font-size: 11px;
-    letter-spacing: .1em;
-    margin-bottom: 18px;
-  }
+        .hero-desc {
+          font-size: 13px;
+          max-width: 100%;
+          margin-bottom: 24px;
+        }
 
-  .hero-desc {
-    font-size: 13px;
-    max-width: 100%;
-    margin-bottom: 24px;
-  }
+        .hero-btns {
+          gap: 10px;
+        }
 
-  .hero-btns {
-    gap: 10px;
-  }
+        .btn {
+          font-size: 12px;
+          padding: 0 22px;
+          height: 44px;
+        }
 
-  .btn {
-    font-size: 12px;
-    padding: 0 22px;
-    height: 44px;
-  }
+        /* Spec cards — 2×2 grid on mobile */
+        .hero-specs {
+          margin-top: 24px;
+          width: 100%;
+        }
 
-  /* Spec cards — 2×2 grid on mobile */
-  .hero-specs {
-    margin-top: 24px;
-    width: 100%;
-  }
+        .spec-row {
+          width: 100%;
+          gap: 10px;
+        }
 
-  .spec-row {
-    width: 100%;
-    gap: 10px;
-  }
+        .spec-card {
+          flex: 1;
+          padding: 12px 14px;
+          gap: 10px;
+          animation: none; /* disable float on mobile for performance */
+        }
 
-  .spec-card {
-    flex: 1;
-    padding: 12px 14px;
-    gap: 10px;
-    animation: none; /* disable float on mobile for performance */
-  }
+        .spec-icon {
+          font-size: 18px;
+        }
+        .spec-val {
+          font-size: 17px;
+        }
+        .spec-lbl {
+          font-size: 9px;
+        }
 
-  .spec-icon { font-size: 18px; }
-  .spec-val { font-size: 17px; }
-  .spec-lbl { font-size: 9px; }
+        /* Trust badges — 2×2 on mobile */
+        .trust-row {
+          bottom: 16px;
+          gap: 8px;
+          padding: 0 3%;
+        }
 
-  /* Trust badges — 2×2 on mobile */
-  .trust-row {
-    bottom: 16px;
-    gap: 8px;
-    padding: 0 3%;
-  }
+        .trust-badge {
+          padding: 7px 10px;
+          gap: 6px;
+          flex: 1 1 calc(50% - 8px);
+          min-width: 130px;
+        }
 
-  .trust-badge {
-    padding: 7px 10px;
-    gap: 6px;
-    flex: 1 1 calc(50% - 8px);
-    min-width: 130px;
-  }
+        .trust-icon {
+          font-size: 12px;
+        }
+        .trust-text {
+          font-size: 10px;
+        }
+        .trust-text strong {
+          font-size: 11px;
+        }
 
-  .trust-icon { font-size: 12px; }
-  .trust-text { font-size: 10px; }
-  .trust-text strong { font-size: 11px; }
+        /* GALLERY */
+        #gallery {
+          padding: 80px 4% 60px;
+        }
 
-  /* GALLERY */
-  #gallery { padding: 80px 4% 60px; }
+        .section-header {
+          margin-bottom: 40px;
+        }
+        .section-title {
+          font-size: clamp(24px, 7vw, 36px);
+        }
+        .section-sub {
+          font-size: 13px;
+        }
 
-  .section-header { margin-bottom: 40px; }
-  .section-title { font-size: clamp(24px, 7vw, 36px); }
-  .section-sub { font-size: 13px; }
+        /* Filter bar — horizontally scrollable chip list on mobile */
+        .gallery-filter-wrap {
+          margin: 0 -4% 28px;
+          padding: 0 4%;
+        }
+        .gallery-filter {
+          flex-wrap: nowrap;
+          justify-content: flex-start;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          padding-bottom: 4px;
+        }
+        .gallery-filter::-webkit-scrollbar {
+          display: none;
+        }
+        .color-chip {
+          flex: 0 0 auto;
+          white-space: nowrap;
+          font-size: 12px;
+          padding: 9px 14px 9px 12px;
+        }
 
-  /* Filter bar — horizontally scrollable chip list on mobile */
-  .gallery-filter-wrap {
-    margin: 0 -4% 28px;
-    padding: 0 4%;
-  }
-  .gallery-filter {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 4px;
-  }
-  .gallery-filter::-webkit-scrollbar { display: none; }
-  .color-chip {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    font-size: 12px;
-    padding: 9px 14px 9px 12px;
-  }
+        /* Gallery grid: 2 columns on mobile */
+        .gallery-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
 
-  /* Gallery grid: 2 columns on mobile */
-  .gallery-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+        .gcard {
+          clip-path: polygon(
+            0 0,
+            calc(100% - 12px) 0,
+            100% 12px,
+            100% 100%,
+            12px 100%,
+            0 calc(100% - 12px)
+          );
+        }
 
-  .gcard {
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-  }
+        .gcard-img {
+          aspect-ratio: 1/1;
+        }
 
-  .gcard-img { aspect-ratio: 1/1; }
+        /* Always show overlay on mobile (no hover) */
+        .gcard-overlay {
+          opacity: 1;
+          padding: 12px;
+          background: linear-gradient(
+            0deg,
+            rgba(4, 6, 10, 0.9) 0%,
+            rgba(4, 6, 10, 0.1) 65%,
+            transparent 100%
+          );
+        }
+        .gcard::after {
+          opacity: 1;
+        }
 
-  /* Always show overlay on mobile (no hover) */
-  .gcard-overlay { opacity: 1; padding: 12px; background: linear-gradient(0deg, rgba(4,6,10,.9) 0%, rgba(4,6,10,.1) 65%, transparent 100%); }
-  .gcard::after { opacity: 1; }
+        .overlay-label {
+          font-size: 8px;
+        }
+        .overlay-title {
+          font-size: 13px;
+        }
 
-  .overlay-label { font-size: 8px; }
-  .overlay-title { font-size: 13px; }
+        /* MARKETING */
+        #marketing {
+          padding: 80px 4% 60px;
+        }
 
-  /* MARKETING */
-  #marketing { padding: 80px 4% 60px; }
+        /* Feature cards — stack vertically */
+        .feature-row {
+          grid-template-columns: 1fr;
+          gap: 14px;
+          margin-bottom: 50px;
+        }
 
-  /* Feature cards — stack vertically */
-  .feature-row {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    margin-bottom: 50px;
-  }
+        .feature-card {
+          padding: 24px 20px;
+        }
+        .fcard-icon {
+          font-size: 28px;
+          margin-bottom: 12px;
+        }
+        .fcard-title {
+          font-size: 17px;
+        }
+        .fcard-desc {
+          font-size: 13px;
+        }
 
-  .feature-card { padding: 24px 20px; }
-  .fcard-icon { font-size: 28px; margin-bottom: 12px; }
-  .fcard-title { font-size: 17px; }
-  .fcard-desc { font-size: 13px; }
+        /* Stats: 2×2 */
+        .stats-row {
+          grid-template-columns: 1fr 1fr;
+          margin-bottom: 50px;
+        }
 
-  /* Stats: 2×2 */
-  .stats-row {
-    grid-template-columns: 1fr 1fr;
-    margin-bottom: 50px;
-  }
+        .stat-cell {
+          padding: 24px 14px;
+        }
+        .stat-num {
+          font-size: clamp(24px, 7vw, 36px);
+        }
+        .stat-label {
+          font-size: 10px;
+        }
 
-  .stat-cell { padding: 24px 14px; }
-  .stat-num { font-size: clamp(24px, 7vw, 36px); }
-  .stat-label { font-size: 10px; }
+        /* Warranty — stack vertically */
+        .warranty-block {
+          grid-template-columns: 1fr;
+          gap: 28px;
+          margin-bottom: 50px;
+        }
 
-  /* Warranty — stack vertically */
-  .warranty-block {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    margin-bottom: 50px;
-  }
+        /* Put visual card FIRST on mobile */
+        .warranty-visual {
+          order: -1;
+        }
 
-  /* Put visual card FIRST on mobile */
-  .warranty-visual { order: -1; }
+        .warranty-title {
+          font-size: clamp(28px, 8vw, 40px);
+        }
+        .warranty-desc {
+          font-size: 13px;
+        }
+        .warranty-list li {
+          font-size: 12px;
+        }
 
-  .warranty-title { font-size: clamp(28px, 8vw, 40px); }
-  .warranty-desc { font-size: 13px; }
-  .warranty-list li { font-size: 12px; }
+        .warranty-card {
+          padding: 28px 22px;
+        }
+        .wcard-icon {
+          font-size: 36px;
+        }
+        .wcard-title {
+          font-size: 22px;
+        }
+        .wcard-sub {
+          font-size: 10px;
+        }
+        .wcard-item {
+          padding: 10px 12px;
+          gap: 12px;
+        }
+        .witem-label {
+          font-size: 10px;
+        }
+        .witem-val {
+          font-size: 14px;
+        }
 
-  .warranty-card { padding: 28px 22px; }
-  .wcard-icon { font-size: 36px; }
-  .wcard-title { font-size: 22px; }
-  .wcard-sub { font-size: 10px; }
-  .wcard-item { padding: 10px 12px; gap: 12px; }
-  .witem-label { font-size: 10px; }
-  .witem-val { font-size: 14px; }
+        /* CTA bottom */
+        .cta-title {
+          font-size: clamp(24px, 7vw, 36px);
+        }
+        .cta-sub {
+          font-size: 13px;
+        }
+        .cta-btns {
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+        }
+        .cta-btns .btn {
+          width: 100%;
+          max-width: 320px;
+          justify-content: center;
+          height: 52px;
+          font-size: 14px;
+        }
 
-  /* CTA bottom */
-  .cta-title { font-size: clamp(24px, 7vw, 36px); }
-  .cta-sub { font-size: 13px; }
-  .cta-btns { flex-direction: column; align-items: center; gap: 12px; }
-  .cta-btns .btn { width: 100%; max-width: 320px; justify-content: center; height: 52px; font-size: 14px; }
+        /* Footer */
+        footer {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 28px 5%;
+          gap: 8px;
+        }
+      }
 
-  /* Footer */
-  footer { flex-direction: column; align-items: flex-start; padding: 28px 5%; gap: 8px; }
-}
-
-/* ═══════════════════════════════════════
+      /* ═══════════════════════════════════════
    TABLET — 769px to 1024px
 ════════════════════════════════════════ */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .gallery-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
+      @media (min-width: 769px) and (max-width: 1024px) {
+        .gallery-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
 
-/* Desktop: 3 columns between 1025–1280, 4 columns above */
-@media (min-width: 1025px) and (max-width: 1280px) {
-  .gallery-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+      /* Desktop: 3 columns between 1025–1280, 4 columns above */
+      @media (min-width: 1025px) and (max-width: 1280px) {
+        .gallery-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
 
-/* ═══════════════════════════════════════
+      /* ═══════════════════════════════════════
    EXTRA SMALL — <= 400px
 ════════════════════════════════════════ */
-@media (max-width: 400px) {
-  .hero-title { font-size: clamp(44px, 15vw, 60px); }
-  .spec-card { padding: 10px 12px; }
-  .spec-val { font-size: 15px; }
-  .trust-badge { flex: 1 1 100%; }
-  .gallery-grid { grid-template-columns: 1fr; }
-}
+      @media (max-width: 400px) {
+        .hero-title {
+          font-size: clamp(44px, 15vw, 60px);
+        }
+        .spec-card {
+          padding: 10px 12px;
+        }
+        .spec-val {
+          font-size: 15px;
+        }
+        .trust-badge {
+          flex: 1 1 100%;
+        }
+        .gallery-grid {
+          grid-template-columns: 1fr;
+        }
+      }
 
-/* ═══════════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════════
    SECTION 4 — PRODUCT REVIEWS
    (Added section only — no existing rules touched)
 ════════════════════════════════════════════════════ */
-#reviews {
-  position: relative;
-  padding: 100px 6%;
-  overflow: hidden;
-}
-#reviews::before {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 55% 45% at 80% 10%, rgba(201,168,76,.06) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 10% 90%, rgba(0,212,255,.04) 0%, transparent 55%),
-    linear-gradient(180deg, var(--bg-deep) 0%, #060A10 50%, var(--bg-deep) 100%);
-}
+      #reviews {
+        position: relative;
+        padding: 100px 6%;
+        overflow: hidden;
+      }
+      #reviews::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 55% 45% at 80% 10%,
+            rgba(201, 168, 76, 0.06) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 40% 40% at 10% 90%,
+            rgba(0, 212, 255, 0.04) 0%,
+            transparent 55%
+          ),
+          linear-gradient(
+            180deg,
+            var(--bg-deep) 0%,
+            #060a10 50%,
+            var(--bg-deep) 100%
+          );
+      }
 
-.reviews-inner { position: relative; z-index: 2; }
+      .reviews-inner {
+        position: relative;
+        z-index: 2;
+      }
 
-.reviews-layout {
-  display: grid;
-  grid-template-columns: .85fr 1.15fr;
-  gap: 40px;
-  align-items: start;
-}
+      .reviews-layout {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 40px;
+        align-items: start;
+      }
 
-/* ── shared glass card base for this section only ── */
-.rv-glass {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  transition: border-color .35s, box-shadow .35s, transform .35s;
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-}
+      /* ── shared glass card base for this section only ── */
+      .rv-glass {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        transition:
+          border-color 0.35s,
+          box-shadow 0.35s,
+          transform 0.35s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 14px) 0,
+          100% 14px,
+          100% 100%,
+          14px 100%,
+          0 calc(100% - 14px)
+        );
+      }
 
-/* ═══ REVIEW FORM ═══ */
-.rv-form-card {
-  position: sticky;
-  top: 90px;
-  padding: 32px 28px;
-  opacity: 0; transform: translateY(26px);
-  transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
-}
-.rv-form-card.visible { opacity: 1; transform: translateY(0); }
-.rv-form-card:hover { border-color: rgba(201,168,76,.22); }
+      /* ═══ REVIEW FORM ═══ */
+      .rv-form-card {
+        position: sticky;
+        top: 90px;
+        padding: 32px 28px;
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rv-form-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .rv-form-card:hover {
+        border-color: rgba(201, 168, 76, 0.22);
+      }
 
-.rv-form-eyebrow {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px; font-weight: 600; letter-spacing: .35em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 10px;
-  display: block;
-}
-.rv-form-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(22px, 2.6vw, 30px); font-weight: 700;
-  color: var(--white); text-transform: uppercase; margin-bottom: 8px; letter-spacing: -.01em;
-}
-.rv-form-sub {
-  font-size: 13px; font-weight: 300; color: var(--muted);
-  line-height: 1.7; margin-bottom: 26px; direction: rtl;
-}
+      .rv-form-eyebrow {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 10px;
+        display: block;
+      }
+      .rv-form-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: clamp(22px, 2.6vw, 30px);
+        font-weight: 700;
+        color: var(--white);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        letter-spacing: -0.01em;
+      }
+      .rv-form-sub {
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.7;
+        margin-bottom: 26px;
+        direction: rtl;
+      }
 
-.rv-field { margin-bottom: 20px; }
-.rv-label {
-  display: block;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px; font-weight: 600; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--off-white); margin-bottom: 10px;
-}
-.rv-label .rv-optional {
-  font-family: 'Vazirmatn', sans-serif;
-  font-weight: 300; text-transform: none; letter-spacing: 0;
-  color: var(--muted); font-size: 11px; margin-right: 6px;
-}
+      .rv-field {
+        margin-bottom: 20px;
+      }
+      .rv-label {
+        display: block;
+        font-family: "Rajdhani", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--off-white);
+        margin-bottom: 10px;
+      }
+      .rv-label .rv-optional {
+        font-family: "Vazirmatn", sans-serif;
+        font-weight: 300;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--muted);
+        font-size: 11px;
+        margin-right: 6px;
+      }
 
-.rv-input, .rv-textarea {
-  width: 100%;
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--card-border);
-  color: var(--white);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 14px;
-  padding: 13px 16px;
-  outline: none;
-  transition: border-color .25s, box-shadow .25s, background .25s;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-}
-.rv-textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
-.rv-input::placeholder, .rv-textarea::placeholder { color: rgba(255,255,255,.28); }
-.rv-input:focus, .rv-textarea:focus {
-  border-color: var(--gold);
-  background: rgba(255,255,255,.05);
-  box-shadow: 0 0 0 3px rgba(201,168,76,.12);
-}
-.rv-field.rv-error .rv-input,
-.rv-field.rv-error .rv-textarea { border-color: #E0554A; box-shadow: 0 0 0 3px rgba(224,85,74,.12); }
+      .rv-input,
+      .rv-textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border);
+        color: var(--white);
+        font-family: "Vazirmatn", sans-serif;
+        font-size: 14px;
+        padding: 13px 16px;
+        outline: none;
+        transition:
+          border-color 0.25s,
+          box-shadow 0.25s,
+          background 0.25s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 8px) 0,
+          100% 8px,
+          100% 100%,
+          8px 100%,
+          0 calc(100% - 8px)
+        );
+      }
+      .rv-textarea {
+        resize: vertical;
+        min-height: 120px;
+        line-height: 1.7;
+      }
+      .rv-input::placeholder,
+      .rv-textarea::placeholder {
+        color: rgba(255, 255, 255, 0.28);
+      }
+      .rv-input:focus,
+      .rv-textarea:focus {
+        border-color: var(--gold);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+      }
+      .rv-field.rv-error .rv-input,
+      .rv-field.rv-error .rv-textarea {
+        border-color: #e0554a;
+        box-shadow: 0 0 0 3px rgba(224, 85, 74, 0.12);
+      }
 
-.rv-errmsg {
-  display: none;
-  align-items: center; gap: 6px;
-  font-size: 11.5px; color: #FF8478; margin-top: 8px;
-  animation: rvShake .35s ease;
-}
-.rv-field.rv-error .rv-errmsg { display: flex; }
-@keyframes rvShake {
-  0%,100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
-}
+      .rv-errmsg {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        color: #ff8478;
+        margin-top: 8px;
+        animation: rvShake 0.35s ease;
+      }
+      .rv-field.rv-error .rv-errmsg {
+        display: flex;
+      }
+      @keyframes rvShake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-4px);
+        }
+        75% {
+          transform: translateX(4px);
+        }
+      }
 
-/* ── Star rating input ── */
-.rv-stars {
-  display: flex; flex-direction: row-reverse; gap: 6px; width: fit-content;
-}
-.rv-star-btn {
-  background: none; border: none; cursor: pointer;
-  font-size: 30px; line-height: 1; padding: 4px;
-  color: rgba(255,255,255,.18);
-  transition: transform .2s cubic-bezier(.16,1,.3,1), color .2s;
-}
-.rv-star-btn:hover, .rv-star-btn:focus-visible { transform: scale(1.18) rotate(-6deg); }
-.rv-star-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
-.rv-star-btn.rv-star-active { color: var(--gold); text-shadow: 0 0 14px rgba(201,168,76,.5); }
-.rv-star-btn.rv-star-hover { color: var(--gold-light); }
-.rv-rating-hint {
-  font-size: 12px; color: var(--muted); margin-top: 8px; min-height: 16px;
-}
+      /* ── Star rating input ── */
+      .rv-stars {
+        display: flex;
+        flex-direction: row-reverse;
+        gap: 6px;
+        width: fit-content;
+      }
+      .rv-star-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 30px;
+        line-height: 1;
+        padding: 4px;
+        color: rgba(255, 255, 255, 0.18);
+        transition:
+          transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+          color 0.2s;
+      }
+      .rv-star-btn:hover,
+      .rv-star-btn:focus-visible {
+        transform: scale(1.18) rotate(-6deg);
+      }
+      .rv-star-btn:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+      .rv-star-btn.rv-star-active {
+        color: var(--gold);
+        text-shadow: 0 0 14px rgba(201, 168, 76, 0.5);
+      }
+      .rv-star-btn.rv-star-hover {
+        color: var(--gold-light);
+      }
+      .rv-rating-hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 8px;
+        min-height: 16px;
+      }
 
-.rv-submit-btn {
-  width: 100%;
-  justify-content: center;
-  margin-top: 6px;
-  position: relative;
-  overflow: hidden;
-}
-.rv-ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,.35);
-  transform: scale(0);
-  animation: rv-ripple-anim .6s ease-out;
-  pointer-events: none;
-}
-@keyframes rv-ripple-anim { to { transform: scale(3); opacity: 0; } }
+      .rv-submit-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 6px;
+        position: relative;
+        overflow: hidden;
+      }
+      .rv-ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+        transform: scale(0);
+        animation: rv-ripple-anim 0.6s ease-out;
+        pointer-events: none;
+      }
+      @keyframes rv-ripple-anim {
+        to {
+          transform: scale(3);
+          opacity: 0;
+        }
+      }
 
-.rv-success {
-  display: none;
-  align-items: center; gap: 12px;
-  margin-top: 18px;
-  padding: 14px 16px;
-  background: rgba(76,201,120,.08);
-  border: 1px solid rgba(76,201,120,.35);
-  color: #8CE0A8;
-  font-size: 13px;
-  animation: slideUp .4s cubic-bezier(.16,1,.3,1);
-}
-.rv-success.rv-show { display: flex; }
-.rv-success-icon { font-size: 18px; flex-shrink: 0; }
+      .rv-success {
+        display: none;
+        align-items: center;
+        gap: 12px;
+        margin-top: 18px;
+        padding: 14px 16px;
+        background: rgba(76, 201, 120, 0.08);
+        border: 1px solid rgba(76, 201, 120, 0.35);
+        color: #8ce0a8;
+        font-size: 13px;
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rv-success.rv-show {
+        display: flex;
+      }
+      .rv-success-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
 
-/* ═══ SUMMARY BAR ═══ */
-.rv-summary-card {
-  padding: 30px 28px;
-  margin-bottom: 28px;
-  opacity: 0; transform: translateY(26px);
-  transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
-}
-.rv-summary-card.visible { opacity: 1; transform: translateY(0); }
+      /* ═══ SUMMARY BAR ═══ */
+      .rv-summary-card {
+        padding: 30px 28px;
+        margin-bottom: 28px;
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rv-summary-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-.rv-summary-top {
-  display: flex; align-items: center; gap: 22px;
-  margin-bottom: 24px; flex-wrap: wrap;
-}
-.rv-score-big {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 52px; font-weight: 700; color: var(--white); line-height: 1;
-}
-.rv-score-meta { display: flex; flex-direction: column; gap: 6px; }
-.rv-stars-display { display: flex; gap: 2px; direction: ltr; }
-.rv-stars-display .rv-star-fill { color: var(--gold); font-size: 17px; }
-.rv-stars-display .rv-star-empty { color: rgba(255,255,255,.15); font-size: 17px; }
-.rv-summary-count { font-size: 12.5px; color: var(--muted); }
+      .rv-summary-top {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .rv-score-big {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 52px;
+        font-weight: 700;
+        color: var(--white);
+        line-height: 1;
+      }
+      .rv-score-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .rv-stars-display {
+        display: flex;
+        gap: 2px;
+        direction: ltr;
+      }
+      .rv-stars-display .rv-star-fill {
+        color: var(--gold);
+        font-size: 17px;
+      }
+      .rv-stars-display .rv-star-empty {
+        color: rgba(255, 255, 255, 0.15);
+        font-size: 17px;
+      }
+      .rv-summary-count {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
 
-.rv-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
-.rv-bar-row:last-child { margin-bottom: 0; }
-.rv-bar-label {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px; font-weight: 600; color: var(--off-white);
-  width: 42px; flex-shrink: 0; text-align: left; direction: ltr;
-}
-.rv-bar-track {
-  flex: 1; height: 7px;
-  background: rgba(255,255,255,.06);
-  overflow: hidden; position: relative;
-}
-.rv-bar-fill {
-  position: absolute; inset: 0 auto 0 0;
-  width: 0%;
-  background: linear-gradient(90deg, #9A6E1E, var(--gold));
-  transition: width 1.1s cubic-bezier(.16,1,.3,1);
-}
-.rv-bar-pct { font-size: 11.5px; color: var(--muted); width: 34px; flex-shrink: 0; }
+      .rv-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 9px;
+      }
+      .rv-bar-row:last-child {
+        margin-bottom: 0;
+      }
+      .rv-bar-label {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--off-white);
+        width: 42px;
+        flex-shrink: 0;
+        text-align: left;
+        direction: ltr;
+      }
+      .rv-bar-track {
+        flex: 1;
+        height: 7px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        position: relative;
+      }
+      .rv-bar-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        background: linear-gradient(90deg, #9a6e1e, var(--gold));
+        transition: width 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rv-bar-pct {
+        font-size: 11.5px;
+        color: var(--muted);
+        width: 34px;
+        flex-shrink: 0;
+      }
 
-/* ═══ REVIEWS LIST ═══ */
-.rv-list-head {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
-}
-.rv-list-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 18px; font-weight: 700; letter-spacing: .05em;
-  color: var(--white); text-transform: uppercase;
-}
+      /* ═══ REVIEWS LIST ═══ */
+      .rv-list-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .rv-list-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--white);
+        text-transform: uppercase;
+      }
 
-.rv-grid { display: flex; flex-direction: column; gap: 14px; }
+      .rv-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
 
-.rv-card {
-  padding: 22px 24px;
-  opacity: 0; transform: translateY(20px);
-  transition: opacity .5s cubic-bezier(.16,1,.3,1), transform .5s cubic-bezier(.16,1,.3,1), border-color .3s, box-shadow .3s;
-}
-.rv-card.visible { opacity: 1; transform: translateY(0); }
-.rv-card:hover {
-  border-color: rgba(201,168,76,.35);
-  box-shadow: 0 16px 44px rgba(0,0,0,.35);
-  transform: translateY(-3px);
-}
+      .rv-card {
+        padding: 22px 24px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .rv-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .rv-card:hover {
+        border-color: rgba(201, 168, 76, 0.35);
+        box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35);
+        transform: translateY(-3px);
+      }
 
-.rv-card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
-.rv-avatar {
-  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 16px;
-  color: #060810;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold) 60%, #9A6E1E);
-}
-.rv-card-headinfo { flex: 1; min-width: 0; }
-.rv-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
-.rv-name { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; color: var(--white); }
-.rv-verified {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 10px; font-weight: 600; letter-spacing: .04em;
-  color: var(--gold); background: rgba(201,168,76,.1);
-  border: 1px solid rgba(201,168,76,.3);
-  padding: 2px 8px;
-}
-.rv-card-sub { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.rv-card-stars { display: flex; gap: 1px; direction: ltr; }
-.rv-card-stars .rv-star-fill { color: var(--gold); font-size: 12.5px; }
-.rv-card-stars .rv-star-empty { color: rgba(255,255,255,.15); font-size: 12.5px; }
-.rv-date { font-size: 11.5px; color: var(--muted); }
+      .rv-card-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 12px;
+      }
+      .rv-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Rajdhani", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: #060810;
+        background: linear-gradient(
+          135deg,
+          var(--gold-light),
+          var(--gold) 60%,
+          #9a6e1e
+        );
+      }
+      .rv-card-headinfo {
+        flex: 1;
+        min-width: 0;
+      }
+      .rv-name-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 3px;
+      }
+      .rv-name {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--white);
+      }
+      .rv-verified {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--gold);
+        background: rgba(201, 168, 76, 0.1);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        padding: 2px 8px;
+      }
+      .rv-card-sub {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .rv-card-stars {
+        display: flex;
+        gap: 1px;
+        direction: ltr;
+      }
+      .rv-card-stars .rv-star-fill {
+        color: var(--gold);
+        font-size: 12.5px;
+      }
+      .rv-card-stars .rv-star-empty {
+        color: rgba(255, 255, 255, 0.15);
+        font-size: 12.5px;
+      }
+      .rv-date {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
 
-.rv-card-title { font-family: 'Rajdhani', sans-serif; font-size: 15.5px; font-weight: 600; color: var(--off-white); margin-bottom: 6px; }
-.rv-card-text { font-size: 13.5px; font-weight: 300; color: rgba(255,255,255,.62); line-height: 1.8; direction: rtl; margin-bottom: 14px; }
+      .rv-card-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 15.5px;
+        font-weight: 600;
+        color: var(--off-white);
+        margin-bottom: 6px;
+      }
+      .rv-card-text {
+        font-size: 13.5px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.62);
+        line-height: 1.8;
+        direction: rtl;
+        margin-bottom: 14px;
+      }
 
-.rv-helpful-btn {
-  display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--card-border);
-  color: var(--muted);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 12px;
-  padding: 7px 14px;
-  cursor: pointer;
-  transition: all .25s;
-}
-.rv-helpful-btn:hover { border-color: rgba(201,168,76,.4); color: var(--gold-light); background: rgba(201,168,76,.06); }
-.rv-helpful-btn.rv-helpful-on { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.1); }
+      .rv-helpful-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border);
+        color: var(--muted);
+        font-family: "Vazirmatn", sans-serif;
+        font-size: 12px;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: all 0.25s;
+      }
+      .rv-helpful-btn:hover {
+        border-color: rgba(201, 168, 76, 0.4);
+        color: var(--gold-light);
+        background: rgba(201, 168, 76, 0.06);
+      }
+      .rv-helpful-btn.rv-helpful-on {
+        border-color: var(--gold);
+        color: var(--gold);
+        background: rgba(201, 168, 76, 0.1);
+      }
 
-/* Load more */
-.rv-loadmore-wrap { text-align: center; margin-top: 30px; }
-.rv-loadmore-btn {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12.5px; font-weight: 600; letter-spacing: .18em;
-  text-transform: uppercase; color: var(--gold);
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--card-border-gold);
-  padding: 13px 34px;
-  cursor: pointer;
-  transition: all .3s;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-}
-.rv-loadmore-btn:hover { background: rgba(201,168,76,.1); box-shadow: 0 8px 26px rgba(201,168,76,.18); transform: translateY(-2px); }
-.rv-loadmore-btn:disabled { opacity: .4; cursor: default; transform: none; box-shadow: none; }
+      /* Load more */
+      .rv-loadmore-wrap {
+        text-align: center;
+        margin-top: 30px;
+      }
+      .rv-loadmore-btn {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gold);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border-gold);
+        padding: 13px 34px;
+        cursor: pointer;
+        transition: all 0.3s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 10px) 0,
+          100% 10px,
+          100% 100%,
+          10px 100%,
+          0 calc(100% - 10px)
+        );
+      }
+      .rv-loadmore-btn:hover {
+        background: rgba(201, 168, 76, 0.1);
+        box-shadow: 0 8px 26px rgba(201, 168, 76, 0.18);
+        transform: translateY(-2px);
+      }
+      .rv-loadmore-btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+        transform: none;
+        box-shadow: none;
+      }
 
-/* Empty state */
-.rv-empty {
-  text-align: center;
-  padding: 70px 24px;
-  border: 1px dashed var(--card-border);
-}
-.rv-empty-illus {
-  font-size: 44px; margin-bottom: 16px; opacity: .5;
-}
-.rv-empty-title { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 600; color: var(--off-white); margin-bottom: 6px; }
-.rv-empty-sub { font-size: 12.5px; color: var(--muted); }
+      /* Empty state */
+      .rv-empty {
+        text-align: center;
+        padding: 70px 24px;
+        border: 1px dashed var(--card-border);
+      }
+      .rv-empty-illus {
+        font-size: 44px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+      .rv-empty-title {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--off-white);
+        margin-bottom: 6px;
+      }
+      .rv-empty-sub {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
 
-/* ── Responsive: tablet & mobile ── */
-@media (max-width: 1024px) {
-  .reviews-layout { grid-template-columns: 1fr; }
-  .rv-form-card { position: static; }
-}
+      /* ── Responsive: tablet & mobile ── */
+      @media (max-width: 1024px) {
+        .reviews-layout {
+          grid-template-columns: 1fr;
+        }
+        .rv-form-card {
+          position: static;
+        }
+      }
 
-@media (max-width: 768px) {
-  #reviews { padding: 80px 4% 60px; }
-  .reviews-layout { gap: 26px; }
-  .rv-form-card, .rv-summary-card { padding: 24px 18px; }
-  .rv-form-title { font-size: 22px; }
-  .rv-star-btn { font-size: 28px; padding: 6px; }
-  .rv-submit-btn { height: 50px; font-size: 13px; }
-  .rv-score-big { font-size: 42px; }
-  .rv-card { padding: 18px 16px; }
-  .rv-avatar { width: 38px; height: 38px; font-size: 14px; }
-  .rv-loadmore-btn { width: 100%; }
-}
+      @media (max-width: 768px) {
+        #reviews {
+          padding: 80px 4% 60px;
+        }
+        .reviews-layout {
+          gap: 26px;
+        }
+        .rv-form-card,
+        .rv-summary-card {
+          padding: 24px 18px;
+        }
+        .rv-form-title {
+          font-size: 22px;
+        }
+        .rv-star-btn {
+          font-size: 28px;
+          padding: 6px;
+        }
+        .rv-submit-btn {
+          height: 50px;
+          font-size: 13px;
+        }
+        .rv-score-big {
+          font-size: 42px;
+        }
+        .rv-card {
+          padding: 18px 16px;
+        }
+        .rv-avatar {
+          width: 38px;
+          height: 38px;
+          font-size: 14px;
+        }
+        .rv-loadmore-btn {
+          width: 100%;
+        }
+      }
 
-@media (max-width: 400px) {
-  .rv-name-row { flex-direction: column; align-items: flex-start; gap: 4px; }
-  .rv-bar-label { width: 36px; font-size: 11px; }
-}
-/* اضافه کردن استایل برای دکمه علاقه‌مندی */
-.wishlist-btn {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  padding: 0 20px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  border: 1px solid var(--card-border-gold);
-  background: rgba(255,255,255,.04);
-  color: var(--off-white);
-  backdrop-filter: blur(8px);
-  transition: all .25s;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-  text-decoration: none;
-}
-.wishlist-btn:hover {
-  transform: translateY(-2px);
-  border-color: var(--gold);
-  box-shadow: 0 0 24px rgba(201,168,76,.15);
-}
-.wishlist-btn:active { transform: scale(.97); }
-.wishlist-btn.in-wishlist {
-  border-color: var(--gold);
-  background: rgba(201,168,76,.15);
-  color: var(--gold);
-}
-.wishlist-btn .fa-heart {
-  transition: all .3s;
-}
-.wishlist-btn.in-wishlist .fa-heart {
-  color: var(--gold);
-  text-shadow: 0 0 20px rgba(201,168,76,.5);
-}
-.wishlist-btn i {
-  font-size: 16px;
-}
+      @media (max-width: 400px) {
+        .rv-name-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+        }
+        .rv-bar-label {
+          width: 36px;
+          font-size: 11px;
+        }
+      }
+      /* اضافه کردن استایل برای دکمه علاقه‌مندی */
+      .wishlist-btn {
+        font-family: "Rajdhani", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 0 20px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        border: 1px solid var(--card-border-gold);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--off-white);
+        backdrop-filter: blur(8px);
+        transition: all 0.25s;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 10px) 0,
+          100% 10px,
+          100% 100%,
+          10px 100%,
+          0 calc(100% - 10px)
+        );
+        text-decoration: none;
+      }
+      .wishlist-btn:hover {
+        transform: translateY(-2px);
+        border-color: var(--gold);
+        box-shadow: 0 0 24px rgba(201, 168, 76, 0.15);
+      }
+      .wishlist-btn:active {
+        transform: scale(0.97);
+      }
+      .wishlist-btn.in-wishlist {
+        border-color: var(--gold);
+        background: rgba(201, 168, 76, 0.15);
+        color: var(--gold);
+      }
+      .wishlist-btn .fa-heart {
+        transition: all 0.3s;
+      }
+      .wishlist-btn.in-wishlist .fa-heart {
+        color: var(--gold);
+        text-shadow: 0 0 20px rgba(201, 168, 76, 0.5);
+      }
+      .wishlist-btn i {
+        font-size: 16px;
+      }
 
-.loading-spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-.loading-spinner::after {
-  content: '';
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255,255,255,.1);
-  border-top-color: var(--gold);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-</style>
-</head>
-<body>
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+      }
+      .loading-spinner::after {
+        content: "";
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== NAV ===== -->
+    <nav class="nav">
+      <a href="/" class="nav-logo">VOLT<span>EX</span></a>
+      <ul class="nav-links">
+        <li><a href="/">خانه</a></li>
+        <li><a href="/products/">محصولات</a></li>
+        <li><a href="/blog/">مجله</a></li>
+      </ul>
+      <button class="nav-reserve" onclick="location.href = '/cart/'">
+        سبد خرید
+      </button>
+    </nav>
 
-<!-- ===== NAV ===== -->
-<nav class="nav">
-  <a href="/" class="nav-logo">VOLT<span>EX</span></a>
-  <ul class="nav-links">
-    <li><a href="/">خانه</a></li>
-    <li><a href="/products/">محصولات</a></li>
-    <li><a href="/blog/">مجله</a></li>
-  </ul>
-  <button class="nav-reserve" onclick="location.href='/cart/'">سبد خرید</button>
-</nav>
+    <!-- ===== SECTION 1 — HERO ===== -->
+    <section id="hero">
+      <div class="bg-base"></div>
+      <div class="bg-glow-gold"></div>
+      <div class="bg-glow-cyan"></div>
+      <div class="bg-grid"></div>
+      <div class="bg-floor"></div>
+      <div class="bg-vignette"></div>
+      <canvas id="hero-particles"></canvas>
 
-<!-- ===== SECTION 1 — HERO ===== -->
-<section id="hero">
-  <div class="bg-base"></div>
-  <div class="bg-glow-gold"></div>
-  <div class="bg-glow-cyan"></div>
-  <div class="bg-grid"></div>
-  <div class="bg-floor"></div>
-  <div class="bg-vignette"></div>
-  <canvas id="hero-particles"></canvas>
+      <div id="loading-spinner" class="loading-spinner"></div>
 
-  <div id="loading-spinner" class="loading-spinner"></div>
+      <div id="product-content" style="display: none">
+        <div class="hero-layout">
+          <div class="hero-copy">
+            <div class="hero-brand" id="product-category">...</div>
+            <h1 class="hero-title" id="product-name">...</h1>
+            <p class="hero-tagline" id="product-tagline">...</p>
+            <div class="hero-divider"></div>
+            <p class="hero-desc" id="product-description">...</p>
 
-  <div id="product-content" style="display:none;">
-    <div class="hero-layout">
+            <div class="hero-btns">
+              <a href="#" class="btn btn-primary" id="add-to-cart-btn">
+                <i class="fas fa-shopping-cart"></i> خرید کنید
+              </a>
+              <button class="wishlist-btn" id="wishlist-btn">
+                <i class="far fa-heart"></i>
+                <span id="wishlist-text">علاقه‌مندی</span>
+              </button>
+            </div>
 
-      <div class="hero-copy">
-        <div class="hero-brand" id="product-category">...</div>
-        <h1 class="hero-title" id="product-name">...</h1>
-        <p class="hero-tagline" id="product-tagline">...</p>
-        <div class="hero-divider"></div>
-        <p class="hero-desc" id="product-description">...</p>
-        
-        <div class="hero-btns">
-          <a href="#" class="btn btn-primary" id="add-to-cart-btn">
-            <i class="fas fa-shopping-cart"></i> خرید کنید
-          </a>
-          <button class="wishlist-btn" id="wishlist-btn">
-            <i class="far fa-heart"></i> 
-            <span id="wishlist-text">علاقه‌مندی</span>
-          </button>
+            <div class="hero-specs" id="product-specs">
+              <!-- توسط JavaScript پر می‌شود -->
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div
+              style="
+                position: absolute;
+                bottom: 8%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 70%;
+                height: 30px;
+                background: radial-gradient(
+                  ellipse at center,
+                  rgba(201, 168, 76, 0.18) 0%,
+                  transparent 70%
+                );
+                filter: blur(8px);
+                animation: ground-glow 3s ease-in-out infinite alternate;
+              "
+            ></div>
+            <div class="hero-img-wrap">
+              <img
+                id="hero-img"
+                src=""
+                alt=""
+                style="
+                  width: 100%;
+                  height: auto;
+                  display: block;
+                  filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.7))
+                    drop-shadow(0 0 40px rgba(201, 168, 76, 0.15));
+                  animation: scooterFloat 5s ease-in-out infinite;
+                "
+              />
+            </div>
+          </div>
         </div>
 
-        <div class="hero-specs" id="product-specs">
+        <div class="trust-row" id="trust-row">
+          <!-- توسط JavaScript پر می‌شود -->
+        </div>
+
+        <div class="scroll-cue">
+          <div class="scroll-arrow"></div>
+          <span>اسکرول کنید</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2 — GALLERY ===== -->
+    <section id="gallery">
+      <div class="section-header" data-reveal>
+        <span class="section-tag">Visual Tour</span>
+        <div class="sec-line"></div>
+        <h2 class="section-title">از هر زاویه</h2>
+        <p class="section-sub">
+          رنگ مورد نظر خود را انتخاب کنید و تمام تصاویر را مشاهده کنید
+        </p>
+      </div>
+
+      <div class="gallery-filter-wrap">
+        <ul
+          class="gallery-filter"
+          id="gallery-filter"
+          role="tablist"
+          aria-label="فیلتر رنگ گالری تصاویر"
+        ></ul>
+      </div>
+
+      <div
+        class="gallery-grid"
+        id="gallery-grid"
+        role="tabpanel"
+        aria-live="polite"
+      ></div>
+    </section>
+
+    <!-- ===== SECTION 3 — MARKETING ===== -->
+    <section id="marketing">
+      <div class="mkt-inner">
+        <div class="section-header" data-reveal>
+          <span class="section-tag">Why This Product</span>
+          <div class="sec-line"></div>
+          <h2 class="section-title" id="marketing-title">چرا این محصول؟</h2>
+          <p class="section-sub" id="marketing-sub">
+            تجربه‌ای که فراتر از انتظار است
+          </p>
+        </div>
+
+        <div class="feature-row" id="feature-row">
+          <!-- توسط JavaScript پر می‌شود -->
+        </div>
+
+        <div class="stats-row" id="stats-row">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
       </div>
+    </section>
 
-      <div class="hero-visual">
-        <div style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:70%;height:30px;background:radial-gradient(ellipse at center,rgba(201,168,76,.18) 0%,transparent 70%);filter:blur(8px);animation:ground-glow 3s ease-in-out infinite alternate;"></div>
-        <div class="hero-img-wrap">
-          <img id="hero-img" src="" alt="" style="width:100%;height:auto;display:block;filter:drop-shadow(0 20px 60px rgba(0,0,0,.7)) drop-shadow(0 0 40px rgba(201,168,76,.15));animation:scooterFloat 5s ease-in-out infinite;">
+    <!-- ===== SECTION 4 — PRODUCT REVIEWS ===== -->
+    <section id="reviews" aria-labelledby="reviews-heading">
+      <div class="reviews-inner">
+        <div class="section-header" data-reveal>
+          <span class="section-tag">Customer Voices</span>
+          <div class="sec-line"></div>
+          <h2 class="section-title" id="reviews-heading">نظرات مشتریان</h2>
+          <p class="section-sub">
+            تجربه واقعی راکبان را بخوانید و نظر خودتان را ثبت کنید
+          </p>
+        </div>
+
+        <div class="reviews-layout">
+          <!-- ===== REVIEW FORM ===== -->
+          <header class="rv-form-card rv-glass" id="rv-form-card">
+            <span class="rv-form-eyebrow">Write A Review</span>
+            <h3 class="rv-form-title">نظر خود را بنویسید</h3>
+            <p class="rv-form-sub">
+              تجربه‌تان به دیگران کمک می‌کند تصمیم بهتری بگیرند.
+            </p>
+
+            <form id="rv-form" novalidate autocomplete="off">
+              <input
+                type="hidden"
+                name="csrfmiddlewaretoken"
+                id="csrf-token"
+                value=""
+              />
+
+              <div class="rv-field" id="rv-field-rating">
+                <label class="rv-label" for="rv-star-5">امتیاز شما</label>
+                <div
+                  class="rv-stars"
+                  id="rv-stars"
+                  role="radiogroup"
+                  aria-label="امتیاز از ۵ ستاره"
+                >
+                  <button
+                    type="button"
+                    class="rv-star-btn"
+                    data-value="5"
+                    id="rv-star-5"
+                    role="radio"
+                    aria-checked="false"
+                    aria-label="۵ ستاره - عالی"
+                  >
+                    ★
+                  </button>
+                  <button
+                    type="button"
+                    class="rv-star-btn"
+                    data-value="4"
+                    role="radio"
+                    aria-checked="false"
+                    aria-label="۴ ستاره - خوب"
+                  >
+                    ★
+                  </button>
+                  <button
+                    type="button"
+                    class="rv-star-btn"
+                    data-value="3"
+                    role="radio"
+                    aria-checked="false"
+                    aria-label="۳ ستاره - متوسط"
+                  >
+                    ★
+                  </button>
+                  <button
+                    type="button"
+                    class="rv-star-btn"
+                    data-value="2"
+                    role="radio"
+                    aria-checked="false"
+                    aria-label="۲ ستاره - ضعیف"
+                  >
+                    ★
+                  </button>
+                  <button
+                    type="button"
+                    class="rv-star-btn"
+                    data-value="1"
+                    role="radio"
+                    aria-checked="false"
+                    aria-label="۱ ستاره - بسیار ضعیف"
+                  >
+                    ★
+                  </button>
+                </div>
+                <input
+                  type="hidden"
+                  name="rating"
+                  id="rv-rating-value"
+                  value=""
+                />
+                <div class="rv-rating-hint" id="rv-rating-hint">
+                  روی ستاره‌ها بزنید
+                </div>
+                <div class="rv-errmsg" role="alert">
+                  ⚠ لطفاً یک امتیاز انتخاب کنید
+                </div>
+              </div>
+
+              <div class="rv-field" id="rv-field-title">
+                <label class="rv-label" for="rv-title"
+                  >عنوان نظر <span class="rv-optional">(اختیاری)</span></label
+                >
+                <input
+                  class="rv-input"
+                  type="text"
+                  id="rv-title"
+                  name="title"
+                  placeholder="مثال: فراتر از انتظارم بود"
+                  maxlength="100"
+                />
+              </div>
+
+              <div class="rv-field" id="rv-field-text">
+                <label class="rv-label" for="rv-text">متن نظر</label>
+                <textarea
+                  class="rv-textarea"
+                  id="rv-text"
+                  name="comment"
+                  placeholder="تجربه خود را بنویسید..."
+                  maxlength="800"
+                ></textarea>
+                <div class="rv-errmsg" role="alert">
+                  ⚠ لطفاً متن نظر خود را بنویسید
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary rv-submit-btn"
+                id="rv-submit-btn"
+              >
+                ثبت نظر
+              </button>
+
+              <div class="rv-success" id="rv-success" role="status">
+                <span class="rv-success-icon">✓</span>
+                <span
+                  >نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده
+                  می‌شود.</span
+                >
+              </div>
+            </form>
+          </header>
+
+          <!-- ===== SUMMARY + REVIEWS ===== -->
+          <div>
+            <div class="rv-summary-card rv-glass" id="rv-summary-card">
+              <div class="rv-summary-top">
+                <div class="rv-score-big" id="rv-score-big">0.0</div>
+                <div class="rv-score-meta">
+                  <div
+                    class="rv-stars-display"
+                    id="rv-stars-display"
+                    aria-hidden="true"
+                  ></div>
+                  <div class="rv-summary-count" id="rv-summary-count">
+                    بدون نظر
+                  </div>
+                </div>
+              </div>
+              <div class="rv-bars" id="rv-bars"></div>
+            </div>
+
+            <div class="rv-list-head">
+              <h3 class="rv-list-title">نظرات تأیید‌شده</h3>
+            </div>
+
+            <div class="rv-grid" id="rv-grid" aria-live="polite"></div>
+
+            <div class="rv-loadmore-wrap" id="rv-loadmore-wrap">
+              <button
+                type="button"
+                class="rv-loadmore-btn"
+                id="rv-loadmore-btn"
+              >
+                مشاهده نظرات بیشتر
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+    </section>
 
-    </div>
+    <!-- ===== FOOTER ===== -->
+    <footer>
+      <div class="footer-logo">VOLT<span>EX</span></div>
+      <div class="footer-copy">© ۱۴۰۳ VOLTEX. تمامی حقوق محفوظ است.</div>
+    </footer>
 
-    <div class="trust-row" id="trust-row">
-      <!-- توسط JavaScript پر می‌شود -->
-    </div>
-
-    <div class="scroll-cue">
-      <div class="scroll-arrow"></div>
-      <span>اسکرول کنید</span>
-    </div>
-  </div>
-</section>
-
-<!-- ===== SECTION 2 — GALLERY ===== -->
-<section id="gallery">
-  <div class="section-header" data-reveal>
-    <span class="section-tag">Visual Tour</span>
-    <div class="sec-line"></div>
-    <h2 class="section-title">از هر زاویه</h2>
-    <p class="section-sub">رنگ مورد نظر خود را انتخاب کنید و تمام تصاویر را مشاهده کنید</p>
-  </div>
-
-  <div class="gallery-filter-wrap">
-    <ul class="gallery-filter" id="gallery-filter" role="tablist" aria-label="فیلتر رنگ گالری تصاویر"></ul>
-  </div>
-
-  <div class="gallery-grid" id="gallery-grid" role="tabpanel" aria-live="polite"></div>
-</section>
-
-<!-- ===== SECTION 3 — MARKETING ===== -->
-<section id="marketing">
-  <div class="mkt-inner">
-
-    <div class="section-header" data-reveal>
-      <span class="section-tag">Why This Product</span>
-      <div class="sec-line"></div>
-      <h2 class="section-title" id="marketing-title">چرا این محصول؟</h2>
-      <p class="section-sub" id="marketing-sub">تجربه‌ای که فراتر از انتظار است</p>
-    </div>
-
-    <div class="feature-row" id="feature-row">
-      <!-- توسط JavaScript پر می‌شود -->
-    </div>
-
-    <div class="stats-row" id="stats-row">
-      <!-- توسط JavaScript پر می‌شود -->
-    </div>
-
-  </div>
-</section>
-
-<!-- ===== SECTION 4 — PRODUCT REVIEWS ===== -->
-<section id="reviews" aria-labelledby="reviews-heading">
-  <div class="reviews-inner">
-
-    <div class="section-header" data-reveal>
-      <span class="section-tag">Customer Voices</span>
-      <div class="sec-line"></div>
-      <h2 class="section-title" id="reviews-heading">نظرات مشتریان</h2>
-      <p class="section-sub">تجربه واقعی راکبان را بخوانید و نظر خودتان را ثبت کنید</p>
-    </div>
-
-    <div class="reviews-layout">
-
-      <!-- ===== REVIEW FORM ===== -->
-      <header class="rv-form-card rv-glass" id="rv-form-card">
-        <span class="rv-form-eyebrow">Write A Review</span>
-        <h3 class="rv-form-title">نظر خود را بنویسید</h3>
-        <p class="rv-form-sub">تجربه‌تان به دیگران کمک می‌کند تصمیم بهتری بگیرند.</p>
-
-        <form id="rv-form" novalidate autocomplete="off">
-          <input type="hidden" name="csrfmiddlewaretoken" id="csrf-token" value="">
-
-          <div class="rv-field" id="rv-field-rating">
-            <label class="rv-label" for="rv-star-5">امتیاز شما</label>
-            <div class="rv-stars" id="rv-stars" role="radiogroup" aria-label="امتیاز از ۵ ستاره">
-              <button type="button" class="rv-star-btn" data-value="5" id="rv-star-5" role="radio" aria-checked="false" aria-label="۵ ستاره - عالی">★</button>
-              <button type="button" class="rv-star-btn" data-value="4" role="radio" aria-checked="false" aria-label="۴ ستاره - خوب">★</button>
-              <button type="button" class="rv-star-btn" data-value="3" role="radio" aria-checked="false" aria-label="۳ ستاره - متوسط">★</button>
-              <button type="button" class="rv-star-btn" data-value="2" role="radio" aria-checked="false" aria-label="۲ ستاره - ضعیف">★</button>
-              <button type="button" class="rv-star-btn" data-value="1" role="radio" aria-checked="false" aria-label="۱ ستاره - بسیار ضعیف">★</button>
-            </div>
-            <input type="hidden" name="rating" id="rv-rating-value" value="">
-            <div class="rv-rating-hint" id="rv-rating-hint">روی ستاره‌ها بزنید</div>
-            <div class="rv-errmsg" role="alert">⚠ لطفاً یک امتیاز انتخاب کنید</div>
-          </div>
-
-          <div class="rv-field" id="rv-field-title">
-            <label class="rv-label" for="rv-title">عنوان نظر <span class="rv-optional">(اختیاری)</span></label>
-            <input class="rv-input" type="text" id="rv-title" name="title" placeholder="مثال: فراتر از انتظارم بود" maxlength="100">
-          </div>
-
-          <div class="rv-field" id="rv-field-text">
-            <label class="rv-label" for="rv-text">متن نظر</label>
-            <textarea class="rv-textarea" id="rv-text" name="comment" placeholder="تجربه خود را بنویسید..." maxlength="800"></textarea>
-            <div class="rv-errmsg" role="alert">⚠ لطفاً متن نظر خود را بنویسید</div>
-          </div>
-
-          <button type="submit" class="btn btn-primary rv-submit-btn" id="rv-submit-btn">ثبت نظر</button>
-
-          <div class="rv-success" id="rv-success" role="status">
-            <span class="rv-success-icon">✓</span>
-            <span>نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده می‌شود.</span>
-          </div>
-        </form>
-      </header>
-
-      <!-- ===== SUMMARY + REVIEWS ===== -->
-      <div>
-        <div class="rv-summary-card rv-glass" id="rv-summary-card">
-          <div class="rv-summary-top">
-            <div class="rv-score-big" id="rv-score-big">0.0</div>
-            <div class="rv-score-meta">
-              <div class="rv-stars-display" id="rv-stars-display" aria-hidden="true"></div>
-              <div class="rv-summary-count" id="rv-summary-count">بدون نظر</div>
-            </div>
-          </div>
-          <div class="rv-bars" id="rv-bars"></div>
-        </div>
-
-        <div class="rv-list-head">
-          <h3 class="rv-list-title">نظرات تأیید‌شده</h3>
-        </div>
-
-        <div class="rv-grid" id="rv-grid" aria-live="polite"></div>
-
-        <div class="rv-loadmore-wrap" id="rv-loadmore-wrap">
-          <button type="button" class="rv-loadmore-btn" id="rv-loadmore-btn">مشاهده نظرات بیشتر</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
-<footer>
-  <div class="footer-logo">VOLT<span>EX</span></div>
-  <div class="footer-copy">© ۱۴۰۳ VOLTEX. تمامی حقوق محفوظ است.</div>
-</footer>
-
-<!-- ===== SCRIPTS ===== -->
-<script>
-/* ════════════════════════════════════
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+      /* ════════════════════════════════════
    CONFIG
    ════════════════════════════════════ */
-function getSlugFromUrl() {
-    let path = window.location.pathname;
-    if (path.endsWith("/")) {
-        path = path.slice(0, -1);
-    }
-    const parts = path.split("/");
-    const slug = parts[parts.length - 1];
-    try {
-        return decodeURIComponent(slug);
-    } catch (e) {
-        return slug;
-    }
-}
+      function getSlugFromUrl() {
+        let path = window.location.pathname;
+        if (path.endsWith("/")) {
+          path = path.slice(0, -1);
+        }
+        const parts = path.split("/");
+        const slug = parts[parts.length - 1];
+        try {
+          return decodeURIComponent(slug);
+        } catch (e) {
+          return slug;
+        }
+      }
 
-const slug = getSlugFromUrl();
-const API_BASE = '/shop/api/';
-console.log("🔍 Slug:", slug);
+      const slug = getSlugFromUrl();
+      const API_BASE = "/shop/api/";
+      console.log("🔍 Slug:", slug);
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    CSRF TOKEN
    ════════════════════════════════════ */
-function getCSRFToken() {
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrftoken='))
-        ?.split('=')[1];
-    return cookieValue || '';
-}
+      function getCSRFToken() {
+        const cookieValue = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("csrftoken="))
+          ?.split("=")[1];
+        return cookieValue || "";
+      }
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    UTILITY FUNCTIONS
    ════════════════════════════════════ */
-function formatDate(date) {
-    return new Intl.DateTimeFormat('fa-IR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    }).format(date);
-}
+      function formatDate(date) {
+        return new Intl.DateTimeFormat("fa-IR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(date);
+      }
 
-function starGlyphs(rating) {
-    let html = '';
-    for (let i = 1; i <= 5; i++) {
-        html += `<span class="${i <= rating ? 'rv-star-fill' : 'rv-star-empty'}">★</span>`;
-    }
-    return html;
-}
+      function starGlyphs(rating) {
+        let html = "";
+        for (let i = 1; i <= 5; i++) {
+          html += `<span class="${i <= rating ? "rv-star-fill" : "rv-star-empty"}">★</span>`;
+        }
+        return html;
+      }
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    LOAD PRODUCT
    ════════════════════════════════════ */
-async function loadProduct() {
-    const spinner = document.getElementById('loading-spinner');
-    const content = document.getElementById('product-content');
+      async function loadProduct() {
+        const spinner = document.getElementById("loading-spinner");
+        const content = document.getElementById("product-content");
 
-    try {
-        const apiUrl = `${API_BASE}products/${encodeURIComponent(slug)}/`;
-        console.log('📡 Fetching:', apiUrl);
+        try {
+          const apiUrl = `${API_BASE}products/${encodeURIComponent(slug)}/`;
+          console.log("📡 Fetching:", apiUrl);
 
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`HTTP ${response.status}: محصول یافت نشد`);
+          const response = await fetch(apiUrl);
+          if (!response.ok)
+            throw new Error(`HTTP ${response.status}: محصول یافت نشد`);
 
-        const product = await response.json();
-        console.log('✅ Product loaded:', product.name);
+          const product = await response.json();
+          console.log("✅ Product loaded:", product.name);
 
-        spinner.style.display = 'none';
-        content.style.display = 'block';
+          spinner.style.display = "none";
+          content.style.display = "block";
 
-        renderProduct(product);
-        document.getElementById('rv-form-card').classList.add('visible');
-        document.getElementById('rv-summary-card').classList.add('visible');
-        renderGallery(product.images);
-        renderMarketing(product.marketing_features, product.stat_features);
-        loadReviews();
-
-    } catch (error) {
-        console.error('❌ Error:', error);
-        spinner.innerHTML = `
+          renderProduct(product);
+          document.getElementById("rv-form-card").classList.add("visible");
+          document.getElementById("rv-summary-card").classList.add("visible");
+          renderGallery(product.images);
+          renderMarketing(product.marketing_features, product.stat_features);
+          loadReviews();
+        } catch (error) {
+          console.error("❌ Error:", error);
+          spinner.innerHTML = `
             <div class="text-center" style="color:var(--muted);padding:60px 20px;">
                 <p style="font-size:24px;margin-bottom:16px;">😕</p>
                 <p style="font-size:18px;margin-bottom:12px;">متأسفانه محصول مورد نظر یافت نشد</p>
@@ -1783,225 +2962,249 @@ async function loadProduct() {
                 <a href="/products/" style="display:inline-block;margin-top:20px;padding:12px 30px;background:var(--gold);color:#060810;border-radius:8px;text-decoration:none;font-weight:600;">بازگشت به محصولات</a>
             </div>
         `;
-    }
-}
+        }
+      }
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    RENDER PRODUCT
    ════════════════════════════════════ */
-function renderProduct(product) {
-    const currentUrl = window.location.href;
+      function renderProduct(product) {
+        const currentUrl = window.location.href;
 
-    // ===== SEO =====
-    document.title = `${product.name} | VOLTEX`;
-    document.getElementById('page-title').textContent = document.title;
-    document.getElementById('meta-description').content = product.meta_description || product.description.substring(0, 155);
-    document.getElementById('meta-canonical').href = currentUrl;
+        // ===== SEO =====
+        document.title = `${product.name} | VOLTEX`;
+        document.getElementById("page-title").textContent = document.title;
+        document.getElementById("meta-description").content =
+          product.meta_description || product.description.substring(0, 155);
+        document.getElementById("meta-canonical").href = currentUrl;
 
-    document.getElementById('og-title').content = product.name;
-    document.getElementById('og-description').content = product.meta_description || product.description.substring(0, 155);
-    document.getElementById('og-image').content = product.cover_image_url || '';
-    document.getElementById('og-url').content = currentUrl;
+        document.getElementById("og-title").content = product.name;
+        document.getElementById("og-description").content =
+          product.meta_description || product.description.substring(0, 155);
+        document.getElementById("og-image").content =
+          product.cover_image_url || "";
+        document.getElementById("og-url").content = currentUrl;
 
-    document.getElementById('twitter-title').content = product.name;
-    document.getElementById('twitter-description').content = product.meta_description || product.description.substring(0, 155);
-    document.getElementById('twitter-image').content = product.cover_image_url || '';
+        document.getElementById("twitter-title").content = product.name;
+        document.getElementById("twitter-description").content =
+          product.meta_description || product.description.substring(0, 155);
+        document.getElementById("twitter-image").content =
+          product.cover_image_url || "";
 
-    // ===== JSON-LD =====
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": product.name,
-        "description": product.description,
-        "image": product.cover_image_url,
-        "sku": product.slug,
-        "offers": {
+        // ===== JSON-LD =====
+        const jsonLd = {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description,
+          image: product.cover_image_url,
+          sku: product.slug,
+          offers: {
             "@type": "Offer",
-            "price": product.final_price,
-            "priceCurrency": "IRR",
-            "availability": product.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-        },
-        "aggregateRating": {
+            price: product.final_price,
+            priceCurrency: "IRR",
+            availability: product.is_available
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          },
+          aggregateRating: {
             "@type": "AggregateRating",
-            "ratingValue": product.average_rating || 0,
-            "reviewCount": product.reviews_count || 0
-        }
-    };
-    document.getElementById('json-ld-product').textContent = JSON.stringify(jsonLd);
+            ratingValue: product.average_rating || 0,
+            reviewCount: product.reviews_count || 0,
+          },
+        };
+        document.getElementById("json-ld-product").textContent =
+          JSON.stringify(jsonLd);
 
-    // ===== Hero =====
-    // Category
-    document.getElementById('product-category').textContent = product.category ? product.category.name : 'محصول';
+        // ===== Hero =====
+        // Category
+        document.getElementById("product-category").textContent =
+          product.category ? product.category.name : "محصول";
 
-    // Name
-    document.getElementById('product-name').innerHTML = product.name.replace(/\s/g, ' ');
+        // Name
+        document.getElementById("product-name").innerHTML =
+          product.name.replace(/\s/g, " ");
 
-    // Tagline
-    document.getElementById('product-tagline').textContent = product.tagline || '';
+        // Tagline
+        document.getElementById("product-tagline").textContent =
+          product.tagline || "";
 
-    // Description
-    document.getElementById('product-description').textContent = product.description;
+        // Description
+        document.getElementById("product-description").textContent =
+          product.description;
 
-    // Hero Image
-    document.getElementById('hero-img').src = product.cover_image_url || '/static/images/default-product.jpg';
-    document.getElementById('hero-img').alt = product.cover_alt_text || product.name;
+        // Hero Image
+        document.getElementById("hero-img").src =
+          product.cover_image_url || "/static/images/default-product.jpg";
+        document.getElementById("hero-img").alt =
+          product.cover_alt_text || product.name;
 
-    // ===== Specs =====
-    const specsContainer = document.getElementById('product-specs');
-    specsContainer.innerHTML = '';
-    if (product.specs && product.specs.length > 0) {
-        const rows = [];
-        for (let i = 0; i < product.specs.length; i += 2) {
-            const row = document.createElement('div');
-            row.className = 'spec-row';
+        // ===== Specs =====
+        const specsContainer = document.getElementById("product-specs");
+        specsContainer.innerHTML = "";
+        if (product.specs && product.specs.length > 0) {
+          const rows = [];
+          for (let i = 0; i < product.specs.length; i += 2) {
+            const row = document.createElement("div");
+            row.className = "spec-row";
             const items = product.specs.slice(i, i + 2);
-            items.forEach(spec => {
-                const card = document.createElement('div');
-                card.className = 'spec-card';
-                card.innerHTML = `
-                    ${spec.icon ? `<div class="spec-icon">${spec.icon}</div>` : ''}
+            items.forEach((spec) => {
+              const card = document.createElement("div");
+              card.className = "spec-card";
+              card.innerHTML = `
+                    ${spec.icon ? `<div class="spec-icon">${spec.icon}</div>` : ""}
                     <div>
                         <div class="spec-val">${spec.value}</div>
                         <div class="spec-lbl">${spec.label}</div>
                     </div>
                 `;
-                row.appendChild(card);
+              row.appendChild(card);
             });
             specsContainer.appendChild(row);
+          }
         }
-    }
 
-    // ===== Trust Badges =====
-    const trustContainer = document.getElementById('trust-row');
-    trustContainer.innerHTML = '';
-    if (product.trust_badges && product.trust_badges.length > 0) {
-        product.trust_badges.forEach(badge => {
-            const div = document.createElement('div');
-            div.className = 'trust-badge';
+        // ===== Trust Badges =====
+        const trustContainer = document.getElementById("trust-row");
+        trustContainer.innerHTML = "";
+        if (product.trust_badges && product.trust_badges.length > 0) {
+          product.trust_badges.forEach((badge) => {
+            const div = document.createElement("div");
+            div.className = "trust-badge";
             div.innerHTML = `
-                ${badge.icon ? `<span class="trust-icon">${badge.icon}</span>` : ''}
+                ${badge.icon ? `<span class="trust-icon">${badge.icon}</span>` : ""}
                 <div class="trust-text">
-                    ${badge.value ? `<strong>${badge.value}</strong>` : ''}
+                    ${badge.value ? `<strong>${badge.value}</strong>` : ""}
                     ${badge.label}
                 </div>
             `;
             trustContainer.appendChild(div);
+          });
+        }
+
+        // ===== Wishlist =====
+        const wishlistBtn = document.getElementById("wishlist-btn");
+        const wishlistText = document.getElementById("wishlist-text");
+        if (product && product.is_in_wishlist === true) {
+          wishlistBtn.classList.add("in-wishlist");
+          wishlistBtn.querySelector("i").className = "fas fa-heart";
+          wishlistText.textContent = "حذف از علاقه‌مندی";
+        } else {
+          wishlistBtn.classList.remove("in-wishlist");
+          wishlistBtn.querySelector("i").className = "far fa-heart";
+          wishlistText.textContent = "علاقه‌مندی";
+        }
+
+        // ===== Add to Cart =====
+        document
+          .getElementById("add-to-cart-btn")
+          .addEventListener("click", function (e) {
+            e.preventDefault();
+            addToCart(product.id, product.name);
+          });
+
+        // ===== Wishlist Toggle =====
+        wishlistBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          toggleWishlist();
         });
-    }
+      }
 
-    // ===== Wishlist =====
-    const wishlistBtn = document.getElementById('wishlist-btn');
-    const wishlistText = document.getElementById('wishlist-text');
-    if (product.is_in_wishlist) {
-        wishlistBtn.classList.add('in-wishlist');
-        wishlistBtn.querySelector('i').className = 'fas fa-heart';
-        wishlistText.textContent = 'حذف از علاقه‌مندی';
-    }
-
-    // ===== Add to Cart =====
-    document.getElementById('add-to-cart-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        addToCart(product.id, product.name);
-    });
-
-    // ===== Wishlist Toggle =====
-    wishlistBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        toggleWishlist();
-    });
-}
-
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    ADD TO CART
    ════════════════════════════════════ */
-function addToCart(productId, productName) {
-    // TEMP: فعلاً فقط alert می‌زنیم
-    // بعداً به API سبد خرید وصل می‌شود
-    alert(`✅ ${productName} به سبد خرید اضافه شد!`);
-    // TODO: بعداً به /api/cart/add/ وصل می‌شود
-}
+      function addToCart(productId, productName) {
+        // TEMP: فعلاً فقط alert می‌زنیم
+        // بعداً به API سبد خرید وصل می‌شود
+        alert(`✅ ${productName} به سبد خرید اضافه شد!`);
+        // TODO: بعداً به /api/cart/add/ وصل می‌شود
+      }
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    WISHLIST TOGGLE
    ════════════════════════════════════ */
-async function toggleWishlist() {
-    const btn = document.getElementById('wishlist-btn');
-    const icon = btn.querySelector('i');
-    const text = document.getElementById('wishlist-text');
+      async function toggleWishlist() {
+        const btn = document.getElementById("wishlist-btn");
+        const icon = btn.querySelector("i");
+        const text = document.getElementById("wishlist-text");
 
-    try {
-        const csrfToken = getCSRFToken();
-        const response = await fetch(`${API_BASE}products/${encodeURIComponent(slug)}/wishlist/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
+        try {
+          const csrfToken = getCSRFToken();
+          const response = await fetch(
+            `${API_BASE}products/${encodeURIComponent(slug)}/wishlist/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+              },
+              credentials: "same-origin",
             },
-            credentials: 'same-origin',
-        });
+          );
 
-        if (response.ok) {
+          if (response.ok) {
             const data = await response.json();
-            if (data.status === 'added') {
-                btn.classList.add('in-wishlist');
-                icon.className = 'fas fa-heart';
-                text.textContent = 'حذف از علاقه‌مندی';
+            if (data.status === "added") {
+              btn.classList.add("in-wishlist");
+              icon.className = "fas fa-heart";
+              text.textContent = "حذف از علاقه‌مندی";
             } else {
-                btn.classList.remove('in-wishlist');
-                icon.className = 'far fa-heart';
-                text.textContent = 'علاقه‌مندی';
+              btn.classList.remove("in-wishlist");
+              icon.className = "far fa-heart";
+              text.textContent = "علاقه‌مندی";
             }
-        } else {
-            alert('خطا در عملیات. لطفاً دوباره تلاش کنید.');
+          } else {
+            alert("خطا در عملیات. لطفاً دوباره تلاش کنید.");
+          }
+        } catch (error) {
+          console.error("Wishlist error:", error);
+          alert("خطا در ارتباط با سرور.");
         }
-    } catch (error) {
-        console.error('Wishlist error:', error);
-        alert('خطا در ارتباط با سرور.');
-    }
-}
+      }
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    RENDER GALLERY
    ════════════════════════════════════ */
-function renderGallery(images) {
-    const filterEl = document.getElementById('gallery-filter');
-    const gridEl = document.getElementById('gallery-grid');
+      function renderGallery(images) {
+        const filterEl = document.getElementById("gallery-filter");
+        const gridEl = document.getElementById("gallery-grid");
 
-    if (!images || images.length === 0) {
-        gridEl.innerHTML = `<div class="gallery-empty">تصویری برای این محصول ثبت نشده است</div>`;
-        return;
-    }
-
-    // Build color map
-    const colorMap = new Map();
-    images.forEach(item => {
-        const key = item.color_slug;
-        if (!colorMap.has(key)) {
-            colorMap.set(key, {
-                slug: key,
-                label: item.color_label,
-                hex: item.color_hex,
-                count: 0
-            });
+        if (!images || images.length === 0) {
+          gridEl.innerHTML = `<div class="gallery-empty">تصویری برای این محصول ثبت نشده است</div>`;
+          return;
         }
-        colorMap.get(key).count++;
-    });
-    const colors = Array.from(colorMap.values());
 
-    let activeColor = 'all';
+        // Build color map
+        const colorMap = new Map();
+        images.forEach((item) => {
+          const key = item.color_slug;
+          if (!colorMap.has(key)) {
+            colorMap.set(key, {
+              slug: key,
+              label: item.color_label,
+              hex: item.color_hex,
+              count: 0,
+            });
+          }
+          colorMap.get(key).count++;
+        });
+        const colors = Array.from(colorMap.values());
 
-    function renderChips() {
-        const allCount = images.length;
-        const chips = [
+        let activeColor = "all";
+
+        function renderChips() {
+          const allCount = images.length;
+          const chips = [
             `<li>
                 <button type="button" class="color-chip all-chip" data-color="all"
-                    role="tab" aria-pressed="${activeColor === 'all'}" aria-selected="${activeColor === 'all'}">
+                    role="tab" aria-pressed="${activeColor === "all"}" aria-selected="${activeColor === "all"}">
                     <span class="chip-dot" aria-hidden="true"></span>
                     <span>همه</span>
                     <span class="chip-count">(${allCount})</span>
                 </button>
             </li>`,
-            ...colors.map(c => `
+            ...colors.map(
+              (c) => `
             <li>
                 <button type="button" class="color-chip" data-color="${c.slug}"
                     role="tab" aria-pressed="${activeColor === c.slug}" aria-selected="${activeColor === c.slug}"
@@ -2010,22 +3213,28 @@ function renderGallery(images) {
                     <span>${c.label}</span>
                     <span class="chip-count">(${c.count})</span>
                 </button>
-            </li>`)
-        ];
-        filterEl.innerHTML = chips.join('');
-    }
-
-    function renderGrid() {
-        const items = [...images]
-            .filter(item => activeColor === 'all' || item.color_slug === activeColor)
-            .sort((a, b) => a.sort_order - b.sort_order);
-
-        if (!items.length) {
-            gridEl.innerHTML = `<div class="gallery-empty">تصویری برای این رنگ ثبت نشده است</div>`;
-            return;
+            </li>`,
+            ),
+          ];
+          filterEl.innerHTML = chips.join("");
         }
 
-        gridEl.innerHTML = items.map((item, i) => `
+        function renderGrid() {
+          const items = [...images]
+            .filter(
+              (item) =>
+                activeColor === "all" || item.color_slug === activeColor,
+            )
+            .sort((a, b) => a.sort_order - b.sort_order);
+
+          if (!items.length) {
+            gridEl.innerHTML = `<div class="gallery-empty">تصویری برای این رنگ ثبت نشده است</div>`;
+            return;
+          }
+
+          gridEl.innerHTML = items
+            .map(
+              (item, i) => `
             <div class="gcard" tabindex="0" role="button"
                 aria-label="${item.alt_text || item.color_label}"
                 style="transition-delay:${Math.min(i, 8) * 0.05}s;">
@@ -2037,204 +3246,240 @@ function renderGallery(images) {
                         <span class="chip-dot" style="background:${item.color_hex};"></span>
                         ${item.color_label}
                     </div>
-                    <div class="overlay-title">${document.getElementById('product-name').textContent}</div>
+                    <div class="overlay-title">${document.getElementById("product-name").textContent}</div>
                 </div>
             </div>
-        `).join('');
+        `,
+            )
+            .join("");
 
-        // Observe new cards
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-        }, { threshold: .1 });
-        gridEl.querySelectorAll('.gcard').forEach(card => {
+          // Observe new cards
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) e.target.classList.add("visible");
+              });
+            },
+            { threshold: 0.1 },
+          );
+          gridEl.querySelectorAll(".gcard").forEach((card) => {
             observer.observe(card);
-            requestAnimationFrame(() => card.classList.add('visible'));
-        });
-    }
+            requestAnimationFrame(() => card.classList.add("visible"));
+          });
+        }
 
-    function setActiveColor(slug) {
-        if (slug === activeColor) return;
-        activeColor = slug;
-        gridEl.style.transition = 'opacity .25s ease, transform .25s ease';
-        gridEl.style.opacity = '0';
-        gridEl.style.transform = 'scale(.98)';
-        setTimeout(() => {
+        function setActiveColor(slug) {
+          if (slug === activeColor) return;
+          activeColor = slug;
+          gridEl.style.transition = "opacity .25s ease, transform .25s ease";
+          gridEl.style.opacity = "0";
+          gridEl.style.transform = "scale(.98)";
+          setTimeout(() => {
             renderChips();
             renderGrid();
-            gridEl.style.opacity = '1';
-            gridEl.style.transform = 'scale(1)';
-        }, 220);
-    }
+            gridEl.style.opacity = "1";
+            gridEl.style.transform = "scale(1)";
+          }, 220);
+        }
 
-    filterEl.addEventListener('click', (e) => {
-        const btn = e.target.closest('.color-chip');
-        if (!btn) return;
-        setActiveColor(btn.dataset.color);
-    });
+        filterEl.addEventListener("click", (e) => {
+          const btn = e.target.closest(".color-chip");
+          if (!btn) return;
+          setActiveColor(btn.dataset.color);
+        });
 
-    // Keyboard support
-    filterEl.addEventListener('keydown', (e) => {
-        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-        const chipsArr = Array.from(filterEl.querySelectorAll('.color-chip'));
-        const idx = chipsArr.indexOf(document.activeElement);
-        if (idx === -1) return;
-        e.preventDefault();
-        const dir = e.key === 'ArrowRight' ? -1 : 1;
-        const next = chipsArr[(idx + dir + chipsArr.length) % chipsArr.length];
-        next.focus();
-    });
+        // Keyboard support
+        filterEl.addEventListener("keydown", (e) => {
+          if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+          const chipsArr = Array.from(filterEl.querySelectorAll(".color-chip"));
+          const idx = chipsArr.indexOf(document.activeElement);
+          if (idx === -1) return;
+          e.preventDefault();
+          const dir = e.key === "ArrowRight" ? -1 : 1;
+          const next =
+            chipsArr[(idx + dir + chipsArr.length) % chipsArr.length];
+          next.focus();
+        });
 
-    renderChips();
-    renderGrid();
-}
+        renderChips();
+        renderGrid();
+      }
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    RENDER MARKETING
    ════════════════════════════════════ */
-function renderMarketing(features, stats) {
-    // ===== Features =====
-    const featureRow = document.getElementById('feature-row');
-    featureRow.innerHTML = '';
-    if (features && features.length > 0) {
-        features.forEach((feature, index) => {
-            const card = document.createElement('div');
-            card.className = 'feature-card';
+      function renderMarketing(features, stats) {
+        // ===== Features =====
+        const featureRow = document.getElementById("feature-row");
+        featureRow.innerHTML = "";
+        if (features && features.length > 0) {
+          features.forEach((feature, index) => {
+            const card = document.createElement("div");
+            card.className = "feature-card";
             card.style.transitionDelay = `${index * 0.1}s`;
             card.innerHTML = `
-                ${feature.icon ? `<span class="fcard-icon">${feature.icon}</span>` : ''}
+                ${feature.icon ? `<span class="fcard-icon">${feature.icon}</span>` : ""}
                 <div class="fcard-title">${feature.title}</div>
                 <p class="fcard-desc">${feature.description}</p>
-                ${feature.accent ? `<div class="fcard-accent">${feature.accent}</div>` : ''}
+                ${feature.accent ? `<div class="fcard-accent">${feature.accent}</div>` : ""}
             `;
             featureRow.appendChild(card);
-        });
-        // Observe feature cards
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-        }, { threshold: .1 });
-        featureRow.querySelectorAll('.feature-card').forEach(card => observer.observe(card));
-    }
+          });
+          // Observe feature cards
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) e.target.classList.add("visible");
+              });
+            },
+            { threshold: 0.1 },
+          );
+          featureRow
+            .querySelectorAll(".feature-card")
+            .forEach((card) => observer.observe(card));
+        }
 
-    // ===== Stats =====
-    const statsRow = document.getElementById('stats-row');
-    statsRow.innerHTML = '';
-    if (stats && stats.length > 0) {
-        stats.forEach((stat) => {
-            const cell = document.createElement('div');
-            cell.className = 'stat-cell';
+        // ===== Stats =====
+        const statsRow = document.getElementById("stats-row");
+        statsRow.innerHTML = "";
+        if (stats && stats.length > 0) {
+          stats.forEach((stat) => {
+            const cell = document.createElement("div");
+            cell.className = "stat-cell";
             cell.innerHTML = `
                 <div class="stat-num">
                     <span>${stat.number}</span>
-                    ${stat.suffix ? `<span style="color:var(--gold)">${stat.suffix}</span>` : ''}
+                    ${stat.suffix ? `<span style="color:var(--gold)">${stat.suffix}</span>` : ""}
                 </div>
                 <div class="stat-label">${stat.label}</div>
             `;
             statsRow.appendChild(cell);
-        });
-        // Observe stats
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-        }, { threshold: .1 });
-        statsRow.querySelectorAll('.stat-cell').forEach(cell => observer.observe(cell));
-    }
-}
+          });
+          // Observe stats
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) e.target.classList.add("visible");
+              });
+            },
+            { threshold: 0.1 },
+          );
+          statsRow
+            .querySelectorAll(".stat-cell")
+            .forEach((cell) => observer.observe(cell));
+        }
+      }
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    REVIEWS
    ════════════════════════════════════ */
-let reviewsData = [];
-const PAGE_SIZE = 6;
-let visibleCount = 0;
+      let reviewsData = [];
+      const PAGE_SIZE = 6;
+      let visibleCount = 0;
 
-async function loadReviews() {
-    try {
-        const response = await fetch(`${API_BASE}products/${encodeURIComponent(slug)}/reviews/`);
-        if (response.ok) {
+      async function loadReviews() {
+        try {
+          const response = await fetch(
+            `${API_BASE}products/${encodeURIComponent(slug)}/reviews/`,
+          );
+          if (response.ok) {
             reviewsData = await response.json();
             renderSummary(reviewsData);
             renderReviews(true);
+          }
+        } catch (error) {
+          console.error("Error loading reviews:", error);
         }
-    } catch (error) {
-        console.error('Error loading reviews:', error);
-    }
-}
+      }
 
-function renderSummary(reviews) {
-    const total = reviews.length;
-    if (total === 0) {
-        document.getElementById('rv-score-big').textContent = '0.0';
-        document.getElementById('rv-summary-count').textContent = 'بدون نظر';
-        document.getElementById('rv-stars-display').innerHTML = starGlyphs(0);
-        document.getElementById('rv-bars').innerHTML = '';
-        return;
-    }
+      function renderSummary(reviews) {
+        const total = reviews.length;
+        if (total === 0) {
+          document.getElementById("rv-score-big").textContent = "0.0";
+          document.getElementById("rv-summary-count").textContent = "بدون نظر";
+          document.getElementById("rv-stars-display").innerHTML = starGlyphs(0);
+          document.getElementById("rv-bars").innerHTML = "";
+          return;
+        }
 
-    const avg = reviews.reduce((s, r) => s + r.rating, 0) / total;
-    document.getElementById('rv-score-big').textContent = avg.toFixed(1);
-    document.getElementById('rv-summary-count').textContent = `بر اساس ${total.toLocaleString('fa-IR')} نظر`;
-    document.getElementById('rv-stars-display').innerHTML = starGlyphs(Math.round(avg));
+        const avg = reviews.reduce((s, r) => s + r.rating, 0) / total;
+        document.getElementById("rv-score-big").textContent = avg.toFixed(1);
+        document.getElementById("rv-summary-count").textContent =
+          `بر اساس ${total.toLocaleString("fa-IR")} نظر`;
+        document.getElementById("rv-stars-display").innerHTML = starGlyphs(
+          Math.round(avg),
+        );
 
-    const counts = [5, 4, 3, 2, 1].map(star => reviews.filter(r => r.rating === star).length);
-    document.getElementById('rv-bars').innerHTML = [5, 4, 3, 2, 1].map((star, i) => {
-        const pct = total ? Math.round((counts[i] / total) * 100) : 0;
-        return `
+        const counts = [5, 4, 3, 2, 1].map(
+          (star) => reviews.filter((r) => r.rating === star).length,
+        );
+        document.getElementById("rv-bars").innerHTML = [5, 4, 3, 2, 1]
+          .map((star, i) => {
+            const pct = total ? Math.round((counts[i] / total) * 100) : 0;
+            return `
             <div class="rv-bar-row">
                 <span class="rv-bar-label">${star} ★</span>
                 <span class="rv-bar-track"><span class="rv-bar-fill" data-pct="${pct}"></span></span>
                 <span class="rv-bar-pct">${pct}%</span>
             </div>
         `;
-    }).join('');
+          })
+          .join("");
 
-    // Animate bars
-    setTimeout(() => {
-        document.querySelectorAll('.rv-bar-fill').forEach(fill => {
-            fill.style.width = fill.dataset.pct + '%';
-        });
-    }, 300);
-}
+        // Animate bars
+        setTimeout(() => {
+          document.querySelectorAll(".rv-bar-fill").forEach((fill) => {
+            fill.style.width = fill.dataset.pct + "%";
+          });
+        }, 300);
+      }
 
-function renderReviews(reset) {
-    const grid = document.getElementById('rv-grid');
-    const loadMoreWrap = document.getElementById('rv-loadmore-wrap');
-    const loadMoreBtn = document.getElementById('rv-loadmore-btn');
+      function renderReviews(reset) {
+        const grid = document.getElementById("rv-grid");
+        const loadMoreWrap = document.getElementById("rv-loadmore-wrap");
+        const loadMoreBtn = document.getElementById("rv-loadmore-btn");
 
-    if (reset) { grid.innerHTML = ''; visibleCount = 0; }
+        if (reset) {
+          grid.innerHTML = "";
+          visibleCount = 0;
+        }
 
-    const approved = reviewsData.filter(r => r.status === 'approved');
+        const approved = reviewsData.filter((r) => r.status === "approved");
 
-    if (approved.length === 0) {
-        grid.innerHTML = `
+        if (approved.length === 0) {
+          grid.innerHTML = `
             <div class="rv-empty">
                 <div class="rv-empty-illus" aria-hidden="true">🗒️</div>
                 <div class="rv-empty-title">هنوز نظری تأیید نشده است</div>
                 <div class="rv-empty-sub">اولین نفری باشید که نظرش را ثبت می‌کند</div>
             </div>
         `;
-        loadMoreWrap.style.display = 'none';
-        return;
-    }
+          loadMoreWrap.style.display = "none";
+          return;
+        }
 
-    const nextCount = Math.min(visibleCount + PAGE_SIZE, approved.length);
-    const newItems = approved.slice(visibleCount, nextCount);
+        const nextCount = Math.min(visibleCount + PAGE_SIZE, approved.length);
+        const newItems = approved.slice(visibleCount, nextCount);
 
-    newItems.forEach((review, i) => {
-        const card = document.createElement('article');
-        card.className = 'rv-card rv-glass';
-        card.style.transitionDelay = `${Math.min(i, 5) * 0.06}s`;
+        newItems.forEach((review, i) => {
+          const card = document.createElement("article");
+          card.className = "rv-card rv-glass";
+          card.style.transitionDelay = `${Math.min(i, 5) * 0.06}s`;
 
-        const initials = review.user_name ? review.user_name.trim().charAt(0) : '؟';
-        const avatarUrl = review.user_avatar || null;
+          const initials = review.user_name
+            ? review.user_name.trim().charAt(0)
+            : "؟";
+          const avatarUrl = review.user_avatar || null;
 
-        card.innerHTML = `
+          card.innerHTML = `
             <div class="rv-card-head">
-                <div class="rv-avatar" style="${avatarUrl ? 'background:transparent;padding:0;overflow:hidden;' : ''}">
+                <div class="rv-avatar" style="${avatarUrl ? "background:transparent;padding:0;overflow:hidden;" : ""}">
                     ${avatarUrl ? `<img src="${avatarUrl}" alt="${review.user_name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials}
                 </div>
                 <div class="rv-card-headinfo">
                     <div class="rv-name-row">
-                        <span class="rv-name">${review.user_name || 'کاربر ناشناس'}</span>
-                        ${review.is_verified_purchase ? '<span class="rv-verified">✓ خرید تأیید‌شده</span>' : ''}
+                        <span class="rv-name">${review.user_name || "کاربر ناشناس"}</span>
+                        ${review.is_verified_purchase ? '<span class="rv-verified">✓ خرید تأیید‌شده</span>' : ""}
                     </div>
                     <div class="rv-card-sub">
                         <div class="rv-card-stars" aria-label="${review.rating} از ۵ ستاره">${starGlyphs(review.rating)}</div>
@@ -2242,7 +3487,7 @@ function renderReviews(reset) {
                     </div>
                 </div>
             </div>
-            ${review.title ? `<h4 class="rv-card-title">${review.title}</h4>` : ''}
+            ${review.title ? `<h4 class="rv-card-title">${review.title}</h4>` : ""}
             <p class="rv-card-text">${review.comment}</p>
             <button type="button" class="rv-helpful-btn" data-id="${review.id}">
                 <span class="rv-helpful-icon">👍</span>
@@ -2250,185 +3495,236 @@ function renderReviews(reset) {
                 <span class="rv-helpful-count">(${review.helpful_count || 0})</span>
             </button>
         `;
-        grid.appendChild(card);
+          grid.appendChild(card);
 
-        // Observe for animation
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-        }, { threshold: .08 });
-        observer.observe(card);
-        requestAnimationFrame(() => card.classList.add('visible'));
-    });
-
-    visibleCount = nextCount;
-    loadMoreBtn.disabled = false;
-    loadMoreBtn.textContent = 'مشاهده نظرات بیشتر';
-
-    if (visibleCount >= approved.length) {
-        loadMoreWrap.style.display = approved.length <= PAGE_SIZE ? 'none' : 'block';
-        loadMoreBtn.disabled = true;
-        loadMoreBtn.textContent = 'همه نظرات نمایش داده شد';
-    } else {
-        loadMoreWrap.style.display = 'block';
-    }
-}
-
-/* ════════════════════════════════════
-   SUBMIT REVIEW
-   ════════════════════════════════════ */
-document.getElementById('rv-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const errorDiv = document.getElementById('rv-field-text').querySelector('.rv-errmsg');
-    const successBox = document.getElementById('rv-success');
-
-    const rating = parseInt(document.getElementById('rv-rating-value').value);
-    const title = document.getElementById('rv-title').value.trim();
-    const comment = document.getElementById('rv-text').value.trim();
-
-    // Validation
-    let valid = true;
-    if (!rating) {
-        document.getElementById('rv-field-rating').classList.add('rv-error');
-        valid = false;
-    }
-    if (!comment) {
-        document.getElementById('rv-field-text').classList.add('rv-error');
-        valid = false;
-    }
-    if (!valid) return;
-
-    try {
-        const csrfToken = getCSRFToken();
-        const response = await fetch(`${API_BASE}products/${encodeURIComponent(slug)}/reviews/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
+          // Observe for animation
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) e.target.classList.add("visible");
+              });
             },
-            credentials: 'same-origin',
-            body: JSON.stringify({ rating, title, comment })
+            { threshold: 0.08 },
+          );
+          observer.observe(card);
+          requestAnimationFrame(() => card.classList.add("visible"));
         });
 
-        if (response.ok) {
-            successBox.classList.add('rv-show');
-            document.getElementById('rv-form').reset();
-            document.getElementById('rv-rating-value').value = '';
-            document.getElementById('rv-stars').querySelectorAll('.rv-star-btn').forEach(btn => {
-                btn.classList.remove('rv-star-active');
-            });
-            document.getElementById('rv-rating-hint').textContent = 'روی ستاره‌ها بزنید';
-            ['rv-field-rating', 'rv-field-text'].forEach(id => {
-                document.getElementById(id).classList.remove('rv-error');
-            });
-            setTimeout(() => successBox.classList.remove('rv-show'), 5000);
-            loadReviews();
-        } else {
-            const data = await response.json();
-            errorDiv.textContent = data.detail || 'خطا در ارسال نظر';
-            document.getElementById('rv-field-text').classList.add('rv-error');
-        }
-    } catch (error) {
-        errorDiv.textContent = 'خطا در ارتباط با سرور';
-        document.getElementById('rv-field-text').classList.add('rv-error');
-    }
-});
+        visibleCount = nextCount;
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = "مشاهده نظرات بیشتر";
 
-/* ════════════════════════════════════
+        if (visibleCount >= approved.length) {
+          loadMoreWrap.style.display =
+            approved.length <= PAGE_SIZE ? "none" : "block";
+          loadMoreBtn.disabled = true;
+          loadMoreBtn.textContent = "همه نظرات نمایش داده شد";
+        } else {
+          loadMoreWrap.style.display = "block";
+        }
+      }
+
+      /* ════════════════════════════════════
+   SUBMIT REVIEW
+   ════════════════════════════════════ */
+      document
+        .getElementById("rv-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const errorDiv = document
+            .getElementById("rv-field-text")
+            .querySelector(".rv-errmsg");
+          const successBox = document.getElementById("rv-success");
+
+          const rating = parseInt(
+            document.getElementById("rv-rating-value").value,
+          );
+          const title = document.getElementById("rv-title").value.trim();
+          const comment = document.getElementById("rv-text").value.trim();
+
+          // Validation
+          let valid = true;
+          if (!rating) {
+            document
+              .getElementById("rv-field-rating")
+              .classList.add("rv-error");
+            valid = false;
+          }
+          if (!comment) {
+            document.getElementById("rv-field-text").classList.add("rv-error");
+            valid = false;
+          }
+          if (!valid) return;
+
+          try {
+            const csrfToken = getCSRFToken();
+            const response = await fetch(
+              `${API_BASE}products/${encodeURIComponent(slug)}/reviews/`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": csrfToken,
+                },
+                credentials: "same-origin",
+                body: JSON.stringify({ rating, title, comment }),
+              },
+            );
+
+            if (response.ok) {
+              successBox.classList.add("rv-show");
+              document.getElementById("rv-form").reset();
+              document.getElementById("rv-rating-value").value = "";
+              document
+                .getElementById("rv-stars")
+                .querySelectorAll(".rv-star-btn")
+                .forEach((btn) => {
+                  btn.classList.remove("rv-star-active");
+                });
+              document.getElementById("rv-rating-hint").textContent =
+                "روی ستاره‌ها بزنید";
+              ["rv-field-rating", "rv-field-text"].forEach((id) => {
+                document.getElementById(id).classList.remove("rv-error");
+              });
+              setTimeout(() => successBox.classList.remove("rv-show"), 5000);
+              loadReviews();
+            } else {
+              const data = await response.json();
+              errorDiv.textContent = data.detail || "خطا در ارسال نظر";
+              document
+                .getElementById("rv-field-text")
+                .classList.add("rv-error");
+            }
+          } catch (error) {
+            errorDiv.textContent = "خطا در ارتباط با سرور";
+            document.getElementById("rv-field-text").classList.add("rv-error");
+          }
+        });
+
+      /* ════════════════════════════════════
    STAR RATING INPUT
    ════════════════════════════════════ */
-const starsWrap = document.getElementById('rv-stars');
-const ratingInput = document.getElementById('rv-rating-value');
-const ratingHint = document.getElementById('rv-rating-hint');
-const ratingLabels = { 1: 'بسیار ضعیف', 2: 'ضعیف', 3: 'متوسط', 4: 'خوب', 5: 'عالی' };
-let currentRating = 0;
+      const starsWrap = document.getElementById("rv-stars");
+      const ratingInput = document.getElementById("rv-rating-value");
+      const ratingHint = document.getElementById("rv-rating-hint");
+      const ratingLabels = {
+        1: "بسیار ضعیف",
+        2: "ضعیف",
+        3: "متوسط",
+        4: "خوب",
+        5: "عالی",
+      };
+      let currentRating = 0;
 
-function paintStars(value) {
-    const btns = starsWrap.querySelectorAll('.rv-star-btn');
-    btns.forEach(btn => {
-        const v = parseInt(btn.dataset.value, 10);
-        btn.classList.toggle('rv-star-active', v <= value);
-    });
-}
+      function paintStars(value) {
+        const btns = starsWrap.querySelectorAll(".rv-star-btn");
+        btns.forEach((btn) => {
+          const v = parseInt(btn.dataset.value, 10);
+          btn.classList.toggle("rv-star-active", v <= value);
+        });
+      }
 
-starsWrap.addEventListener('mousemove', (e) => {
-    const btn = e.target.closest('.rv-star-btn');
-    if (!btn) return;
-    paintStars(parseInt(btn.dataset.value, 10));
-});
-starsWrap.addEventListener('mouseleave', () => paintStars(currentRating));
+      starsWrap.addEventListener("mousemove", (e) => {
+        const btn = e.target.closest(".rv-star-btn");
+        if (!btn) return;
+        paintStars(parseInt(btn.dataset.value, 10));
+      });
+      starsWrap.addEventListener("mouseleave", () => paintStars(currentRating));
 
-starsWrap.addEventListener('click', (e) => {
-    const btn = e.target.closest('.rv-star-btn');
-    if (!btn) return;
-    currentRating = parseInt(btn.dataset.value, 10);
-    ratingInput.value = currentRating;
-    paintStars(currentRating);
-    ratingHint.textContent = `امتیاز شما: ${ratingLabels[currentRating]} (${currentRating} از ۵)`;
-    document.getElementById('rv-field-rating').classList.remove('rv-error');
-});
+      starsWrap.addEventListener("click", (e) => {
+        const btn = e.target.closest(".rv-star-btn");
+        if (!btn) return;
+        currentRating = parseInt(btn.dataset.value, 10);
+        ratingInput.value = currentRating;
+        paintStars(currentRating);
+        ratingHint.textContent = `امتیاز شما: ${ratingLabels[currentRating]} (${currentRating} از ۵)`;
+        document.getElementById("rv-field-rating").classList.remove("rv-error");
+      });
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    LOAD MORE REVIEWS
    ════════════════════════════════════ */
-document.getElementById('rv-loadmore-btn').addEventListener('click', () => renderReviews(false));
+      document
+        .getElementById("rv-loadmore-btn")
+        .addEventListener("click", () => renderReviews(false));
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    PARTICLES (همون کد قبلی)
    ════════════════════════════════════ */
-const canvas = document.getElementById('hero-particles');
-const ctx = canvas.getContext('2d');
-let W, H;
-const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
-resize(); window.addEventListener('resize', resize);
+      const canvas = document.getElementById("hero-particles");
+      const ctx = canvas.getContext("2d");
+      let W, H;
+      const resize = () => {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      };
+      resize();
+      window.addEventListener("resize", resize);
 
-const isMobile = window.innerWidth <= 768;
-const particles = Array.from({length: isMobile ? 30 : 60}, () => ({
-    x: Math.random() * 2000 - 200,
-    y: Math.random() * H,
-    r: Math.random() * 1.4 + .3,
-    vx: (Math.random() - .5) * .18,
-    vy: -(Math.random() * .35 + .1),
-    col: Math.random() < .5 ? 'rgba(201,168,76,' : Math.random() < .5 ? 'rgba(0,212,255,' : 'rgba(255,255,255,',
-    alpha: Math.random() * .45 + .1,
-    pulse: Math.random() * Math.PI * 2,
-    ps: Math.random() * .025 + .01
-}));
+      const isMobile = window.innerWidth <= 768;
+      const particles = Array.from({ length: isMobile ? 30 : 60 }, () => ({
+        x: Math.random() * 2000 - 200,
+        y: Math.random() * H,
+        r: Math.random() * 1.4 + 0.3,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: -(Math.random() * 0.35 + 0.1),
+        col:
+          Math.random() < 0.5
+            ? "rgba(201,168,76,"
+            : Math.random() < 0.5
+              ? "rgba(0,212,255,"
+              : "rgba(255,255,255,",
+        alpha: Math.random() * 0.45 + 0.1,
+        pulse: Math.random() * Math.PI * 2,
+        ps: Math.random() * 0.025 + 0.01,
+      }));
 
-function drawParticles() {
-    ctx.clearRect(0, 0, W, H);
-    for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.pulse += p.ps;
-        if (p.y < -5) { p.y = H + 5; p.x = Math.random() * W; }
-        if (p.x < -50) p.x = W + 50;
-        if (p.x > W + 50) p.x = -50;
-        const a = p.alpha * (0.65 + 0.35 * Math.sin(p.pulse));
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.col + a + ')';
-        ctx.fill();
-    }
-    requestAnimationFrame(drawParticles);
-}
-drawParticles();
+      function drawParticles() {
+        ctx.clearRect(0, 0, W, H);
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.pulse += p.ps;
+          if (p.y < -5) {
+            p.y = H + 5;
+            p.x = Math.random() * W;
+          }
+          if (p.x < -50) p.x = W + 50;
+          if (p.x > W + 50) p.x = -50;
+          const a = p.alpha * (0.65 + 0.35 * Math.sin(p.pulse));
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.col + a + ")";
+          ctx.fill();
+        }
+        requestAnimationFrame(drawParticles);
+      }
+      drawParticles();
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    SCROLL REVEAL
    ════════════════════════════════════ */
-const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: .1 });
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add("visible");
+          });
+        },
+        { threshold: 0.1 },
+      );
 
-document.querySelectorAll('[data-reveal], .gcard, .feature-card, .stats-row, .warranty-block, .cta-bottom').forEach(el => {
-    revealObserver.observe(el);
-});
+      document
+        .querySelectorAll(
+          "[data-reveal], .gcard, .feature-card, .stats-row, .warranty-block, .cta-bottom",
+        )
+        .forEach((el) => {
+          revealObserver.observe(el);
+        });
 
-/* ════════════════════════════════════
+      /* ════════════════════════════════════
    START
    ════════════════════════════════════ */
-loadProduct();
-</script>
-
-</body>
+      loadProduct();
+    </script>
+  </body>
 </html>

@@ -588,7 +588,7 @@
           if (state.tag) params.set("tag", state.tag);
           params.set("page", state.page);
 
-          fetch("/home/api/articles/?" + params.toString(), {
+          fetch("/api/articles/?" + params.toString(), {
             method: "GET",
             headers: { Accept: "application/json" },
             signal: currentController.signal,
@@ -611,7 +611,7 @@
         }
 
         function fetchTags() {
-          fetch("/home/api/tags/", { headers: { Accept: "application/json" } })
+          fetch("/api/tags/", { headers: { Accept: "application/json" } })
             .then(function (res) {
               return res.ok ? res.json() : [];
             })

@@ -1,13 +1,12 @@
 # apps/shop/views.py
 
-from django.db.models import Avg, Count, Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 
 from .models import Product, Category, ProductReview, Wishlist
 from .pagination import ProductPagination
@@ -78,6 +77,7 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
         instance = self.get_object()
         instance.view_count += 1
         instance.save(update_fields=['view_count'])
+
         serializer = self.get_serializer(instance, context={'request': request})
         return Response(serializer.data)
 
@@ -140,27 +140,41 @@ class ProductReviewListCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# apps/shop/views.py
+
 class WishlistToggleAPIView(APIView):
-    """API برای افزودن/حذف از علاقه‌مندی‌ها"""
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        product_id = request.data.get('product_id')
-        if not product_id:
-            return Response({'error': 'شناسه محصول الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
-
-        product = get_object_or_404(Product, id=product_id, is_published=True)
+    def post(self, request, slug=None):  # ← slug رو اضافه کن
+        # اگر slug از URL اومده
+        if slug:
+            product = get_object_or_404(Product, slug=slug, is_published=True)
+        else:
+            # اگر product_id از body اومده
+            product_id = request.data.get('product_id')
+            if not product_id:
+                return Response(
+                    {'error': 'شناسه محصول الزامی است'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            product = get_object_or_404(Product, id=product_id, is_published=True)
 
         wishlist_item = Wishlist.objects.filter(user=request.user, product=product)
 
         if wishlist_item.exists():
             wishlist_item.delete()
-            return Response({'status': 'removed', 'message': 'از علاقه‌مندی‌ها حذف شد.'})
+            return Response({
+                'status': 'removed',
+                'message': 'از علاقه‌مندی‌ها حذف شد.',
+                'is_in_wishlist': False
+            })
         else:
             Wishlist.objects.create(user=request.user, product=product)
-            return Response({'status': 'added', 'message': 'به علاقه‌مندی‌ها اضافه شد.'})
-
-
+            return Response({
+                'status': 'added',
+                'message': 'به علاقه‌مندی‌ها اضافه شد.',
+                'is_in_wishlist': True
+            })
 class WishlistListAPIView(generics.ListAPIView):
     """API برای لیست علاقه‌مندی‌های کاربر"""
     permission_classes = [IsAuthenticated]
@@ -204,5 +218,3 @@ class ProductPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['slug'] = self.kwargs.get('slug')
         return context
-
-

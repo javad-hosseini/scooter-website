@@ -748,7 +748,7 @@
           </nav>
 
           <form
-            action="/logout/"
+            action="/accounts/logout/"
             method="post"
             class="pt-4 mt-4 border-t border-line"
           >
@@ -2109,6 +2109,8 @@
       /* ═══════════════════════════════════════
    WISHLIST
 ═══════════════════════════════════════ */
+      // apps/accounts/templates/accounts/user_dashboard.html
+
       function renderWishlist() {
         const wishlist = dashboardData.wishlist || [];
         const el = document.getElementById("wishlistGrid");
@@ -2132,31 +2134,65 @@
         el.innerHTML = wishlist
           .map(
             (p) => `
-    <div class="card card-hover overflow-hidden group">
-      <div class="relative aspect-square overflow-hidden bg-elevated">
-        <img src="${p.product_image || "/static/img/default-product.jpg"}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" alt="${p.product_name}">
-        ${p.discount_price ? `<span class="absolute top-2 right-2 badge bg-danger/90 text-white border-0">${Math.round(((p.price - p.discount_price) / p.price) * 100)}%-</span>` : ""}
-        <button onclick="removeFromWishlist(${p.product_id})" aria-label="حذف از علاقه‌مندی" class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur flex items-center justify-center focus-ring hover:bg-danger/80 transition">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-        ${!p.in_stock ? `<div class="absolute inset-0 bg-black/55 flex items-center justify-center"><span class="text-[11px] text-white/90">ناموجود</span></div>` : ""}
-      </div>
-      <div class="p-3">
-        <p class="text-xs font-medium truncate">${p.product_name || ""}</p>
-        <p class="font-mono text-sm mt-1.5 text-gold-bright">${formatPrice(p.final_price || p.price)}</p>
-        <div class="flex gap-1.5 mt-2.5">
-          <button ${!p.in_stock ? "disabled" : ""} class="flex-1 btn-primary text-[11px] py-1.5 rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">افزودن به سبد</button>
-          <a href="/shop/product/${p.product_slug}/" class="btn-ghost text-[11px] px-2.5 py-1.5 rounded-lg focus-ring">مشاهده</a>
+        <div class="card card-hover overflow-hidden group">
+            <div class="relative aspect-square overflow-hidden bg-elevated">
+                <img src="${p.product_image || "/static/img/default-product.jpg"}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                     loading="lazy" alt="${p.product_name}">
+                ${
+                  p.discount_price
+                    ? `
+                    <span class="absolute top-2 right-2 badge bg-danger/90 text-white border-0">
+                        ${Math.round(((p.price - p.discount_price) / p.price) * 100)}%-
+                    </span>
+                `
+                    : ""
+                }
+                <button onclick="toggleWishlist(${p.product_id}, this)" 
+                        data-in-wishlist="true"
+                        aria-label="حذف از علاقه‌مندی" 
+                        class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur flex items-center justify-center focus-ring hover:bg-danger/80 transition">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+                    </svg>
+                </button>
+                ${
+                  !p.in_stock
+                    ? `
+                    <div class="absolute inset-0 bg-black/55 flex items-center justify-center">
+                        <span class="text-[11px] text-white/90">ناموجود</span>
+                    </div>
+                `
+                    : ""
+                }
+            </div>
+            <div class="p-3">
+                <p class="text-xs font-medium truncate">${p.product_name || ""}</p>
+                <p class="font-mono text-sm mt-1.5 text-gold-bright">
+                    ${formatPrice(p.final_price || p.price)}
+                </p>
+                <div class="flex gap-1.5 mt-2.5">
+                    <button ${!p.in_stock ? "disabled" : ""} 
+                            class="flex-1 btn-primary text-[11px] py-1.5 rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">
+                        افزودن به سبد
+                    </button>
+                    <a href="/shop/product/${p.product_slug}/" 
+                       class="btn-ghost text-[11px] px-2.5 py-1.5 rounded-lg focus-ring">
+                        مشاهده
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  `,
+    `,
           )
           .join("");
       }
 
-      async function removeFromWishlist(productId) {
+      // ===== تابع یکپارچه برای اضافه/حذف علاقه‌مندی =====
+      async function toggleWishlist(productId, btn) {
         try {
+          const isInWishlist = btn.dataset.inWishlist === "true";
+
           const response = await fetch("/shop/api/wishlist/toggle/", {
             method: "POST",
             headers: {
@@ -2168,14 +2204,39 @@
           });
 
           if (response.ok) {
-            showToast("محصول از علاقه‌مندی‌ها حذف شد", "ok");
+            const data = await response.json();
+
+            // بروزرسانی دکمه
+            if (data.is_in_wishlist) {
+              btn.dataset.inWishlist = "true";
+              btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+                    </svg>
+                `;
+              btn.setAttribute("aria-label", "حذف از علاقه‌مندی");
+              showToast("به علاقه‌مندی‌ها اضافه شد", "ok");
+            } else {
+              btn.dataset.inWishlist = "false";
+              btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+                    </svg>
+                `;
+              btn.setAttribute("aria-label", "افزودن به علاقه‌مندی");
+              showToast("از علاقه‌مندی‌ها حذف شد", "ok");
+            }
+
+            // بروزرسانی لیست (با ریلود کردن دیتا)
             loadDashboard();
+          } else {
+            showToast("خطا در عملیات", "danger");
           }
         } catch (error) {
-          showToast("خطا در حذف", "danger");
+          console.error("Wishlist error:", error);
+          showToast("خطا در ارتباط با سرور", "danger");
         }
       }
-
       /* ═══════════════════════════════════════
    ADDRESSES
 ═══════════════════════════════════════ */
