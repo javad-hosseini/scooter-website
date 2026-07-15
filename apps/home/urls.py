@@ -18,6 +18,7 @@ urlpatterns = [
     # ===== صفحات HTML =====
     path('articles/', ArticleListPageView.as_view(), name='articles'),
     re_path(r'^articles/(?P<slug>.+)/$', ArticleDetailPageView.as_view(), name='article_detail'),
+    path('categories/', views.CategoryPageView.as_view(), name='categories'),
 
     # ===== صفحه اصلی =====
     path('', views.IndexPageView.as_view(), name='index'),
@@ -33,7 +34,7 @@ urlpatterns = [
     re_path(r'^api/articles/(?P<slug>.+)/$', ArticleDetailAPIView.as_view(), name='api_article_detail'),
     path('api/articles/', ArticleListAPIView.as_view(), name='api_articles'),
     path('api/tags/', TagListAPIView.as_view(), name='api_tags'),
-
+    path('api/categories/', views.CategoryListAPIView.as_view(), name='api_categories'),
 
     # ===== API مقالات (موجود) =====
     path('api/articles/', views.ArticleListAPIView.as_view(), name='api_articles'),

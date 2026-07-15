@@ -10,7 +10,6 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone as django_timezone
 from django.utils.text import slugify
-
 from apps.shop.models import Category
 
 ALLOWED_ATTACHMENT_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'mp4', 'mp3', 'pdf']
@@ -492,35 +491,36 @@ class IndexPageSettings(models.Model):
 
 
 class CategoryFeature(models.Model):
-    """ویژگی‌های دسته‌بندی برای نمایش در صفحه اصلی (4 ویژگی)"""
+    """ویژگی‌های دسته‌بندی (spec-chip)"""
     CATEGORY_COLORS = [
-        ('neon', '#4fd8ff'),
-        ('orange', '#ff9a3c'),
-        ('green', '#a8e063'),
-        ('neon2', '#8b7bff'),
-        ('neon3', '#ff6cc4'),
+        ('cyan', '#00f0ff'),
+        ('orange', '#f97316'),
+        ('red', '#ef4444'),
+        ('yellow', '#fbbf24'),
+        ('purple', '#a855f7'),
+        ('green', '#22c55e'),
     ]
 
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
-        related_name='index_features'
+        related_name='features'
     )
-    label = models.CharField(max_length=100, verbose_name="برچسب ویژگی")
-    value = models.CharField(max_length=50, verbose_name="مقدار ویژگی")
-    unit = models.CharField(max_length=20, blank=True, verbose_name="واحد")
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="آیکون",
+        help_text="آیکون فونت‌آ‌وسم یا ایموجی"
+    )
+    value = models.CharField(max_length=100, verbose_name="مقدار")
+    label = models.CharField(max_length=100, verbose_name="برچسب")
     color = models.CharField(
         max_length=20,
         choices=CATEGORY_COLORS,
-        default='neon',
+        default='cyan',
         verbose_name="رنگ"
     )
-    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب")
-
-    def get_color_hex(self):
-        """دریافت کد هگز رنگ"""
-        colors = dict(self.CATEGORY_COLORS)
-        return colors.get(self.color, '#4fd8ff')
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
 
     class Meta:
         verbose_name = "ویژگی دسته‌بندی"
@@ -529,6 +529,84 @@ class CategoryFeature(models.Model):
 
     def __str__(self):
         return f"{self.category.name} - {self.label}"
+
+    def get_color_hex(self):
+        colors = dict(self.CATEGORY_COLORS)
+        return colors.get(self.color, '#00f0ff')
+
+
+class CategoryImage(models.Model):
+    """تصویر دسته‌بندی"""
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='images'
+    )
+    image = models.ImageField(
+        upload_to='categories/',
+        verbose_name="تصویر"
+    )
+    alt_text = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="متن جایگزین"
+    )
+    is_primary = models.BooleanField(
+        default=True,
+        verbose_name="تصویر اصلی"
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب")
+
+    class Meta:
+        verbose_name = "تصویر دسته‌بندی"
+        verbose_name_plural = "تصاویر دسته‌بندی"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.category.name} - {self.order}"
+
+
+class CategoryBadge(models.Model):
+    """نشان دسته‌بندی (cat-pill)"""
+    CATEGORY_COLORS = [
+        ('cyan', '#00f0ff'),
+        ('orange', '#f97316'),
+        ('red', '#ef4444'),
+        ('yellow', '#fbbf24'),
+        ('purple', '#a855f7'),
+        ('green', '#22c55e'),
+    ]
+
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='badges'
+    )
+    label = models.CharField(max_length=100, verbose_name="برچسب")
+    badge_text = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="متن نشان"
+    )
+    color = models.CharField(
+        max_length=20,
+        choices=CATEGORY_COLORS,
+        default='cyan',
+        verbose_name="رنگ"
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب")
+
+    class Meta:
+        verbose_name = "نشان دسته‌بندی"
+        verbose_name_plural = "نشان‌های دسته‌بندی"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.category.name} - {self.label}"
+
+    def get_color_hex(self):
+        colors = dict(self.CATEGORY_COLORS)
+        return colors.get(self.color, '#00f0ff')
 
 
 class ProductCard(models.Model):

@@ -17,7 +17,6 @@ class ArticleListSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     cover_image_url = serializers.SerializerMethodField()
 
-
     class Meta:
         model = Article
         fields = [
@@ -148,11 +147,16 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
 # apps/home/serializers.py (افزودن به سریالایزرهای موجود)
 
-from rest_framework import serializers
 from .models import (
-    IndexPageSettings, CategoryFeature, ProductCard,
-    Testimonial, Promise, Article, Tag
+    IndexPageSettings, ProductCard,
+    Testimonial, Promise, Article
 )
+
+# apps/home/serializers.py
+
+from rest_framework import serializers
+from .models import CategoryFeature, CategoryImage, CategoryBadge
+from apps.shop.models import Category
 
 
 class CategoryFeatureSerializer(serializers.ModelSerializer):
@@ -160,18 +164,70 @@ class CategoryFeatureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoryFeature
-        fields = ['label', 'value', 'unit', 'color', 'color_hex']
+        fields = ['id', 'icon', 'value', 'label', 'color', 'color_hex', 'order']
 
     def get_color_hex(self, obj):
-        colors = dict(CategoryFeature.CATEGORY_COLORS)
-        colors = {
-            'neon': '#4fd8ff',
-            'orange': '#ff9a3c',
-            'green': '#a8e063',
-            'neon2': '#8b7bff',
-            'neon3': '#ff6cc4',
-        }
-        return colors.get(obj.color, '#4fd8ff')
+        return obj.get_color_hex()
+
+
+class CategoryImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CategoryImage
+        fields = ['id', 'image_url', 'alt_text', 'is_primary', 'order']
+
+    def get_image_url(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
+
+
+class CategoryBadgeSerializer(serializers.ModelSerializer):
+    color_hex = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CategoryBadge
+        fields = ['id', 'label', 'badge_text', 'color', 'color_hex', 'order']
+
+    def get_color_hex(self, obj):
+        return obj.get_color_hex()
+
+
+class CategoryListSerializer(serializers.ModelSerializer):
+    """سریالایزر برای نمایش دسته‌بندی‌ها در صفحه اصلی"""
+    features = CategoryFeatureSerializer(many=True, read_only=True)
+    images = CategoryImageSerializer(many=True, read_only=True)
+    badges = CategoryBadgeSerializer(many=True, read_only=True)
+    primary_image = serializers.SerializerMethodField()
+    primary_color = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = [
+            'id', 'name', 'slug', 'icon', 'description',
+            'features', 'images', 'badges', 'primary_image',
+            'primary_color', 'is_active', 'order'
+        ]
+
+    def get_primary_image(self, obj):
+        primary = obj.images.filter(is_primary=True).first()
+        if primary:
+            return CategoryImageSerializer(primary).data
+        first = obj.images.first()
+        if first:
+            return CategoryImageSerializer(first).data
+        return None
+
+    def get_primary_color(self, obj):
+        # گرفتن رنگ از اولین ویژگی یا اولین نشان
+        feature = obj.features.first()
+        if feature:
+            return feature.get_color_hex()
+        badge = obj.badges.first()
+        if badge:
+            return badge.get_color_hex()
+        return '#00f0ff'
 
 
 class ProductCardSerializer(serializers.ModelSerializer):
@@ -316,11 +372,11 @@ class IndexPageSerializer(serializers.ModelSerializer):
 
     def get_categories(self, obj):
         """گرفتن دسته‌بندی‌های فعال با ویژگی‌هایشان"""
-        from .models import Category
+        from apps.shop.models import Category
         categories = Category.objects.filter(is_active=True, parent__isnull=True).order_by('order')
         result = []
         for cat in categories:
-            features = cat.index_features.all()[:4]
+            features = cat.features.all()[:4]
             result.append({
                 'id': cat.id,
                 'name': cat.name,

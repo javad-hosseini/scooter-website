@@ -1093,6 +1093,7 @@
           <form id="passForm" class="card p-5 lg:p-7 max-w-xl">
             {% csrf_token %}
             <div class="space-y-5">
+              <!-- رمز عبور فعلی -->
               <div>
                 <label class="label" for="curPass">رمز عبور فعلی</label>
                 <div class="relative">
@@ -1108,6 +1109,7 @@
                     data-toggle="curPass"
                     class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring"
                   >
+                    <!-- آیکون چشم -->
                     <svg
                       width="17"
                       height="17"
@@ -1121,7 +1123,14 @@
                     </svg>
                   </button>
                 </div>
+                <!-- جایگاه ارور رمز فعلی -->
+                <p
+                  id="error-old_password"
+                  class="text-red-500 text-xs mt-1.5 hidden"
+                ></p>
               </div>
+
+              <!-- رمز عبور جدید -->
               <div>
                 <label class="label" for="newPass">رمز عبور جدید</label>
                 <div class="relative">
@@ -1137,6 +1146,7 @@
                     data-toggle="newPass"
                     class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring"
                   >
+                    <!-- آیکون چشم -->
                     <svg
                       width="17"
                       height="17"
@@ -1159,7 +1169,14 @@
                 <p id="strengthLabel" class="text-[11px] text-ink-faint mt-1.5">
                   قدرت رمز عبور
                 </p>
+                <!-- جایگاه ارور رمز جدید -->
+                <p
+                  id="error-new_password1"
+                  class="text-red-500 text-xs mt-1.5 hidden"
+                ></p>
               </div>
+
+              <!-- تکرار رمز عبور جدید -->
               <div>
                 <label class="label" for="confPass">تکرار رمز عبور جدید</label>
                 <div class="relative">
@@ -1175,6 +1192,7 @@
                     data-toggle="confPass"
                     class="pw-toggle absolute top-1/2 -translate-y-1/2 end-3.5 text-ink-faint focus-ring"
                   >
+                    <!-- آیکون چشم -->
                     <svg
                       width="17"
                       height="17"
@@ -1189,27 +1207,32 @@
                   </button>
                 </div>
                 <p id="matchMsg" class="text-[11px] mt-1.5 hidden"></p>
+                <!-- جایگاه ارور تکرار رمز جدید -->
+                <p
+                  id="error-new_password2"
+                  class="text-red-500 text-xs mt-1.5 hidden"
+                ></p>
               </div>
             </div>
+
+            <!-- خطای عمومی فرم (مثلاً خطای سرور) -->
+            <div
+              id="general-error"
+              class="text-red-500 text-sm mt-4 hidden"
+            ></div>
+            <div
+              id="success-msg"
+              class="text-green-500 text-sm mt-4 hidden"
+            ></div>
+
             <button
               type="submit"
+              id="submitBtn"
               class="btn-primary rounded-xl px-6 py-2.5 text-sm mt-6 focus-ring"
             >
               به‌روزرسانی رمز عبور
             </button>
           </form>
-
-          <div class="card p-5 lg:p-7 max-w-xl mt-5">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="font-medium text-sm">تأیید دو مرحله‌ای</h3>
-                <p class="text-ink-faint text-xs mt-1">
-                  امنیت حساب خود را با کد پیامکی افزایش دهید
-                </p>
-              </div>
-              <div class="toggle" data-toggle-switch></div>
-            </div>
-          </div>
         </section>
 
         <!-- ============ ORDERS ============ -->
@@ -1597,13 +1620,13 @@
 
     <script>
       /* ═══════════════════════════════════════
-   CONFIG & API
+ CONFIG & API
 ═══════════════════════════════════════ */
       const API_BASE = "/accounts/api/";
       const CSRF_TOKEN = "{{ csrf_token }}";
 
       /* ═══════════════════════════════════════
-   UTILITY FUNCTIONS
+ UTILITY FUNCTIONS
 ═══════════════════════════════════════ */
       function toPersianNum(n) {
         return String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
@@ -1642,7 +1665,7 @@
       }
 
       /* ═══════════════════════════════════════
-   ICONS
+ ICONS
 ═══════════════════════════════════════ */
       const ICONS = {
         box: '<path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
@@ -1699,7 +1722,7 @@
       };
 
       /* ═══════════════════════════════════════
-   LOAD DASHBOARD DATA
+ LOAD DASHBOARD DATA
 ═══════════════════════════════════════ */
       let dashboardData = null;
 
@@ -1717,7 +1740,7 @@
       }
 
       /* ═══════════════════════════════════════
-   RENDER ALL
+ RENDER ALL
 ═══════════════════════════════════════ */
       function renderAll() {
         if (!dashboardData) return;
@@ -1735,7 +1758,7 @@
       }
 
       /* ═══════════════════════════════════════
-   RENDER USER PROFILE
+ RENDER USER PROFILE
 ═══════════════════════════════════════ */
       function renderUserProfile() {
         const user = dashboardData.user;
@@ -1769,7 +1792,7 @@
       }
 
       /* ═══════════════════════════════════════
-   RENDER STATS
+ RENDER STATS
 ═══════════════════════════════════════ */
       function renderStats() {
         const stats = dashboardData.stats;
@@ -1819,19 +1842,19 @@
           .map((s) => {
             const [c, bg] = ACCENTS[s.accent];
             return `
-    <div class="card card-hover p-4">
-      <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style="background:${bg}">
-        ${icon(s.icon, 17, c)}
-      </div>
-      <p class="font-display text-xl font-semibold" data-count="${s.value}">${toPersianNum(s.value)}</p>
-      <p class="text-ink-faint text-[11px] mt-0.5">${s.label}</p>
-    </div>`;
+  <div class="card card-hover p-4">
+    <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style="background:${bg}">
+      ${icon(s.icon, 17, c)}
+    </div>
+    <p class="font-display text-xl font-semibold" data-count="${s.value}">${toPersianNum(s.value)}</p>
+    <p class="text-ink-faint text-[11px] mt-0.5">${s.label}</p>
+  </div>`;
           })
           .join("");
       }
 
       /* ═══════════════════════════════════════
-   RENDER RECENT ORDERS
+ RENDER RECENT ORDERS
 ═══════════════════════════════════════ */
       function renderRecentOrders() {
         const orders = dashboardData.recent_orders || [];
@@ -1848,20 +1871,20 @@
           .map((o) => {
             const firstItem = o.items && o.items.length > 0 ? o.items[0] : null;
             return `
-    <div class="flex items-center gap-3 p-3 rounded-xl border border-line hover:border-gold/30 transition cursor-pointer" onclick="openOrderModal('${o.id}')">
-      ${firstItem ? `<img src="${firstItem.product_image || "/static/img/default-product.jpg"}" class="w-12 h-12 rounded-lg object-cover shrink-0" alt="${firstItem.product_name}" loading="lazy">` : '<div class="w-12 h-12 rounded-lg bg-elevated shrink-0"></div>'}
-      <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium truncate">${firstItem ? firstItem.product_name : "محصول"}</p>
-        <p class="text-ink-faint text-[11px] font-mono mt-0.5">${o.order_number || ""} · ${formatDate(o.created_at)}</p>
-      </div>
-      <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
-    </div>`;
+  <div class="flex items-center gap-3 p-3 rounded-xl border border-line hover:border-gold/30 transition cursor-pointer" onclick="openOrderModal('${o.id}')">
+    ${firstItem ? `<img src="${firstItem.product_image || "/static/img/default-product.jpg"}" class="w-12 h-12 rounded-lg object-cover shrink-0" alt="${firstItem.product_name}" loading="lazy">` : '<div class="w-12 h-12 rounded-lg bg-elevated shrink-0"></div>'}
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-medium truncate">${firstItem ? firstItem.product_name : "محصول"}</p>
+      <p class="text-ink-faint text-[11px] font-mono mt-0.5">${o.order_number || ""} · ${formatDate(o.created_at)}</p>
+    </div>
+    <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
+  </div>`;
           })
           .join("");
       }
 
       /* ═══════════════════════════════════════
-   RENDER RECENT NOTIFICATIONS
+ RENDER RECENT NOTIFICATIONS
 ═══════════════════════════════════════ */
       function renderRecentNotifs() {
         const notifs = dashboardData.notifications || [];
@@ -1877,20 +1900,20 @@
           .slice(0, 4)
           .map(
             (n) => `
-    <div class="flex gap-3">
-      <div class="w-8 h-8 rounded-lg bg-elevated border border-line flex items-center justify-center shrink-0">${icon(n.icon || "bell", 14, "#C9A961")}</div>
-      <div class="min-w-0">
-        <p class="text-xs font-medium">${n.title}</p>
-        <p class="text-ink-faint text-[11px] mt-0.5">${n.time}</p>
-      </div>
+  <div class="flex gap-3">
+    <div class="w-8 h-8 rounded-lg bg-elevated border border-line flex items-center justify-center shrink-0">${icon(n.icon || "bell", 14, "#C9A961")}</div>
+    <div class="min-w-0">
+      <p class="text-xs font-medium">${n.title}</p>
+      <p class="text-ink-faint text-[11px] mt-0.5">${n.time}</p>
     </div>
-  `,
+  </div>
+`,
           )
           .join("");
       }
 
       /* ═══════════════════════════════════════
-   ORDERS SECTION
+ ORDERS SECTION
 ═══════════════════════════════════════ */
       let activeOrderTab = "all";
       const ORDER_TABS = [
@@ -1906,8 +1929,8 @@
         const el = document.getElementById("orderTabs");
         el.innerHTML = ORDER_TABS.map(
           ([key, label]) => `
-    <button data-tab="${key}" class="tab-btn ${key === activeOrderTab ? "active" : ""} px-4 py-2.5 text-sm whitespace-nowrap text-ink-muted focus-ring" role="tab">${label}</button>
-  `,
+  <button data-tab="${key}" class="tab-btn ${key === activeOrderTab ? "active" : ""} px-4 py-2.5 text-sm whitespace-nowrap text-ink-muted focus-ring" role="tab">${label}</button>
+`,
         ).join("");
 
         el.querySelectorAll("[data-tab]").forEach((btn) => {
@@ -1948,41 +1971,41 @@
             const items = o.items || [];
             const discount = o.discount_amount || 0;
             return `
-    <div class="card p-4 lg:p-5">
-      <div class="flex flex-wrap items-center gap-4 justify-between">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="flex -space-x-3 rtl:space-x-reverse">
-            ${items
-              .slice(0, 3)
-              .map(
-                (it) => `
-              <img src="${it.product_image || "/static/img/default-product.jpg"}" class="w-11 h-11 rounded-xl object-cover border-2 border-bg-surface" loading="lazy" alt="${it.product_name}">
-            `,
-              )
-              .join("")}
-          </div>
-          <div class="min-w-0">
-            <p class="text-sm font-medium font-mono">${o.order_number || ""}</p>
-            <p class="text-ink-faint text-[11px] mt-0.5">${formatDate(o.created_at)} · ${items.length} کالا</p>
-          </div>
+  <div class="card p-4 lg:p-5">
+    <div class="flex flex-wrap items-center gap-4 justify-between">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="flex -space-x-3 rtl:space-x-reverse">
+          ${items
+            .slice(0, 3)
+            .map(
+              (it) => `
+            <img src="${it.product_image || "/static/img/default-product.jpg"}" class="w-11 h-11 rounded-xl object-cover border-2 border-bg-surface" loading="lazy" alt="${it.product_name}">
+          `,
+            )
+            .join("")}
         </div>
-        <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
-        <div class="text-sm font-mono font-medium">${formatPrice(o.total)}</div>
-        <div class="flex items-center gap-2">
-          <button onclick="openOrderModal('${o.id}')" class="btn-ghost text-xs px-3.5 py-2 rounded-lg focus-ring">مشاهده جزئیات</button>
+        <div class="min-w-0">
+          <p class="text-sm font-medium font-mono">${o.order_number || ""}</p>
+          <p class="text-ink-faint text-[11px] mt-0.5">${formatDate(o.created_at)} · ${items.length} کالا</p>
         </div>
       </div>
-      <button onclick="toggleExpand(this)" class="w-full flex items-center justify-center gap-1 text-ink-faint text-[11px] mt-3 pt-3 border-t border-line hover:text-gold-bright transition focus-ring">
-        کد رهگیری: <span class="font-mono">${o.tracking_code || "—"}</span>
-        <svg class="expand-chev transition-transform" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-      <div class="expand-panel hidden mt-3 pt-3 border-t border-line grid sm:grid-cols-2 gap-2 text-xs">
-        <div class="flex justify-between text-ink-muted"><span>وضعیت پرداخت</span><span class="text-ink">${o.payment_label || o.payment_status || "—"}</span></div>
-        <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono text-ink">${formatPrice(o.shipping_cost || 0)}</span></div>
-        <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">${formatPrice(discount)}</span></div>
-        <div class="flex justify-between text-ink-muted"><span>مبلغ نهایی</span><span class="font-mono text-ink font-medium">${formatPrice(o.total)}</span></div>
+      <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
+      <div class="text-sm font-mono font-medium">${formatPrice(o.total)}</div>
+      <div class="flex items-center gap-2">
+        <button onclick="openOrderModal('${o.id}')" class="btn-ghost text-xs px-3.5 py-2 rounded-lg focus-ring">مشاهده جزئیات</button>
       </div>
-    </div>`;
+    </div>
+    <button onclick="toggleExpand(this)" class="w-full flex items-center justify-center gap-1 text-ink-faint text-[11px] mt-3 pt-3 border-t border-line hover:text-gold-bright transition focus-ring">
+      کد رهگیری: <span class="font-mono">${o.tracking_code || "—"}</span>
+      <svg class="expand-chev transition-transform" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="expand-panel hidden mt-3 pt-3 border-t border-line grid sm:grid-cols-2 gap-2 text-xs">
+      <div class="flex justify-between text-ink-muted"><span>وضعیت پرداخت</span><span class="text-ink">${o.payment_label || o.payment_status || "—"}</span></div>
+      <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono text-ink">${formatPrice(o.shipping_cost || 0)}</span></div>
+      <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">${formatPrice(discount)}</span></div>
+      <div class="flex justify-between text-ink-muted"><span>مبلغ نهایی</span><span class="font-mono text-ink font-medium">${formatPrice(o.total)}</span></div>
+    </div>
+  </div>`;
           })
           .join("");
       }
@@ -2008,45 +2031,45 @@
         const discount = o.discount_amount || 0;
 
         body.innerHTML = `
-    <div class="flex items-center justify-between mb-1 pe-10">
-      <h3 class="font-display font-semibold text-lg">سفارش ${o.order_number || ""}</h3>
-      <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
-    </div>
-    <p class="text-ink-faint text-xs mb-6">ثبت‌شده در ${formatDate(o.created_at)} · کد رهگیری: <span class="font-mono">${o.tracking_code || "—"}</span></p>
+  <div class="flex items-center justify-between mb-1 pe-10">
+    <h3 class="font-display font-semibold text-lg">سفارش ${o.order_number || ""}</h3>
+    <span class="badge ${STATUS_BADGE[o.status] || "badge-pending"}">${o.status_label || o.status}</span>
+  </div>
+  <p class="text-ink-faint text-xs mb-6">ثبت‌شده در ${formatDate(o.created_at)} · کد رهگیری: <span class="font-mono">${o.tracking_code || "—"}</span></p>
 
-    <div class="space-y-3 mb-6">
-      ${items
-        .map(
-          (it) => `
-        <div class="flex items-center gap-3 p-3 rounded-xl border border-line">
-          <img src="${it.product_image || "/static/img/default-product.jpg"}" class="w-14 h-14 rounded-lg object-cover" loading="lazy" alt="${it.product_name}">
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate">${it.product_name || "محصول"}</p>
-            <p class="text-ink-faint text-[11px] mt-0.5">تعداد: ${it.quantity || 1}</p>
-          </div>
-          <div class="text-sm font-mono">${formatPrice(it.price || 0)}</div>
+  <div class="space-y-3 mb-6">
+    ${items
+      .map(
+        (it) => `
+      <div class="flex items-center gap-3 p-3 rounded-xl border border-line">
+        <img src="${it.product_image || "/static/img/default-product.jpg"}" class="w-14 h-14 rounded-lg object-cover" loading="lazy" alt="${it.product_name}">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate">${it.product_name || "محصول"}</p>
+          <p class="text-ink-faint text-[11px] mt-0.5">تعداد: ${it.quantity || 1}</p>
         </div>
-      `,
-        )
-        .join("")}
-    </div>
+        <div class="text-sm font-mono">${formatPrice(it.price || 0)}</div>
+      </div>
+    `,
+      )
+      .join("")}
+  </div>
 
-    <div class="border-t border-line pt-4 space-y-2 text-sm">
-      <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono">${formatPrice(o.shipping_cost || 0)}</span></div>
-      <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">-${formatPrice(discount)}</span></div>
-      <div class="flex justify-between font-medium text-base pt-2 border-t border-line mt-2"><span>مبلغ نهایی</span><span class="font-mono text-gold-bright">${formatPrice(o.total)}</span></div>
-    </div>
+  <div class="border-t border-line pt-4 space-y-2 text-sm">
+    <div class="flex justify-between text-ink-muted"><span>هزینه ارسال</span><span class="font-mono">${formatPrice(o.shipping_cost || 0)}</span></div>
+    <div class="flex justify-between text-ink-muted"><span>تخفیف</span><span class="font-mono text-ok">-${formatPrice(discount)}</span></div>
+    <div class="flex justify-between font-medium text-base pt-2 border-t border-line mt-2"><span>مبلغ نهایی</span><span class="font-mono text-gold-bright">${formatPrice(o.total)}</span></div>
+  </div>
 
-    <div class="flex gap-3 mt-6">
-      <button class="btn-primary flex-1 rounded-xl py-2.5 text-sm focus-ring">دانلود فاکتور</button>
-      <button data-close-modal class="btn-ghost flex-1 rounded-xl py-2.5 text-sm focus-ring">بستن</button>
-    </div>
-  `;
+  <div class="flex gap-3 mt-6">
+    <button class="btn-primary flex-1 rounded-xl py-2.5 text-sm focus-ring">دانلود فاکتور</button>
+    <button data-close-modal class="btn-ghost flex-1 rounded-xl py-2.5 text-sm focus-ring">بستن</button>
+  </div>
+`;
         showModal("orderModal");
       }
 
       /* ═══════════════════════════════════════
-   COMMENTS
+ COMMENTS
 ═══════════════════════════════════════ */
       function renderComments() {
         const comments = dashboardData.comments || [];
@@ -2085,29 +2108,29 @@
               c.type === "product" ? c.product_image : c.article_image;
 
             return `
-    <div class="card p-4 lg:p-5">
-      <div class="flex items-start gap-3">
-        <img src="${imageUrl || "/static/img/default-product.jpg"}" class="w-12 h-12 rounded-xl object-cover shrink-0" loading="lazy" alt="${typeLabel}">
-        <div class="flex-1 min-w-0">
-          <div class="flex flex-wrap items-center gap-2 justify-between">
-            <p class="text-sm font-medium">${typeLabel}</p>
-            <span class="badge ${cls}">${label}</span>
-          </div>
-          <div class="flex items-center gap-2 mt-1.5">
-            ${c.rating ? starRow(c.rating) : ""}
-            <span class="text-ink-faint text-[11px]">${formatDate(c.date)}</span>
-          </div>
-          <p class="text-ink-muted text-sm mt-2 leading-relaxed">${c.text || ""}</p>
-          ${c.status === "rejected" && c.reject_reason ? `<p class="text-danger text-[11px] mt-2 flex items-center gap-1">${icon("clock", 12, "#F87171")} دلیل رد: ${c.reject_reason}</p>` : ""}
+  <div class="card p-4 lg:p-5">
+    <div class="flex items-start gap-3">
+      <img src="${imageUrl || "/static/img/default-product.jpg"}" class="w-12 h-12 rounded-xl object-cover shrink-0" loading="lazy" alt="${typeLabel}">
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 justify-between">
+          <p class="text-sm font-medium">${typeLabel}</p>
+          <span class="badge ${cls}">${label}</span>
         </div>
+        <div class="flex items-center gap-2 mt-1.5">
+          ${c.rating ? starRow(c.rating) : ""}
+          <span class="text-ink-faint text-[11px]">${formatDate(c.date)}</span>
+        </div>
+        <p class="text-ink-muted text-sm mt-2 leading-relaxed">${c.text || ""}</p>
+        ${c.status === "rejected" && c.reject_reason ? `<p class="text-danger text-[11px] mt-2 flex items-center gap-1">${icon("clock", 12, "#F87171")} دلیل رد: ${c.reject_reason}</p>` : ""}
       </div>
-    </div>`;
+    </div>
+  </div>`;
           })
           .join("");
       }
 
       /* ═══════════════════════════════════════
-   WISHLIST
+ WISHLIST
 ═══════════════════════════════════════ */
       // apps/accounts/templates/accounts/user_dashboard.html
 
@@ -2134,56 +2157,56 @@
         el.innerHTML = wishlist
           .map(
             (p) => `
-        <div class="card card-hover overflow-hidden group">
-            <div class="relative aspect-square overflow-hidden bg-elevated">
-                <img src="${p.product_image || "/static/img/default-product.jpg"}" 
-                     class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
-                     loading="lazy" alt="${p.product_name}">
-                ${
-                  p.discount_price
-                    ? `
-                    <span class="absolute top-2 right-2 badge bg-danger/90 text-white border-0">
-                        ${Math.round(((p.price - p.discount_price) / p.price) * 100)}%-
-                    </span>
-                `
-                    : ""
-                }
-                <button onclick="toggleWishlist(${p.product_id}, this)" 
-                        data-in-wishlist="true"
-                        aria-label="حذف از علاقه‌مندی" 
-                        class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur flex items-center justify-center focus-ring hover:bg-danger/80 transition">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
-                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
-                    </svg>
-                </button>
-                ${
-                  !p.in_stock
-                    ? `
-                    <div class="absolute inset-0 bg-black/55 flex items-center justify-center">
-                        <span class="text-[11px] text-white/90">ناموجود</span>
-                    </div>
-                `
-                    : ""
-                }
-            </div>
-            <div class="p-3">
-                <p class="text-xs font-medium truncate">${p.product_name || ""}</p>
-                <p class="font-mono text-sm mt-1.5 text-gold-bright">
-                    ${formatPrice(p.final_price || p.price)}
-                </p>
-                <div class="flex gap-1.5 mt-2.5">
-                    <button ${!p.in_stock ? "disabled" : ""} 
-                            class="flex-1 btn-primary text-[11px] py-1.5 rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">
-                        افزودن به سبد
-                    </button>
-                    <a href="/shop/product/${p.product_slug}/" 
-                       class="btn-ghost text-[11px] px-2.5 py-1.5 rounded-lg focus-ring">
-                        مشاهده
-                    </a>
-                </div>
-            </div>
-        </div>
-    `,
+      <div class="card card-hover overflow-hidden group">
+          <div class="relative aspect-square overflow-hidden bg-elevated">
+              <img src="${p.product_image || "/static/img/default-product.jpg"}"
+                   class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                   loading="lazy" alt="${p.product_name}">
+              ${
+                p.discount_price
+                  ? `
+                  <span class="absolute top-2 right-2 badge bg-danger/90 text-white border-0">
+                      ${Math.round(((p.price - p.discount_price) / p.price) * 100)}%-
+                  </span>
+              `
+                  : ""
+              }
+              <button onclick="toggleWishlist(${p.product_id}, this)"
+                      data-in-wishlist="true"
+                      aria-label="حذف از علاقه‌مندی"
+                      class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur flex items-center justify-center focus-ring hover:bg-danger/80 transition">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
+                      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+                  </svg>
+              </button>
+              ${
+                !p.in_stock
+                  ? `
+                  <div class="absolute inset-0 bg-black/55 flex items-center justify-center">
+                      <span class="text-[11px] text-white/90">ناموجود</span>
+                  </div>
+              `
+                  : ""
+              }
+          </div>
+          <div class="p-3">
+              <p class="text-xs font-medium truncate">${p.product_name || ""}</p>
+              <p class="font-mono text-sm mt-1.5 text-gold-bright">
+                  ${formatPrice(p.final_price || p.price)}
+              </p>
+              <div class="flex gap-1.5 mt-2.5">
+                  <button ${!p.in_stock ? "disabled" : ""}
+                          class="flex-1 btn-primary text-[11px] py-1.5 rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">
+                      افزودن به سبد
+                  </button>
+                  <a href="/shop/product/${p.product_slug}/"
+                     class="btn-ghost text-[11px] px-2.5 py-1.5 rounded-lg focus-ring">
+                      مشاهده
+                  </a>
+              </div>
+          </div>
+      </div>
+  `,
           )
           .join("");
       }
@@ -2210,19 +2233,19 @@
             if (data.is_in_wishlist) {
               btn.dataset.inWishlist = "true";
               btn.innerHTML = `
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
-                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
-                    </svg>
-                `;
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
+                      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+                  </svg>
+              `;
               btn.setAttribute("aria-label", "حذف از علاقه‌مندی");
               showToast("به علاقه‌مندی‌ها اضافه شد", "ok");
             } else {
               btn.dataset.inWishlist = "false";
               btn.innerHTML = `
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
-                    </svg>
-                `;
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+                  </svg>
+              `;
               btn.setAttribute("aria-label", "افزودن به علاقه‌مندی");
               showToast("از علاقه‌مندی‌ها حذف شد", "ok");
             }
@@ -2238,7 +2261,7 @@
         }
       }
       /* ═══════════════════════════════════════
-   ADDRESSES
+ ADDRESSES
 ═══════════════════════════════════════ */
       function renderAddresses() {
         const addresses = dashboardData.addresses || [];
@@ -2260,16 +2283,16 @@
         el.innerHTML = addresses
           .map(
             (a) => `
-    <div class="card p-4">
-      <p class="text-sm font-medium">${a.recipient_name || ""}</p>
-      <p class="text-ink-faint text-xs font-mono mt-1">${a.recipient_phone || ""}</p>
-      <p class="text-ink-muted text-xs mt-3 leading-relaxed">${a.province_name || ""}، ${a.city_name || ""}<br>${a.address || ""}</p>
-      <p class="text-ink-faint text-[11px] font-mono mt-2">کد پستی: ${a.postal_code || ""}</p>
-      <div class="flex gap-2 mt-4 pt-3 border-t border-line">
-        <button onclick="deleteAddress(${a.id})" class="btn-danger-ghost text-xs px-3 py-1.5 rounded-lg focus-ring">حذف</button>
-      </div>
+  <div class="card p-4">
+    <p class="text-sm font-medium">${a.recipient_name || ""}</p>
+    <p class="text-ink-faint text-xs font-mono mt-1">${a.recipient_phone || ""}</p>
+    <p class="text-ink-muted text-xs mt-3 leading-relaxed">${a.province_name || ""}، ${a.city_name || ""}<br>${a.address || ""}</p>
+    <p class="text-ink-faint text-[11px] font-mono mt-2">کد پستی: ${a.postal_code || ""}</p>
+    <div class="flex gap-2 mt-4 pt-3 border-t border-line">
+      <button onclick="deleteAddress(${a.id})" class="btn-danger-ghost text-xs px-3 py-1.5 rounded-lg focus-ring">حذف</button>
     </div>
-  `,
+  </div>
+`,
           )
           .join("");
       }
@@ -2297,7 +2320,7 @@
       }
 
       /* ═══════════════════════════════════════
-   NOTIFICATIONS
+ NOTIFICATIONS
 ═══════════════════════════════════════ */
       function renderNotifs() {
         const notifs = dashboardData.notifications || [];
@@ -2326,27 +2349,27 @@
           notifs
             .map(
               (n, i) => `
-    <div class="flex gap-4 relative pb-6 ${i === notifs.length - 1 ? "" : "border-r-2 border-line mr-[19px]"}">
-      <div class="w-10 h-10 rounded-full ${n.unread ? "bg-gold/15 border border-gold/30" : "bg-elevated border border-line"} flex items-center justify-center shrink-0 -mr-5 z-10">
-        ${icon(n.icon || "bell", 16, n.unread ? "#E4C77E" : "#9C9BA6")}
-      </div>
-      <div class="flex-1 pt-1.5">
-        <div class="flex items-center gap-2">
-          <p class="text-sm font-medium">${n.title || ""}</p>
-          ${n.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-gold"></span>' : ""}
-        </div>
-        <p class="text-ink-muted text-xs mt-1">${n.desc || ""}</p>
-        <p class="text-ink-faint text-[11px] mt-1.5">${n.time || ""}</p>
-      </div>
+  <div class="flex gap-4 relative pb-6 ${i === notifs.length - 1 ? "" : "border-r-2 border-line mr-[19px]"}">
+    <div class="w-10 h-10 rounded-full ${n.unread ? "bg-gold/15 border border-gold/30" : "bg-elevated border border-line"} flex items-center justify-center shrink-0 -mr-5 z-10">
+      ${icon(n.icon || "bell", 16, n.unread ? "#E4C77E" : "#9C9BA6")}
     </div>
-  `,
+    <div class="flex-1 pt-1.5">
+      <div class="flex items-center gap-2">
+        <p class="text-sm font-medium">${n.title || ""}</p>
+        ${n.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-gold"></span>' : ""}
+      </div>
+      <p class="text-ink-muted text-xs mt-1">${n.desc || ""}</p>
+      <p class="text-ink-faint text-[11px] mt-1.5">${n.time || ""}</p>
+    </div>
+  </div>
+`,
             )
             .join("") +
           `</div>`;
       }
 
       /* ═══════════════════════════════════════
-   UPDATE BADGES
+ UPDATE BADGES
 ═══════════════════════════════════════ */
       function updateBadges() {
         const stats = dashboardData.stats || {};
@@ -2357,21 +2380,21 @@
       }
 
       /* ═══════════════════════════════════════
-   EMPTY STATE
+ EMPTY STATE
 ═══════════════════════════════════════ */
       function emptyState(iconName, title, desc) {
         return `
-  <div class="card flex flex-col items-center text-center py-14 px-6">
-    <div class="w-16 h-16 rounded-2xl bg-elevated border border-line flex items-center justify-center mb-4">
-      ${icon(iconName, 28, "#5F5E68", 1.5)}
-    </div>
-    <h3 class="font-display font-medium">${title}</h3>
-    <p class="text-ink-faint text-sm mt-1.5 max-w-xs">${desc}</p>
-  </div>`;
+<div class="card flex flex-col items-center text-center py-14 px-6">
+  <div class="w-16 h-16 rounded-2xl bg-elevated border border-line flex items-center justify-center mb-4">
+    ${icon(iconName, 28, "#5F5E68", 1.5)}
+  </div>
+  <h3 class="font-display font-medium">${title}</h3>
+  <p class="text-ink-faint text-sm mt-1.5 max-w-xs">${desc}</p>
+</div>`;
       }
 
       /* ═══════════════════════════════════════
-   NAVIGATION
+ NAVIGATION
 ═══════════════════════════════════════ */
       const sections = [
         "overview",
@@ -2431,7 +2454,7 @@
       overlay.addEventListener("click", closeDrawer);
 
       /* ═══════════════════════════════════════
-   MODALS / TOASTS
+ MODALS / TOASTS
 ═══════════════════════════════════════ */
       function showModal(id) {
         const m = document.getElementById(id);
@@ -2499,7 +2522,7 @@
       }
 
       /* ═══════════════════════════════════════
-   ADDRESS FORM
+ ADDRESS FORM
 ═══════════════════════════════════════ */
       async function loadProvinces() {
         try {
@@ -2576,7 +2599,7 @@
         });
 
       /* ═══════════════════════════════════════
-   PERSONAL INFO — avatar upload + form
+ PERSONAL INFO — avatar upload + form
 ═══════════════════════════════════════ */
       const avatarInput = document.getElementById("avatarInput");
       const avatarPreview = document.getElementById("avatarPreview");
@@ -2634,8 +2657,95 @@
           }
         });
       /* ═══════════════════════════════════════
-   SECURITY — password visibility + strength meter
+ SECURITY — password visibility + strength meter
 ═══════════════════════════════════════ */
+      document.addEventListener("DOMContentLoaded", function () {
+        const passForm = document.getElementById("passForm");
+
+        if (passForm) {
+          passForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById("submitBtn");
+            const generalError = document.getElementById("general-error");
+            const successMsg = document.getElementById("success-msg");
+
+            // پاک کردن خطاهای قبلی
+            document.querySelectorAll('[id^="error-"]').forEach((el) => {
+              el.innerText = "";
+              el.classList.add("hidden");
+            });
+            generalError.classList.add("hidden");
+            successMsg.classList.add("hidden");
+
+            // گرفتن اطلاعات فرم
+            const formData = new FormData(passForm);
+            const data = Object.fromEntries(formData.entries());
+
+            // گرفتن توکن CSRF برای ارسال امن
+            const csrfToken = document.querySelector(
+              "[name=csrfmiddlewaretoken]",
+            ).value;
+
+            try {
+              submitBtn.disabled = true;
+              submitBtn.innerText = "در حال بررسی...";
+
+              // توجه: مسیر URL پایین را با URL واقعی API خود جایگزین کنید (مثلا /api/accounts/change-password/)
+              const response = await fetch("/api/accounts/change-password/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify({
+                  old_password: data.old_password,
+                  new_password1: data.new_password1,
+                  new_password2: data.new_password2,
+                }),
+              });
+
+              const result = await response.json();
+
+              if (response.ok) {
+                // موفقیت در تغییر رمز عبور
+                successMsg.innerText =
+                  result.message || "رمز عبور با موفقیت تغییر کرد";
+                successMsg.classList.remove("hidden");
+                passForm.reset();
+              } else {
+                // مدیریت خطاهای دریافتی از سریالایزر
+                if (result.errors) {
+                  for (const [field, messages] of Object.entries(
+                    result.errors,
+                  )) {
+                    const errorEl = document.getElementById(`error-${field}`);
+                    if (errorEl) {
+                      // نمایش اولین خطای مربوط به هر فیلد
+                      errorEl.innerText = Array.isArray(messages)
+                        ? messages[0]
+                        : messages;
+                      errorEl.classList.remove("hidden");
+                    }
+                  }
+                } else {
+                  generalError.innerText =
+                    result.message || "خطایی رخ داده است.";
+                  generalError.classList.remove("hidden");
+                }
+              }
+            } catch (error) {
+              generalError.innerText =
+                "خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کنید.";
+              generalError.classList.remove("hidden");
+            } finally {
+              submitBtn.disabled = false;
+              submitBtn.innerText = "به‌روزرسانی رمز عبور";
+            }
+          });
+        }
+      });
+
       document.querySelectorAll(".pw-toggle").forEach((btn) => {
         btn.addEventListener("click", () => {
           const input = document.getElementById(btn.dataset.toggle);
@@ -2748,7 +2858,7 @@
         ?.addEventListener("input", renderOrders);
 
       /* ═══════════════════════════════════════
-   MARK ALL NOTIFICATIONS READ
+ MARK ALL NOTIFICATIONS READ
 ═══════════════════════════════════════ */
       document
         .getElementById("markAllReadBtn")
@@ -2764,7 +2874,7 @@
         });
 
       /* ═══════════════════════════════════════
-   INIT
+ INIT
 ═══════════════════════════════════════ */
       loadProvinces();
       loadDashboard();

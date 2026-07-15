@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.utils.html import format_html
 
+# from apps.shop.models import Category
 from .models import Article, Tag, Comment
+from .models import CategoryImage, CategoryBadge
 
 User = get_user_model()
 
@@ -219,7 +222,6 @@ class CommentAdmin(admin.ModelAdmin):
 # apps/home/admin.py (افزودن به ادمین موجود)
 
 from django.contrib import admin
-from django.utils.html import format_html
 from .models import (
     IndexPageSettings, CategoryFeature, ProductCard,
     Testimonial, Promise
@@ -287,7 +289,7 @@ class IndexPageSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(CategoryFeature)
 class CategoryFeatureAdmin(admin.ModelAdmin):
-    list_display = ['category', 'label', 'value', 'unit', 'color', 'order']
+    list_display = ['category', 'label', 'value', 'color', 'order']
     list_filter = ['category', 'color']
     list_editable = ['order']
     ordering = ['category', 'order']
@@ -332,3 +334,60 @@ class PromiseAdmin(admin.ModelAdmin):
     list_filter = ['color', 'is_active']
     list_editable = ['order', 'is_active']
     ordering = ['order']
+
+
+# apps/home/admin.py
+
+
+class CategoryFeatureInline(admin.TabularInline):
+    model = CategoryFeature
+    extra = 1
+    fields = ['icon', 'value', 'label', 'color', 'order']
+    ordering = ['order']
+
+
+class CategoryImageInline(admin.TabularInline):
+    model = CategoryImage
+    extra = 1
+    fields = ['image', 'alt_text', 'is_primary', 'order']
+    ordering = ['order']
+
+
+class CategoryBadgeInline(admin.TabularInline):
+    model = CategoryBadge
+    extra = 1
+    fields = ['label', 'badge_text', 'color', 'order']
+    ordering = ['order']
+
+
+# @admin.register(Category)
+# class CategoryAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'slug', 'icon', 'is_active', 'order', 'feature_count']
+#     list_filter = ['is_active']
+#     search_fields = ['name', 'slug', 'description']
+#     prepopulated_fields = {'slug': ('name',)}
+#     list_editable = ['order', 'is_active']
+#     inlines = [CategoryFeatureInline, CategoryImageInline, CategoryBadgeInline]
+#
+#     fieldsets = (
+#         ('اطلاعات اصلی', {
+#             'fields': ('name', 'slug', 'icon', 'description')
+#         }),
+#         ('والد', {
+#             'fields': ('parent',)
+#         }),
+#         ('وضعیت', {
+#             'fields': ('is_active', 'order')
+#         }),
+#         ('تاریخ', {
+#             'fields': ('created_at', 'updated_at'),
+#             'classes': ('collapse',)
+#         }),
+#     )
+#
+#     readonly_fields = ['created_at', 'updated_at']
+#
+#     def feature_count(self, obj):
+#         return obj.features.count()
+#
+#     feature_count.short_description = 'تعداد ویژگی‌ها'

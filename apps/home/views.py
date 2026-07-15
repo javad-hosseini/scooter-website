@@ -2,9 +2,8 @@
 from django.db.models import Q, Prefetch
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Article, Tag, Comment
@@ -156,6 +155,37 @@ class IndexPageAPIView(generics.RetrieveAPIView):
 class IndexPageView(TemplateView):
     """صفحه اصلی سایت"""
     template_name = 'home/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+# apps/home/views.py
+
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+from django.views.generic import TemplateView
+from apps.shop.models import Category
+from .serializers import CategoryListSerializer
+
+
+class CategoryListAPIView(generics.ListAPIView):
+    """API برای دریافت لیست دسته‌بندی‌ها"""
+    permission_classes = [AllowAny]
+    serializer_class = CategoryListSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return Category.objects.filter(
+            is_active=True,
+            parent__isnull=True
+        ).order_by('order', 'name')
+
+
+class CategoryPageView(TemplateView):
+    """صفحه نمایش دسته‌بندی‌ها"""
+    template_name = 'home/categories.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
