@@ -2,34 +2,31 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="utf-8" />
-    <title>اسکوتیکس | داشبورد مدیریت</title>
+    <title id="page-title">اسکوتیکس | داشبورد مدیریت</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Font Awesome -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-
-    <!-- Bootstrap 5 RTL -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
     />
-
-    <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
 
+    <!-- ============================================================
+   STYLES — تمام استایل‌های فایل admin_dashboard.html رو اینجا کپی کن
+   (از <style> تا </style> فایل اصلی)
+   ============================================================ -->
     <style>
       /* ============================================================
    DESIGN TOKENS — Electric Scooter Admin / "Current" system
@@ -1018,7 +1015,8 @@
             <span
               class="badge text-bg-primary rounded-pill ms-2"
               style="font-size: 10px"
-              >۱۲</span
+              id="orderBadgeCount"
+              >۰</span
             >
           </a>
 
@@ -1090,106 +1088,16 @@
                     >علامت‌گذاری همه</span
                   >
                 </div>
-
-                <div class="notif-item">
-                  <div class="notif-prio" style="background: var(--red)"></div>
-                  <div
-                    class="notif-ico"
-                    style="
-                      background: rgba(239, 68, 68, 0.12);
-                      color: var(--red);
-                    "
-                  >
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                  </div>
-                  <div class="notif-body">
-                    <p>هشدار موجودی انبار</p>
-                    <span class="d"
-                      >موجودی «اسکوتر فلش پرو» کمتر از ۵ واحد است</span
-                    ><small>۲ دقیقه پیش</small>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-prio" style="background: var(--blue)"></div>
-                  <div
-                    class="notif-ico"
-                    style="
-                      background: rgba(47, 111, 237, 0.12);
-                      color: var(--blue);
-                    "
-                  >
-                    <i class="fa-solid fa-cart-shopping"></i>
-                  </div>
-                  <div class="notif-body">
-                    <p>سفارش جدید ثبت شد</p>
-                    <span class="d">سفارش #۳۲۹۸ به ارزش ۲۸,۵۰۰,۰۰۰ تومان</span
-                    ><small>۱۸ دقیقه پیش</small>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div
-                    class="notif-prio"
-                    style="background: var(--orange)"
-                  ></div>
-                  <div
-                    class="notif-ico"
-                    style="
-                      background: rgba(245, 158, 11, 0.13);
-                      color: var(--orange);
-                    "
-                  >
-                    <i class="fa-solid fa-star"></i>
-                  </div>
-                  <div class="notif-body">
-                    <p>دیدگاه جدید</p>
-                    <span class="d"
-                      >امتیاز ۴ ستاره برای «اسکوتر شهری اوربیت»</span
-                    ><small>۱ ساعت پیش</small>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div
-                    class="notif-prio"
-                    style="background: var(--green)"
-                  ></div>
-                  <div
-                    class="notif-ico"
-                    style="
-                      background: rgba(16, 185, 129, 0.13);
-                      color: var(--green);
-                    "
-                  >
-                    <i class="fa-solid fa-truck"></i>
-                  </div>
-                  <div class="notif-body">
-                    <p>سفارش ارسال شد</p>
-                    <span class="d">سفارش #۳۲۹۰ تحویل پیک شد</span
-                    ><small>۳ ساعت پیش</small>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-prio" style="background: var(--cyan)"></div>
-                  <div
-                    class="notif-ico"
-                    style="background: rgba(34, 211, 238, 0.14); color: #0e7490"
-                  >
-                    <i class="fa-solid fa-box"></i>
-                  </div>
-                  <div class="notif-body">
-                    <p>محصول جدید افزوده شد</p>
-                    <span class="d"
-                      >«اسکوتر آفرود ترندر X2» به فروشگاه اضافه شد</span
-                    ><small>دیروز</small>
-                  </div>
-                </div>
+                <div id="notifList"></div>
               </div>
             </div>
 
             <div class="dropdown-wrap">
               <div class="profile-chip" id="profileBtn">
-                <img src="https://i.pravatar.cc/100?img=47" alt="" />
+                <img id="profileAvatar" src="" alt="تصویر پروفایل" />
                 <div class="who d-none d-sm-block">
-                  <b>الهام حسینی</b><span>مدیر فروشگاه</span>
+                  <b id="profileName">کاربر</b
+                  ><span id="profileRole">مدیر فروشگاه</span>
                 </div>
                 <i
                   class="fa-solid fa-chevron-down"
@@ -1236,8 +1144,8 @@
         <div class="page-wrap">
           <div class="page-head">
             <div>
-              <h1>سلام، الهام 👋</h1>
-              <p>خلاصه عملکرد فروشگاه اسکوتر برقی شما — شنبه، ۳۰ خرداد ۱۴۰۵</p>
+              <h1 id="greetingText">سلام، کاربر 👋</h1>
+              <p id="todayDate">خلاصه عملکرد فروشگاه اسکوتر برقی شما — امروز</p>
             </div>
           </div>
 
@@ -1252,12 +1160,12 @@
                   >
                     <i class="fa-solid fa-box-open"></i>
                   </div>
-                  <div class="stat-trend trend-up">
-                    <i class="fa-solid fa-arrow-trend-up"></i> ۸.۲٪
+                  <div class="stat-trend trend-up" id="productsTrend">
+                    <i class="fa-solid fa-arrow-trend-up"></i> ۰٪
                   </div>
                 </div>
                 <div>
-                  <div class="stat-value" data-count="486">۰</div>
+                  <div class="stat-value" id="totalProducts">۰</div>
                   <div class="stat-label">کل محصولات فعال</div>
                 </div>
                 <div id="sparkProducts" class="stat-spark"></div>
@@ -1270,12 +1178,12 @@
                   <div class="stat-icon" style="background: var(--grad-orange)">
                     <i class="fa-solid fa-cart-shopping"></i>
                   </div>
-                  <div class="stat-trend trend-up">
-                    <i class="fa-solid fa-arrow-trend-up"></i> ۱۲.۴٪
+                  <div class="stat-trend trend-up" id="ordersTrend">
+                    <i class="fa-solid fa-arrow-trend-up"></i> ۰٪
                   </div>
                 </div>
                 <div>
-                  <div class="stat-value" data-count="93">۰</div>
+                  <div class="stat-value" id="todayOrders">۰</div>
                   <div class="stat-label">سفارش‌های امروز</div>
                 </div>
                 <div id="sparkOrders" class="stat-spark"></div>
@@ -1288,12 +1196,12 @@
                   <div class="stat-icon" style="background: var(--grad-green)">
                     <i class="fa-solid fa-users"></i>
                   </div>
-                  <div class="stat-trend trend-up">
-                    <i class="fa-solid fa-arrow-trend-up"></i> ۵.۱٪
+                  <div class="stat-trend trend-up" id="customersTrend">
+                    <i class="fa-solid fa-arrow-trend-up"></i> ۰٪
                   </div>
                 </div>
                 <div>
-                  <div class="stat-value" data-count="12480">۰</div>
+                  <div class="stat-value" id="totalCustomers">۰</div>
                   <div class="stat-label">کل مشتریان</div>
                 </div>
                 <div id="sparkCustomers" class="stat-spark"></div>
@@ -1306,15 +1214,15 @@
                   <div class="stat-icon" style="background: var(--grad-purple)">
                     <i class="fa-solid fa-sack-dollar"></i>
                   </div>
-                  <div class="stat-trend trend-down">
-                    <i class="fa-solid fa-arrow-trend-down"></i> ۲.۳٪
+                  <div class="stat-trend trend-down" id="revenueTrend">
+                    <i class="fa-solid fa-arrow-trend-down"></i> ۰٪
                   </div>
                 </div>
                 <div>
                   <div class="stat-value">
-                    <span class="num" data-count="2840" data-suffix="M">۰</span>
+                    <span class="num" id="monthlyRevenue">۰</span>
                   </div>
-                  <div class="stat-label">درآمد ماهانه (تومان)</div>
+                  <div class="stat-label">درآمد ماهانه (میلیون تومان)</div>
                 </div>
                 <div id="sparkRevenue" class="stat-spark"></div>
               </div>
@@ -1323,16 +1231,20 @@
 
           <!-- ============ CHARTS ROW 1 ============ -->
           <div class="row g-4 mb-4">
-            <div class="col-xl-7">
+            <div class="col-xl-12">
               <div class="gcard h-100">
                 <div class="gcard-head">
                   <div>
                     <h2>روند فروش ماهانه</h2>
-                    <div class="sub">
-                      درآمد و تعداد سفارش‌ها در ۱۲ ماه گذشته
-                    </div>
+                    <div class="sub">درآمد در ۱۲ ماه گذشته</div>
                   </div>
-                  <span class="link-more">گزارش کامل</span>
+                  <button
+                    class="link-more"
+                    id="downloadExcelBtn"
+                    style="border: none; background: none; cursor: pointer"
+                  >
+                    <i class="fa-solid fa-file-excel"></i> خروجی اکسل
+                  </button>
                 </div>
                 <div class="gcard-body">
                   <div id="chartSales"></div>
@@ -1340,10 +1252,6 @@
                     <span
                       ><i style="background: var(--blue)"></i> درآمد (میلیون
                       تومان)</span
-                    >
-                    <span
-                      ><i style="background: var(--purple)"></i> تعداد
-                      سفارش</span
                     >
                   </div>
                 </div>
@@ -1358,9 +1266,17 @@
                 <div class="gcard-head">
                   <div>
                     <h2>سفارش‌های اخیر</h2>
-                    <div class="sub">۶ سفارش ثبت‌شده آخر</div>
+                    <div class="sub" id="recentOrdersCount">
+                      ۶ سفارش ثبت‌شده آخر
+                    </div>
                   </div>
-                  <span class="link-more">مشاهده همه</span>
+                  <button
+                    class="link-more"
+                    id="downloadOrdersBtn"
+                    style="border: none; background: none; cursor: pointer"
+                  >
+                    <i class="fa-solid fa-file-excel"></i> خروجی اکسل
+                  </button>
                 </div>
                 <div class="gcard-body" style="overflow-x: auto">
                   <table class="table-modern">
@@ -1374,120 +1290,11 @@
                         <th>تاریخ</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="recentOrdersTable">
                       <tr>
-                        <td class="num">#۳۲۹۸</td>
-                        <td>
-                          <div class="cust-cell">
-                            <img src="https://i.pravatar.cc/80?img=12" />
-                            <div>
-                              <div class="nm">نیلوفر جلیلی</div>
-                              <div class="id">CUS-1042</div>
-                            </div>
-                          </div>
+                        <td colspan="6" class="text-center text-muted">
+                          در حال بارگذاری...
                         </td>
-                        <td>اسکوتر برقی نوا X1</td>
-                        <td class="num">۲۸,۵۰۰,۰۰۰</td>
-                        <td>
-                          <span class="badge-status st-pending">در انتظار</span>
-                        </td>
-                        <td class="num">۱۴۰۵/۰۳/۳۰</td>
-                      </tr>
-                      <tr>
-                        <td class="num">#۳۲۹۷</td>
-                        <td>
-                          <div class="cust-cell">
-                            <img src="https://i.pravatar.cc/80?img=23" />
-                            <div>
-                              <div class="nm">میلاد احمدی</div>
-                              <div class="id">CUS-1041</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>اسکوتر شهری اوربیت</td>
-                        <td class="num">۱۹,۹۰۰,۰۰۰</td>
-                        <td>
-                          <span class="badge-status st-processing"
-                            >در حال پردازش</span
-                          >
-                        </td>
-                        <td class="num">۱۴۰۵/۰۳/۲۹</td>
-                      </tr>
-                      <tr>
-                        <td class="num">#۳۲۹۶</td>
-                        <td>
-                          <div class="cust-cell">
-                            <img src="https://i.pravatar.cc/80?img=33" />
-                            <div>
-                              <div class="nm">علی مرادی</div>
-                              <div class="id">CUS-0998</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>اسکوتر فلش پرو</td>
-                        <td class="num">۳۴,۲۰۰,۰۰۰</td>
-                        <td>
-                          <span class="badge-status st-shipped">ارسال شده</span>
-                        </td>
-                        <td class="num">۱۴۰۵/۰۳/۲۸</td>
-                      </tr>
-                      <tr>
-                        <td class="num">#۳۲۹۵</td>
-                        <td>
-                          <div class="cust-cell">
-                            <img src="https://i.pravatar.cc/80?img=45" />
-                            <div>
-                              <div class="nm">سعید نوری</div>
-                              <div class="id">CUS-0975</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>اسکوتر آفرود ترندر</td>
-                        <td class="num">۴۱,۰۰۰,۰۰۰</td>
-                        <td>
-                          <span class="badge-status st-delivered"
-                            >تحویل شده</span
-                          >
-                        </td>
-                        <td class="num">۱۴۰۵/۰۳/۲۷</td>
-                      </tr>
-                      <tr>
-                        <td class="num">#۳۲۹۴</td>
-                        <td>
-                          <div class="cust-cell">
-                            <img src="https://i.pravatar.cc/80?img=56" />
-                            <div>
-                              <div class="nm">پریسا کاظمی</div>
-                              <div class="id">CUS-0954</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>اسکوتر برقی نوا X1</td>
-                        <td class="num">۲۸,۵۰۰,۰۰۰</td>
-                        <td>
-                          <span class="badge-status st-cancelled">لغو شده</span>
-                        </td>
-                        <td class="num">۱۴۰۵/۰۳/۲۶</td>
-                      </tr>
-                      <tr>
-                        <td class="num">#۳۲۹۳</td>
-                        <td>
-                          <div class="cust-cell">
-                            <img src="https://i.pravatar.cc/80?img=15" />
-                            <div>
-                              <div class="nm">رضا توکلی</div>
-                              <div class="id">CUS-0932</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>اسکوتر شهری اوربیت</td>
-                        <td class="num">۱۹,۹۰۰,۰۰۰</td>
-                        <td>
-                          <span class="badge-status st-delivered"
-                            >تحویل شده</span
-                          >
-                        </td>
-                        <td class="num">۱۴۰۵/۰۳/۲۵</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1500,81 +1307,9 @@
                 <div class="gcard-head">
                   <div><h2>فعالیت‌های اخیر</h2></div>
                 </div>
-                <div class="gcard-body">
-                  <div class="feed-item">
-                    <div
-                      class="feed-ico"
-                      style="
-                        background: rgba(47, 111, 237, 0.12);
-                        color: var(--blue);
-                      "
-                    >
-                      <i class="fa-solid fa-cart-shopping"></i>
-                    </div>
-                    <div class="feed-txt">
-                      <p>سفارش جدید دریافت شد</p>
-                      <span>سفارش #۳۲۹۸ — ۲ دقیقه پیش</span>
-                    </div>
-                  </div>
-                  <div class="feed-item">
-                    <div
-                      class="feed-ico"
-                      style="
-                        background: rgba(124, 92, 252, 0.12);
-                        color: var(--purple);
-                      "
-                    >
-                      <i class="fa-solid fa-box"></i>
-                    </div>
-                    <div class="feed-txt">
-                      <p>محصول جدید اضافه شد</p>
-                      <span>اسکوتر آفرود ترندر X2 — ۴۵ دقیقه پیش</span>
-                    </div>
-                  </div>
-                  <div class="feed-item">
-                    <div
-                      class="feed-ico"
-                      style="
-                        background: rgba(245, 158, 11, 0.13);
-                        color: var(--orange);
-                      "
-                    >
-                      <i class="fa-solid fa-star"></i>
-                    </div>
-                    <div class="feed-txt">
-                      <p>دیدگاه جدید ثبت شد</p>
-                      <span>امتیاز ۵ ستاره — ۱ ساعت پیش</span>
-                    </div>
-                  </div>
-                  <div class="feed-item">
-                    <div
-                      class="feed-ico"
-                      style="
-                        background: rgba(16, 185, 129, 0.13);
-                        color: var(--green);
-                      "
-                    >
-                      <i class="fa-solid fa-truck"></i>
-                    </div>
-                    <div class="feed-txt">
-                      <p>وضعیت سفارش به‌روزرسانی شد</p>
-                      <span>سفارش #۳۲۹۰ ارسال شد — ۳ ساعت پیش</span>
-                    </div>
-                  </div>
-                  <div class="feed-item">
-                    <div
-                      class="feed-ico"
-                      style="
-                        background: rgba(239, 68, 68, 0.12);
-                        color: var(--red);
-                      "
-                    >
-                      <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <div class="feed-txt">
-                      <p>هشدار کاهش موجودی</p>
-                      <span>اسکوتر فلش پرو — ۵ ساعت پیش</span>
-                    </div>
+                <div class="gcard-body" id="activitiesList">
+                  <div class="text-center text-muted py-3">
+                    در حال بارگذاری...
                   </div>
                 </div>
               </div>
@@ -1592,104 +1327,9 @@
                   </div>
                   <span class="link-more">مدیریت محصولات</span>
                 </div>
-                <div class="gcard-body">
-                  <div class="row g-3">
-                    <div class="col-md-6">
-                      <div class="product-row">
-                        <div
-                          class="product-thumb"
-                          style="background: var(--grad-primary)"
-                        >
-                          <i class="fa-solid fa-motorcycle"></i>
-                        </div>
-                        <div class="product-info">
-                          <div class="pname">اسکوتر برقی نوا X1</div>
-                          <div class="pmeta">
-                            <span>۳۲۰ فروش</span><span>۲۸.۵M تومان</span>
-                          </div>
-                          <div class="stock-bar">
-                            <div
-                              style="width: 72%; background: var(--green)"
-                            ></div>
-                          </div>
-                        </div>
-                        <div class="qbtn">
-                          <i class="fa-solid fa-arrow-up-left-from-circle"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="product-row">
-                        <div
-                          class="product-thumb"
-                          style="background: var(--grad-orange)"
-                        >
-                          <i class="fa-solid fa-motorcycle"></i>
-                        </div>
-                        <div class="product-info">
-                          <div class="pname">اسکوتر فلش پرو</div>
-                          <div class="pmeta">
-                            <span>۲۷۸ فروش</span><span>۳۴.۲M تومان</span>
-                          </div>
-                          <div class="stock-bar">
-                            <div
-                              style="width: 18%; background: var(--orange)"
-                            ></div>
-                          </div>
-                        </div>
-                        <div class="qbtn">
-                          <i class="fa-solid fa-arrow-up-left-from-circle"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="product-row">
-                        <div
-                          class="product-thumb"
-                          style="background: var(--grad-green)"
-                        >
-                          <i class="fa-solid fa-motorcycle"></i>
-                        </div>
-                        <div class="product-info">
-                          <div class="pname">اسکوتر شهری اوربیت</div>
-                          <div class="pmeta">
-                            <span>۲۱۵ فروش</span><span>۱۹.۹M تومان</span>
-                          </div>
-                          <div class="stock-bar">
-                            <div
-                              style="width: 55%; background: var(--green)"
-                            ></div>
-                          </div>
-                        </div>
-                        <div class="qbtn">
-                          <i class="fa-solid fa-arrow-up-left-from-circle"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="product-row">
-                        <div
-                          class="product-thumb"
-                          style="background: var(--grad-purple)"
-                        >
-                          <i class="fa-solid fa-motorcycle"></i>
-                        </div>
-                        <div class="product-info">
-                          <div class="pname">اسکوتر آفرود ترندر</div>
-                          <div class="pmeta">
-                            <span>۱۶۰ فروش</span><span>۴۱.۰M تومان</span>
-                          </div>
-                          <div class="stock-bar">
-                            <div
-                              style="width: 8%; background: var(--red)"
-                            ></div>
-                          </div>
-                        </div>
-                        <div class="qbtn">
-                          <i class="fa-solid fa-arrow-up-left-from-circle"></i>
-                        </div>
-                      </div>
-                    </div>
+                <div class="gcard-body" id="topProductsList">
+                  <div class="text-center text-muted py-3">
+                    در حال بارگذاری...
                   </div>
                 </div>
               </div>
@@ -1707,127 +1347,10 @@
                   class="gcard-body"
                   style="max-height: 320px; overflow-y: auto"
                   class="scroll-thin"
+                  id="notificationList"
                 >
-                  <div class="notif-item">
-                    <div
-                      class="notif-prio"
-                      style="background: var(--red)"
-                    ></div>
-                    <div
-                      class="notif-ico"
-                      style="
-                        background: rgba(239, 68, 68, 0.12);
-                        color: var(--red);
-                      "
-                    >
-                      <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <div class="notif-body">
-                      <p>هشدار موجودی انبار</p>
-                      <span class="d"
-                        >موجودی «اسکوتر فلش پرو» رو به اتمام است</span
-                      ><small>۲ دقیقه پیش</small>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div
-                      class="notif-prio"
-                      style="background: var(--blue)"
-                    ></div>
-                    <div
-                      class="notif-ico"
-                      style="
-                        background: rgba(47, 111, 237, 0.12);
-                        color: var(--blue);
-                      "
-                    >
-                      <i class="fa-solid fa-cart-shopping"></i>
-                    </div>
-                    <div class="notif-body">
-                      <p>سفارش جدید ثبت شد</p>
-                      <span class="d">سفارش #۳۲۹۸ از نیلوفر جلیلی</span
-                      ><small>۱۸ دقیقه پیش</small>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div
-                      class="notif-prio"
-                      style="background: var(--orange)"
-                    ></div>
-                    <div
-                      class="notif-ico"
-                      style="
-                        background: rgba(245, 158, 11, 0.13);
-                        color: var(--orange);
-                      "
-                    >
-                      <i class="fa-solid fa-star"></i>
-                    </div>
-                    <div class="notif-body">
-                      <p>دیدگاه جدید دریافت شد</p>
-                      <span class="d">امتیاز ۴ ستاره برای اسکوتر اوربیت</span
-                      ><small>۱ ساعت پیش</small>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div
-                      class="notif-prio"
-                      style="background: var(--green)"
-                    ></div>
-                    <div
-                      class="notif-ico"
-                      style="
-                        background: rgba(16, 185, 129, 0.13);
-                        color: var(--green);
-                      "
-                    >
-                      <i class="fa-solid fa-truck"></i>
-                    </div>
-                    <div class="notif-body">
-                      <p>سفارش ارسال شد</p>
-                      <span class="d">سفارش #۳۲۹۰ تحویل پیک شد</span
-                      ><small>۳ ساعت پیش</small>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div
-                      class="notif-prio"
-                      style="background: var(--cyan)"
-                    ></div>
-                    <div
-                      class="notif-ico"
-                      style="
-                        background: rgba(34, 211, 238, 0.14);
-                        color: #0e7490;
-                      "
-                    >
-                      <i class="fa-solid fa-box"></i>
-                    </div>
-                    <div class="notif-body">
-                      <p>محصول جدید افزوده شد</p>
-                      <span class="d">اسکوتر آفرود ترندر X2 اضافه شد</span
-                      ><small>دیروز</small>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div
-                      class="notif-prio"
-                      style="background: var(--purple)"
-                    ></div>
-                    <div
-                      class="notif-ico"
-                      style="
-                        background: rgba(124, 92, 252, 0.12);
-                        color: var(--purple);
-                      "
-                    >
-                      <i class="fa-solid fa-user-plus"></i>
-                    </div>
-                    <div class="notif-body">
-                      <p>مشتری جدید ثبت‌نام کرد</p>
-                      <span class="d">رضا توکلی به فروشگاه پیوست</span
-                      ><small>۲ روز پیش</small>
-                    </div>
+                  <div class="text-center text-muted py-3">
+                    در حال بارگذاری...
                   </div>
                 </div>
                 <div class="px-3 pb-3">
@@ -1861,13 +1384,436 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-      /* ============================================================
-   THEME ENGINE (in-memory, no storage APIs)
-   ============================================================ */
+      /* ═══════════════════════════════════════
+   CONFIG & API
+═══════════════════════════════════════ */
+      const API_BASE = "/shop/api/";
+      const API_URL = API_BASE + "admin/dashboard/stats/";
+      let charts = {};
+      let dashboardData = null;
+
+      /* ═══════════════════════════════════════
+   UTILITY FUNCTIONS
+═══════════════════════════════════════ */
+      function toPersianNum(n) {
+        return String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
+      }
+
+      function formatPrice(price) {
+        if (!price) return "۰";
+        const num = Number(price);
+        if (isNaN(num)) return String(price);
+        return num.toLocaleString("fa-IR");
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
+        try {
+          const d = new Date(dateStr);
+          return d
+            .toLocaleDateString("fa-IR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })
+            .replace(/\//g, "/");
+        } catch (e) {
+          return dateStr;
+        }
+      }
+
+      function getStatusBadge(status) {
+        const map = {
+          pending: "st-pending",
+          processing: "st-processing",
+          shipping: "st-shipped",
+          delivered: "st-delivered",
+          cancelled: "st-cancelled",
+        };
+        const labels = {
+          pending: "در انتظار",
+          processing: "در حال پردازش",
+          shipping: "ارسال شده",
+          delivered: "تحویل شده",
+          cancelled: "لغو شده",
+        };
+        return {
+          className: map[status] || "st-pending",
+          label: labels[status] || status,
+        };
+      }
+
+      /* ═══════════════════════════════════════
+   LOAD DASHBOARD DATA
+═══════════════════════════════════════ */
+      async function loadDashboard() {
+        try {
+          const response = await fetch(API_URL);
+          if (!response.ok) throw new Error("Failed to load dashboard data");
+          dashboardData = await response.json();
+          console.log("✅ Dashboard loaded:", dashboardData);
+          renderAll();
+        } catch (error) {
+          console.error("❌ Error loading dashboard:", error);
+          document
+            .querySelectorAll(".stat-value")
+            .forEach((el) => (el.textContent = "۰"));
+          document.getElementById("recentOrdersTable").innerHTML = `
+            <tr><td colspan="6" class="text-center text-danger">خطا در بارگذاری اطلاعات</td></tr>
+          `;
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════ */
+      function renderAll() {
+        if (!dashboardData) return;
+        renderUserProfile();
+        renderStats();
+        renderMonthlySalesChart();
+        renderRecentOrders();
+        renderActivities();
+        renderTopProducts();
+        renderNotifications();
+        updateBadges();
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER USER PROFILE
+═══════════════════════════════════════ */
+      function renderUserProfile() {
+        const user = dashboardData.user || {};
+        const avatar = user.profile_image || "https://i.pravatar.cc/100?img=47";
+
+        document.getElementById("greetingText").textContent =
+          `سلام، ${user.fullname || "کاربر"} 👋`;
+        document.getElementById("todayDate").textContent =
+          dashboardData.today_date ||
+          "خلاصه عملکرد فروشگاه اسکوتر برقی شما — امروز";
+        document.getElementById("profileAvatar").src = avatar;
+        document.getElementById("profileName").textContent =
+          user.fullname || "کاربر";
+        document.getElementById("profileRole").textContent =
+          user.bio || "مدیر فروشگاه";
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER STATS
+═══════════════════════════════════════ */
+      function renderStats() {
+        const stats = dashboardData.stats || {};
+        const trends = stats.trends || {};
+
+        document.getElementById("totalProducts").textContent = toPersianNum(
+          stats.total_products || 0,
+        );
+        document.getElementById("todayOrders").textContent = toPersianNum(
+          stats.today_orders || 0,
+        );
+        document.getElementById("totalCustomers").textContent = toPersianNum(
+          stats.total_customers || 0,
+        );
+        document.getElementById("monthlyRevenue").textContent = toPersianNum(
+          stats.monthly_revenue || 0,
+        );
+
+        // Trends
+        const trendMap = {
+          productsTrend: trends.products_trend || "+0%",
+          ordersTrend: trends.orders_trend || "+0%",
+          customersTrend: trends.customers_trend || "+0%",
+          revenueTrend: trends.revenue_trend || "+0%",
+        };
+
+        Object.entries(trendMap).forEach(([id, value]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const isUp = value.startsWith("+");
+          el.className = `stat-trend ${isUp ? "trend-up" : "trend-down"}`;
+          el.innerHTML = `<i class="fa-solid fa-arrow-trend-${isUp ? "up" : "down"}"></i> ${value}`;
+        });
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER MONTHLY SALES CHART
+═══════════════════════════════════════ */
+      function renderMonthlySalesChart() {
+        const data = dashboardData.monthly_sales || [];
+        const categories = data.map((d) => d.month);
+        const series = data.map((d) => d.total);
+
+        const palette = {
+          blue: "#2F6FED",
+          purple: "#7C5CFC",
+          cyan: "#22D3EE",
+          green: "#10B981",
+          orange: "#F59E0B",
+          red: "#EF4444",
+        };
+        const baseFont = "'Vazirmatn', sans-serif";
+        const isDark = document.body.getAttribute("data-theme") === "dark";
+
+        if (charts.sales) {
+          charts.sales.destroy();
+        }
+
+        charts.sales = new ApexCharts(document.querySelector("#chartSales"), {
+          chart: {
+            type: "area",
+            height: 300,
+            fontFamily: baseFont,
+            toolbar: { show: false },
+            animations: { easing: "easeinout" },
+          },
+          series: [
+            {
+              name: "درآمد",
+              type: "area",
+              data: series,
+            },
+          ],
+          stroke: { width: [0], curve: "smooth" },
+          fill: {
+            type: ["gradient"],
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.45,
+              opacityTo: 0,
+              stops: [0, 90, 100],
+            },
+          },
+          colors: [palette.blue],
+          dataLabels: { enabled: false },
+          xaxis: {
+            categories: categories,
+            labels: { style: { fontSize: "11px" } },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+          },
+          yaxis: {
+            opposite: true,
+            labels: { style: { fontSize: "11px" }, formatter: (v) => v + "M" },
+          },
+          grid: {
+            borderColor: isDark
+              ? "rgba(255,255,255,.08)"
+              : "rgba(11,17,32,.08)",
+            strokeDashArray: 4,
+          },
+          tooltip: {
+            shared: true,
+            y: { formatter: (v) => v + " میلیون تومان" },
+          },
+          legend: { show: false },
+        });
+        charts.sales.render();
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER RECENT ORDERS
+═══════════════════════════════════════ */
+      function renderRecentOrders() {
+        const orders = dashboardData.recent_orders || [];
+        const tbody = document.getElementById("recentOrdersTable");
+
+        if (orders.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">هیچ سفارشی یافت نشد</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = orders
+          .map((o) => {
+            const status = getStatusBadge(o.status);
+            const products = o.products || [];
+            const productNames = products.join(" - ");
+            const avatar =
+              o.customer_avatar || "https://i.pravatar.cc/80?img=12";
+
+            return `
+            <tr>
+              <td class="num">${o.order_number || "N/A"}</td>
+              <td>
+                <div class="cust-cell">
+                  <img src="${avatar}" />
+                  <div>
+                    <div class="nm">${o.customer_name || "کاربر"}</div>
+                    <div class="id">@${o.customer_username || "user"}</div>
+                  </div>
+                </div>
+              </td>
+              <td>${productNames || "-"}</td>
+              <td class="num">${formatPrice(o.total)}</td>
+              <td>
+                <span class="badge-status ${status.className}">${status.label}</span>
+              </td>
+              <td class="num">${formatDate(o.created_at)}</td>
+            </tr>
+          `;
+          })
+          .join("");
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER ACTIVITIES
+═══════════════════════════════════════ */
+      function renderActivities() {
+        const activities = dashboardData.recent_activities || [];
+        const container = document.getElementById("activitiesList");
+
+        if (activities.length === 0) {
+          container.innerHTML = `<div class="text-center text-muted py-3">هیچ فعالیتی یافت نشد</div>`;
+          return;
+        }
+
+        const colorMap = {
+          blue: { bg: "rgba(47,111,237,0.12)", color: "#2F6FED" },
+          purple: { bg: "rgba(124,92,252,0.12)", color: "#7C5CFC" },
+          orange: { bg: "rgba(245,158,11,0.13)", color: "#F59E0B" },
+          green: { bg: "rgba(16,185,129,0.13)", color: "#10B981" },
+          red: { bg: "rgba(239,68,68,0.12)", color: "#EF4444" },
+          cyan: { bg: "rgba(34,211,238,0.14)", color: "#0E7490" },
+        };
+
+        container.innerHTML = activities
+          .map((a) => {
+            const colors = colorMap[a.color] || colorMap.blue;
+            return `
+            <div class="feed-item">
+              <div class="feed-ico" style="background: ${colors.bg}; color: ${colors.color};">
+                <i class="fa-solid ${a.icon || "fa-bell"}"></i>
+              </div>
+              <div class="feed-txt">
+                <p>${a.title || "فعالیت"}</p>
+                <span>${a.description || ""} — ${a.time || ""}</span>
+              </div>
+            </div>
+          `;
+          })
+          .join("");
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER TOP PRODUCTS
+═══════════════════════════════════════ */
+      function renderTopProducts() {
+        const products = dashboardData.top_products || [];
+        const container = document.getElementById("topProductsList");
+
+        if (products.length === 0) {
+          container.innerHTML = `<div class="text-center text-muted py-3">هیچ محصولی یافت نشد</div>`;
+          return;
+        }
+
+        const gradients = [
+          "var(--grad-primary)",
+          "var(--grad-orange)",
+          "var(--grad-green)",
+          "var(--grad-purple)",
+        ];
+
+        container.innerHTML =
+          `<div class="row g-3">` +
+          products
+            .map((p, i) => {
+              const color = gradients[i % gradients.length];
+              const cover = p.cover_image || "";
+              return `
+            <div class="col-md-6">
+              <div class="product-row">
+                <div class="product-thumb" style="background: ${color};">
+                  ${cover ? `<img src="${cover}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">` : `<i class="fa-solid fa-motorcycle"></i>`}
+                </div>
+                <div class="product-info">
+                  <div class="pname">${p.name || "محصول"}</div>
+                  <div class="pmeta">
+                    <span>${toPersianNum(p.total_sold || 0)} فروش</span>
+                    <span>${formatPrice(p.total_revenue || 0)} تومان</span>
+                  </div>
+                </div>
+                <div class="qbtn">
+                  <i class="fa-solid fa-arrow-up-left-from-circle"></i>
+                </div>
+              </div>
+            </div>
+          `;
+            })
+            .join("") +
+          `</div>`;
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER NOTIFICATIONS
+═══════════════════════════════════════ */
+      function renderNotifications() {
+        const notifications = dashboardData.notifications || [];
+        const container = document.getElementById("notificationList");
+        const panelContainer = document.getElementById("notifList");
+
+        if (notifications.length === 0) {
+          container.innerHTML = `<div class="text-center text-muted py-3">هیچ اعلانی وجود ندارد</div>`;
+          panelContainer.innerHTML = `<div class="text-center text-muted py-3">هیچ اعلانی وجود ندارد</div>`;
+          return;
+        }
+
+        const renderItem = (n) => `
+          <div class="notif-item">
+            <div class="notif-prio" style="background: ${n.priority_color || "var(--blue)"}"></div>
+            <div class="notif-ico" style="background: ${n.icon_color ? `rgba(${getColorRgb(n.icon_color)},0.12)` : "rgba(47,111,237,0.12)"}; color: ${n.icon_color ? getColorHex(n.icon_color) : "var(--blue)"};">
+              <i class="fa-solid ${n.icon || "fa-bell"}"></i>
+            </div>
+            <div class="notif-body">
+              <p>${n.title || "اعلان"}</p>
+              <span class="d">${n.description || ""}</span>
+              <small>${n.time || ""}</small>
+            </div>
+          </div>
+        `;
+
+        function getColorHex(name) {
+          const map = {
+            red: "#EF4444",
+            blue: "#2F6FED",
+            orange: "#F59E0B",
+            green: "#10B981",
+            cyan: "#22D3EE",
+            purple: "#7C5CFC",
+          };
+          return map[name] || "#2F6FED";
+        }
+
+        function getColorRgb(name) {
+          const map = {
+            red: "239,68,68",
+            blue: "47,111,237",
+            orange: "245,158,11",
+            green: "16,185,129",
+            cyan: "34,211,238",
+            purple: "124,92,252",
+          };
+          return map[name] || "47,111,237";
+        }
+
+        const html = notifications.map(renderItem).join("");
+        container.innerHTML = html;
+        panelContainer.innerHTML = html;
+      }
+
+      /* ═══════════════════════════════════════
+   UPDATE BADGES
+═══════════════════════════════════════ */
+      function updateBadges() {
+        const stats = dashboardData.stats || {};
+        document.getElementById("orderBadgeCount").textContent =
+          stats.today_orders || 0;
+      }
+
+      /* ═══════════════════════════════════════
+   THEME ENGINE
+═══════════════════════════════════════ */
       const body = document.body;
       const btnLight = document.getElementById("themeLight");
       const btnDark = document.getElementById("themeDark");
-      let charts = {};
 
       function applyChartTheme(isDark) {
         Object.values(charts).forEach((c) => {
@@ -1888,21 +1834,28 @@
           );
         });
       }
+
       function setTheme(mode) {
         body.setAttribute("data-theme", mode);
         btnLight.classList.toggle("active", mode === "light");
         btnDark.classList.toggle("active", mode === "dark");
         applyChartTheme(mode === "dark");
+        // رفرش چارت
+        if (charts.sales) {
+          renderMonthlySalesChart();
+        }
       }
+
       btnLight.addEventListener("click", () => setTheme("light"));
       btnDark.addEventListener("click", () => setTheme("dark"));
+
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         setTheme("dark");
       }
 
-      /* ============================================================
+      /* ═══════════════════════════════════════
    DROPDOWNS
-   ============================================================ */
+═══════════════════════════════════════ */
       function wireDropdown(btnId, panelId) {
         const btn = document.getElementById(btnId);
         const panel = document.getElementById(panelId);
@@ -1922,9 +1875,9 @@
           .forEach((p) => p.classList.remove("show")),
       );
 
-      /* ============================================================
+      /* ═══════════════════════════════════════
    MOBILE SIDEBAR
-   ============================================================ */
+═══════════════════════════════════════ */
       const sidebar = document.getElementById("sidebar");
       const sbBackdrop = document.getElementById("sbBackdrop");
       document.getElementById("sbToggle").addEventListener("click", () => {
@@ -1936,264 +1889,27 @@
         sbBackdrop.classList.remove("show");
       });
 
-      /* ============================================================
-   ANIMATED COUNTERS
-   ============================================================ */
-      function animateCounter(el) {
-        const target = parseInt(el.getAttribute("data-count"), 10);
-        const suffix = el.getAttribute("data-suffix") || "";
-        const duration = 1400;
-        const start = performance.now();
-        function toPersianDigits(n) {
-          return n.toString().replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
-        }
-        function tick(now) {
-          const p = Math.min(1, (now - start) / duration);
-          const eased = 1 - Math.pow(1 - p, 3);
-          const val = Math.floor(eased * target);
-          el.textContent =
-            toPersianDigits(val.toLocaleString("en-US")) +
-            (suffix ? " " + suffix : "");
-          if (p < 1) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      }
-      const counterObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) {
-              animateCounter(e.target);
-              counterObserver.unobserve(e.target);
-            }
-          });
-        },
-        { threshold: 0.4 },
-      );
+      /* ═══════════════════════════════════════
+   EXCEL DOWNLOAD HANDLERS (TODO)
+═══════════════════════════════════════ */
       document
-        .querySelectorAll("[data-count]")
-        .forEach((el) => counterObserver.observe(el));
-
-      /* ============================================================
-   APEXCHARTS — shared palette
-   ============================================================ */
-      const palette = {
-        blue: "#2F6FED",
-        purple: "#7C5CFC",
-        cyan: "#22D3EE",
-        green: "#10B981",
-        orange: "#F59E0B",
-        red: "#EF4444",
-      };
-      const baseFont = "'Vazirmatn', sans-serif";
-
-      // 1) Monthly sales: revenue (area) + orders (line)
-      charts.sales = new ApexCharts(document.querySelector("#chartSales"), {
-        chart: {
-          type: "line",
-          height: 300,
-          fontFamily: baseFont,
-          toolbar: { show: false },
-          animations: { easing: "easeinout" },
-        },
-        series: [
-          {
-            name: "درآمد",
-            type: "area",
-            data: [120, 135, 128, 150, 162, 158, 170, 182, 176, 195, 205, 214],
-          },
-          {
-            name: "سفارش‌ها",
-            type: "line",
-            data: [60, 68, 64, 72, 80, 78, 84, 90, 88, 96, 101, 108],
-          },
-        ],
-        stroke: { width: [0, 3], curve: "smooth" },
-        fill: {
-          type: ["gradient", "solid"],
-          gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.45,
-            opacityTo: 0,
-            stops: [0, 90, 100],
-          },
-        },
-        colors: [palette.blue, palette.purple],
-        dataLabels: { enabled: false },
-        xaxis: {
-          categories: [
-            "فرو",
-            "ارد",
-            "خرد",
-            "تیر",
-            "مرد",
-            "شهر",
-            "مهر",
-            "آبا",
-            "آذر",
-            "دی",
-            "بهم",
-            "اسف",
-          ],
-          labels: { style: { fontSize: "11px" } },
-          axisBorder: { show: false },
-          axisTicks: { show: false },
-        },
-        yaxis: { opposite: true, labels: { style: { fontSize: "11px" } } },
-        grid: { borderColor: "rgba(11,17,32,.08)", strokeDashArray: 4 },
-        tooltip: { shared: true },
-        legend: { show: false },
-      });
-      charts.sales.render();
-
-      // 2) Daily visits area
-      charts.traffic = new ApexCharts(document.querySelector("#chartTraffic"), {
-        chart: {
-          type: "area",
-          height: 130,
-          fontFamily: baseFont,
-          sparkline: { enabled: true },
-        },
-        series: [
-          {
-            name: "بازدید",
-            data: [210, 260, 240, 300, 280, 340, 400, 380, 420, 460, 440, 500],
-          },
-        ],
-        stroke: { width: 2.5, curve: "smooth" },
-        fill: {
-          type: "gradient",
-          gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0 },
-        },
-        colors: [palette.cyan],
-        tooltip: { x: { show: false } },
-      });
-      charts.traffic.render();
-
-      // 3) Conversion radial
-      charts.conversion = new ApexCharts(
-        document.querySelector("#chartConversion"),
-        {
-          chart: { type: "radialBar", height: 130, fontFamily: baseFont },
-          series: [48],
-          plotOptions: {
-            radialBar: {
-              hollow: { size: "58%" },
-              dataLabels: {
-                value: {
-                  fontSize: "15px",
-                  fontWeight: 700,
-                  formatter: (v) => v + "%",
-                },
-              },
-            },
-          },
-          colors: [palette.purple],
-          stroke: { lineCap: "round" },
-          labels: ["نرخ تبدیل"],
-        },
-      );
-      charts.conversion.render();
-
-      // 4) Top selling scooters bar
-      charts.topSelling = new ApexCharts(
-        document.querySelector("#chartTopSelling"),
-        {
-          chart: {
-            type: "bar",
-            height: 300,
-            fontFamily: baseFont,
-            toolbar: { show: false },
-          },
-          series: [{ name: "تعداد فروش", data: [320, 278, 215, 160, 134] }],
-          plotOptions: {
-            bar: {
-              borderRadius: 8,
-              horizontal: true,
-              distributed: true,
-              barHeight: "52%",
-            },
-          },
-          colors: [
-            palette.blue,
-            palette.purple,
-            palette.cyan,
-            palette.orange,
-            palette.green,
-          ],
-          dataLabels: {
-            enabled: true,
-            style: { fontSize: "11px", fontWeight: 700 },
-          },
-          xaxis: {
-            categories: ["نوا X1", "فلش پرو", "اوربیت", "ترندر", "مینی کامپکت"],
-            labels: { style: { fontSize: "11px" } },
-          },
-          grid: { borderColor: "rgba(11,17,32,.08)", strokeDashArray: 4 },
-          legend: { show: false },
-        },
-      );
-      charts.topSelling.render();
-
-      // 5) Inventory status
-      charts.inventory = new ApexCharts(
-        document.querySelector("#chartInventory"),
-        {
-          chart: {
-            type: "bar",
-            height: 300,
-            fontFamily: baseFont,
-            toolbar: { show: false },
-          },
-          series: [{ name: "موجودی فعلی", data: [72, 18, 55, 8, 40] }],
-          plotOptions: {
-            bar: {
-              borderRadius: 8,
-              horizontal: true,
-              barHeight: "52%",
-              colors: {
-                ranges: [
-                  { from: 0, to: 15, color: palette.red },
-                  { from: 16, to: 40, color: palette.orange },
-                  { from: 41, to: 100, color: palette.green },
-                ],
-              },
-            },
-          },
-          dataLabels: {
-            enabled: true,
-            formatter: (v) => v + "%",
-            style: { fontSize: "11px", fontWeight: 700 },
-          },
-          xaxis: {
-            categories: ["نوا X1", "فلش پرو", "اوربیت", "ترندر", "مینی کامپکت"],
-            max: 100,
-            labels: { style: { fontSize: "11px" } },
-          },
-          grid: { borderColor: "rgba(11,17,32,.08)", strokeDashArray: 4 },
-          legend: { show: false },
-        },
-      );
-      charts.inventory.render();
-
-      // 6) Mini sparklines on stat cards
-      function spark(id, data, color) {
-        charts[id] = new ApexCharts(document.querySelector("#" + id), {
-          chart: { type: "area", height: 34, sparkline: { enabled: true } },
-          series: [{ data }],
-          stroke: { width: 2, curve: "smooth" },
-          fill: {
-            type: "gradient",
-            gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0 },
-          },
-          colors: [color],
-          tooltip: { enabled: false },
+        .getElementById("downloadExcelBtn")
+        .addEventListener("click", () => {
+          // TODO: پیاده‌سازی خروجی اکسل کامل با نمودارهای مختلف
+          alert("📊 TODO: خروجی اکسل کامل با نمودارهای درآمد ماهانه");
         });
-        charts[id].render();
-      }
-      spark("sparkProducts", [30, 34, 32, 40, 38, 44, 48, 46], palette.blue);
-      spark("sparkOrders", [10, 18, 14, 22, 19, 26, 24, 30], palette.orange);
-      spark("sparkCustomers", [40, 42, 46, 44, 50, 52, 55, 58], palette.green);
-      spark("sparkRevenue", [60, 58, 55, 50, 48, 44, 40, 38], palette.purple);
+
+      document
+        .getElementById("downloadOrdersBtn")
+        .addEventListener("click", () => {
+          // TODO: پیاده‌سازی خروجی اکسل ۲۰ سفارش آخر
+          alert("📊 TODO: خروجی اکسل ۲۰ سفارش آخر");
+        });
+
+      /* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+      loadDashboard();
     </script>
   </body>
 </html>

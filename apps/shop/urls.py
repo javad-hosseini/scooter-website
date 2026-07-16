@@ -11,6 +11,8 @@ urlpatterns = [
     re_path(r'^api/category/(?P<slug>.+)/$', views.CategoryDetailAPIView.as_view(), name='api_category_detail'),
     re_path(r'^api/product/(?P<slug>.+)/$', views.ProductDetailAPIView.as_view(), name='api_product_detail'),
     path('api/wishlist/toggle/', views.WishlistToggleAPIView.as_view(), name='api_wishlist_toggle'),
+    path('api/admin/dashboard/stats/', views.AdminDashboardStatsAPIView.as_view(), name='api_admin_dashboard_stats'),
+
 
     # ⚠️ IMPORTANT: آدرس‌های با جزئیات بیشتر را اول بگذار
     re_path(r'^api/products/(?P<slug>.+)/reviews/$', views.ProductReviewListCreateAPIView.as_view(),

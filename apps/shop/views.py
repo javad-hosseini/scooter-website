@@ -1,13 +1,20 @@
 # apps/shop/views.py
 
-from django.db.models import Q
+from datetime import timedelta
+
+from django.db.models import Sum, Q
+from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.views.generic import TemplateView
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.accounts.models import CustomUser
+from .models import Order, OrderItem
 from .models import Product, Category, ProductReview, Wishlist
 from .pagination import ProductPagination
 from .serializers import (
@@ -175,6 +182,8 @@ class WishlistToggleAPIView(APIView):
                 'message': 'به علاقه‌مندی‌ها اضافه شد.',
                 'is_in_wishlist': True
             })
+
+
 class WishlistListAPIView(generics.ListAPIView):
     """API برای لیست علاقه‌مندی‌های کاربر"""
     permission_classes = [IsAuthenticated]
@@ -218,3 +227,175 @@ class ProductPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['slug'] = self.kwargs.get('slug')
         return context
+
+
+class AdminDashboardStatsAPIView(APIView):
+    """API برای دریافت آمار داشبورد ادمین"""
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        user = request.user
+
+        # ===== تاریخ امروز =====
+        today = timezone.now().date()
+
+        # ===== 1. کل محصولات فعال =====
+        total_products = Product.objects.filter(is_available=True, is_published=True).count()
+
+        # ===== 2. سفارش‌های امروز =====
+        today_orders = Order.objects.filter(
+            created_at__date=today
+        ).count()
+
+        # ===== 3. کل مشتریان =====
+        total_customers = CustomUser.objects.filter(is_active=True).count()
+
+        # ===== 4. درآمد ماهانه (فقط سفارش‌های پرداخت شده) =====
+        first_day_of_month = today.replace(day=1)
+        monthly_revenue = Order.objects.filter(
+            payment_status='paid',
+            created_at__gte=first_day_of_month
+        ).aggregate(total=Sum('total'))['total'] or 0
+
+        # تبدیل به میلیون تومان
+        monthly_revenue_million = monthly_revenue / 1_000_000
+
+        # ===== 5. روند فروش ماهانه (۱۲ ماه اخیر) =====
+        monthly_sales = []
+        end_date = today
+        start_date = today - timedelta(days=365)
+
+        # گرفتن داده‌های ماهانه
+        sales_data = Order.objects.filter(
+            payment_status='paid',
+            created_at__gte=start_date,
+            created_at__lte=end_date
+        ).annotate(
+            month=TruncMonth('created_at')
+        ).values('month').annotate(
+            total=Sum('total')
+        ).order_by('month')
+
+        # ایجاد لیست کامل ۱۲ ماه
+        months = []
+        for i in range(11, -1, -1):
+            month_date = today - timedelta(days=30 * i)
+            months.append({
+                'month': month_date.strftime('%B'),
+                'year': month_date.year,
+                'total': 0
+            })
+
+        # پر کردن داده‌ها
+        for data in sales_data:
+            if data['month']:
+                month_name = data['month'].strftime('%B')
+                for m in months:
+                    if m['month'] == month_name:
+                        m['total'] = data['total'] / 1_000_000  # تبدیل به میلیون
+                        break
+
+        monthly_sales = months
+
+        # ===== 6. ۶ سفارش آخر =====
+        recent_orders = Order.objects.select_related(
+            'user', 'address'
+        ).prefetch_related(
+            'items__product'
+        ).order_by('-created_at')[:6]
+
+        recent_orders_data = []
+        for order in recent_orders:
+            # گرفتن محصولات
+            products = order.items.all()
+            product_names = [item.product.name for item in products]
+
+            recent_orders_data.append({
+                'order_number': order.order_number,
+                'customer_name': order.user.fullname or order.user.username,
+                'customer_username': order.user.username,
+                'customer_avatar': order.user.profile_image.url if order.user.profile_image else None,
+                'products': product_names,
+                'total': order.total,
+                'status': order.status,
+                'status_label': dict(Order.STATUS_CHOICES).get(order.status, order.status),
+                'created_at': order.created_at,
+                'payment_status': order.payment_status,
+            })
+
+        # ===== 7. پرفروش‌ترین محصولات ماه =====
+        start_of_month = today.replace(day=1)
+        top_products = OrderItem.objects.filter(
+            order__payment_status='paid',
+            order__created_at__gte=start_of_month
+        ).values(
+            'product_id', 'product__name', 'product__cover_image'
+        ).annotate(
+            total_sold=Sum('quantity'),
+            total_revenue=Sum('price')
+        ).order_by('-total_sold')[:4]
+
+        top_products_data = []
+        for item in top_products:
+            top_products_data.append({
+                'product_id': item['product_id'],
+                'name': item['product__name'],
+                'cover_image': item['product__cover_image'],
+                'total_sold': item['total_sold'],
+                'total_revenue': item['total_revenue'] or 0,
+            })
+
+        # ===== 8. فعالیت‌های اخیر (برای TODO) =====
+        # این بخش فعلاً با داده‌های نمونه پر می‌شود
+        recent_activities = [
+            {
+                'icon': 'fa-cart-shopping',
+                'title': 'سفارش جدید دریافت شد',
+                'description': f'سفارش #{recent_orders[0].order_number if recent_orders else "N/A"}',
+                'time': '۲ دقیقه پیش',
+                'color': 'blue'
+            },
+            # ... بقیه فعالیت‌ها
+        ]
+
+        # ===== 9. اعلان‌ها (برای TODO) =====
+        notifications = [
+            {
+                'priority_color': 'red',
+                'icon': 'fa-triangle-exclamation',
+                'icon_color': 'red',
+                'title': 'هشدار موجودی انبار',
+                'description': 'موجودی «اسکوتر فلش پرو» کمتر از ۵ واحد است',
+                'time': '۲ دقیقه پیش'
+            },
+            # ... بقیه اعلان‌ها
+        ]
+
+        data = {
+            'user': {
+                'fullname': user.fullname or user.username,
+                'profile_image': user.profile_image.url if user.profile_image else None,
+                'bio': user.bio or 'مدیر فروشگاه',
+                'username': user.username,
+            },
+            'stats': {
+                'total_products': total_products,
+                'today_orders': today_orders,
+                'total_customers': total_customers,
+                'monthly_revenue': round(monthly_revenue_million, 1),
+                'trends': {
+                    'products_trend': '+8.2%',
+                    'orders_trend': '+12.4%',
+                    'customers_trend': '+5.1%',
+                    'revenue_trend': '-2.3%',
+                }
+            },
+            'monthly_sales': monthly_sales,
+            'recent_orders': recent_orders_data,
+            'top_products': top_products_data,
+            'recent_activities': recent_activities,
+            'notifications': notifications,
+            'today_date': today.strftime('%A، %d %B %Y'),
+        }
+
+        return Response(data)

@@ -286,3 +286,32 @@ class DashboardSerializer(serializers.Serializer):
     wishlist = serializers.ListField()
     addresses = AddressSerializer(many=True)
     notifications = serializers.ListField()
+
+
+# apps/shop/serializers.py (افزودن)
+
+class AdminOrderSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='user.fullname')
+    customer_username = serializers.CharField(source='user.username')
+    customer_avatar = serializers.SerializerMethodField()
+    products = serializers.SerializerMethodField()
+    status_label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = [
+            'order_number', 'customer_name', 'customer_username',
+            'customer_avatar', 'products', 'total', 'status',
+            'status_label', 'created_at', 'payment_status'
+        ]
+
+    def get_customer_avatar(self, obj):
+        if obj.user and obj.user.profile_image:
+            return obj.user.profile_image.url
+        return None
+
+    def get_products(self, obj):
+        return [item.product.name for item in obj.items.all()]
+
+    def get_status_label(self, obj):
+        return dict(Order.STATUS_CHOICES).get(obj.status, obj.status)

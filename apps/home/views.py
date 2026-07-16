@@ -1,6 +1,9 @@
 # apps/home/views.py
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Prefetch
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -190,3 +193,20 @@ class CategoryPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
+
+def is_admin_group(user):
+    """چک کردن اینکه کاربر در گروه 'admin' هست"""
+    return user.is_authenticated and user.groups.filter(name='admin').exists()
+
+
+class AccessDeniedView(TemplateView):
+    """صفحه عدم دسترسی"""
+    template_name = 'home/access_denied.html'
+
+
+@method_decorator(login_required(login_url='/access-denied/'), name='dispatch')
+@method_decorator(staff_member_required(login_url='/access-denied/'), name='dispatch')
+class AdminDashboardPageView(TemplateView):
+    """صفحه داشبورد ادمین"""
+    template_name = 'accounts/admin_dashboard.html'

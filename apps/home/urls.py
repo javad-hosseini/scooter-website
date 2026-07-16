@@ -19,6 +19,7 @@ urlpatterns = [
     path('articles/', ArticleListPageView.as_view(), name='articles'),
     re_path(r'^articles/(?P<slug>.+)/$', ArticleDetailPageView.as_view(), name='article_detail'),
     path('categories/', views.CategoryPageView.as_view(), name='categories'),
+    path('admin/dashboard/', views.AdminDashboardPageView.as_view(), name='admin_dashboard'),
 
     # ===== صفحه اصلی =====
     path('', views.IndexPageView.as_view(), name='index'),
@@ -41,6 +42,8 @@ urlpatterns = [
     re_path(r'^api/articles/(?P<slug>.+)/$', views.ArticleDetailAPIView.as_view(), name='api_article_detail'),
     path('api/tags/', views.TagListAPIView.as_view(), name='api_tags'),
     re_path(r'^api/articles/(?P<slug>.+)/comments/$', views.CommentListCreateAPIView.as_view(), name='api_comments'),
+    # ===== صفحه عدم دسترسی =====
+    path('access-denied/', views.AccessDeniedView.as_view(), name='access_denied'),
 ]
 
 if settings.DEBUG:

@@ -360,6 +360,38 @@ class CategoryBadgeInline(admin.TabularInline):
     ordering = ['order']
 
 
+# apps/home/admin.py
+
+# این رو به انتهای فایل اضافه کن
+
+@admin.register(CategoryImage)
+class CategoryImageAdmin(admin.ModelAdmin):
+    list_display = ['category', 'image_preview', 'alt_text', 'is_primary', 'order']
+    list_filter = ['category', 'is_primary']
+    list_editable = ['order', 'is_primary']
+    search_fields = ['category__name', 'alt_text']
+    ordering = ['category', 'order']
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="height:50px;width:50px;object-fit:cover;border-radius:6px;" />',
+                obj.image.url
+            )
+        return '—'
+
+    image_preview.short_description = 'تصویر'
+
+# apps/home/admin.py
+
+@admin.register(CategoryBadge)
+class CategoryBadgeAdmin(admin.ModelAdmin):
+    list_display = ['category', 'label', 'badge_text', 'color', 'order']
+    list_filter = ['category', 'color']
+    list_editable = ['order']
+    search_fields = ['category__name', 'label']
+    ordering = ['category', 'order']
+
 # @admin.register(Category)
 # class CategoryAdmin(admin.ModelAdmin):
 #     list_display = ['name', 'slug', 'icon', 'is_active', 'order', 'feature_count']

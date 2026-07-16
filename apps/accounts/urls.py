@@ -35,6 +35,7 @@ urlpatterns = [
 
     path('api/provinces/', views.ProvinceListAPIView.as_view(), name='api_provinces'),
     path('api/cities/', views.CityListAPIView.as_view(), name='api_cities'),
+
 ]
 
 if settings.DEBUG:

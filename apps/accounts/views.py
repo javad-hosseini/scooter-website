@@ -4,10 +4,12 @@ from datetime import timedelta
 
 from django.contrib.auth import login as django_login
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
@@ -467,6 +469,7 @@ class CityListAPIView(generics.ListAPIView):
         return City.objects.none()
 
 
+@method_decorator(login_required(login_url='/accounts/login/'), name='dispatch')
 class DashboardPageView(TemplateView):
     """صفحه داشبورد کاربر"""
     template_name = 'accounts/user_dashboard.html'
