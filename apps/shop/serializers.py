@@ -2,11 +2,13 @@
 
 from rest_framework import serializers
 
+from apps.accounts.models import Province, City
 from .models import (
-    Product, Category, ProductSpec, TrustBadge,
+    Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist, OrderItem, Order
+    ProductReview, Wishlist
 )
+from .models import Product, Order, OrderItem, Address
 from ..accounts.serializers import UserProfileSerializer, AddressSerializer
 
 
@@ -315,3 +317,151 @@ class AdminOrderSerializer(serializers.ModelSerializer):
 
     def get_status_label(self, obj):
         return dict(Order.STATUS_CHOICES).get(obj.status, obj.status)
+
+
+# apps/shop/serializers.py (افزودن به سریالایزرهای موجود)
+
+
+class ProvinceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Province
+        fields = ['id', 'name']
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['id', 'name', 'province']
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    province_name = serializers.CharField(source='province.name', read_only=True)
+    city_name = serializers.CharField(source='city.name', read_only=True)
+
+    class Meta:
+        model = Address
+        fields = [
+            'id', 'recipient_name', 'recipient_phone', 'province', 'province_name',
+            'city', 'city_name', 'address', 'postal_code', 'plaque',
+            'unit', 'floor', 'description', 'is_active'
+        ]
+        read_only_fields = ['user']
+
+
+# apps/shop/serializers.py
+
+class CartItemSerializer(serializers.Serializer):
+    """سریالایزر برای آیتم‌های سبد خرید (محصول + تعداد + رنگ انتخاب‌شده)"""
+
+    # این فیلدها باید با دیکشنری ورودی هماهنگ باشند
+    product = serializers.DictField(child=serializers.CharField(), required=False)
+    quantity = serializers.IntegerField(default=1)
+    selected_color = serializers.DictField(child=serializers.CharField(), required=False)
+    product_name = serializers.CharField(required=False)
+    product_slug = serializers.CharField(required=False)
+    product_image = serializers.CharField(required=False)
+    short_specs = serializers.CharField(required=False)
+    warranty_months = serializers.IntegerField(default=12)
+    available_colors = serializers.ListField(required=False, default=list)
+    original_price = serializers.IntegerField(required=False)
+    final_price = serializers.IntegerField(required=False)
+    saving_amount = serializers.IntegerField(required=False)
+    estimated_delivery = serializers.CharField(required=False)
+
+    def to_representation(self, instance):
+        # اگر instance یک دیکشنری باشد
+        if isinstance(instance, dict):
+            # استخراج محصول از دیکشنری
+            product = instance.get('product')
+            quantity = instance.get('quantity', 1)
+            selected_color = instance.get('selected_color', {'slug': 'black', 'name': 'مشکی', 'hex': '#1A1A1A'})
+
+            if product:
+                from decimal import Decimal
+                price = Decimal(str(product.price))
+                discount_price = Decimal(str(product.discount_price)) if product.discount_price else None
+                final_price = discount_price if discount_price else price
+                saving = (price - final_price) * Decimal(str(quantity)) if discount_price else Decimal('0')
+
+                specs = product.specs.all()[:2]
+                short_specs = ' | '.join([f"{s.label}: {s.value}" for s in specs])
+
+                colors = product.images.values('color_slug', 'color_label', 'color_hex').distinct()
+                available_colors = [
+                    {
+                        'slug': c['color_slug'],
+                        'name': c['color_label'],
+                        'hex': c['color_hex'],
+                        'selected': c['color_slug'] == selected_color.get('slug')
+                    }
+                    for c in colors
+                ]
+
+                from datetime import datetime, timedelta
+                delivery_date = datetime.now() + timedelta(days=3)
+
+                return {
+                    'product_id': product.id,
+                    'product_name': product.name,
+                    'product_slug': product.slug,
+                    'product_image': product.cover_image.url if product.cover_image else None,
+                    'short_specs': short_specs,
+                    'warranty_months': 12,
+                    'available_colors': available_colors,
+                    'selected_color': selected_color,
+                    'quantity': quantity,
+                    'original_price': int(price),
+                    'final_price': int(final_price),
+                    'saving_amount': int(saving),
+                    'estimated_delivery': delivery_date.strftime('%d %B %Y'),
+                }
+
+            return instance
+
+        # اگر instance یک آبجکت Product باشد (برای استفاده در آینده)
+        return super().to_representation(instance)
+
+
+class CartSerializer(serializers.Serializer):
+    """سریالایزر اصلی سبد خرید"""
+    items = CartItemSerializer(many=True)
+    item_count = serializers.IntegerField()
+    subtotal = serializers.DecimalField(max_digits=15, decimal_places=0)
+    discount_total = serializers.DecimalField(max_digits=15, decimal_places=0)
+    shipping_cost = serializers.CharField()
+    applied_coupon = serializers.CharField(allow_blank=True, allow_null=True)
+    tax_amount = serializers.DecimalField(max_digits=15, decimal_places=0)
+    final_total = serializers.DecimalField(max_digits=15, decimal_places=0)
+
+
+class OrderCreateSerializer(serializers.Serializer):
+    """سریالایزر برای ایجاد سفارش جدید"""
+    # اطلاعات ارسال
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    phone = serializers.CharField(max_length=11)
+    province_id = serializers.IntegerField()
+    city_id = serializers.IntegerField()
+    postal_code = serializers.CharField(max_length=10)
+    address = serializers.CharField()
+    save_address = serializers.BooleanField(default=False)
+
+    # پرداخت
+    payment_method = serializers.ChoiceField(choices=['card', 'cod', 'installments'])
+    coupon_code = serializers.CharField(required=False, allow_blank=True)
+    gift_card_code = serializers.CharField(required=False, allow_blank=True)
+
+    # اقساط
+    installment_months = serializers.IntegerField(required=False, default=6)
+
+    def validate(self, data):
+        # اعتبارسنجی شماره موبایل
+        import re
+        if not re.match(r'^09\d{9}$', data['phone']):
+            raise serializers.ValidationError({'phone': 'شماره موبایل معتبر نیست'})
+
+        # اعتبارسنجی کد پستی
+        if len(data['postal_code']) != 10:
+            raise serializers.ValidationError({'postal_code': 'کد پستی باید ۱۰ رقم باشد'})
+
+        return data

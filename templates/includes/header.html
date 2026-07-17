@@ -1,0 +1,151 @@
+<nav id="nav">
+  <a href="/" class="nav-logo">VOLTEX</a>
+  <ul class="nav-links">
+    <li><a href="/">خانه</a></li>
+    <li><a href="/shop/">محصولات</a></li>
+    <li><a href="/blog/">مجله</a></li>
+    <li><a href="/about/">درباره ما</a></li>
+  </ul>
+
+  <div class="nav-right-cluster">
+    <div class="nav-auth" id="navAuth">
+      <div class="auth-guest" id="authGuest">
+        <a href="/accounts/login/" class="auth-link-login">ورود</a>
+        <button class="nav-cta" onclick="location.href = '/accounts/register/'">
+          ثبت‌نام
+        </button>
+      </div>
+      <div class="auth-user" id="authUser" style="display: none">
+        <button
+          class="auth-user-btn"
+          id="authUserBtn"
+          onclick="toggleUserMenu(event)"
+        >
+          <span class="auth-user-avatar" id="userAvatar">👤</span>
+          <span class="auth-user-name" id="userName">کاربر</span>
+        </button>
+        <div class="auth-user-menu" id="authUserMenu" role="menu">
+          <a href="/accounts/profile/" role="menuitem">پروفایل</a>
+          <a href="/orders/" role="menuitem">سفارش‌های من</a>
+          <a href="/wishlist/" role="menuitem">علاقه‌مندی‌ها</a>
+          <a href="/accounts/settings/" role="menuitem">تنظیمات حساب</a>
+          <a
+            href="/accounts/logout/"
+            class="auth-logout"
+            role="menuitem"
+            onclick="
+              event.preventDefault();
+              document.getElementById('logout-form').submit();
+            "
+            >خروج</a
+          >
+          <form
+            id="logout-form"
+            action="/accounts/logout/"
+            method="POST"
+            style="display: none"
+          >
+            {% csrf_token %}
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <button
+      class="nav-cart-btn"
+      id="navCartBtn"
+      aria-label="سبد خرید"
+      onclick="location.href = '/cart/'"
+    >
+      <svg class="nav-cart-icon" viewBox="0 0 24 24">
+        <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" />
+        <circle cx="10" cy="20.5" r="1.4" />
+        <circle cx="17" cy="20.5" r="1.4" />
+      </svg>
+      <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
+    </button>
+
+    <button
+      class="nav-menu-btn"
+      id="menuBtn"
+      onclick="toggleMenu()"
+      aria-label="منو"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== MOBILE DRAWER ===== -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <a
+    href="/"
+    onclick="
+      closeMenu();
+      return false;
+    "
+    >خانه</a
+  >
+  <a
+    href="/shop/"
+    onclick="
+      closeMenu();
+      return false;
+    "
+    >محصولات</a
+  >
+  <a
+    href="/blog/"
+    onclick="
+      closeMenu();
+      return false;
+    "
+    >مجله</a
+  >
+  <a
+    href="/about/"
+    onclick="
+      closeMenu();
+      return false;
+    "
+    >درباره ما</a
+  >
+  <button
+    class="mobile-drawer-cta"
+    onclick="
+      closeMenu();
+      location.href = '/shop/';
+    "
+  >
+    خرید کنید
+  </button>
+
+  <div class="drawer-auth" id="drawerAuthGuest">
+    <a href="/accounts/login/" class="drawer-auth-link">ورود</a>
+    <button
+      class="drawer-auth-register"
+      onclick="location.href = '/accounts/register/'"
+    >
+      ثبت‌نام
+    </button>
+  </div>
+
+  <div class="drawer-auth-user" id="drawerAuthUser" style="display: none">
+    <div class="drawer-user-info">
+      👤 <span id="drawerUserName">کاربر</span>
+    </div>
+    <a href="/accounts/profile/">پروفایل</a>
+    <a href="/orders/">سفارش‌های من</a>
+    <a href="/wishlist/">علاقه‌مندی‌ها</a>
+    <a href="/accounts/settings/">تنظیمات حساب</a>
+    <a
+      href="/accounts/logout/"
+      class="auth-logout"
+      onclick="
+        event.preventDefault();
+        document.getElementById('logout-form').submit();
+      "
+      >خروج</a
+    >
+  </div>
+</div>

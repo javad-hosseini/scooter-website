@@ -91,6 +91,22 @@ class UserLoginAPIView(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
 
 
+# class LoginPageView(TemplateView):
+#     template_name = 'accounts/login.html'
+#
+#     def post(self, request, *args, **kwargs):
+#         form = AuthenticationForm(request, data=request.POST)
+#         if form.is_valid():
+#             user = form.get_user()
+#             login(request, user)
+#
+#
+#             if user.is_staff:
+#                 return redirect('home_app:admin_dashboard')
+#             return redirect('home_app:index')
+#
+#         return self.render_to_response({'form': form})
+
 class LoginPageView(TemplateView):
     template_name = 'accounts/login.html'
 

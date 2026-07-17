@@ -1,0 +1,205 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- عنوان صفحه (قابل تغییر در هر صفحه) -->
+    <title>
+      {% block title %}VOLTEX — اسکوترهای برقی پریمیوم{% endblock %}
+    </title>
+
+    <!-- توضیحات متا (قابل تغییر) -->
+    <meta
+      name="description"
+      content="{% block meta_description %}اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.{% endblock %}"
+    />
+
+    <!-- لینک کنونیکال -->
+    <link
+      rel="canonical"
+      href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}"
+    />
+
+    <!-- Open Graph -->
+    <meta
+      property="og:type"
+      content="{% block og_type %}website{% endblock %}"
+    />
+    <meta
+      property="og:title"
+      content="{% block og_title %}VOLTEX — اسکوترهای برقی پریمیوم{% endblock %}"
+    />
+    <meta
+      property="og:description"
+      content="{% block og_description %}اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.{% endblock %}"
+    />
+    <meta
+      property="og:image"
+      content="{% block og_image %}{% static 'images/og-cover.jpg' %}{% endblock %}"
+    />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:site_name" content="VOLTEX" />
+    <meta property="og:locale" content="fa_IR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="{% block twitter_title %}VOLTEX — اسکوترهای برقی پریمیوم{% endblock %}"
+    />
+    <meta
+      name="twitter:description"
+      content="{% block twitter_description %}اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.{% endblock %}"
+    />
+    <meta
+      name="twitter:image"
+      content="{% block twitter_image %}{% static 'images/og-cover.jpg' %}{% endblock %}"
+    />
+
+    <!-- فونت‌ها -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- استایل‌های پایه (همه صفحات) -->
+    <style>
+      /* ── CSS Variables ── */
+      :root {
+        --black: #050507;
+        --deep: #08080d;
+        --surface: #0c0c13;
+        --card: #101018;
+        --card-hover: #14141e;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-lit: rgba(125, 211, 252, 0.22);
+        --white: #f6f6f8;
+        --dim: rgba(246, 246, 248, 0.58);
+        --muted: rgba(246, 246, 248, 0.32);
+        --neon: #4fd8ff;
+        --neon2: #8b7bff;
+        --neon3: #ff6cc4;
+        --gold: #e9c97f;
+        --accent: #4fd8ff;
+        --glow: rgba(79, 216, 255, 0.14);
+        --font-display: "Vazirmatn", "Space Grotesk", sans-serif;
+        --font-ui: "Vazirmatn", "Inter", sans-serif;
+        --font-body: "Vazirmatn", "Inter", sans-serif;
+        --font-mono: "JetBrains Mono", "Vazirmatn", monospace;
+        --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --nav-h: 64px;
+        --r-sm: 10px;
+        --r-md: 14px;
+        --r-lg: 20px;
+        --shadow-card:
+          0 1px 0 rgba(255, 255, 255, 0.03) inset,
+          0 20px 50px -20px rgba(0, 0, 0, 0.7);
+        --shadow-lift:
+          0 30px 70px -24px rgba(0, 0, 0, 0.75),
+          0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+      }
+
+      /* ── Reset ── */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 16px;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--black);
+        color: var(--white);
+        font-family: var(--font-body);
+        font-weight: 300;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      ::selection {
+        background: var(--neon);
+        color: var(--black);
+      }
+      :focus-visible {
+        outline: 1.5px solid var(--neon);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+
+      /* ── Fluid Container ── */
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        width: 100%;
+      }
+
+      /* ── Responsive ── */
+      @media (min-width: 768px) {
+        :root {
+          --nav-h: 68px;
+        }
+      }
+      @media (min-width: 1024px) {
+        :root {
+          --nav-h: 76px;
+        }
+      }
+    </style>
+
+    <!-- استایل‌های هدر -->
+    {% include 'includes/header-styles.html' %}
+
+    <!-- استایل‌های فوتر -->
+    {% include 'includes/footer-styles.html' %}
+
+    <!-- استایل‌های اضافی مخصوص هر صفحه -->
+    {% block extra_styles %}{% endblock %}
+
+    <!-- JSON-LD (قابل تغییر در هر صفحه) -->
+    {% block json_ld %}{% endblock %}
+  </head>
+  <body>
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+    {% include 'includes/header.html' %}
+
+    <!-- ============================================================
+         MAIN CONTENT
+         ============================================================ -->
+    <main>{% block content %}{% endblock %}</main>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    {% include 'includes/footer.html' %}
+
+    <!-- ============================================================
+         SCRIPTS
+         ============================================================ -->
+    <!-- اسکریپت‌های هدر (مدیریت کاربر، منو و ...) -->
+    {% include 'includes/header-scripts.html' %}
+
+    <!-- اسکریپت‌های فوتر (خبرنامه و ...) -->
+    {% include 'includes/footer-scripts.html' %}
+
+    <!-- اسکریپت‌های اضافی مخصوص هر صفحه -->
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>

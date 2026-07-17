@@ -2,27 +2,34 @@
 
 from datetime import timedelta
 
+from django.db import transaction
 from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.generic import TemplateView
-from rest_framework import generics, status
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework import generics
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import CustomUser
-from .models import Order, OrderItem
-from .models import Product, Category, ProductReview, Wishlist
+from .models import Category, ProductReview, Wishlist
+from .models import Product, Order, OrderItem, Address
 from .pagination import ProductPagination
+from .serializers import (
+    CartSerializer, OrderCreateSerializer, CartItemSerializer
+)
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer,
     ProductReviewSerializer, ProductReviewCreateSerializer,
     WishlistSerializer, CategorySerializer, CategoryDetailSerializer
 )
 
+from apps.accounts.models import  Province, City
 
 class ProductListAPIView(generics.ListAPIView):
     """API برای لیست محصولات"""
@@ -399,3 +406,173 @@ class AdminDashboardStatsAPIView(APIView):
         }
 
         return Response(data)
+
+
+# apps/shop/views.py (افزودن به ویوهای موجود)
+
+
+# apps/shop/views.py
+
+# apps/shop/views.py
+
+class CartAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        product = Product.objects.filter(is_published=True, is_available=True).first()
+        if not product:
+            return Response({
+                'items': [],
+                'item_count': 0,
+                'subtotal': 0,
+                'discount_total': 0,
+                'shipping_cost': 'رایگان',
+                'applied_coupon': None,
+                'tax_amount': 0,
+                'final_total': 0,
+            })
+
+        quantity = 2
+        from decimal import Decimal
+
+        # ساخت آیتم با دیکشنری
+        items = [{
+            'product': product,
+            'quantity': quantity,
+            'selected_color': {'slug': 'black', 'name': 'مشکی', 'hex': '#1A1A1A'},
+        }]
+
+        # محاسبات
+        price = Decimal(str(product.price))
+        discount_price = Decimal(str(product.discount_price)) if product.discount_price else Decimal('0')
+
+        subtotal = price * Decimal(str(quantity))
+        discount = discount_price * Decimal(str(quantity)) if discount_price else Decimal('0')
+        final_total = subtotal - discount
+        tax = (subtotal * Decimal('0.09')).quantize(Decimal('0'))
+
+        # سریالایز کردن آیتم‌ها
+        serialized_items = CartItemSerializer(items, many=True).data
+
+        data = {
+            'items': serialized_items,
+            'item_count': quantity,
+            'subtotal': int(subtotal),
+            'discount_total': int(discount),
+            'shipping_cost': 'رایگان',
+            'applied_coupon': None,
+            'tax_amount': int(tax),
+            'final_total': int(final_total + tax),
+        }
+
+        return Response(data)
+
+class CheckoutPageView(TemplateView):
+    """صفحه تسویه حساب و پرداخت"""
+    template_name = 'shop/cart.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['provinces'] = Province.objects.all()
+        context['cities'] = City.objects.all()
+        return context
+
+
+class CheckoutSubmitAPIView(APIView):
+    """API برای ثبت نهایی سفارش و هدایت به درگاه پرداخت"""
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def post(self, request):
+        serializer = OrderCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        data = serializer.validated_data
+        user = request.user
+
+        # ===== 1. پیدا کردن یا ایجاد آدرس =====
+        province = get_object_or_404(Province, id=data['province_id'])
+        city = get_object_or_404(City, id=data['city_id'])
+
+        # آدرس کامل
+        full_name = f"{data['first_name']} {data['last_name']}"
+
+        address, created = Address.objects.get_or_create(
+            user=user,
+            recipient_name=full_name,
+            recipient_phone=data['phone'],
+            province=province,
+            city=city,
+            address=data['address'],
+            postal_code=data['postal_code'],
+            defaults={
+                'is_active': data.get('save_address', False)
+            }
+        )
+
+        # ===== 2. محاسبه قیمت‌ها =====
+        # TODO: گرفتن آیتم‌های سبد خرید از session
+        # فعلاً با دیتای نمونه
+        product = Product.objects.filter(is_published=True, is_available=True).first()
+        if not product:
+            return Response(
+                {'error': 'هیچ محصولی در سبد خرید وجود ندارد'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        quantity = 2  # از session گرفته شود
+        unit_price = product.final_price
+        subtotal = unit_price * quantity
+        discount = 0  # از session گرفته شود
+        shipping_cost = 0  # از session گرفته شود
+        tax = int(subtotal * 0.09)  # ۹% مالیات
+        total = subtotal - discount + shipping_cost + tax
+
+        # ===== 3. ایجاد سفارش =====
+        order = Order.objects.create(
+            user=user,
+            address=address,
+            subtotal=subtotal,
+            discount_amount=discount,
+            shipping_cost=shipping_cost,
+            total=total,
+            status='pending',
+            payment_status='pending',
+            notes=f"روش پرداخت: {data['payment_method']}"
+        )
+
+        # ===== 4. ایجاد آیتم‌های سفارش =====
+        OrderItem.objects.create(
+            order=order,
+            product=product,
+            quantity=quantity,
+            price=product.price,
+            discount=product.discount_price or 0
+        )
+
+        # ===== 5. TODO: اتصال به درگاه پرداخت =====
+        # اینجا باید به درگاه پرداخت متصل شود
+        # و user را به صفحه پرداخت هدایت کند
+        # فعلاً یک پاسخ موفق برمی‌گردانیم
+
+        return Response({
+            'status': 'success',
+            'order_id': order.id,
+            'order_number': order.order_number,
+            'redirect_url': f'/payment/gateway/{order.id}/',  # TODO: آدرس درگاه پرداخت
+            'message': 'سفارش با موفقیت ثبت شد و در حال انتقال به درگاه پرداخت هستید.'
+        })
+
+
+class PaymentGatewayView(TemplateView):
+    """صفحه درگاه پرداخت (موقت)"""
+    template_name = 'shop/payment_gateway.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order_id = self.kwargs.get('order_id')
+        context['order'] = get_object_or_404(Order, id=order_id)
+        return context

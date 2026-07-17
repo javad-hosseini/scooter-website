@@ -1,0 +1,2849 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "My API",
+    "version": "1.0.0",
+    "description": "API documentation"
+  },
+  "paths": {
+    "/accounts/api/addresses/": {
+      "get": {
+        "operationId": "accounts_api_addresses_retrieve",
+        "description": "API برای لیست و ایجاد آدرس",
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      },
+      "post": {
+        "operationId": "accounts_api_addresses_create",
+        "description": "API برای لیست و ایجاد آدرس",
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/accounts/api/addresses/{id}/delete/": {
+      "delete": {
+        "operationId": "accounts_api_addresses_delete_destroy",
+        "description": "API برای حذف آدرس",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/accounts/api/change-password/": {
+      "post": {
+        "operationId": "accounts_api_change_password_create",
+        "tags": ["accounts"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangePassword"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/cities/": {
+      "get": {
+        "operationId": "accounts_api_cities_list",
+        "description": "API برای لیست شهرهای یک استان",
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/dashboard/": {
+      "get": {
+        "operationId": "accounts_api_dashboard_retrieve",
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/accounts/api/login/": {
+      "post": {
+        "operationId": "accounts_api_login_create",
+        "tags": ["accounts"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLogin"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/password-reset/confirm/": {
+      "post": {
+        "operationId": "accounts_api_password_reset_confirm_create",
+        "tags": ["accounts"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirm"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirm"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirm"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordResetConfirm"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/password-reset/request/": {
+      "post": {
+        "operationId": "accounts_api_password_reset_request_create",
+        "tags": ["accounts"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordResetRequest"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/password-reset/verify/": {
+      "post": {
+        "operationId": "accounts_api_password_reset_verify_create",
+        "tags": ["accounts"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetVerify"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetVerify"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetVerify"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordResetVerify"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/password/change/": {
+      "post": {
+        "operationId": "accounts_api_password_change_create",
+        "tags": ["accounts"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangePassword"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/products/{slug}/wishlist/": {
+      "post": {
+        "operationId": "accounts_api_products_wishlist_create",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/accounts/api/profile/update/": {
+      "put": {
+        "operationId": "accounts_api_profile_update_update",
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/accounts/api/provinces/": {
+      "get": {
+        "operationId": "accounts_api_provinces_list",
+        "description": "API برای لیست استان‌ها",
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Province"
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/register/": {
+      "post": {
+        "operationId": "accounts_api_register_create",
+        "tags": ["accounts"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegistration"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts/api/wishlist/toggle/": {
+      "post": {
+        "operationId": "accounts_api_wishlist_toggle_create",
+        "tags": ["accounts"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/api/articles/": {
+      "get": {
+        "operationId": "api_articles_list",
+        "description": "API برای لیست مقالات",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return per page.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedArticleListList"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/articles/{slug}/": {
+      "get": {
+        "operationId": "api_articles_retrieve",
+        "description": "API برای جزئیات یک مقاله",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleDetail"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/articles/{slug}/comments/": {
+      "get": {
+        "operationId": "api_articles_comments_retrieve",
+        "description": "گرفتن نظرات یک مقاله",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      },
+      "post": {
+        "operationId": "api_articles_comments_create",
+        "description": "ایجاد نظر جدید",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/api/categories/": {
+      "get": {
+        "operationId": "api_categories_list",
+        "description": "API برای دریافت لیست دسته‌بندی‌ها",
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryList"
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/index/": {
+      "get": {
+        "operationId": "api_index_retrieve",
+        "description": "API برای دریافت اطلاعات صفحه اصلی",
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexPage"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/schema/": {
+      "get": {
+        "operationId": "api_schema_retrieve",
+        "description": "OpenApi3 schema for this API. Format can be selected via content negotiation.\n\n- YAML: application/vnd.oai.openapi\n- JSON: application/vnd.oai.openapi+json",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "yaml"]
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string",
+              "enum": ["en", "fa"]
+            }
+          }
+        ],
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.oai.openapi": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              },
+              "application/vnd.oai.openapi+json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/tags/": {
+      "get": {
+        "operationId": "api_tags_list",
+        "description": "API برای لیست تگ‌ها",
+        "tags": ["api"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/admin/dashboard/stats/": {
+      "get": {
+        "operationId": "shop_api_admin_dashboard_stats_retrieve",
+        "description": "API برای دریافت آمار داشبورد ادمین",
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/shop/api/cart/": {
+      "get": {
+        "operationId": "shop_api_cart_retrieve",
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/shop/api/categories/": {
+      "get": {
+        "operationId": "shop_api_categories_list",
+        "description": "API برای لیست دسته‌بندی‌ها",
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/category/{slug}/": {
+      "get": {
+        "operationId": "shop_api_category_retrieve",
+        "description": "API برای نمایش یک کتگوری با محصولات و اسلایدر",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryDetail"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/cities/": {
+      "get": {
+        "operationId": "shop_api_cities_list",
+        "description": "API برای لیست شهرهای یک استان",
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/products/": {
+      "get": {
+        "operationId": "shop_api_products_list",
+        "description": "API برای لیست محصولات",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return per page.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedProductListList"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/products/{slug}/": {
+      "get": {
+        "operationId": "shop_api_products_retrieve",
+        "description": "API برای نمایش جزئیات یک محصول",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetail"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/products/{slug}/reviews/": {
+      "get": {
+        "operationId": "shop_api_products_reviews_retrieve",
+        "description": "گرفتن نظرات تایید شده یک محصول",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      },
+      "post": {
+        "operationId": "shop_api_products_reviews_create",
+        "description": "ایجاد نظر جدید برای محصول",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/shop/api/products/{slug}/wishlist/": {
+      "post": {
+        "operationId": "shop_api_products_wishlist_create",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string",
+              "pattern": "^.+$"
+            },
+            "required": true
+          }
+        ],
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/shop/api/provinces/": {
+      "get": {
+        "operationId": "shop_api_provinces_list",
+        "description": "API برای لیست استان‌ها",
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Province"
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/wishlist/": {
+      "get": {
+        "operationId": "shop_api_wishlist_list",
+        "description": "API برای لیست علاقه‌مندی‌های کاربر",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return per page.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedWishlistList"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/shop/api/wishlist/toggle/": {
+      "post": {
+        "operationId": "shop_api_wishlist_toggle_create",
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/shop/checkout/submit/": {
+      "post": {
+        "operationId": "shop_checkout_submit_create",
+        "description": "API برای ثبت نهایی سفارش و هدایت به درگاه پرداخت",
+        "tags": ["shop"],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ArticleDetail": {
+        "type": "object",
+        "description": "برای صفحه جزئیات - شامل description کامل و اطلاعات نویسنده",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "عنوان مقاله",
+            "maxLength": 255
+          },
+          "slug": {
+            "type": "string",
+            "title": "اسلاگ",
+            "pattern": "^[-\\w]+$",
+            "maxLength": 280
+          },
+          "description": {
+            "type": "string",
+            "title": "محتوا"
+          },
+          "excerpt": {
+            "type": "string",
+            "title": "خلاصه",
+            "description": "خلاصه‌ای از مقاله که در کارت‌ها و متا دیسکریپشن نمایش داده می‌شود. اگر خالی باشد، از ۱۵۰ کاراکتر اول description استفاده می‌شود.",
+            "maxLength": 300
+          },
+          "cover_image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "cover_alt_text": {
+            "type": "string",
+            "title": "متن جایگزین تصویر",
+            "description": "برای سئو و دسترسی‌پذیری",
+            "maxLength": 200
+          },
+          "attachment": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "فرمت‌های مجاز: png, jpg, webp, mp4, mp3, pdf — حداکثر ۲۵ مگابایت",
+            "pattern": "(?:png|jpg|jpeg|webp|mp4|mp3|pdf)$"
+          },
+          "attachment_type": {
+            "type": "string",
+            "readOnly": true
+          },
+          "time_to_read": {
+            "type": "integer",
+            "maximum": 32767,
+            "minimum": 0,
+            "nullable": true,
+            "title": "زمان مطالعه (دقیقه)",
+            "description": "اگر خالی باشد، به‌طور خودکار از روی محتوا محاسبه می‌شود"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "title": "زمان ایجاد"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "title": "آخرین بروزرسانی"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "زمان انتشار",
+            "description": "اگر خالی باشد و is_published=True باشد، زمان ایجاد استفاده می‌شود"
+          },
+          "author_name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "author_bio": {
+            "type": "string",
+            "readOnly": true,
+            "default": ""
+          },
+          "author_profile_image": {
+            "type": "string",
+            "readOnly": true
+          },
+          "author_joined_date": {
+            "type": "string",
+            "readOnly": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "readOnly": true
+          },
+          "meta_description": {
+            "type": "string",
+            "title": "متا دیسکریپشن",
+            "description": "اگر خالی باشد، از excerpt استفاده می‌شود",
+            "maxLength": 160
+          },
+          "meta_keywords": {
+            "type": "string",
+            "title": "کلمات کلیدی",
+            "description": "با کاما جدا کنید",
+            "maxLength": 200
+          },
+          "canonical_url": {
+            "type": "string",
+            "format": "uri",
+            "title": "لینک کنونیکال",
+            "description": "اگر خالی باشد، لینک خود مقاله استفاده می‌شود",
+            "maxLength": 200
+          },
+          "view_count": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "تعداد بازدید"
+          },
+          "related_articles": {
+            "type": "string",
+            "readOnly": true
+          },
+          "comments_count": {
+            "type": "string",
+            "readOnly": true
+          },
+          "recent_comments": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "attachment_type",
+          "author_bio",
+          "author_joined_date",
+          "author_name",
+          "author_profile_image",
+          "comments_count",
+          "cover_image_url",
+          "created_at",
+          "description",
+          "recent_comments",
+          "related_articles",
+          "slug",
+          "tags",
+          "title",
+          "updated_at"
+        ]
+      },
+      "ArticleList": {
+        "type": "object",
+        "description": "برای صفحه لیست - سبک، بدون description کامل",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "عنوان مقاله",
+            "maxLength": 255
+          },
+          "slug": {
+            "type": "string",
+            "title": "اسلاگ",
+            "pattern": "^[-\\w]+$",
+            "maxLength": 280
+          },
+          "excerpt": {
+            "type": "string",
+            "title": "خلاصه",
+            "description": "خلاصه‌ای از مقاله که در کارت‌ها و متا دیسکریپشن نمایش داده می‌شود. اگر خالی باشد، از ۱۵۰ کاراکتر اول description استفاده می‌شود.",
+            "maxLength": 300
+          },
+          "cover_image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "cover_alt_text": {
+            "type": "string",
+            "title": "متن جایگزین تصویر",
+            "description": "برای سئو و دسترسی‌پذیری",
+            "maxLength": 200
+          },
+          "time_to_read": {
+            "type": "integer",
+            "maximum": 32767,
+            "minimum": 0,
+            "nullable": true,
+            "title": "زمان مطالعه (دقیقه)",
+            "description": "اگر خالی باشد، به‌طور خودکار از روی محتوا محاسبه می‌شود"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "title": "زمان ایجاد"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "title": "زمان انتشار",
+            "description": "اگر خالی باشد و is_published=True باشد، زمان ایجاد استفاده می‌شود"
+          },
+          "author_name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "author_profile_image": {
+            "type": "string",
+            "readOnly": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "readOnly": true
+          },
+          "view_count": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "تعداد بازدید"
+          }
+        },
+        "required": [
+          "author_name",
+          "author_profile_image",
+          "cover_image_url",
+          "created_at",
+          "slug",
+          "tags",
+          "title"
+        ]
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "title": "نام دسته‌بندی",
+            "maxLength": 100
+          },
+          "slug": {
+            "type": "string",
+            "title": "اسلاگ",
+            "maxLength": 120,
+            "pattern": "^[-a-zA-Z0-9_]+$"
+          },
+          "icon": {
+            "type": "string",
+            "title": "آیکون",
+            "description": "آیکون فونت‌آ‌وسم یا ایموجی",
+            "maxLength": 50
+          }
+        },
+        "required": ["id", "name", "slug"]
+      },
+      "CategoryBadge": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "label": {
+            "type": "string",
+            "title": "برچسب",
+            "maxLength": 100
+          },
+          "badge_text": {
+            "type": "string",
+            "title": "متن نشان",
+            "maxLength": 100
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ColorEnum"
+              }
+            ],
+            "title": "رنگ"
+          },
+          "color_hex": {
+            "type": "string",
+            "readOnly": true
+          },
+          "order": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "ترتیب"
+          }
+        },
+        "required": ["color_hex", "id", "label"]
+      },
+      "CategoryDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "title": "نام دسته‌بندی",
+            "maxLength": 100
+          },
+          "slug": {
+            "type": "string",
+            "title": "اسلاگ",
+            "maxLength": 120,
+            "pattern": "^[-a-zA-Z0-9_]+$"
+          },
+          "icon": {
+            "type": "string",
+            "title": "آیکون",
+            "description": "آیکون فونت‌آ‌وسم یا ایموجی",
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "title": "توضیحات"
+          },
+          "color_hex": {
+            "type": "string",
+            "readOnly": true
+          },
+          "hero_products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryHeroProduct"
+            },
+            "readOnly": true
+          },
+          "products": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "color_hex",
+          "hero_products",
+          "id",
+          "name",
+          "products",
+          "slug"
+        ]
+      },
+      "CategoryFeature": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "icon": {
+            "type": "string",
+            "title": "آیکون",
+            "description": "آیکون فونت‌آ‌وسم یا ایموجی",
+            "maxLength": 50
+          },
+          "value": {
+            "type": "string",
+            "title": "مقدار",
+            "maxLength": 100
+          },
+          "label": {
+            "type": "string",
+            "title": "برچسب",
+            "maxLength": 100
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ColorEnum"
+              }
+            ],
+            "title": "رنگ"
+          },
+          "color_hex": {
+            "type": "string",
+            "readOnly": true
+          },
+          "order": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "ترتیب نمایش"
+          }
+        },
+        "required": ["color_hex", "id", "label", "value"]
+      },
+      "CategoryHeroProduct": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "integer"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "product_slug": {
+            "type": "string"
+          },
+          "product_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,15}(?:\\.\\d{0,0})?$"
+          },
+          "product_discount_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,15}(?:\\.\\d{0,0})?$",
+            "nullable": true
+          },
+          "product_description": {
+            "type": "string"
+          },
+          "product_tagline": {
+            "type": "string"
+          },
+          "cover_image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "cover_alt_text": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "ترتیب نمایش"
+          }
+        },
+        "required": [
+          "cover_alt_text",
+          "cover_image_url",
+          "product_description",
+          "product_discount_price",
+          "product_id",
+          "product_name",
+          "product_price",
+          "product_slug",
+          "product_tagline"
+        ]
+      },
+      "CategoryImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "alt_text": {
+            "type": "string",
+            "title": "متن جایگزین",
+            "maxLength": 200
+          },
+          "is_primary": {
+            "type": "boolean",
+            "title": "تصویر اصلی"
+          },
+          "order": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "ترتیب"
+          }
+        },
+        "required": ["id", "image_url"]
+      },
+      "CategoryList": {
+        "type": "object",
+        "description": "سریالایزر برای نمایش دسته‌بندی‌ها در صفحه اصلی",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "title": "نام دسته‌بندی",
+            "maxLength": 100
+          },
+          "slug": {
+            "type": "string",
+            "title": "اسلاگ",
+            "maxLength": 120,
+            "pattern": "^[-a-zA-Z0-9_]+$"
+          },
+          "icon": {
+            "type": "string",
+            "title": "آیکون",
+            "description": "آیکون فونت‌آ‌وسم یا ایموجی",
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "title": "توضیحات"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryFeature"
+            },
+            "readOnly": true
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryImage"
+            },
+            "readOnly": true
+          },
+          "badges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryBadge"
+            },
+            "readOnly": true
+          },
+          "primary_image": {
+            "type": "string",
+            "readOnly": true
+          },
+          "primary_color": {
+            "type": "string",
+            "readOnly": true
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "فعال"
+          },
+          "order": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "ترتیب نمایش"
+          }
+        },
+        "required": [
+          "badges",
+          "features",
+          "id",
+          "images",
+          "name",
+          "primary_color",
+          "primary_image",
+          "slug"
+        ]
+      },
+      "ChangePassword": {
+        "type": "object",
+        "properties": {
+          "old_password": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "new_password1": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "new_password2": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": ["new_password1", "new_password2", "old_password"]
+      },
+      "ChannelEnum": {
+        "enum": ["email", "sms"],
+        "type": "string",
+        "description": "* `email` - email\n* `sms` - sms"
+      },
+      "City": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "title": "نام شهر",
+            "maxLength": 100
+          },
+          "province": {
+            "type": "integer",
+            "title": "استان"
+          }
+        },
+        "required": ["id", "name", "province"]
+      },
+      "ColorEnum": {
+        "enum": ["cyan", "orange", "red", "yellow", "purple", "green"],
+        "type": "string",
+        "description": "* `cyan` - #00f0ff\n* `orange` - #f97316\n* `red` - #ef4444\n* `yellow` - #fbbf24\n* `purple` - #a855f7\n* `green` - #22c55e"
+      },
+      "IndexPage": {
+        "type": "object",
+        "description": "سریالایزر کامل صفحه اصلی",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "categories": {
+            "type": "string",
+            "readOnly": true
+          },
+          "product_cards": {
+            "type": "string",
+            "readOnly": true
+          },
+          "testimonials": {
+            "type": "string",
+            "readOnly": true
+          },
+          "promises": {
+            "type": "string",
+            "readOnly": true
+          },
+          "recent_articles": {
+            "type": "string",
+            "readOnly": true
+          },
+          "meta_title": {
+            "type": "string",
+            "title": "عنوان متا",
+            "description": "عنوان صفحه در نتایج جستجو (حداکثر ۶۰ کاراکتر)",
+            "maxLength": 60
+          },
+          "meta_description": {
+            "type": "string",
+            "title": "توضیحات متا",
+            "description": "توضیحات صفحه در نتایج جستجو (حداکثر ۱۶۰ کاراکتر)",
+            "maxLength": 160
+          },
+          "hero_title_part1": {
+            "type": "string",
+            "title": "بخش اول عنوان هیرو",
+            "maxLength": 100
+          },
+          "hero_title_part2": {
+            "type": "string",
+            "title": "بخش دوم عنوان هیرو (رنگی)",
+            "maxLength": 100
+          },
+          "hero_title_part3": {
+            "type": "string",
+            "title": "بخش سوم عنوان هیرو",
+            "maxLength": 100
+          },
+          "hero_tag": {
+            "type": "string",
+            "title": "تگ هیرو",
+            "maxLength": 200
+          },
+          "hero_description": {
+            "type": "string",
+            "title": "توضیحات هیرو"
+          },
+          "hero_btn_text": {
+            "type": "string",
+            "title": "متن دکمه اصلی",
+            "maxLength": 100
+          },
+          "hero_btn_secondary_text": {
+            "type": "string",
+            "title": "متن دکمه ثانویه",
+            "maxLength": 100
+          },
+          "hero_image": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "title": "تصویر هیرو",
+            "description": "تصویر اصلی هیرو (Desktop)\n📐 ابعاد: 1200 × 800 پیکسل\n📁 فرمت: WebP یا JPEG"
+          },
+          "hero_mobile_image": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "title": "تصویر هیرو موبایل",
+            "description": "تصویر هیرو برای موبایل\n📐 ابعاد: 600 × 400 پیکسل"
+          },
+          "hero_image_alt": {
+            "type": "string",
+            "title": "متن جایگزین تصویر هیرو",
+            "maxLength": 200
+          },
+          "hero_stat_1_value": {
+            "type": "string",
+            "title": "مقدار آمار ۱",
+            "maxLength": 50
+          },
+          "hero_stat_1_unit": {
+            "type": "string",
+            "title": "واحد آمار ۱",
+            "maxLength": 20
+          },
+          "hero_stat_1_label": {
+            "type": "string",
+            "title": "برچسب آمار ۱",
+            "maxLength": 50
+          },
+          "hero_stat_2_value": {
+            "type": "string",
+            "title": "مقدار آمار ۲",
+            "maxLength": 50
+          },
+          "hero_stat_2_unit": {
+            "type": "string",
+            "title": "واحد آمار ۲",
+            "maxLength": 20
+          },
+          "hero_stat_2_label": {
+            "type": "string",
+            "title": "برچسب آمار ۲",
+            "maxLength": 50
+          },
+          "hero_stat_3_value": {
+            "type": "string",
+            "title": "مقدار آمار ۳",
+            "maxLength": 50
+          },
+          "hero_stat_3_unit": {
+            "type": "string",
+            "title": "واحد آمار ۳",
+            "maxLength": 20
+          },
+          "hero_stat_3_label": {
+            "type": "string",
+            "title": "برچسب آمار ۳",
+            "maxLength": 50
+          },
+          "hero_stat_4_value": {
+            "type": "string",
+            "title": "مقدار آمار ۴",
+            "maxLength": 50
+          },
+          "hero_stat_4_unit": {
+            "type": "string",
+            "title": "واحد آمار ۴",
+            "maxLength": 20
+          },
+          "hero_stat_4_label": {
+            "type": "string",
+            "title": "برچسب آمار ۴",
+            "maxLength": 50
+          },
+          "best_sellers_label": {
+            "type": "string",
+            "title": "برچسب بخش پرفروش‌ها",
+            "maxLength": 100
+          },
+          "best_sellers_title": {
+            "type": "string",
+            "title": "عنوان بخش پرفروش‌ها",
+            "maxLength": 200
+          },
+          "testimonials_label": {
+            "type": "string",
+            "title": "برچسب بخش نظرات",
+            "maxLength": 100
+          },
+          "testimonials_title": {
+            "type": "string",
+            "title": "عنوان بخش نظرات",
+            "maxLength": 200
+          },
+          "testimonials_rating": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,2}(?:\\.\\d{0,1})?$",
+            "title": "میانگین امتیاز"
+          },
+          "testimonials_count": {
+            "type": "string",
+            "title": "تعداد نظرات",
+            "maxLength": 50
+          },
+          "testimonials_count_label": {
+            "type": "string",
+            "title": "برچسب تعداد نظرات",
+            "maxLength": 100
+          },
+          "guide_label": {
+            "type": "string",
+            "title": "برچسب بخش راهنما",
+            "maxLength": 100
+          },
+          "guide_title": {
+            "type": "string",
+            "title": "عنوان بخش راهنما",
+            "maxLength": 200
+          },
+          "promise_label": {
+            "type": "string",
+            "title": "برچسب بخش تعهدات",
+            "maxLength": 100
+          },
+          "promise_title": {
+            "type": "string",
+            "title": "عنوان بخش تعهدات",
+            "maxLength": 200
+          },
+          "statement_eyebrow": {
+            "type": "string",
+            "title": "زیر عنوان بیانیه پایانی",
+            "maxLength": 200
+          },
+          "statement_title": {
+            "type": "string",
+            "title": "عنوان بیانیه پایانی",
+            "maxLength": 200
+          },
+          "statement_title_highlight": {
+            "type": "string",
+            "title": "کلمه برجسته در بیانیه پایانی",
+            "maxLength": 100
+          },
+          "statement_description": {
+            "type": "string",
+            "title": "توضیحات بیانیه پایانی"
+          },
+          "statement_btn_text": {
+            "type": "string",
+            "title": "متن دکمه اصلی بیانیه پایانی",
+            "maxLength": 100
+          },
+          "statement_btn_secondary_text": {
+            "type": "string",
+            "title": "متن دکمه ثانویه بیانیه پایانی",
+            "maxLength": 100
+          },
+          "footer_tagline": {
+            "type": "string",
+            "title": "شعار فوتر",
+            "maxLength": 200
+          },
+          "footer_copyright": {
+            "type": "string",
+            "title": "متن کپی‌رایت",
+            "maxLength": 200
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "categories",
+          "created_at",
+          "id",
+          "product_cards",
+          "promises",
+          "recent_articles",
+          "testimonials",
+          "updated_at"
+        ]
+      },
+      "MarketingFeature": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "icon": {
+            "type": "string",
+            "title": "آیکون",
+            "description": "آیکون فونت‌آ‌وسم یا ایموجی",
+            "maxLength": 50
+          },
+          "title": {
+            "type": "string",
+            "title": "عنوان",
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "title": "توضیحات"
+          },
+          "accent": {
+            "type": "string",
+            "title": "آیکون پس‌زمینه",
+            "maxLength": 50
+          }
+        },
+        "required": ["description", "id", "title"]
+      },
+      "PaginatedArticleListList": {
+        "type": "object",
+        "required": ["count", "results"],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "example": 123
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=4"
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=2"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArticleList"
+            }
+          }
+        }
+      },
+      "PaginatedProductListList": {
+        "type": "object",
+        "required": ["count", "results"],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "example": 123
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=4"
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=2"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductList"
+            }
+          }
+        }
+      },
+      "PaginatedWishlistList": {
+        "type": "object",
+        "required": ["count", "results"],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "example": 123
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=4"
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=2"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Wishlist"
+            }
+          }
+        }
+      },
+      "PasswordResetConfirm": {
+        "type": "object",
+        "properties": {
+          "reset_token": {
+            "type": "string"
+          },
+          "new_password1": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "new_password2": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": ["new_password1", "new_password2", "reset_token"]
+      },
+      "PasswordResetRequest": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/ChannelEnum"
+          }
+        },
+        "required": ["channel", "identifier"]
+      },
+      "PasswordResetVerify": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 6,
+            "minLength": 6
+          }
+        },
+        "required": ["code", "identifier"]
+      },
+      "ProductDetail": {
+        "type": "object",
+        "description": "برای جزئیات کامل محصول",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "title": "نام محصول",
+            "maxLength": 255
+          },
+          "slug": {
+            "type": "string",
+            "title": "اسلاگ",
+            "pattern": "^[-\\w]+$",
+            "maxLength": 280
+          },
+          "category": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Category"
+              }
+            ],
+            "readOnly": true
+          },
+          "tagline": {
+            "type": "string",
+            "title": "شعار",
+            "description": "یک عبارت کوتاه برای نمایش در هدر",
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "title": "توضیحات"
+          },
+          "cover_image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "cover_alt_text": {
+            "type": "string",
+            "title": "متن جایگزین تصویر کاور",
+            "maxLength": 200
+          },
+          "price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,15}(?:\\.\\d{0,0})?$",
+            "title": "قیمت (تومان)"
+          },
+          "discount_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,15}(?:\\.\\d{0,0})?$",
+            "nullable": true,
+            "title": "قیمت با تخفیف"
+          },
+          "final_price": {
+            "type": "string",
+            "readOnly": true
+          },
+          "stock": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "موجودی"
+          },
+          "is_available": {
+            "type": "boolean",
+            "title": "موجود"
+          },
+          "is_published": {
+            "type": "boolean",
+            "title": "منتشر شده"
+          },
+          "is_featured": {
+            "type": "boolean",
+            "title": "ویژه"
+          },
+          "specs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSpec"
+            },
+            "readOnly": true
+          },
+          "trust_badges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrustBadge"
+            },
+            "readOnly": true
+          },
+          "marketing_features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MarketingFeature"
+            },
+            "readOnly": true
+          },
+          "stat_features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatFeature"
+            },
+            "readOnly": true
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImage"
+            },
+            "readOnly": true
+          },
+          "average_rating": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "reviews_count": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "rating_distribution": {
+            "type": "object",
+            "additionalProperties": {},
+            "readOnly": true
+          },
+          "view_count": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "تعداد بازدید"
+          },
+          "is_in_wishlist": {
+            "type": "string",
+            "readOnly": true
+          },
+          "meta_title": {
+            "type": "string",
+            "title": "عنوان متا",
+            "maxLength": 60
+          },
+          "meta_description": {
+            "type": "string",
+            "title": "توضیحات متا",
+            "maxLength": 160
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "average_rating",
+          "category",
+          "cover_image_url",
+          "created_at",
+          "description",
+          "final_price",
+          "id",
+          "images",
+          "is_in_wishlist",
+          "marketing_features",
+          "name",
+          "price",
+          "rating_distribution",
+          "reviews_count",
+          "slug",
+          "specs",
+          "stat_features",
+          "trust_badges",
+          "updated_at"
+        ]
+      },
+      "ProductImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "color_slug": {
+            "type": "string",
+            "title": "اسلاگ رنگ",
+            "description": "مثلاً: red, white, black, blue",
+            "maxLength": 50,
+            "pattern": "^[-a-zA-Z0-9_]+$"
+          },
+          "color_label": {
+            "type": "string",
+            "title": "نام رنگ",
+            "description": "مثلاً: قرمز, سفید, مشکی, آبی",
+            "maxLength": 50
+          },
+          "color_hex": {
+            "type": "string",
+            "title": "کد رنگ (Hex)",
+            "description": "مثلاً: #D6483C",
+            "maxLength": 7
+          },
+          "alt_text": {
+            "type": "string",
+            "title": "متن جایگزین",
+            "maxLength": 200
+          },
+          "sort_order": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "ترتیب"
+          },
+          "is_primary": {
+            "type": "boolean",
+            "title": "تصویر اصلی"
+          }
+        },
+        "required": ["color_label", "color_slug", "id", "image_url"]
+      },
+      "ProductList": {
+        "type": "object",
+        "description": "برای لیست محصولات (سبک)",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "title": "نام محصول",
+            "maxLength": 255
+          },
+          "slug": {
+            "type": "string",
+            "title": "اسلاگ",
+            "pattern": "^[-\\w]+$",
+            "maxLength": 280
+          },
+          "cover_image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "cover_alt_text": {
+            "type": "string",
+            "title": "متن جایگزین تصویر کاور",
+            "maxLength": 200
+          },
+          "price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,15}(?:\\.\\d{0,0})?$",
+            "title": "قیمت (تومان)"
+          },
+          "discount_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,15}(?:\\.\\d{0,0})?$",
+            "nullable": true,
+            "title": "قیمت با تخفیف"
+          },
+          "final_price": {
+            "type": "string",
+            "readOnly": true
+          },
+          "average_rating": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "reviews_count": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "is_available": {
+            "type": "boolean",
+            "title": "موجود"
+          },
+          "is_featured": {
+            "type": "boolean",
+            "title": "ویژه"
+          },
+          "category_name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "average_rating",
+          "category_name",
+          "cover_image_url",
+          "created_at",
+          "final_price",
+          "id",
+          "name",
+          "price",
+          "reviews_count",
+          "slug"
+        ]
+      },
+      "ProductSpec": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "icon": {
+            "type": "string",
+            "title": "آیکون",
+            "description": "آیکون فونت‌آ‌وسم یا ایموجی",
+            "maxLength": 50
+          },
+          "value": {
+            "type": "string",
+            "title": "مقدار",
+            "maxLength": 100
+          },
+          "label": {
+            "type": "string",
+            "title": "برچسب",
+            "maxLength": 100
+          }
+        },
+        "required": ["id", "label", "value"]
+      },
+      "Province": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "title": "نام استان",
+            "maxLength": 100
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "StatFeature": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "number": {
+            "type": "string",
+            "title": "عدد/مقدار",
+            "maxLength": 50
+          },
+          "suffix": {
+            "type": "string",
+            "title": "پسوند",
+            "description": "مثلاً: +, km, W, سال",
+            "maxLength": 20
+          },
+          "label": {
+            "type": "string",
+            "title": "برچسب",
+            "maxLength": 100
+          }
+        },
+        "required": ["id", "label", "number"]
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[-\\w]+$",
+            "maxLength": 60
+          }
+        },
+        "required": ["name", "slug"]
+      },
+      "TrustBadge": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "icon": {
+            "type": "string",
+            "title": "آیکون",
+            "description": "آیکون فونت‌آ‌وسم یا ایموجی",
+            "maxLength": 50
+          },
+          "label": {
+            "type": "string",
+            "title": "برچسب",
+            "maxLength": 100
+          },
+          "value": {
+            "type": "string",
+            "title": "مقدار",
+            "maxLength": 100
+          }
+        },
+        "required": ["id", "label"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": ["password", "username"]
+      },
+      "UserRegistration": {
+        "type": "object",
+        "properties": {
+          "fullname": {
+            "type": "string",
+            "title": "نام کامل",
+            "maxLength": 100
+          },
+          "username": {
+            "type": "string",
+            "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+            "maxLength": 150
+          },
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "maxLength": 11
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "ایمیل",
+            "maxLength": 254
+          },
+          "password1": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 8
+          },
+          "password2": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "agree_terms": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "agree_terms",
+          "email",
+          "fullname",
+          "mobile",
+          "password1",
+          "password2",
+          "username"
+        ]
+      },
+      "Wishlist": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "product": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductList"
+              }
+            ],
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": ["created_at", "id", "product"]
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sessionid"
+      }
+    }
+  }
+}

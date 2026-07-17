@@ -1,0 +1,27 @@
+<script>
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NEWSLETTER SUBMIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("nlBtn");
+    if (!btn) return;
+
+    btn.addEventListener("click", function () {
+      const input = document.getElementById("nl-email");
+      const email = input.value.trim();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        input.style.borderColor = "rgba(248,113,113,.6)";
+        input.focus();
+        setTimeout(() => (input.style.borderColor = ""), 1800);
+        return;
+      }
+
+      this.textContent = "✓ ثبت شد";
+      this.style.background = "#00c97a";
+      this.disabled = true;
+      input.value = "";
+      input.disabled = true;
+    });
+  });
+</script>

@@ -5093,8 +5093,8 @@ DESKTOP (1024px+)
         <div class="final-desktop-wrap" id="final-desktop-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
+        
       </div>
-    </div>
 
     <!-- ============================================================
      JAVASCRIPT — همه دیتاها از API میاد
@@ -5390,13 +5390,14 @@ DESKTOP (1024px+)
           mobileWrap.appendChild(imgArea);
 
           // محتوا
+          // ===== داخل renderCategories (موبایل) =====
           const content = document.createElement("div");
           content.className = "cat-content-m";
           content.innerHTML = `
             <div class="cat-name-m" id="catNameM">${firstCat?.name || "دسته‌بندی"}</div>
             <div class="cat-sub-m" id="catSubM">${firstCat?.description || ""}</div>
             <div class="cat-btns-m">
-              <button class="cat-btn-m primary" onclick="goToSlide(2)" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
+              <button class="cat-btn-m primary" id="catBtnM" onclick="window.location.href='/shop/category/${firstCat?.slug || ""}/'" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
             </div>
             <div class="cat-dots-m" id="catDotsM">
               ${categories.map((_, idx) => `<div class="cat-dot-m${idx === 0 ? " active" : ""}" onclick="switchCat(${idx})" style="${idx === 0 ? "background:" + (firstCat?.color_hex || "var(--neon)") : ""}"></div>`).join("")}
@@ -5458,6 +5459,7 @@ DESKTOP (1024px+)
           ];
           const displayFeatures = features.length ? features : defaultFeatures;
 
+          // ===== داخل renderCategories (دسکتاپ) =====
           const contentHTML = `
             <span class="section-label" id="catLabelD" style="color:${firstCat?.color_hex || "var(--neon)"}">${firstCat?.name || "دسته‌بندی"}</span>
             <div class="cat-heading-d" id="catHeadingD">${firstCat?.name || ""}</div>
@@ -5475,7 +5477,7 @@ DESKTOP (1024px+)
                 .join("")}
             </div>
             <div class="cat-btns-d">
-              <button class="cat-btn-primary-d" id="catBtnD" onclick="goToSlide(2)" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
+              <button class="cat-btn-primary-d" id="catBtnD" onclick="window.location.href='/shop/category/${firstCat?.slug || ""}/'" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
             </div>
           `;
           contentPanel.insertAdjacentHTML("beforeend", contentHTML);
@@ -5552,8 +5554,15 @@ DESKTOP (1024px+)
         if (nameM) nameM.textContent = cat.name || "";
         const subM = document.getElementById("catSubM");
         if (subM) subM.textContent = cat.description || "";
+
+        // ✅ دکمه موبایل
         const btnM = document.getElementById("catBtnM");
-        if (btnM) btnM.style.background = cat.color_hex || "var(--neon)";
+        if (btnM) {
+          btnM.style.background = cat.color_hex || "var(--neon)";
+          btnM.onclick = function () {
+            window.location.href = "/shop/category/" + (cat.slug || "") + "/";
+          };
+        }
 
         // بروزرسانی محتوای دسکتاپ
         const labelD = document.getElementById("catLabelD");
@@ -5565,8 +5574,15 @@ DESKTOP (1024px+)
         if (headingD) headingD.textContent = cat.name || "";
         const subD = document.getElementById("catSubD");
         if (subD) subD.textContent = cat.description || "";
+
+        // ✅ دکمه دسکتاپ (یک بار تعریف شده)
         const btnD = document.getElementById("catBtnD");
-        if (btnD) btnD.style.background = cat.color_hex || "var(--neon)";
+        if (btnD) {
+          btnD.style.background = cat.color_hex || "var(--neon)";
+          btnD.onclick = function () {
+            window.location.href = "/shop/category/" + (cat.slug || "") + "/";
+          };
+        }
 
         // بروزرسانی ویژگی‌ها
         const features = cat.features || [];
@@ -5583,10 +5599,10 @@ DESKTOP (1024px+)
           specRowD.innerHTML = displayFeatures
             .map(
               (f) => `
-              <div class="cat-spec-d">
-                <div class="cat-spec-val-d">${f.value || "0"}<span class="cat-spec-unit-d" style="color:${cat.color_hex || "var(--neon)"}"> ${f.unit || ""}</span></div>
-                <div class="cat-spec-label-d">${f.label || ""}</div>
-              </div>
+                <div class="cat-spec-d">
+                    <div class="cat-spec-val-d">${f.value || "0"}<span class="cat-spec-unit-d" style="color:${cat.color_hex || "var(--neon)"}"> ${f.unit || ""}</span></div>
+                    <div class="cat-spec-label-d">${f.label || ""}</div>
+                </div>
             `,
             )
             .join("");
@@ -5597,10 +5613,10 @@ DESKTOP (1024px+)
           metricsM.innerHTML = displayFeatures
             .map(
               (f) => `
-              <div class="cat-img-metric">
-                <div class="cat-img-metric-val">${f.value || "0"}<span class="cat-img-metric-unit"> ${f.unit || ""}</span></div>
-                <div class="cat-img-metric-label">${f.label || ""}</div>
-              </div>
+                <div class="cat-img-metric">
+                    <div class="cat-img-metric-val">${f.value || "0"}<span class="cat-img-metric-unit"> ${f.unit || ""}</span></div>
+                    <div class="cat-img-metric-label">${f.label || ""}</div>
+                </div>
             `,
             )
             .join("");
@@ -5972,124 +5988,160 @@ DESKTOP (1024px+)
       /* ════════════════════════════════════
          RENDER FINAL (PROMISES + STATEMENT + FOOTER)
          ════════════════════════════════════ */
-      function renderFinal(data) {
-        const promises = data.promises || [];
-        const colors = {
-          neon: { hex: "#4fd8ff", rgb: "79,216,255" },
-          orange: { hex: "#ff9a3c", rgb: "255,154,60" },
-          green: { hex: "#a8e063", rgb: "168,224,99" },
-          neon2: { hex: "#8b7bff", rgb: "139,123,255" },
-          neon3: { hex: "#ff6cc4", rgb: "255,108,196" },
-        };
-
-        // ===== MOBILE =====
-        const mobileWrap = document.getElementById("final-mobile-wrap");
-        if (mobileWrap) {
-          mobileWrap.innerHTML = `
-            <div class="promise-header-m">
-              <span class="section-label">${data.promise_label || "چرا VOLTEX"}</span>
-              <h3>${data.promise_title || "تعهد VOLTEX"}</h3>
-            </div>
-            <div class="promise-list-m">
-              ${promises
-                .map((p) => {
-                  const c = colors[p.color] || colors["neon"];
-                  return `
-                  <div class="promise-strip-m" style="--pc:${c.hex};--pc-rgb:${c.rgb}">
-                    <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(${c.rgb},0.16) 0%,rgba(${c.rgb},0.03) 70%);border-color:rgba(${c.rgb},0.22)">
-                      ${p.icon_svg || `<svg viewBox="0 0 24 24" fill="none" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}
-                    </div>
-                    <div class="ps-content-m">
-                      <div class="ps-label-m">${p.label || ""}</div>
-                      <div class="ps-title-m">${p.title || ""}</div>
-                      <div class="ps-desc-m">${p.description || ""}</div>
-                    </div>
-                    <div class="ps-badge-m" style="color:${c.hex}">${p.badge_value || ""}<span class="ps-badge-unit-m" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
-                  </div>
-                `;
-                })
-                .join("")}
-            </div>
-            <div class="footer-m">
-              <div class="footer-brand-row-m">
-                <div class="footer-brand-m">
-                  <span class="footer-logo-m">VOLTEX</span>
-                  <p class="footer-tagline-m">${data.footer_tagline || "اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند."}</p>
-                  <div class="footer-social-m">
-                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
-                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
-                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
-                  </div>
-                </div>
+      /* ════════════════════════════════════
+   RENDER FINAL (PROMISES + STATEMENT + FOOTER)
+   ════════════════════════════════════ */
+    function renderFinal(data) {
+      // ===== MOBILE =====
+      const mobileWrap = document.getElementById("final-mobile-wrap");
+      if (mobileWrap) {
+        mobileWrap.innerHTML = `
+          <div class="promise-header-m">
+            <span class="section-label">چرا VOLTEX</span>
+            <h3>تعهد VOLTEX</h3>
+          </div>
+          <div class="promise-list-m">
+            <div class="promise-strip-m" style="--pc:var(--neon);--pc-rgb:79,216,255">
+              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(79,216,255,0.16) 0%,rgba(79,216,255,0.03) 70%);border-color:rgba(79,216,255,0.22)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--neon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>
               </div>
-              <div class="footer-nav-m">
-                <div>
-                  <span class="footer-nav-title-m">محصولات</span>
-                  <ul class="footer-nav-links-m"><li><a href="#">اسکوترهای شهری</a></li><li><a href="#">آفرود</a></li><li><a href="#">تاشو</a></li><li><a href="#">پرفورمنس</a></li></ul>
-                  <span class="footer-nav-title-m">شرکت</span>
-                  <ul class="footer-nav-links-m"><li><a href="#">درباره Voltex</a></li><li><a href="#">فرصت‌های شغلی</a></li><li><a href="#">رسانه</a></li></ul>
-                </div>
-                <div>
-                  <span class="footer-nav-title-m">پشتیبانی</span>
-                  <ul class="footer-nav-links-m"><li><a href="#">مرکز راهنمایی</a></li><li><a href="#">پیگیری سفارش</a></li><li><a href="#">بازگشت کالا</a></li><li><a href="#">گارانتی</a></li></ul>
-                  <span class="footer-nav-title-m">قوانین</span>
-                  <ul class="footer-nav-links-m"><li><a href="#">حریم خصوصی</a></li><li><a href="#">شرایط استفاده</a></li><li><a href="#">کوکی‌ها</a></li></ul>
-                </div>
+              <div class="ps-content-m">
+                <div class="ps-label-m">ارسال</div>
+                <div class="ps-title-m">ارسال سریع</div>
+                <div class="ps-desc-m">ارسال رایگان یک‌روزه در سراسر اروپا</div>
               </div>
-              <div class="newsletter-wrap-m">
-                <span class="newsletter-label-m">خبرنامه</span>
-                <div class="newsletter-row-m">
-                  <input class="newsletter-input-m" type="email" placeholder="ایمیل شما">
-                  <button class="newsletter-btn-m"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-                </div>
-                <div class="footer-copy-m">${data.footer_copyright || "© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است."}</div>
-              </div>
+              <div class="ps-badge-m" style="color:var(--neon)">24<span class="ps-badge-unit-m" style="color:var(--neon)">h</span></div>
             </div>
-          `;
-        }
-
-        // ===== DESKTOP =====
-        const desktopWrap = document.getElementById("final-desktop-wrap");
-        if (desktopWrap) {
-          desktopWrap.innerHTML = `
-            <div class="promise-section-d fs-anim d-1">
-              <div class="section-label">${data.promise_label || "چرا VOLTEX"}</div>
-              <h2 class="fs-anim d-2">${data.promise_title || "تعهد VOLTEX"}</h2>
-              <div class="promise-grid-d">
-                ${promises
-                  .map((p, i) => {
-                    const c = colors[p.color] || colors["neon"];
-                    return `
-                    <div class="promise-card-d fs-anim d-${i + 3}" style="--pc:${c.hex};--pc-glow:rgba(${c.rgb},0.12)">
-                      <div class="promise-icon-d" style="border-color:rgba(${c.rgb},0.3)">${p.icon_svg || `<svg viewBox="0 0 24 24" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}</div>
-                      <div class="promise-card-text">
-                        <div class="promise-big-d">${p.badge_value || ""}<span class="promise-big-unit-d" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
-                        <div class="promise-title-d">${p.title || ""}</div>
-                        <div class="promise-desc-d">${p.description || ""}</div>
-                      </div>
-                    </div>
-                  `;
-                  })
-                  .join("")}
+            <div class="promise-strip-m" style="--pc:#a8e063;--pc-rgb:168,224,99">
+              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(168,224,99,0.16) 0%,rgba(168,224,99,0.03) 70%);border-color:rgba(168,224,99,0.22)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#a8e063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
+              <div class="ps-content-m">
+                <div class="ps-label-m">گارانتی</div>
+                <div class="ps-title-m">گارانتی رسمی</div>
+                <div class="ps-desc-m">گارانتی کامل کارخانه + شبکه خدمات اروپا</div>
+              </div>
+              <div class="ps-badge-m" style="color:#a8e063">3<span class="ps-badge-unit-m" style="color:#a8e063">yr</span></div>
             </div>
-            <div class="stmt-desktop fs-anim d-2">
-              <div class="stmt-ring"></div>
-              <div class="stmt-ring"></div>
-              <div class="stmt-inner-d">
-                <span class="stmt-eyebrow-d fs-anim d-2">${data.statement_eyebrow || "سفر شما از اینجا آغاز می‌شود"}</span>
-                <div class="stmt-desktop-title fs-anim d-3">${data.statement_title || "امروز"} <em>${data.statement_title_highlight || "جلوتر"}</em> برو</div>
-                <p class="stmt-desktop-desc fs-anim d-4">${data.statement_description || "به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند."}</p>
-                <div class="stmt-desktop-btns fs-anim d-5">
-                  <button class="stmt-btn-p-d" onclick="goToSlide(2)">${data.statement_btn_text || "مشاهده همه مدل‌ها"}</button>
-                  <button class="stmt-btn-s-d" onclick="goToSlide(1)">${data.statement_btn_secondary_text || "کاوش مجموعه‌ها"}</button>
+            <div class="promise-strip-m" style="--pc:var(--neon2);--pc-rgb:139,123,255">
+              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(139,123,255,0.16) 0%,rgba(139,123,255,0.03) 70%);border-color:rgba(139,123,255,0.22)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--neon2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              </div>
+              <div class="ps-content-m">
+                <div class="ps-label-m">پرداخت</div>
+                <div class="ps-title-m">پرداخت امن</div>
+                <div class="ps-desc-m">رمزنگاری بانکی، پشتیبانی از ۱۲ روش پرداخت</div>
+              </div>
+              <div class="ps-badge-m" style="color:var(--neon2)">256<span class="ps-badge-unit-m" style="color:var(--neon2)">bit</span></div>
+            </div>
+            <div class="promise-strip-m" style="--pc:var(--neon3);--pc-rgb:255,108,196">
+              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(255,108,196,0.16) 0%,rgba(255,108,196,0.03) 70%);border-color:rgba(255,108,196,0.22)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--neon3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="ps-content-m">
+                <div class="ps-label-m">پشتیبانی</div>
+                <div class="ps-title-m">پشتیبانی متخصص</div>
+                <div class="ps-desc-m">انسان واقعی، بدون ربات، هر روز هفته</div>
+              </div>
+              <div class="ps-badge-m" style="color:var(--neon3)">7<span class="ps-badge-unit-m" style="color:var(--neon3)">×24</span></div>
+            </div>
+          </div>
+          <div class="footer-m">
+            <div class="footer-brand-row-m">
+              <div class="footer-brand-m">
+                <span class="footer-logo-m">VOLTEX</span>
+                <p class="footer-tagline-m">اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.</p>
+                <div class="footer-social-m">
+                  <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
+                  <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                  <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
                 </div>
               </div>
             </div>
-          
-          `;
-        }
+            <div class="footer-nav-m">
+              <div>
+                <span class="footer-nav-title-m">محصولات</span>
+                <ul class="footer-nav-links-m"><li><a href="#">اسکوترهای شهری</a></li><li><a href="#">آفرود</a></li><li><a href="#">تاشو</a></li><li><a href="#">پرفورمنس</a></li></ul>
+                <span class="footer-nav-title-m">شرکت</span>
+                <ul class="footer-nav-links-m"><li><a href="#">درباره Voltex</a></li><li><a href="#">فرصت‌های شغلی</a></li><li><a href="#">رسانه</a></li></ul>
+              </div>
+              <div>
+                <span class="footer-nav-title-m">پشتیبانی</span>
+                <ul class="footer-nav-links-m"><li><a href="#">مرکز راهنمایی</a></li><li><a href="#">پیگیری سفارش</a></li><li><a href="#">بازگشت کالا</a></li><li><a href="#">گارانتی</a></li></ul>
+                <span class="footer-nav-title-m">قوانین</span>
+                <ul class="footer-nav-links-m"><li><a href="#">حریم خصوصی</a></li><li><a href="#">شرایط استفاده</a></li><li><a href="#">کوکی‌ها</a></li></ul>
+              </div>
+            </div>
+            <div class="newsletter-wrap-m">
+              <span class="newsletter-label-m">خبرنامه</span>
+              <div class="newsletter-row-m">
+                <input class="newsletter-input-m" type="email" placeholder="ایمیل شما">
+                <button class="newsletter-btn-m"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+              </div>
+              <div class="footer-copy-m">© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است.</div>
+            </div>
+          </div>
+        `;
       }
+
+      // ===== DESKTOP =====
+      const desktopWrap = document.getElementById("final-desktop-wrap");
+      if (desktopWrap) {
+        desktopWrap.innerHTML = `
+          <div class="promise-section-d fs-anim d-1">
+            <div class="section-label">چرا VOLTEX</div>
+            <h2 class="fs-anim d-2">تعهد VOLTEX</h2>
+            <div class="promise-grid-d">
+              <div class="promise-card-d fs-anim d-3" style="--pc:var(--neon);--pc-glow:rgba(79,216,255,0.12)">
+                <div class="promise-icon-d"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg></div>
+                <div class="promise-card-text">
+                  <div class="promise-big-d">24<span class="promise-big-unit-d" style="color:var(--neon)">h</span></div>
+                  <div class="promise-title-d">ارسال سریع</div>
+                  <div class="promise-desc-d">ارسال رایگان یک‌روزه در سراسر اروپا</div>
+                </div>
+              </div>
+              <div class="promise-card-d fs-anim d-4" style="--pc:#a8e063;--pc-glow:rgba(168,224,99,0.1)">
+                <div class="promise-icon-d" style="border-color:rgba(168,224,99,0.3)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="#a8e063"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="promise-card-text">
+                  <div class="promise-big-d">3<span class="promise-big-unit-d" style="color:#a8e063">yr</span></div>
+                  <div class="promise-title-d">گارانتی رسمی</div>
+                  <div class="promise-desc-d">گارانتی کامل کارخانه + شبکه خدمات اروپا</div>
+                </div>
+              </div>
+              <div class="promise-card-d fs-anim d-5" style="--pc:var(--neon2);--pc-glow:rgba(139,123,255,0.1)">
+                <div class="promise-icon-d" style="border-color:rgba(139,123,255,0.3)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="var(--neon2)"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                <div class="promise-card-text">
+                  <div class="promise-big-d">256<span class="promise-big-unit-d" style="color:var(--neon2);font-size:0.9rem">bit</span></div>
+                  <div class="promise-title-d">پرداخت امن</div>
+                  <div class="promise-desc-d">رمزنگاری بانکی، پشتیبانی از ۱۲ روش پرداخت</div>
+                </div>
+              </div>
+              <div class="promise-card-d fs-anim d-6" style="--pc:var(--neon3);--pc-glow:rgba(255,108,196,0.1)">
+                <div class="promise-icon-d" style="border-color:rgba(255,108,196,0.3)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="var(--neon3)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <div class="promise-card-text">
+                  <div class="promise-big-d">7<span class="promise-big-unit-d" style="color:var(--neon3)">×24</span></div>
+                  <div class="promise-title-d">پشتیبانی متخصص</div>
+                  <div class="promise-desc-d">انسان واقعی، بدون ربات، هر روز هفته</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="stmt-desktop fs-anim d-2">
+            <div class="stmt-ring"></div>
+            <div class="stmt-ring"></div>
+            <div class="stmt-inner-d">
+              <span class="stmt-eyebrow-d fs-anim d-2">سفر شما از اینجا آغاز می‌شود</span>
+              <div class="stmt-desktop-title fs-anim d-3">امروز <em>جلوتر</em> برو</div>
+              <p class="stmt-desktop-desc fs-anim d-4">به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند. اسکوترهای پریمیوم، تحویل در ۲۴ ساعت، با ۳ سال گارانتی.</p>
+              <div class="stmt-desktop-btns fs-anim d-5">
+                <button class="stmt-btn-p-d" onclick="goToSlide(2)">مشاهده همه مدل‌ها</button>
+                <button class="stmt-btn-s-d" onclick="goToSlide(1)">کاوش مجموعه‌ها</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
 
       /* ════════════════════════════════════
          UPDATE SEO
