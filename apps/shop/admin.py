@@ -11,6 +11,10 @@ from .models import (
     MarketingFeature, StatFeature, ProductImage,
     ProductReview, Wishlist, CategoryHeroProduct, OrderItem, Order
 )
+from .actions import (
+    export_selected_orders_to_pdf,
+    export_selected_orders_to_excel,
+)
 
 
 class ProductSpecInline(admin.TabularInline):
@@ -358,8 +362,16 @@ class OrderAdmin(admin.ModelAdmin):
     list_per_page = 25
     date_hierarchy = 'created_at'
     inlines = [OrderItemInline]
-    actions = ['mark_as_pending', 'mark_as_processing', 'mark_as_shipping', 'mark_as_delivered', 'mark_as_cancelled']
-
+    actions = [
+        'mark_as_pending',
+        'mark_as_processing',
+        'mark_as_shipping',
+        'mark_as_delivered',
+        'mark_as_cancelled',
+        # ===== اضافه کردن اکشن‌های جدید =====
+        export_selected_orders_to_pdf,
+        export_selected_orders_to_excel,
+    ]
     fieldsets = (
         ('اطلاعات سفارش', {
             'fields': ('order_number', 'tracking_code', 'user', 'address')
