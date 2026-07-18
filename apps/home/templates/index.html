@@ -364,6 +364,7 @@
         font-size: 0.82rem;
         flex-shrink: 0;
         line-height: 1;
+        object-fit: cover;
       }
       .auth-user-menu {
         position: absolute;
@@ -392,7 +393,8 @@
         visibility: visible;
         transform: translateY(0);
       }
-      .auth-user-menu a {
+      .auth-user-menu a,
+      .auth-user-menu button.auth-logout {
         font-family: var(--font-ui);
         font-size: 0.78rem;
         color: var(--dim);
@@ -404,18 +406,31 @@
           color 0.2s var(--ease-smooth);
       }
       .auth-user-menu a:hover,
-      .auth-user-menu a:focus-visible {
+      .auth-user-menu a:focus-visible,
+      .auth-user-menu button.auth-logout:hover,
+      .auth-user-menu button.auth-logout:focus-visible {
         background: rgba(255, 255, 255, 0.05);
         color: var(--white);
       }
-      .auth-user-menu a.auth-logout {
+      .auth-user-menu a.auth-logout,
+      .auth-user-menu button.auth-logout {
         color: #ff8a8a;
         border-top: 1px solid var(--border);
         margin-top: 4px;
         padding-top: 11px;
+        background: none;
+        border-inline: none;
+        border-bottom: none;
+        width: 100%;
+        text-align: right;
+        cursor: pointer;
       }
-      .auth-user-menu a.auth-logout:hover {
+      .auth-user-menu a.auth-logout:hover,
+      .auth-user-menu button.auth-logout:hover {
         background: rgba(255, 108, 108, 0.08);
+      }
+      .auth-logout-form {
+        margin: 0;
       }
 
       @media (min-width: 768px) {
@@ -555,18 +570,27 @@
         font-size: 0.95rem;
         margin-bottom: 10px;
       }
-      .drawer-auth-user a {
+      .drawer-auth-user a,
+      .drawer-auth-user button.auth-logout {
         font-family: var(--font-ui);
         font-size: 0.85rem;
         color: var(--dim);
         text-decoration: none;
         padding: 9px 0;
         transition: color 0.3s var(--ease-smooth);
+        display: block;
+        width: 100%;
+        text-align: right;
+        background: none;
+        border: none;
+        cursor: pointer;
       }
-      .drawer-auth-user a:hover {
+      .drawer-auth-user a:hover,
+      .drawer-auth-user button.auth-logout:hover {
         color: var(--neon);
       }
-      .drawer-auth-user a.auth-logout {
+      .drawer-auth-user a.auth-logout,
+      .drawer-auth-user button.auth-logout {
         color: #ff8a8a;
       }
 
@@ -4885,30 +4909,54 @@ DESKTOP (1024px+)
 
       <div class="nav-right-cluster">
         <div class="nav-auth" id="navAuth">
-          <div class="auth-guest" id="authGuest">
-            <a href="#" class="auth-link-login">ورود</a>
-            <button class="nav-cta">ثبت‌نام</button>
-          </div>
-          <div class="auth-user" id="authUser" style="display: none">
+          {% if user.is_authenticated %}
+          <div class="auth-user" id="authUser">
             <button
               class="auth-user-btn"
               id="authUserBtn"
               onclick="toggleUserMenu(event)"
             >
+              {% if user.profile_image %}
+              <img
+                class="auth-user-avatar"
+                src="{{ user.profile_image.url }}"
+                alt="{{ user.username }}"
+              />
+              {% else %}
               <span class="auth-user-avatar">👤</span>
-              <span class="auth-user-name">کاربر</span>
+              {% endif %}
+              <span class="auth-user-name">{{ user.fullname|default:user.username }}</span>
             </button>
             <div class="auth-user-menu" id="authUserMenu" role="menu">
-              <a href="#" role="menuitem">پروفایل</a>
-              <a href="#" role="menuitem">سفارش‌های من</a>
-              <a href="#" role="menuitem">علاقه‌مندی‌ها</a>
-              <a href="#" role="menuitem">تنظیمات حساب</a>
-              <a href="#" class="auth-logout" role="menuitem">خروج</a>
+              <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
+              <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
+              <a href="{% url 'accounts_app:dashboard' %}#wishlist" role="menuitem">علاقه‌مندی‌ها</a>
+              <a href="{% url 'accounts_app:dashboard' %}#settings" role="menuitem">تنظیمات حساب</a>
+              <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form" role="none">
+                {% csrf_token %}
+                <button type="submit" class="auth-logout" role="menuitem">خروج</button>
+              </form>
             </div>
           </div>
+          {% else %}
+          <div class="auth-guest" id="authGuest">
+            <a href="{% url 'accounts_app:login' %}" class="auth-link-login">ورود</a>
+            <button
+              class="nav-cta"
+              onclick="window.location.href='{% url 'accounts_app:register' %}'"
+            >
+              ثبت‌نام
+            </button>
+          </div>
+          {% endif %}
         </div>
 
-        <button class="nav-cart-btn" id="navCartBtn" aria-label="سبد خرید">
+        <a
+          class="nav-cart-btn"
+          id="navCartBtn"
+          href="{% url 'shop:cart' %}"
+          aria-label="سبد خرید"
+        >
           <svg class="nav-cart-icon" viewBox="0 0 24 24">
             <path
               d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"
@@ -4916,8 +4964,8 @@ DESKTOP (1024px+)
             <circle cx="10" cy="20.5" r="1.4" />
             <circle cx="17" cy="20.5" r="1.4" />
           </svg>
-          <span class="nav-cart-badge" id="navCartCount">0</span>
-        </button>
+          <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
+        </a>
 
         <button
           class="nav-menu-btn"
@@ -4997,18 +5045,31 @@ DESKTOP (1024px+)
       >
         خرید کنید
       </button>
+      {% if user.is_authenticated %}
+      <div class="drawer-auth-user" id="drawerAuthUser">
+        <div class="drawer-user-info">
+          👤 <span>{{ user.fullname|default:user.username }}</span>
+        </div>
+        <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
+        <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
+        <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>
+        <a href="{% url 'accounts_app:dashboard' %}#settings">تنظیمات حساب</a>
+        <form method="post" action="{% url 'accounts_app:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-logout">خروج</button>
+        </form>
+      </div>
+      {% else %}
       <div class="drawer-auth" id="drawerAuthGuest">
-        <a href="#" class="drawer-auth-link">ورود</a>
-        <button class="drawer-auth-register">ثبت‌نام</button>
+        <a href="{% url 'accounts_app:login' %}" class="drawer-auth-link">ورود</a>
+        <button
+          class="drawer-auth-register"
+          onclick="window.location.href='{% url 'accounts_app:register' %}'"
+        >
+          ثبت‌نام
+        </button>
       </div>
-      <div class="drawer-auth-user" id="drawerAuthUser" style="display: none">
-        <div class="drawer-user-info">👤 <span>کاربر</span></div>
-        <a href="#">پروفایل</a>
-        <a href="#">سفارش‌های من</a>
-        <a href="#">علاقه‌مندی‌ها</a>
-        <a href="#">تنظیمات حساب</a>
-        <a href="#" class="auth-logout">خروج</a>
-      </div>
+      {% endif %}
     </div>
 
     <!-- ============================================================
@@ -5094,6 +5155,8 @@ DESKTOP (1024px+)
          ════════════════════════════════════ */
       const API_BASE = "/api/";
       const API_URL = API_BASE + "index/";
+      const CART_URL = API_BASE + "shop/cart/"; // TODO: با urls.py واقعی خودت هماهنگ کن
+      const IS_AUTHENTICATED = {% if user.is_authenticated %}true{% else %}false{% endif %};
 
       /* ════════════════════════════════════
          LOAD DATA
@@ -5107,6 +5170,28 @@ DESKTOP (1024px+)
         if (isNaN(num)) return val;
         // کلمه تومان + عدد جدا شده
         return "تومان " + num.toLocaleString("fa-IR");
+      }
+
+      /* شمارنده سبد خرید — فقط برای کاربر لاگین‌شده صدا زده می‌شود،
+         چون CartAPIView با permission_classes=[IsAuthenticated] است
+         و برای مهمان 401/403 برمی‌گرداند. */
+      async function updateCartBadge() {
+        const badge = document.getElementById("navCartCount");
+        if (!IS_AUTHENTICATED || !badge) return;
+
+        try {
+          const response = await fetch(CART_URL, {
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+          });
+          if (!response.ok) throw new Error("Failed to fetch cart");
+          const cart = await response.json();
+
+          const count = cart.item_count || 0;
+          badge.textContent = count;
+          badge.hidden = count === 0;
+        } catch (error) {
+          console.error("❌ Error loading cart count:", error);
+        }
       }
 
       async function loadIndexData() {
@@ -5125,6 +5210,7 @@ DESKTOP (1024px+)
           console.log("📂 Is Array:", Array.isArray(pageData.categories));
 
           renderAll();
+          updateCartBadge();
           setTimeout(() => {
             document.getElementById("loader").classList.add("done");
             setTimeout(() => goToSlide(0), 200);

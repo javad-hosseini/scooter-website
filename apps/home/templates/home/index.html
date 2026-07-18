@@ -570,27 +570,18 @@
         font-size: 0.95rem;
         margin-bottom: 10px;
       }
-      .drawer-auth-user a,
-      .drawer-auth-user button.auth-logout {
+      .drawer-auth-user a {
         font-family: var(--font-ui);
         font-size: 0.85rem;
         color: var(--dim);
         text-decoration: none;
         padding: 9px 0;
         transition: color 0.3s var(--ease-smooth);
-        display: block;
-        width: 100%;
-        text-align: right;
-        background: none;
-        border: none;
-        cursor: pointer;
       }
-      .drawer-auth-user a:hover,
-      .drawer-auth-user button.auth-logout:hover {
+      .drawer-auth-user a:hover {
         color: var(--neon);
       }
-      .drawer-auth-user a.auth-logout,
-      .drawer-auth-user button.auth-logout {
+      .drawer-auth-user a.auth-logout {
         color: #ff8a8a;
       }
 
@@ -5045,31 +5036,18 @@ DESKTOP (1024px+)
       >
         خرید کنید
       </button>
-      {% if user.is_authenticated %}
-      <div class="drawer-auth-user" id="drawerAuthUser">
-        <div class="drawer-user-info">
-          👤 <span>{{ user.fullname|default:user.username }}</span>
-        </div>
-        <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
-        <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
-        <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>
-        <a href="{% url 'accounts_app:dashboard' %}#settings">تنظیمات حساب</a>
-        <form method="post" action="{% url 'accounts_app:logout' %}">
-          {% csrf_token %}
-          <button type="submit" class="auth-logout">خروج</button>
-        </form>
-      </div>
-      {% else %}
       <div class="drawer-auth" id="drawerAuthGuest">
-        <a href="{% url 'accounts_app:login' %}" class="drawer-auth-link">ورود</a>
-        <button
-          class="drawer-auth-register"
-          onclick="window.location.href='{% url 'accounts_app:register' %}'"
-        >
-          ثبت‌نام
-        </button>
+        <a href="#" class="drawer-auth-link">ورود</a>
+        <button class="drawer-auth-register">ثبت‌نام</button>
       </div>
-      {% endif %}
+      <div class="drawer-auth-user" id="drawerAuthUser" style="display: none">
+        <div class="drawer-user-info">👤 <span>کاربر</span></div>
+        <a href="#">پروفایل</a>
+        <a href="#">سفارش‌های من</a>
+        <a href="#">علاقه‌مندی‌ها</a>
+        <a href="#">تنظیمات حساب</a>
+        <a href="#" class="auth-logout">خروج</a>
+      </div>
     </div>
 
     <!-- ============================================================
@@ -5155,8 +5133,6 @@ DESKTOP (1024px+)
          ════════════════════════════════════ */
       const API_BASE = "/api/";
       const API_URL = API_BASE + "index/";
-      const CART_URL = API_BASE + "shop/cart/"; // TODO: با urls.py واقعی خودت هماهنگ کن
-      const IS_AUTHENTICATED = {% if user.is_authenticated %}true{% else %}false{% endif %};
 
       /* ════════════════════════════════════
          LOAD DATA
@@ -5170,28 +5146,6 @@ DESKTOP (1024px+)
         if (isNaN(num)) return val;
         // کلمه تومان + عدد جدا شده
         return "تومان " + num.toLocaleString("fa-IR");
-      }
-
-      /* شمارنده سبد خرید — فقط برای کاربر لاگین‌شده صدا زده می‌شود،
-         چون CartAPIView با permission_classes=[IsAuthenticated] است
-         و برای مهمان 401/403 برمی‌گرداند. */
-      async function updateCartBadge() {
-        const badge = document.getElementById("navCartCount");
-        if (!IS_AUTHENTICATED || !badge) return;
-
-        try {
-          const response = await fetch(CART_URL, {
-            headers: { "X-Requested-With": "XMLHttpRequest" },
-          });
-          if (!response.ok) throw new Error("Failed to fetch cart");
-          const cart = await response.json();
-
-          const count = cart.item_count || 0;
-          badge.textContent = count;
-          badge.hidden = count === 0;
-        } catch (error) {
-          console.error("❌ Error loading cart count:", error);
-        }
       }
 
       async function loadIndexData() {
@@ -5210,7 +5164,6 @@ DESKTOP (1024px+)
           console.log("📂 Is Array:", Array.isArray(pageData.categories));
 
           renderAll();
-          updateCartBadge();
           setTimeout(() => {
             document.getElementById("loader").classList.add("done");
             setTimeout(() => goToSlide(0), 200);
@@ -5760,7 +5713,7 @@ DESKTOP (1024px+)
                             ${formatPrice(card.product_price)} 
                             <small>شروع قیمت از</small>
                         </div>
-                        <button class="pc-cta-m" style="background:${color}" onclick="location.href='/shop/${card.product_slug}/'">خرید کنید</button>
+                        <button class="pc-cta-m" style="background:${color}" onclick="location.href='/shop/product/${card.product_slug}/'">خرید کنید</button>
                       </div>
                     </div>
                   </div>
@@ -5814,7 +5767,7 @@ DESKTOP (1024px+)
                   const color = colors[card.color] || "#4fd8ff";
                   const specs = card.product_specs || [];
                   return `
-                  <div class="pc-large-d visible" style="--pc-color:${color};--pc-glow:rgba(79,216,255,0.1)">
+                  <div class="pc-large-d visible" style="--pc-color:${color};--pc-glow:rgba(79,216,255,0.1);cursor:pointer" onclick="location.href='/shop/product/${card.product_slug}/'">
                     <div class="pc-accent-bar-d" style="background:${color}"></div>
                     <div class="pc-img-d">
                       <div class="pc-img-bg-d" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>

@@ -700,6 +700,13 @@ class CartItem(models.Model):
         verbose_name="تعداد"
     )
 
+    color_slug = models.CharField(
+        max_length=50,
+        blank=True,
+        default='',
+        verbose_name="رنگ"
+    )
+
     # ===== اطلاعات محصول در زمان اضافه شدن (برای ثبات قیمت) =====
     price_snapshot = models.DecimalField(
         max_digits=15,

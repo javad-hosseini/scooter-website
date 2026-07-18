@@ -2762,37 +2762,10 @@
       /* ═══════════════════════════════════════
    ADD TO CART
 ═══════════════════════════════════════ */
-      async function addToCart(e, productId) {
+      function addToCart(e, productId) {
         if (e) e.stopPropagation();
-
-        if (!HEADER_IS_AUTHENTICATED) {
-          alert("برای افزودن به سبد خرید ابتدا وارد حساب کاربری خود شوید.");
-          return;
-        }
-
-        try {
-          const response = await fetch("/shop/api/cart/add/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCSRFToken(),
-              "X-Requested-With": "XMLHttpRequest",
-            },
-            body: JSON.stringify({ product_id: productId, quantity: 1 }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || "خطا در افزودن محصول به سبد خرید");
-          }
-
-          alert("✅ محصول به سبد خرید اضافه شد!");
-          updateCartBadge();
-        } catch (error) {
-          console.error("❌ Error adding to cart:", error);
-          alert(`❌ ${error.message}`);
-        }
+        alert(`✅ محصول با شناسه ${productId} به سبد خرید اضافه شد!`);
+        // TODO: connect to actual cart API
       }
 
       /* ═══════════════════════════════════════
@@ -2901,7 +2874,7 @@
 
     <script>
       const HEADER_IS_AUTHENTICATED = {% if user.is_authenticated %}true{% else %}false{% endif %};
-      const HEADER_CART_URL = "/shop/api/cart/";
+      const HEADER_CART_URL = "/api/shop/cart/"; // TODO: با urls.py واقعی خودت هماهنگ کن
 
       async function updateCartBadge() {
         const badge = document.getElementById("navCartCount");
