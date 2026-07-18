@@ -43,6 +43,7 @@ urlpatterns = [
         name="redoc",
     ),
     path("i18n/", include("django.conf.urls.i18n")),
+    path('api/shop/', include('apps.shop.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls', namespace='accounts_app')),
     path('shop/', include('apps.shop.urls', namespace='shop_app')),

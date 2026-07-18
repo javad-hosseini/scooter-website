@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from rest_framework import generics
+from rest_framework import status as http_status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
@@ -60,12 +61,16 @@ class ArticleDetailAPIView(generics.RetrieveAPIView):
             .select_related('author')
             .prefetch_related(
                 'tags',
-                Prefetch('comments', queryset=Comment.objects.filter(is_approved=True))
+                Prefetch(
+                    'comments',
+                    queryset=Comment.objects.filter(
+                        status='approved', parent__isnull=True
+                    ).select_related('user')
+                )
             )
         )
 
     def retrieve(self, request, *args, **kwargs):
-        # افزایش تعداد بازدید
         instance = self.get_object()
         instance.view_count += 1
         instance.save(update_fields=['view_count'])
@@ -88,21 +93,22 @@ class CommentListCreateAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, slug):
-        """گرفتن نظرات یک مقاله"""
+        """گرفتن نظرات تایید شده‌ی یک مقاله"""
         article = get_object_or_404(Article, slug=slug, is_published=True)
-        comments = article.comments.filter(is_approved=True, parent__isnull=True)
-        serializer = CommentSerializer(comments, many=True)
+        comments = article.comments.filter(
+            status='approved', parent__isnull=True
+        ).select_related('user')
+        serializer = CommentSerializer(comments, many=True, context={'request': request})
         return Response(serializer.data)
 
-    def post(self, request, slug):  # این رو حتماً داشته باش
-        """ایجاد نظر جدید"""
+    def post(self, request, slug):
+        """ایجاد نظر جدید (با وضعیت pending)"""
         article = get_object_or_404(Article, slug=slug, is_published=True)
 
-        # اگه کاربر لاگین نیست
         if not request.user.is_authenticated:
             return Response(
                 {'detail': 'برای ارسال نظر باید وارد حساب کاربری خود شوید.'},
-                status=status.HTTP_401_UNAUTHORIZED
+                status=http_status.HTTP_401_UNAUTHORIZED
             )
 
         serializer = CommentCreateSerializer(
@@ -113,11 +119,14 @@ class CommentListCreateAPIView(APIView):
         if serializer.is_valid():
             comment = serializer.save()
             return Response(
-                CommentSerializer(comment).data,
-                status=status.HTTP_201_CREATED
+                {
+                    'comment': CommentSerializer(comment, context={'request': request}).data,
+                    'message': 'نظر شما با موفقیت ثبت شد و پس از تایید توسط ادمین نمایش داده خواهد شد.'
+                },
+                status=http_status.HTTP_201_CREATED
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
 
 class ArticleListPageView(TemplateView):
@@ -137,7 +146,7 @@ class ArticleDetailPageView(TemplateView):
 
 # apps/home/views.py (افزودن به ویوهای موجود)
 
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.views.generic import TemplateView
@@ -210,3 +219,7 @@ class AccessDeniedView(TemplateView):
 class AdminDashboardPageView(TemplateView):
     """صفحه داشبورد ادمین"""
     template_name = 'accounts/admin_dashboard.html'
+
+
+class AboutUsPageView(TemplateView):
+    template_name = 'home/about_us.html'

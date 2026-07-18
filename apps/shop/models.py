@@ -250,7 +250,7 @@ class ProductReview(models.Model):
     class Meta:
         verbose_name = "نظر محصول"
         verbose_name_plural = "نظرات محصولات"
-        ordering  = ['-created_at']
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.user.fullname} - {self.product.name} ({self.rating}★)"
@@ -352,6 +352,19 @@ class Product(models.Model):
     # زمان
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    stock_out_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="تاریخ اتمام موجودی"
+    )
+
+    # ===== سیگنال برای اطلاع‌رسانی اتمام موجودی =====
+    def send_stock_alert(self):
+        """ارسال هشدار اتمام موجودی به ادمین"""
+        if self.stock <= 5 and self.is_available:
+            # TODO: ارسال ایمیل یا نوتیفیکیشن به ادمین
+            pass
 
     class Meta:
         verbose_name = "محصول"
@@ -576,3 +589,142 @@ class OrderItem(models.Model):
     @property
     def total(self):
         return (self.price - self.discount) * self.quantity
+
+
+# apps/shop/models.py
+
+class Cart(models.Model):
+    """سبد خرید کاربر (اعم از مهمان یا لاگین‌شده)"""
+
+    # ===== شناسه =====
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='carts',
+        verbose_name="کاربر"
+    )
+    session_key = models.CharField(
+        max_length=40,
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name="کلید نشست"
+    )
+
+    # ===== وضعیت =====
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
+
+    # ===== کوپن/تخفیف =====
+    coupon_code = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name="کد تخفیف"
+    )
+    coupon_discount = models.DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        default=0,
+        verbose_name="تخفیف کوپن"
+    )
+
+    # ===== زمان =====
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "سبد خرید"
+        verbose_name_plural = "سبدهای خرید"
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['session_key', 'is_active']),
+        ]
+
+    def __str__(self):
+        if self.user:
+            return f"سبد {self.user.fullname}"
+        return f"سبد مهمان ({self.session_key})"
+
+    @property
+    def total_items(self):
+        """تعداد کل آیتم‌ها"""
+        return self.items.aggregate(
+            total=models.Sum('quantity')
+        )['total'] or 0
+
+    @property
+    def subtotal(self):
+        """جمع کل بدون تخفیف"""
+        total = 0
+        for item in self.items.all():
+            total += item.product.price * item.quantity
+        return total
+
+    @property
+    def total(self):
+        """مبلغ نهایی با تخفیف"""
+        return self.subtotal - self.coupon_discount
+
+    @property
+    def has_items(self):
+        return self.items.exists()
+
+
+class CartItem(models.Model):
+    """آیتم‌های سبد خرید"""
+
+    cart = models.ForeignKey(
+        Cart,
+        on_delete=models.CASCADE,
+        related_name='items',
+        verbose_name="سبد خرید"
+    )
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.PROTECT,
+        related_name='cart_items',
+        verbose_name="محصول"
+    )
+    quantity = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1)],
+        verbose_name="تعداد"
+    )
+
+    # ===== اطلاعات محصول در زمان اضافه شدن (برای ثبات قیمت) =====
+    price_snapshot = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="قیمت لحظه اضافه شدن"
+    )
+
+    # ===== اضافه کردن این فیلد =====
+    selected_color = models.CharField(
+        max_length=50,
+        default='black',
+        verbose_name="رنگ انتخاب‌شده"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "آیتم سبد خرید"
+        verbose_name_plural = "آیتم‌های سبد خرید"
+        unique_together = ['cart', 'product']  # هر محصول فقط یک بار در سبد
+
+    def __str__(self):
+        return f"{self.product.name} x{self.quantity}"
+
+    @property
+    def total(self):
+        return self.price_snapshot * self.quantity
+
+    def save(self, *args, **kwargs):
+        """ذخیره قیمت لحظه‌ای در اولین بار ایجاد"""
+        if not self.pk and not self.price_snapshot:
+            self.price_snapshot = self.product.final_price  # قیمت با تخفیف
+        super().save(*args, **kwargs)

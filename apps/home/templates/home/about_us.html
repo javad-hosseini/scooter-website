@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>درباره ما | VOLTX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:       #0A0A0A;
+  --bg2:      #141414;
+  --surface:  #1D1D1D;
+  --text:     #FFFFFF;
+  --muted:    #A1A1AA;
+  --gold:     #D4AF37;
+  --gold-h:   #E5C158;
+  --border:   rgba(255,255,255,0.08);
+  --font:     'Vazirmatn', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  direction: rtl;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* every element is contained */
+* { max-width: 100%; }
+
+img, svg, video { display: block; max-width: 100%; height: auto; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+nav {
+  position: fixed;
+  top: 0; right: 0; left: 0;
+  z-index: 200;
+  padding: 1.4rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.9), transparent);
+  transition: backdrop-filter .4s, background .4s;
+}
+nav.scrolled {
+  backdrop-filter: blur(20px);
+  background: rgba(10,10,10,0.92);
+}
+.nav-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--text);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.nav-logo span { color: var(--gold); }
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  flex-shrink: 0;
+}
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .88rem;
+  font-weight: 400;
+  transition: color .3s;
+  white-space: nowrap;
+}
+.nav-links a:hover { color: var(--gold); }
+
+.nav-cta {
+  padding: .55rem 1.5rem;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  text-decoration: none;
+  font-size: .83rem;
+  font-weight: 500;
+  letter-spacing: .05em;
+  transition: all .3s;
+  border-radius: 2px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.nav-cta:hover { background: var(--gold); color: var(--bg); }
+
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+.nav-hamburger span {
+  width: 22px;
+  height: 1px;
+  background: var(--text);
+  display: block;
+  transition: all .3s;
+}
+
+/* Mobile nav drawer */
+.nav-drawer {
+  display: none;
+  position: fixed;
+  top: 64px; right: 0; left: 0;
+  background: rgba(10,10,10,0.97);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+  flex-direction: column;
+  gap: 1.4rem;
+  z-index: 199;
+}
+.nav-drawer.open { display: flex; }
+.nav-drawer a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 400;
+  padding: .5rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: color .3s;
+}
+.nav-drawer a:hover { color: var(--gold); }
+.nav-drawer .nav-drawer-cta {
+  margin-top: .5rem;
+  padding: .9rem;
+  text-align: center;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 2px;
+  font-weight: 600;
+  border-bottom: none;
+}
+
+/* ═══════════════════════════════════════════
+   SHARED LAYOUT
+═══════════════════════════════════════════ */
+section { padding: 6rem 0; width: 100%; }
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--gold);
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  margin-bottom: 1.4rem;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity .85s ease, transform .85s ease;
+  will-change: opacity, transform;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity .85s ease, transform .85s ease;
+  will-change: opacity, transform;
+}
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity .85s ease, transform .85s ease;
+  will-change: opacity, transform;
+}
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  display: inline-block;
+  padding: .9rem 2.6rem;
+  background: var(--gold);
+  color: #000;
+  font-family: var(--font);
+  font-size: .93rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: .04em;
+  transition: all .35s;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+  transform: translateX(110%);
+  transition: transform .55s;
+}
+.btn-primary:hover::after { transform: translateX(-110%); }
+.btn-primary:hover {
+  background: var(--gold-h);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(212,175,55,.28);
+}
+
+.btn-outline {
+  display: inline-block;
+  padding: .9rem 2.6rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.22);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .93rem;
+  font-weight: 400;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: .04em;
+  transition: all .35s;
+  white-space: nowrap;
+}
+.btn-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#hero {
+  position: relative;
+  min-height: 100svh;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 70%, rgba(212,175,55,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 20% 30%, rgba(212,175,55,.04) 0%, transparent 60%),
+    linear-gradient(180deg, #0A0A0A 0%, #080808 100%);
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 80px 80px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  opacity: .4;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 1.5rem;
+  width: 100%;
+  max-width: 860px;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  color: var(--gold);
+  font-size: .76rem;
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp .8s .3s forwards;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 1px;
+  background: var(--gold);
+  opacity: .5;
+  flex-shrink: 0;
+}
+.hero-h1 {
+  font-size: clamp(2.4rem, 7vw, 6.2rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.4rem;
+  opacity: 0;
+  animation: fadeUp .9s .5s forwards;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.hero-h1 .gold { color: var(--gold); }
+.hero-sub {
+  font-size: clamp(.95rem, 2.2vw, 1.3rem);
+  color: var(--muted);
+  font-weight: 300;
+  line-height: 1.75;
+  max-width: 520px;
+  margin: 0 auto 2.8rem;
+  opacity: 0;
+  animation: fadeUp .9s .7s forwards;
+}
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp .9s .9s forwards;
+}
+.hero-scroll {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  color: var(--muted);
+  font-size: .68rem;
+  letter-spacing: .15em;
+  opacity: 0;
+  animation: fadeUp .8s 1.2s forwards;
+  white-space: nowrap;
+}
+.hero-scroll-line {
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollPulse 2s infinite;
+}
+@keyframes scrollPulse {
+  0%,100% { opacity:.3; transform:scaleY(1); }
+  50%      { opacity:1;  transform:scaleY(1.1); }
+}
+
+/* ═══════════════════════════════════════════
+   PHILOSOPHY
+═══════════════════════════════════════════ */
+#philosophy { background: var(--bg); }
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.philosophy-left .big-quote {
+  font-size: clamp(1.9rem, 4vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.8rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.philosophy-left .big-quote .gold { color: var(--gold); }
+.philosophy-left p {
+  color: var(--muted);
+  line-height: 2;
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 1.4rem;
+}
+.philosophy-pillars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--border);
+  margin-top: 1rem;
+}
+.pillar-item {
+  padding: 1.4rem;
+  border: 1px solid var(--border);
+  transition: background .3s;
+}
+.pillar-item:hover { background: rgba(212,175,55,.05); }
+.pillar-num { font-size: .68rem; color: var(--gold); letter-spacing: .2em; margin-bottom: .4rem; }
+.pillar-title { font-size: .95rem; font-weight: 600; margin-bottom: .35rem; }
+.pillar-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+
+.philosophy-visual {
+  position: relative;
+  aspect-ratio: 4/5;
+  background: var(--surface);
+  overflow: hidden;
+  width: 100%;
+}
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-placeholder svg { opacity: .14; }
+.philosophy-visual::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(212,175,55,.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.gold-frame {
+  position: absolute;
+  top: 1.4rem; right: 1.4rem; bottom: 1.4rem; left: 1.4rem;
+  border: 1px solid rgba(212,175,55,.2);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════
+   SHOWCASE
+═══════════════════════════════════════════ */
+#showcase {
+  background: var(--bg2);
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+}
+.showcase-item {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+}
+.showcase-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+}
+.showcase-bg-img {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: .25;
+  transition: opacity .6s, transform 8s;
+}
+.showcase-item:hover .showcase-bg-img { opacity: .35; transform: scale(1.04); }
+.showcase-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(10,10,10,.9) 0%, rgba(10,10,10,.4) 60%, transparent 100%);
+}
+.showcase-item.alt .showcase-overlay {
+  background: linear-gradient(270deg, rgba(10,10,10,.9) 0%, rgba(10,10,10,.4) 60%, transparent 100%);
+}
+.showcase-text {
+  position: relative;
+  z-index: 2;
+  padding: 3.5rem 3rem;
+  max-width: 480px;
+  width: 100%;
+}
+.showcase-item.alt .showcase-text {
+  margin-right: auto;
+  margin-left: 0;
+}
+.showcase-text .tag {
+  display: inline-block;
+  padding: .28rem .75rem;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: .68rem;
+  letter-spacing: .18em;
+  margin-bottom: 1.1rem;
+}
+.showcase-text h3 {
+  font-size: clamp(1.5rem, 3vw, 2.6rem);
+  font-weight: 700;
+  margin-bottom: .9rem;
+  line-height: 1.25;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.showcase-text p { color: var(--muted); line-height: 1.8; font-size: .92rem; font-weight: 300; }
+
+/* ═══════════════════════════════════════════
+   TIMELINE
+═══════════════════════════════════════════ */
+#journey { background: var(--bg); }
+.timeline-header { text-align: center; margin-bottom: 4.5rem; }
+.timeline-header h2 {
+  font-size: clamp(1.9rem, 4vw, 3.3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.timeline-wrap { position: relative; width: 100%; }
+.timeline-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 50%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--gold) 10%, var(--gold) 90%, transparent);
+  opacity: .3;
+}
+.timeline-items { display: flex; flex-direction: column; }
+
+.tl-item {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  align-items: start;
+  gap: 0;
+}
+.tl-left { padding: 2.2rem 2.5rem 2.2rem 0; text-align: left; }
+.tl-right { padding: 2.2rem 0 2.2rem 2.5rem; text-align: right; }
+
+.tl-item:nth-child(even) .tl-left { order: 3; text-align: right; padding: 2.2rem 0 2.2rem 2.5rem; }
+.tl-item:nth-child(even) .tl-right { order: 1; text-align: left; padding: 2.2rem 2.5rem 2.2rem 0; }
+
+.tl-dot {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  order: 2;
+  padding-top: 2.5rem;
+}
+.tl-dot-ring {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: var(--bg);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  transition: all .4s;
+}
+.tl-item:hover .tl-dot-ring { background: var(--gold); box-shadow: 0 0 18px rgba(212,175,55,.5); }
+.tl-year { font-size: .68rem; color: var(--gold); font-weight: 600; letter-spacing: .1em; }
+.tl-content h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: .45rem; }
+.tl-content p { color: var(--muted); font-size: .85rem; line-height: 1.75; font-weight: 300; }
+
+/* ═══════════════════════════════════════════
+   DIFFERENTIATORS
+═══════════════════════════════════════════ */
+#different { background: var(--bg2); }
+.diff-header { text-align: center; margin-bottom: 3.5rem; }
+.diff-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
+.diff-header p { color: var(--muted); margin-top: .9rem; font-size: 1rem; font-weight: 300; }
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  width: 100%;
+}
+.diff-card {
+  background: var(--bg2);
+  padding: 2.5rem 2.2rem;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: background .4s;
+}
+.diff-card::before {
+  content: '';
+  position: absolute; top: 0; right: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transition: transform .5s;
+}
+.diff-card:hover::before { transform: scaleX(1); }
+.diff-card:hover { background: rgba(212,175,55,.04); }
+.diff-icon {
+  width: 48px; height: 48px;
+  border: 1px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.6rem;
+  transition: background .4s;
+  flex-shrink: 0;
+}
+.diff-card:hover .diff-icon { background: rgba(212,175,55,.1); }
+.diff-icon svg { color: var(--gold); flex-shrink: 0; }
+.diff-card h3 { font-size: 1.08rem; font-weight: 700; margin-bottom: .7rem; }
+.diff-card p { color: var(--muted); font-size: .85rem; line-height: 1.8; font-weight: 300; }
+.diff-number {
+  position: absolute; bottom: 1.4rem; left: 1.4rem;
+  font-size: .62rem; color: rgba(212,175,55,.3); letter-spacing: .15em;
+}
+
+/* ═══════════════════════════════════════════
+   METRICS
+═══════════════════════════════════════════ */
+#metrics { background: var(--bg); position: relative; overflow: hidden; }
+.metrics-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,175,55,.04) 0%, transparent 70%);
+}
+.metrics-wrap { position: relative; z-index: 1; text-align: center; }
+.metrics-wrap h2 {
+  font-size: clamp(1.7rem, 3.5vw, 2.9rem);
+  font-weight: 800; margin-bottom: .9rem; letter-spacing: -0.02em;
+}
+.metrics-wrap .sub { color: var(--muted); font-size: 1rem; margin-bottom: 4rem; font-weight: 300; }
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  width: 100%;
+}
+.metric-box {
+  background: var(--bg);
+  padding: 3rem 1.5rem;
+  border-bottom: 2px solid transparent;
+  transition: border-color .4s, background .4s;
+}
+.metric-box:hover { border-color: var(--gold); background: rgba(212,175,55,.03); }
+.metric-num {
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: .45rem;
+}
+.metric-label { font-size: .9rem; color: var(--muted); font-weight: 300; letter-spacing: .05em; }
+
+/* ═══════════════════════════════════════════
+   EXPERIENCE
+═══════════════════════════════════════════ */
+#experience { background: var(--bg2); }
+.exp-top { text-align: center; margin-bottom: 4rem; }
+.exp-top h2 {
+  font-size: clamp(1.9rem, 4vw, 3.3rem);
+  font-weight: 800; letter-spacing: -0.02em; margin-bottom: .9rem;
+}
+.exp-top p { color: var(--muted); max-width: 520px; margin: 0 auto; line-height: 1.8; font-size: 1rem; font-weight: 300; }
+
+.exp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 1px;
+  background: var(--border);
+  width: 100%;
+}
+.exp-card {
+  background: var(--bg2);
+  padding: 2.8rem 2.2rem;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: background .4s;
+}
+.exp-card.tall {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 440px;
+}
+.exp-card.tall .exp-visual {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #1a1408, #2a2010, #1a1408);
+}
+.exp-card.tall .exp-visual::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.82) 40%, transparent 100%);
+}
+.exp-card.tall .exp-card-content { position: relative; z-index: 1; }
+.exp-card:hover { background: rgba(212,175,55,.04); }
+.exp-card.tall:hover .exp-visual { filter: brightness(1.12); }
+.exp-tag { font-size: .68rem; color: var(--gold); letter-spacing: .2em; margin-bottom: .9rem; text-transform: uppercase; }
+.exp-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: .7rem; line-height: 1.35; }
+.exp-card p { color: var(--muted); font-size: .85rem; line-height: 1.8; font-weight: 300; }
+.exp-icon { font-size: 2.2rem; margin-bottom: 1.3rem; opacity: .65; }
+
+/* ═══════════════════════════════════════════
+   VALUES
+═══════════════════════════════════════════ */
+#values { background: var(--bg); }
+.values-header { text-align: center; margin-bottom: 3.5rem; }
+.values-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.2rem;
+  width: 100%;
+}
+.value-card {
+  position: relative;
+  padding: 2.2rem 1.5rem;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  transition: all .4s;
+  cursor: default;
+  overflow: hidden;
+}
+.value-card::before {
+  content: '';
+  position: absolute; inset: -1px;
+  background: linear-gradient(135deg, rgba(212,175,55,.18), transparent, rgba(212,175,55,.09));
+  opacity: 0;
+  transition: opacity .4s;
+}
+.value-card:hover::before { opacity: 1; }
+.value-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(212,175,55,.28);
+  box-shadow: 0 18px 52px rgba(0,0,0,.38);
+}
+.value-icon {
+  width: 52px; height: 52px;
+  margin: 0 auto 1.3rem;
+  background: rgba(212,175,55,.08);
+  border: 1px solid rgba(212,175,55,.2);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.value-icon svg { color: var(--gold); flex-shrink: 0; }
+.value-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .45rem; }
+.value-card p { font-size: .78rem; color: var(--muted); line-height: 1.7; }
+
+/* ═══════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════ */
+#testimonials { background: var(--bg2); }
+.test-header { text-align: center; margin-bottom: 3.5rem; }
+.test-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
+.test-header p { color: var(--muted); margin-top: .9rem; font-size: 1rem; font-weight: 300; }
+
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+  width: 100%;
+}
+.test-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all .4s;
+  cursor: default;
+}
+.test-card::after {
+  content: '';
+  position: absolute; bottom: 0; right: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transition: transform .5s;
+}
+.test-card:hover::after { transform: scaleX(1); }
+.test-card:hover {
+  border-color: rgba(212,175,55,.2);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 48px rgba(0,0,0,.38);
+}
+.test-stars { color: var(--gold); font-size: 1rem; letter-spacing: .18em; margin-bottom: 1.1rem; }
+.test-quote {
+  font-size: .9rem; line-height: 1.9;
+  color: var(--muted); margin-bottom: 1.8rem;
+  font-weight: 300; font-style: italic;
+}
+.test-author { display: flex; align-items: center; gap: .9rem; }
+.test-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), rgba(212,175,55,.3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: .88rem; font-weight: 700; color: #000; flex-shrink: 0;
+}
+.test-name { font-size: .88rem; font-weight: 600; }
+.test-role { font-size: .73rem; color: var(--muted); }
+.test-card.featured {
+  background: linear-gradient(135deg, rgba(212,175,55,.08) 0%, var(--surface) 100%);
+  border-color: rgba(212,175,55,.24);
+}
+
+/* ═══════════════════════════════════════════
+   FINAL CTA
+═══════════════════════════════════════════ */
+#final-cta {
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  padding: 9rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.cta-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 80% at 50% 60%, rgba(212,175,55,.08) 0%, transparent 65%);
+}
+.cta-grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 80px 80px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  opacity: .3;
+}
+.cta-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 1.5rem;
+  width: 100%;
+  max-width: 800px;
+}
+.cta-line {
+  width: 56px; height: 1px;
+  background: var(--gold);
+  margin: 0 auto 2.2rem;
+  opacity: .6;
+}
+.cta-content h2 {
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  margin-bottom: 1.3rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.cta-content h2 .gold { color: var(--gold); }
+.cta-content p { color: var(--muted); font-size: 1.1rem; margin-bottom: 2.8rem; font-weight: 300; }
+.cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════
+   FOOTER  — full multi-column luxury layout
+═══════════════════════════════════════════ */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  width: 100%;
+}
+
+.footer-top {
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--border);
+}
+.footer-top-inner {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 3.5rem;
+  width: 100%;
+}
+
+/* Brand column */
+.footer-brand .footer-logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+}
+.footer-brand .footer-logo span { color: var(--gold); }
+.footer-brand p {
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.8;
+  font-weight: 300;
+  max-width: 280px;
+  margin-bottom: 2rem;
+}
+.footer-social {
+  display: flex;
+  gap: .8rem;
+  flex-wrap: wrap;
+}
+.footer-social a {
+  width: 38px; height: 38px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .75rem;
+  transition: all .3s;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Nav columns */
+.footer-col h5 {
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+.footer-col ul li a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .85rem;
+  font-weight: 300;
+  transition: color .3s;
+  display: inline-block;
+}
+.footer-col ul li a:hover { color: var(--gold); }
+
+/* Newsletter strip */
+.footer-newsletter {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.footer-newsletter-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.footer-newsletter-text h6 {
+  font-size: .98rem;
+  font-weight: 700;
+  margin-bottom: .35rem;
+}
+.footer-newsletter-text p { font-size: .82rem; color: var(--muted); font-weight: 300; }
+.footer-newsletter-form {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+}
+.footer-newsletter-form input {
+  padding: .75rem 1.2rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-left: none;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .85rem;
+  outline: none;
+  width: 240px;
+  max-width: 100%;
+  transition: border-color .3s;
+  direction: rtl;
+}
+.footer-newsletter-form input:focus { border-color: var(--gold); }
+.footer-newsletter-form input::placeholder { color: var(--muted); }
+.footer-newsletter-form button {
+  padding: .75rem 1.5rem;
+  background: var(--gold);
+  color: #000;
+  font-family: var(--font);
+  font-size: .83rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .3s;
+  flex-shrink: 0;
+}
+.footer-newsletter-form button:hover { background: var(--gold-h); }
+
+/* Bottom bar */
+.footer-bottom {
+  padding: 1.8rem 0;
+}
+.footer-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.footer-copy { color: rgba(161,161,170,.4); font-size: .76rem; letter-spacing: .04em; }
+.footer-bottom-links {
+  display: flex;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+}
+.footer-bottom-links a {
+  color: rgba(161,161,170,.4);
+  text-decoration: none;
+  font-size: .76rem;
+  transition: color .3s;
+  white-space: nowrap;
+}
+.footer-bottom-links a:hover { color: var(--gold); }
+.footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .3rem .8rem;
+  border: 1px solid rgba(212,175,55,.2);
+  border-radius: 2px;
+  font-size: .68rem;
+  color: rgba(212,175,55,.6);
+  letter-spacing: .1em;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 1280px
+═══════════════════════════════════════════ */
+@media (max-width: 1280px) {
+  .container { padding: 0 2.5rem; }
+  .values-grid { grid-template-columns: repeat(3, 1fr); }
+  .footer-top-inner { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2.5rem; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 1024px
+═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .container { padding: 0 2rem; }
+  nav { padding: 1.2rem 2rem; }
+
+  /* Philosophy */
+  .philosophy-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .philosophy-visual { aspect-ratio: 16/9; max-height: 360px; }
+  .philosophy-left .big-quote { font-size: clamp(1.8rem, 4.5vw, 3rem); }
+
+  /* Timeline — single-side */
+  .timeline-line { right: 28px; left: auto; }
+  .tl-item { grid-template-columns: 60px 1fr; }
+  .tl-left,
+  .tl-item:nth-child(even) .tl-left { display: none; }
+  .tl-dot { order: 1; padding-top: 2.2rem; width: 60px; }
+  .tl-item:nth-child(even) .tl-dot { order: 1; }
+  .tl-right,
+  .tl-item:nth-child(even) .tl-right {
+    order: 2;
+    text-align: right;
+    padding: 2rem 1.5rem 2rem 0;
+  }
+
+  /* Grids */
+  .diff-grid { grid-template-columns: repeat(2, 1fr); }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .exp-grid { grid-template-columns: repeat(2, 1fr); }
+  .exp-card.tall { grid-row: auto; min-height: 300px; }
+  .test-grid { grid-template-columns: repeat(2, 1fr); }
+  .values-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Footer */
+  .footer-top-inner { grid-template-columns: 1fr 1fr; gap: 3rem; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-brand p { max-width: 100%; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 820px
+═══════════════════════════════════════════ */
+@media (max-width: 820px) {
+  section { padding: 4.5rem 0; }
+  .container { padding: 0 1.5rem; }
+
+  .diff-grid { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .values-grid { grid-template-columns: repeat(2, 1fr); }
+  .exp-grid { grid-template-columns: 1fr; }
+  .test-grid { grid-template-columns: 1fr; }
+
+  .footer-top-inner { grid-template-columns: 1fr 1fr; }
+  .footer-brand { grid-column: 1 / -1; }
+
+  .footer-newsletter-inner { flex-direction: column; align-items: flex-start; }
+  .footer-newsletter-form { width: 100%; }
+  .footer-newsletter-form input { flex: 1; width: auto; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 768px (tablets / mobile)
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Nav */
+  nav { padding: 1rem 1.2rem; }
+  .nav-links { display: none; }
+  .nav-cta { display: none; }
+  .nav-hamburger { display: flex; }
+
+  section { padding: 4rem 0; }
+  .container { padding: 0 1.2rem; }
+
+  /* Hero */
+  .hero-content { padding: 0 1.2rem; }
+  .hero-btns { flex-direction: column; align-items: center; }
+  .hero-btns .btn-primary,
+  .hero-btns .btn-outline { width: 100%; max-width: 300px; text-align: center; }
+
+  /* Philosophy */
+  .philosophy-pillars { grid-template-columns: 1fr; }
+  .pillar-item { padding: 1.2rem; }
+
+  /* Showcase */
+  .showcase-item { min-height: 360px; }
+  .showcase-text { padding: 2.5rem 1.2rem; max-width: 100%; }
+
+  /* Timeline */
+  .timeline-line { right: 20px; }
+  .tl-item { grid-template-columns: 44px 1fr; }
+  .tl-dot { width: 44px; }
+  .tl-dot-ring { width: 11px; height: 11px; }
+
+  /* Grids */
+  .diff-grid { grid-template-columns: 1fr; }
+  .diff-card { padding: 2rem 1.5rem; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .metric-box { padding: 2.2rem 1rem; }
+  .values-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .exp-grid { grid-template-columns: 1fr; }
+  .exp-card.tall { min-height: 280px; }
+  .test-grid { grid-template-columns: 1fr; }
+
+  /* CTA */
+  .cta-btns { flex-direction: column; align-items: center; }
+  .cta-btns .btn-primary,
+  .cta-btns .btn-outline { width: 100%; max-width: 300px; text-align: center; }
+  #final-cta { padding: 6rem 0; }
+
+  /* Footer */
+  .footer-top { padding: 3.5rem 0 3rem; }
+  .footer-top-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .footer-brand { grid-column: auto; }
+  .footer-brand p { max-width: 100%; }
+  .footer-newsletter-form { flex-direction: column; gap: .6rem; width: 100%; }
+  .footer-newsletter-form input {
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    width: 100%; max-width: 100%;
+  }
+  .footer-newsletter-form button { width: 100%; }
+  .footer-bottom-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .footer-bottom-links { gap: 1.2rem; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 480px
+═══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  section { padding: 3.5rem 0; }
+  .container { padding: 0 1rem; }
+
+  nav { padding: .9rem 1rem; }
+  .nav-logo { font-size: 1.2rem; }
+
+  .hero-h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
+  .hero-sub { font-size: .9rem; }
+  .hero-scroll { display: none; }
+
+  .philosophy-left .big-quote { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+
+  .values-grid { grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .value-card { padding: 1.6rem 1rem; }
+
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .metric-box { padding: 1.8rem .8rem; }
+  .metric-num { font-size: clamp(1.8rem, 8vw, 2.8rem); }
+  .metric-label { font-size: .78rem; }
+
+  .showcase-text { padding: 2rem 1rem; }
+
+  .diff-card { padding: 1.8rem 1.2rem; }
+
+  .test-card { padding: 1.8rem 1.2rem; }
+
+  .footer-top-inner { gap: 2rem; }
+  .footer-col ul { gap: .7rem; }
+
+  .cta-content h2 { font-size: clamp(1.9rem, 8vw, 2.8rem); }
+  #final-cta { padding: 5rem 0; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 360px
+═══════════════════════════════════════════ */
+@media (max-width: 360px) {
+  .container { padding: 0 .9rem; }
+  .values-grid { grid-template-columns: 1fr; }
+  .hero-btns .btn-primary,
+  .hero-btns .btn-outline { padding: .85rem 1.5rem; font-size: .87rem; }
+  .btn-primary, .btn-outline { padding: .85rem 1.8rem; }
+  .footer-social a { width: 34px; height: 34px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav id="main-nav">
+  <div class="nav-logo">VOLT<span>X</span></div>
+  <div class="nav-links">
+    <a href="#philosophy">فلسفه ما</a>
+    <a href="#journey">مسیر ما</a>
+    <a href="#different">تمایز</a>
+    <a href="#metrics">آمار</a>
+    <a href="#testimonials">نظرات</a>
+  </div>
+  <a href="#final-cta" class="nav-cta">تماس با ما</a>
+  <div class="nav-hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="منو">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <a href="#philosophy" onclick="closeDrawer()">فلسفه ما</a>
+  <a href="#journey" onclick="closeDrawer()">مسیر ما</a>
+  <a href="#different" onclick="closeDrawer()">تمایز</a>
+  <a href="#metrics" onclick="closeDrawer()">آمار</a>
+  <a href="#testimonials" onclick="closeDrawer()">نظرات</a>
+  <a href="#final-cta" class="nav-drawer-cta" onclick="closeDrawer()">تماس با ما</a>
+</div>
+
+<!-- ═══ SECTION 1: HERO ═══ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">برند اسکوتر برقی لوکس</div>
+    <h1 class="hero-h1">ما فقط اسکوتر<br><span class="gold">نمی‌فروشیم</span></h1>
+    <p class="hero-sub">ما آینده حمل‌ونقل شهری را بازتعریف می‌کنیم.</p>
+    <div class="hero-btns">
+      <button class="btn-primary">مشاهده محصولات</button>
+      <button class="btn-outline">همکاری با ما</button>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>پایین بروید</span>
+  </div>
+</section>
+
+<!-- ═══ SECTION 2: PHILOSOPHY ═══ -->
+<section id="philosophy">
+  <div class="container">
+    <div class="philosophy-grid">
+      <div class="philosophy-left reveal">
+        <div class="section-label">فلسفه برند</div>
+        <div class="big-quote">
+          جایی که <span class="gold">هنر</span><br>با فناوری<br>ملاقات می‌کند
+        </div>
+        <p>ما باور داریم که حرکت در شهر نباید صرفاً یک نیاز روزانه باشد. باید یک تجربه باشد. یک احساس. یک انتخاب هوشمند.</p>
+        <p>هر اسکوتر VOLTX داستانی است از دقت در جزئیات، عشق به طراحی، و تعهد به عملکرد. ما نه برای بازار انبوه، بلکه برای کسانی می‌سازیم که ارزش استثنایی بودن را می‌دانند.</p>
+        <div class="philosophy-pillars">
+          <div class="pillar-item">
+            <div class="pillar-num">۰۱</div>
+            <div class="pillar-title">نوآوری بی‌پایان</div>
+            <div class="pillar-desc">هر فصل، فناوری جدید. هر نسل، تجربه‌ای متفاوت‌تر.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num">۰۲</div>
+            <div class="pillar-title">کیفیت اثبات‌شده</div>
+            <div class="pillar-desc">۲۴۰۰+ ساعت آزمایش قبل از تحویل به دست شما.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num">۰۳</div>
+            <div class="pillar-title">طراحی هدفمند</div>
+            <div class="pillar-desc">زیبایی که از کارکرد زاده می‌شود، نه برعکس.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num">۰۴</div>
+            <div class="pillar-title">تجربه کامل</div>
+            <div class="pillar-desc">از اولین لمس تا سال‌ها استفاده روزانه.</div>
+          </div>
+        </div>
+      </div>
+      <div class="philosophy-visual reveal-right">
+        <div class="img-placeholder">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="0.7">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <div class="gold-frame"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 3: SHOWCASE ═══ -->
+<section id="showcase">
+  <div class="showcase-item reveal">
+    <div class="showcase-bg" style="background:linear-gradient(135deg,#0f1015,#1a1818);"></div>
+    <div class="showcase-bg-img" style="background:linear-gradient(120deg,#0d0d0d,#1a1614,#0d0d0d);"></div>
+    <div class="showcase-overlay"></div>
+    <div class="container">
+      <div class="showcase-text">
+        <div class="tag">طراحی اروپایی</div>
+        <h3>فرم که از درون به بیرون شکل می‌گیرد</h3>
+        <p>تیم طراحان ما با الهام از معماری مدرن اروپایی، هر خط و هر انحنا را با دقت پیکره‌بندی کرده‌اند.</p>
+      </div>
+    </div>
+  </div>
+  <div class="showcase-item alt reveal">
+    <div class="showcase-bg" style="background:linear-gradient(135deg,#0c0f0d,#141a13);"></div>
+    <div class="showcase-bg-img" style="background:linear-gradient(120deg,#0c0f0d,#141a13,#0c0f0d);"></div>
+    <div class="showcase-overlay"></div>
+    <div class="container">
+      <div class="showcase-text" style="margin-right:auto;margin-left:0;">
+        <div class="tag">فناوری باتری</div>
+        <h3>۱۲۰ کیلومتر در یک شارژ</h3>
+        <p>سل‌های NMC نسل پنجم با سیستم مدیریت حرارتی هوشمند. شهر برای شما کوچک‌تر می‌شود.</p>
+      </div>
+    </div>
+  </div>
+  <div class="showcase-item reveal">
+    <div class="showcase-bg" style="background:linear-gradient(135deg,#100e0f,#1a1618);"></div>
+    <div class="showcase-bg-img" style="background:linear-gradient(120deg,#0f0d0e,#1a1516,#0f0d0e);"></div>
+    <div class="showcase-overlay"></div>
+    <div class="container">
+      <div class="showcase-text">
+        <div class="tag">تجربه رانندگی</div>
+        <h3>سکوتری که شما را می‌شناسد</h3>
+        <p>هوش مصنوعی تطبیقی VOLTX از اولین رانندگی، سبک حرکت شما را یاد می‌گیرد.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 4: TIMELINE ═══ -->
+<section id="journey">
+  <div class="container">
+    <div class="timeline-header reveal">
+      <div class="section-label" style="justify-content:center;">مسیر ما</div>
+      <h2>از رویا تا واقعیت</h2>
+    </div>
+    <div class="timeline-wrap">
+      <div class="timeline-line"></div>
+      <div class="timeline-items">
+        <div class="tl-item reveal">
+          <div class="tl-left">
+            <div class="tl-content">
+              <h4>تأسیس VOLTX</h4>
+              <p>چهار مهندس با یک چشم‌انداز مشترک: جنبش برقی شهری که شایسته لوکس بودن باشد.</p>
+            </div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۰</div></div>
+          <div class="tl-right"></div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left"></div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۱</div></div>
+          <div class="tl-right">
+            <div class="tl-content">
+              <h4>اولین نمونه اولیه</h4>
+              <p>بعد از ۱۸ ماه تحقیق و توسعه، VOLTX S1 متولد شد. اولین آزمون‌ها از همه انتظارات پیشی گرفت.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left">
+            <div class="tl-content">
+              <h4>ورود به بازار</h4>
+              <p>عرضه اولیه به ۵۰۰ نفر. در ۴۸ ساعت اول تمام موجودی فروخته شد.</p>
+            </div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۲</div></div>
+          <div class="tl-right"></div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left"></div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۳</div></div>
+          <div class="tl-right">
+            <div class="tl-content">
+              <h4>گسترش ملی</h4>
+              <p>شبکه ۱۵۰ نمایندگی در سراسر کشور. ۵۰۰۰ مشتری راضی. جوایز بین‌المللی طراحی.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left">
+            <div class="tl-content">
+              <h4>VOLTX X2 — آینده</h4>
+              <p>نسل بعدی در راه است. هوش مصنوعی تطبیقی، باتری جامد، طراحی که دوباره تعریف می‌شود.</p>
+            </div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۴</div></div>
+          <div class="tl-right"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 5: DIFFERENTIATORS ═══ -->
+<section id="different">
+  <div class="container">
+    <div class="diff-header reveal">
+      <div class="section-label" style="justify-content:center;">تمایز ما</div>
+      <h2>چرا VOLTX انتخاب متفاوتی است</h2>
+      <p>ما در بازاری رقابت نمی‌کنیم. ما یک دسته جدید می‌سازیم.</p>
+    </div>
+    <div class="diff-grid">
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>طراحی مدرن</h3>
+        <p>هر خط با هدف طراحی شده. زیبایی که از مهندسی سرچشمه می‌گیرد، نه تزئین صرف.</p>
+        <div class="diff-number">۰۱</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>کیفیت ساخت ممتاز</h3>
+        <p>آلیاژ آلومینیوم هوافضایی. اتصالات تیتانیوم. استانداردهایی که از صنعت خودرو وام گرفته شده‌اند.</p>
+        <div class="diff-number">۰۲</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        </div>
+        <h3>فناوری پیشرفته</h3>
+        <p>کنترلر موتور بردار بومی، سیستم ترمز ABS هوشمند، و اتصال یکپارچه با اکوسیستم دیجیتال شما.</p>
+        <div class="diff-number">۰۳</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <h3>پشتیبانی واقعی</h3>
+        <p>تیم متخصص ما ۲۴ ساعته در کنار شماست. تعمیر در محل، تعویض قطعه در کمتر از ۴۸ ساعت.</p>
+        <div class="diff-number">۰۴</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <h3>شبکه گسترده فروش</h3>
+        <p>۱۵۰+ نمایندگی رسمی در سراسر کشور. هر شهر، یک نقطه تماس حضوری.</p>
+        <div class="diff-number">۰۵</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>تحویل سریع</h3>
+        <p>از سفارش تا درِ خانه شما در کمتر از ۷۲ ساعت. بسته‌بندی ویژه که خودش یک تجربه است.</p>
+        <div class="diff-number">۰۶</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 6: METRICS ═══ -->
+<section id="metrics">
+  <div class="metrics-bg"></div>
+  <div class="container metrics-wrap">
+    <div class="reveal">
+      <div class="section-label" style="justify-content:center;">اعداد واقعی</div>
+      <h2>اعتماد که با اعداد ثابت می‌شود</h2>
+      <p class="sub">ادعا نمی‌کنیم. نشان می‌دهیم.</p>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-box reveal">
+        <div class="metric-num" data-target="5000">۰</div>
+        <div class="metric-label">مشتری راضی</div>
+      </div>
+      <div class="metric-box reveal">
+        <div class="metric-num" data-target="150">۰</div>
+        <div class="metric-label">همکار تجاری</div>
+      </div>
+      <div class="metric-box reveal">
+        <div class="metric-num" data-target="98" data-suffix="%">۰</div>
+        <div class="metric-label">رضایت مشتری</div>
+      </div>
+      <div class="metric-box reveal">
+        <div class="metric-num" data-static="1">۲۴/۷</div>
+        <div class="metric-label">پشتیبانی</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 7: EXPERIENCE ═══ -->
+<section id="experience">
+  <div class="container">
+    <div class="exp-top reveal">
+      <div class="section-label" style="justify-content:center;">تجربه VOLTX</div>
+      <h2>این فقط حمل‌ونقل نیست</h2>
+      <p>ما سبک زندگی می‌فروشیم. آزادی می‌فروشیم. احساسی که در هر پیچ و خیابان با شما همراه است.</p>
+    </div>
+    <div class="exp-grid">
+      <div class="exp-card tall reveal">
+        <div class="exp-visual" style="background:linear-gradient(135deg,#1a1408,#2a2010,#1a1408);"></div>
+        <div class="exp-card-content">
+          <div class="exp-tag">آزادی حرکت</div>
+          <h3>شهر متعلق به شماست</h3>
+          <p>ترافیک دیگر مانع نیست. مسیرهای جدید کشف کنید. دیر نرسید.</p>
+        </div>
+      </div>
+      <div class="exp-card reveal">
+        <div class="exp-icon">⚡</div>
+        <div class="exp-tag">فناوری</div>
+        <h3>هوشمند از روز اول</h3>
+        <p>اپلیکیشن اختصاصی، ردیابی زنده، به‌روزرسانی over-the-air. اسکوتر شما با زمان رشد می‌کند.</p>
+      </div>
+      <div class="exp-card reveal">
+        <div class="exp-icon">🌿</div>
+        <div class="exp-tag">پایداری</div>
+        <h3>هر کیلومتر، یک تفاوت</h3>
+        <p>صفر آلودگی. صفر پشیمانی. سبز رانندگی کنید، بزرگ فکر کنید.</p>
+      </div>
+      <div class="exp-card reveal">
+        <div class="exp-icon">✦</div>
+        <div class="exp-tag">سبک زندگی</div>
+        <h3>برای کسانی که متفاوت انتخاب می‌کنند</h3>
+        <p>VOLTX یک بیانیه است. ارزش‌های شما را بازتاب می‌دهد.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 8: VALUES ═══ -->
+<section id="values">
+  <div class="container">
+    <div class="values-header reveal">
+      <div class="section-label" style="justify-content:center;">ارزش‌های ما</div>
+      <h2>آنچه که ما را تعریف می‌کند</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <h4>اعتماد</h4>
+        <p>هر وعده‌ای که می‌دهیم، نگه می‌داریم.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <h4>کیفیت</h4>
+        <p>استانداردی که هر روز بالاتر می‌رود.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h4>نوآوری</h4>
+        <p>راه‌حل‌های جرئت‌مندانه. همیشه یک قدم جلوتر.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h4>تعهد</h4>
+        <p>به مشتریان، به محیط زیست، به آینده.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+        </div>
+        <h4>رضایت مشتری</h4>
+        <p>موفقیت ما در لبخند مشتریان‌مان است.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 9: TESTIMONIALS ═══ -->
+<section id="testimonials">
+  <div class="container">
+    <div class="test-header reveal">
+      <div class="section-label" style="justify-content:center;">نظرات مشتریان</div>
+      <h2>صدای کسانی که ما را انتخاب کردند</h2>
+      <p>هر جمله یک تجربه واقعی است.</p>
+    </div>
+    <div class="test-grid">
+      <div class="test-card featured reveal">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">قبل از VOLTX فکر می‌کردم اسکوتر برقی یعنی یک وسیله ارزان‌قیمت. الان می‌فهمم که اشتباه می‌کردم. این یک تجربه کاملاً متفاوت است. احساس می‌کنی سوار چیزی شدی که واقعاً برای تو ساخته شده.</p>
+        <div class="test-author">
+          <div class="test-avatar">ا</div>
+          <div><div class="test-name">احمد کریمی</div><div class="test-role">مدیر استارتاپ | تهران</div></div>
+        </div>
+      </div>
+      <div class="test-card reveal">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">پشتیبانی VOLTX را باید تجربه کنید. در کمتر از ۲ ساعت تکنسین در محل من بود. این سطح از خدمات در ایران نادر است.</p>
+        <div class="test-author">
+          <div class="test-avatar">س</div>
+          <div><div class="test-name">سارا محمدی</div><div class="test-role">پزشک | اصفهان</div></div>
+        </div>
+      </div>
+      <div class="test-card reveal">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">یک سال است که هر روز با VOLTX X1 به کار می‌روم. نه یک بار خرابی جدی. باتری هنوز مثل روز اول. سرمایه‌گذاری هوشمند بود.</p>
+        <div class="test-author">
+          <div class="test-avatar">م</div>
+          <div><div class="test-name">مهدی رضایی</div><div class="test-role">مهندس نرم‌افزار | مشهد</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 10: FINAL CTA ═══ -->
+<section id="final-cta">
+  <div class="cta-bg"></div>
+  <div class="cta-grid-bg"></div>
+  <div class="cta-content reveal">
+    <div class="cta-line"></div>
+    <h2>آینده از<br><span class="gold">همین‌جا</span> آغاز می‌شود</h2>
+    <p>به جمع هزاران مشتری و همکار ما بپیوندید.</p>
+    <div class="cta-btns">
+      <button class="btn-primary">مشاهده محصولات</button>
+      <button class="btn-outline">تماس با ما</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER — full luxury multi-column ═══ -->
+<footer>
+  <!-- Top: brand + columns -->
+  <div class="footer-top">
+    <div class="container">
+      <div class="footer-top-inner">
+        <!-- Brand -->
+        <div class="footer-brand">
+          <div class="footer-logo">VOLT<span>X</span></div>
+          <p>برند اسکوتر برقی لوکس ایران. جایی که طراحی، فناوری و تجربه در یک محصول به هم می‌رسند. ما آینده حرکت شهری را می‌سازیم.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="اینستاگرام">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" aria-label="تلگرام">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </a>
+            <a href="#" aria-label="یوتیوب">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+            </a>
+            <a href="#" aria-label="لینکدین">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Column: محصولات -->
+        <div class="footer-col">
+          <h5>محصولات</h5>
+          <ul>
+            <li><a href="#">VOLTX S1</a></li>
+            <li><a href="#">VOLTX X2</a></li>
+            <li><a href="#">لوازم جانبی</a></li>
+            <li><a href="#">قطعات یدکی</a></li>
+            <li><a href="#">بسته‌های سرویس</a></li>
+          </ul>
+        </div>
+
+        <!-- Column: شرکت -->
+        <div class="footer-col">
+          <h5>شرکت</h5>
+          <ul>
+            <li><a href="#">درباره ما</a></li>
+            <li><a href="#">مسیر ما</a></li>
+            <li><a href="#">تیم ما</a></li>
+            <li><a href="#">فرصت‌های شغلی</a></li>
+            <li><a href="#">وبلاگ</a></li>
+          </ul>
+        </div>
+
+        <!-- Column: پشتیبانی -->
+        <div class="footer-col">
+          <h5>پشتیبانی</h5>
+          <ul>
+            <li><a href="#">مرکز راهنمایی</a></li>
+            <li><a href="#">نمایندگی‌ها</a></li>
+            <li><a href="#">گارانتی</a></li>
+            <li><a href="#">تماس با ما</a></li>
+            <li><a href="#">۰۲۱–۱۲۳۴–۵۶۷۸</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Newsletter strip -->
+  <div class="footer-newsletter">
+    <div class="container">
+      <div class="footer-newsletter-inner">
+        <div class="footer-newsletter-text">
+          <h6>از آخرین اخبار VOLTX مطلع شوید</h6>
+          <p>رونمایی محصولات جدید، رویدادها و پیشنهادات ویژه — مستقیم در صندوق ورودی شما.</p>
+        </div>
+        <div class="footer-newsletter-form">
+          <input type="email" placeholder="آدرس ایمیل شما">
+          <button type="button">عضویت</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-inner">
+        <span class="footer-copy">© ۱۴۰۴ VOLTX — تمام حقوق محفوظ است</span>
+        <div class="footer-bottom-links">
+          <a href="#">حریم خصوصی</a>
+          <a href="#">شرایط استفاده</a>
+          <a href="#">سیاست کوکی</a>
+        </div>
+        <div class="footer-badge">&#9650; VOLTX PREMIUM</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+/* ─ NAV SCROLL ─ */
+const mainNav = document.getElementById('main-nav');
+window.addEventListener('scroll', () => {
+  mainNav.classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
+
+/* ─ MOBILE DRAWER ─ */
+function toggleDrawer() {
+  document.getElementById('nav-drawer').classList.toggle('open');
+}
+function closeDrawer() {
+  document.getElementById('nav-drawer').classList.remove('open');
+}
+document.addEventListener('click', (e) => {
+  const drawer = document.getElementById('nav-drawer');
+  const hamburger = document.getElementById('hamburger');
+  if (drawer.classList.contains('open') &&
+      !drawer.contains(e.target) &&
+      !hamburger.contains(e.target)) {
+    drawer.classList.remove('open');
+  }
+});
+
+/* ─ SCROLL REVEAL ─ */
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 70);
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+        .forEach(el => revealObs.observe(el));
+
+/* ─ COUNTER ANIMATION ─ */
+function animateCounter(el) {
+  if (el.dataset.static) return; // static values like 24/7
+  const target = parseInt(el.dataset.target);
+  const suffix = el.dataset.suffix || '+';
+  if (isNaN(target)) return;
+  const duration = 2000;
+  const start = Date.now();
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(eased * target);
+    if (progress < 1) {
+      el.textContent = current.toLocaleString('fa-IR');
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = target.toLocaleString('fa-IR') + suffix;
+    }
+  };
+  requestAnimationFrame(tick);
+}
+
+const metricObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.animated) {
+      e.target.dataset.animated = '1';
+      document.querySelectorAll('#metrics .metric-num').forEach(animateCounter);
+      metricObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.25 });
+
+const metricsSection = document.getElementById('metrics');
+if (metricsSection) metricObs.observe(metricsSection);
+
+/* ─ HERO PARALLAX (desktop only) ─ */
+if (window.matchMedia('(min-width: 769px)').matches) {
+  const heroContent = document.querySelector('.hero-content');
+  const heroGrid = document.querySelector('.hero-grid');
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    if (scrolled < window.innerHeight && heroContent) {
+      const tx = scrolled * 0.28;
+      const op = 1 - (scrolled / (window.innerHeight * 0.72));
+      heroContent.style.transform = `translateY(${tx}px)`;
+      heroContent.style.opacity = Math.max(op, 0);
+    }
+    if (heroGrid) heroGrid.style.transform = `translateY(${window.scrollY * 0.13}px)`;
+  }, { passive: true });
+}
+</script>
+</body>
+</html>

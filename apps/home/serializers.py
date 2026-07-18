@@ -95,11 +95,12 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
         return ArticleListSerializer(related, many=True, context=self.context).data
 
     def get_comments_count(self, obj):
-        return obj.comments.filter(is_approved=True).count()
+        return obj.comments.filter(status='approved').count()
 
     def get_recent_comments(self, obj):
-        """آخرین ۵ نظر تایید شده"""
-        comments = obj.comments.filter(is_approved=True, parent__isnull=True)[:5]
+        comments = obj.comments.filter(
+            status='approved', parent__isnull=True
+        ).select_related('user')[:5]
         return CommentSerializer(comments, many=True, context=self.context).data
 
 
@@ -110,9 +111,9 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'user_name', 'user_profile_image', 'content', 'created_at', 'is_approved', 'parent',
-                  'replies']
-        read_only_fields = ['user', 'created_at', 'is_approved']
+        fields = ['id', 'user', 'user_name', 'user_profile_image', 'content',
+                  'created_at', 'status', 'parent', 'replies']
+        read_only_fields = ['user', 'created_at', 'status']
 
     def get_user_profile_image(self, obj):
         if obj.user and obj.user.profile_image:
@@ -120,8 +121,8 @@ class CommentSerializer(serializers.ModelSerializer):
         return None
 
     def get_replies(self, obj):
-        replies = obj.replies.filter(is_approved=True)
-        return CommentSerializer(replies, many=True).data
+        replies = obj.replies.filter(status='approved').select_related('user')
+        return CommentSerializer(replies, many=True, context=self.context).data
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
@@ -133,6 +134,12 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             raise serializers.ValidationError("برای ارسال نظر باید وارد حساب کاربری خود شوید.")
+
+        parent = data.get('parent')
+        if parent and parent.article_id != self.context.get('article_id'):
+            # جلوگیری از پاسخ دادن به کامنت یک مقاله‌ی دیگه
+            raise serializers.ValidationError("کامنت والد به این مقاله تعلق ندارد.")
+
         return data
 
     def save(self, **kwargs):
@@ -141,11 +148,11 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
         self.validated_data['user'] = request.user
         self.validated_data['article_id'] = article_id
+        # status ست نمی‌کنیم، پیش‌فرض مدل خودش pending رو می‌ذاره
+        # حتی اگه کلاینت status بفرسته، چون تو fields نیست، DRF نادیده‌اش می‌گیره
 
         return super().save(**kwargs)
 
-
-# apps/home/serializers.py (افزودن به سریالایزرهای موجود)
 
 from .models import (
     IndexPageSettings, ProductCard,

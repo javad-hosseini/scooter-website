@@ -1,14 +1,16 @@
 # apps/shop/views.py
 
 from datetime import timedelta
+from decimal import Decimal
 
+import jdatetime
 from django.db import transaction
 from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.generic import TemplateView
-from rest_framework import generics
+from rest_framework import generics, serializers
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAdminUser
@@ -17,19 +19,25 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import CustomUser
-from .models import Category, ProductReview, Wishlist
+from apps.accounts.models import Province, City
+from .models import Category, ProductReview, Wishlist, Cart, CartItem, ProductImage
 from .models import Product, Order, OrderItem, Address
 from .pagination import ProductPagination
 from .serializers import (
-    CartSerializer, OrderCreateSerializer, CartItemSerializer
+    OrderCreateSerializer, CartItemSerializer, OrderListSerializer
 )
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer,
-    ProductReviewSerializer, ProductReviewCreateSerializer,
-    WishlistSerializer, CategorySerializer, CategoryDetailSerializer
+    ProductReviewSerializer, WishlistSerializer, CategorySerializer, CategoryDetailSerializer
 )
+from .utils.inventory_utils import InventoryManager
+from .utils.shipping_utils import ShippingCalculator
+from .utils.tax_utils import TaxCalculator
 
-from apps.accounts.models import  Province, City
+
+# ============================================
+# PRODUCT API VIEWS
+# ============================================
 
 class ProductListAPIView(generics.ListAPIView):
     """API برای لیست محصولات"""
@@ -40,25 +48,21 @@ class ProductListAPIView(generics.ListAPIView):
     def get_queryset(self):
         qs = Product.objects.filter(is_published=True)
 
-        # جستجو
         search = self.request.query_params.get('search', '').strip()
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(description__icontains=search))
 
-        # فیلتر بر اساس دسته‌بندی
         category = self.request.query_params.get('category', '').strip()
         if category:
             qs = qs.filter(category__slug=category)
 
-        # فیلتر بر اساس قیمت
         min_price = self.request.query_params.get('min_price')
         max_price = self.request.query_params.get('max_price')
         if min_price:
-            qs = qs.filter(final_price__gte=min_price)
+            qs = qs.filter(price__gte=min_price)
         if max_price:
-            qs = qs.filter(final_price__lte=max_price)
+            qs = qs.filter(price__lte=max_price)
 
-        # مرتب‌سازی
         sort = self.request.query_params.get('sort', '-created_at')
         valid_sorts = ['price', '-price', 'created_at', '-created_at', 'view_count', '-view_count']
         if sort in valid_sorts:
@@ -106,55 +110,59 @@ class CategoryListAPIView(generics.ListAPIView):
         return Category.objects.filter(is_active=True, parent__isnull=True)
 
 
-class ProductReviewListCreateAPIView(APIView):
+# apps/shop/views.py
+
+# ============================================
+# PRODUCT REVIEWS
+# ============================================
+
+class ProductReviewListCreateAPIView(generics.ListCreateAPIView):
     """API برای لیست و ایجاد نظرات محصول"""
     permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = ProductReviewSerializer
 
-    def get(self, request, slug):
-        """گرفتن نظرات تایید شده یک محصول"""
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
         product = get_object_or_404(Product, slug=slug, is_published=True)
-        reviews = product.reviews.filter(status='approved').order_by('-created_at')
-        serializer = ProductReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
+        return product.reviews.filter(status='approved').order_by('-created_at')
 
-    def post(self, request, slug):
-        """ایجاد نظر جدید برای محصول"""
+    def perform_create(self, serializer):
+        slug = self.kwargs.get('slug')
         product = get_object_or_404(Product, slug=slug, is_published=True)
 
-        if not request.user.is_authenticated:
-            return Response(
-                {'detail': 'برای ثبت نظر باید وارد حساب کاربری خود شوید.'},
-                status=status.HTTP_401_UNAUTHORIZED
+        # چک کردن تکراری نبودن نظر
+        if ProductReview.objects.filter(
+                product=product,
+                user=self.request.user,
+                status__in=['pending', 'approved']
+        ).exists():
+            raise serializers.ValidationError(
+                'شما قبلاً برای این محصول نظر ثبت کرده‌اید.'
             )
 
-        # چک کردن اینکه کاربر قبلاً برای این محصول نظر نداده باشد
-        existing = ProductReview.objects.filter(
+        serializer.save(
+            user=self.request.user,
             product=product,
-            user=request.user,
-            status__in=['pending', 'approved']
-        ).exists()
-        if existing:
-            return Response(
-                {'detail': 'شما قبلاً برای این محصول نظر ثبت کرده‌اید.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        serializer = ProductReviewCreateSerializer(
-            data=request.data,
-            context={'request': request, 'product_id': product.id}
+            status='pending'
         )
 
-        if serializer.is_valid():
-            review = serializer.save()
-            return Response(
-                ProductReviewSerializer(review).data,
-                status=status.HTTP_201_CREATED
-            )
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response({
+                'status': 'success',
+                'message': 'نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده می‌شود.',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED, headers=headers)
+        except serializers.ValidationError as e:
+            return Response({
+                'status': 'error',
+                'message': str(e.detail[0]) if isinstance(e.detail, list) else str(e.detail)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# apps/shop/views.py
 
 class WishlistToggleAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -250,9 +258,7 @@ class AdminDashboardStatsAPIView(APIView):
         total_products = Product.objects.filter(is_available=True, is_published=True).count()
 
         # ===== 2. سفارش‌های امروز =====
-        today_orders = Order.objects.filter(
-            created_at__date=today
-        ).count()
+        today_orders = Order.objects.filter(created_at__date=today).count()
 
         # ===== 3. کل مشتریان =====
         total_customers = CustomUser.objects.filter(is_active=True).count()
@@ -268,11 +274,9 @@ class AdminDashboardStatsAPIView(APIView):
         monthly_revenue_million = monthly_revenue / 1_000_000
 
         # ===== 5. روند فروش ماهانه (۱۲ ماه اخیر) =====
-        monthly_sales = []
         end_date = today
         start_date = today - timedelta(days=365)
 
-        # گرفتن داده‌های ماهانه
         sales_data = Order.objects.filter(
             payment_status='paid',
             created_at__gte=start_date,
@@ -283,23 +287,31 @@ class AdminDashboardStatsAPIView(APIView):
             total=Sum('total')
         ).order_by('month')
 
-        # ایجاد لیست کامل ۱۲ ماه
+        # ایجاد لیست کامل ۱۲ ماه با نام‌های فارسی
+        month_names_fa = {
+            1: 'فروردین', 2: 'اردیبهشت', 3: 'خرداد', 4: 'تیر',
+            5: 'مرداد', 6: 'شهریور', 7: 'مهر', 8: 'آبان',
+            9: 'آذر', 10: 'دی', 11: 'بهمن', 12: 'اسفند'
+        }
+
         months = []
         for i in range(11, -1, -1):
             month_date = today - timedelta(days=30 * i)
+            month_num = month_date.month
+            month_name = month_names_fa.get(month_num, str(month_num))
             months.append({
-                'month': month_date.strftime('%B'),
+                'month': month_name,
                 'year': month_date.year,
                 'total': 0
             })
 
-        # پر کردن داده‌ها
         for data in sales_data:
             if data['month']:
-                month_name = data['month'].strftime('%B')
+                month_num = data['month'].month
+                month_name = month_names_fa.get(month_num, str(month_num))
                 for m in months:
                     if m['month'] == month_name:
-                        m['total'] = data['total'] / 1_000_000  # تبدیل به میلیون
+                        m['total'] = float(data['total']) / 1_000_000
                         break
 
         monthly_sales = months
@@ -313,7 +325,6 @@ class AdminDashboardStatsAPIView(APIView):
 
         recent_orders_data = []
         for order in recent_orders:
-            # گرفتن محصولات
             products = order.items.all()
             product_names = [item.product.name for item in products]
 
@@ -323,10 +334,10 @@ class AdminDashboardStatsAPIView(APIView):
                 'customer_username': order.user.username,
                 'customer_avatar': order.user.profile_image.url if order.user.profile_image else None,
                 'products': product_names,
-                'total': order.total,
+                'total': float(order.total),
                 'status': order.status,
                 'status_label': dict(Order.STATUS_CHOICES).get(order.status, order.status),
-                'created_at': order.created_at,
+                'created_at': order.created_at.isoformat(),
                 'payment_status': order.payment_status,
             })
 
@@ -348,35 +359,78 @@ class AdminDashboardStatsAPIView(APIView):
                 'product_id': item['product_id'],
                 'name': item['product__name'],
                 'cover_image': item['product__cover_image'],
-                'total_sold': item['total_sold'],
-                'total_revenue': item['total_revenue'] or 0,
+                'total_sold': item['total_sold'] or 0,
+                'total_revenue': float(item['total_revenue'] or 0),
             })
 
-        # ===== 8. فعالیت‌های اخیر (برای TODO) =====
-        # این بخش فعلاً با داده‌های نمونه پر می‌شود
-        recent_activities = [
-            {
-                'icon': 'fa-cart-shopping',
-                'title': 'سفارش جدید دریافت شد',
-                'description': f'سفارش #{recent_orders[0].order_number if recent_orders else "N/A"}',
-                'time': '۲ دقیقه پیش',
-                'color': 'blue'
-            },
-            # ... بقیه فعالیت‌ها
-        ]
+        # ===== 8. فعالیت‌های اخیر =====
+        recent_activities = []
 
-        # ===== 9. اعلان‌ها (برای TODO) =====
-        notifications = [
-            {
-                'priority_color': 'red',
+        if recent_orders:
+            for order in recent_orders[:3]:
+                recent_activities.append({
+                    'icon': 'fa-cart-shopping',
+                    'title': 'سفارش جدید دریافت شد',
+                    'description': f'سفارش {order.order_number}',
+                    'time': self._get_time_ago(order.created_at),
+                    'color': 'blue'
+                })
+
+        recent_products = Product.objects.filter(is_published=True).order_by('-created_at')[:2]
+        for product in recent_products:
+            recent_activities.append({
+                'icon': 'fa-box',
+                'title': 'محصول جدید اضافه شد',
+                'description': product.name,
+                'time': self._get_time_ago(product.created_at),
+                'color': 'purple'
+            })
+
+        # ===== 9. اعلان‌ها =====
+        notifications = []
+
+        low_stock_products = Product.objects.filter(stock__lt=5, is_available=True)[:3]
+        for product in low_stock_products:
+            notifications.append({
+                'priority_color': '#ef4444',
                 'icon': 'fa-triangle-exclamation',
                 'icon_color': 'red',
                 'title': 'هشدار موجودی انبار',
-                'description': 'موجودی «اسکوتر فلش پرو» کمتر از ۵ واحد است',
-                'time': '۲ دقیقه پیش'
-            },
-            # ... بقیه اعلان‌ها
-        ]
+                'description': f'موجودی «{product.name}» کمتر از ۵ واحد است',
+                'time': 'همین حالا'
+            })
+
+        for order in recent_orders[:2]:
+            notifications.append({
+                'priority_color': '#3b82f6',
+                'icon': 'fa-cart-shopping',
+                'icon_color': 'blue',
+                'title': 'سفارش جدید ثبت شد',
+                'description': f'سفارش {order.order_number} به ارزش {int(order.total):,} تومان',
+                'time': self._get_time_ago(order.created_at)
+            })
+
+        # ===== تاریخ امروز به شمسی =====
+        try:
+            today_jalali = jdatetime.date.fromgregorian(date=today)
+            weekdays_fa = {
+                'Saturday': 'شنبه', 'Sunday': 'یکشنبه', 'Monday': 'دوشنبه',
+                'Tuesday': 'سه‌شنبه', 'Wednesday': 'چهارشنبه', 'Thursday': 'پنجشنبه',
+                'Friday': 'جمعه'
+            }
+            weekday_fa = weekdays_fa.get(today.strftime('%A'), '')
+
+            # روش امن برای گرفتن نام ماه
+            month_names_fa_full = {
+                1: 'فروردین', 2: 'اردیبهشت', 3: 'خرداد', 4: 'تیر',
+                5: 'مرداد', 6: 'شهریور', 7: 'مهر', 8: 'آبان',
+                9: 'آذر', 10: 'دی', 11: 'بهمن', 12: 'اسفند'
+            }
+            month_name = month_names_fa_full.get(today_jalali.month, '')
+            today_date = f"{weekday_fa}، {today_jalali.day} {month_name} {today_jalali.year}"
+        except:
+            # اگر jdatetime نصب نبود، از تاریخ میلادی استفاده کن
+            today_date = today.strftime('%A, %B %d, %Y')
 
         data = {
             'user': {
@@ -391,10 +445,10 @@ class AdminDashboardStatsAPIView(APIView):
                 'total_customers': total_customers,
                 'monthly_revenue': round(monthly_revenue_million, 1),
                 'trends': {
-                    'products_trend': '+8.2%',
-                    'orders_trend': '+12.4%',
-                    'customers_trend': '+5.1%',
-                    'revenue_trend': '-2.3%',
+                    'products_trend': '+8.2',
+                    'orders_trend': '+12.4',
+                    'customers_trend': '+5.1',
+                    'revenue_trend': '-2.3',
                 }
             },
             'monthly_sales': monthly_sales,
@@ -402,18 +456,36 @@ class AdminDashboardStatsAPIView(APIView):
             'top_products': top_products_data,
             'recent_activities': recent_activities,
             'notifications': notifications,
-            'today_date': today.strftime('%A، %d %B %Y'),
+            'today_date': today_date,
         }
 
         return Response(data)
 
+    def _get_time_ago(self, dt):
+        """محاسبه زمان گذشته به فارسی"""
+        now = timezone.now()
+        diff = now - dt
 
-# apps/shop/views.py (افزودن به ویوهای موجود)
+        seconds = int(diff.total_seconds())
+
+        if seconds < 60:
+            return 'لحظاتی پیش'
+        elif seconds < 3600:
+            minutes = seconds // 60
+            return f'{minutes} دقیقه پیش'
+        elif seconds < 86400:
+            hours = seconds // 3600
+            return f'{hours} ساعت پیش'
+        elif seconds < 604800:
+            days = seconds // 86400
+            return f'{days} روز پیش'
+        else:
+            return dt.strftime('%Y/%m/%d')
 
 
-# apps/shop/views.py
+# apps/shop/views.py - CartAPIView
 
-# apps/shop/views.py
+# apps/shop/views.py - CartAPIView
 
 class CartAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -421,53 +493,262 @@ class CartAPIView(APIView):
     def get(self, request):
         user = request.user
 
-        product = Product.objects.filter(is_published=True, is_available=True).first()
-        if not product:
-            return Response({
-                'items': [],
-                'item_count': 0,
-                'subtotal': 0,
-                'discount_total': 0,
-                'shipping_cost': 'رایگان',
-                'applied_coupon': None,
-                'tax_amount': 0,
-                'final_total': 0,
+        cart = Cart.objects.filter(user=user, is_active=True).first()
+        if not cart or not cart.items.exists():
+            return self._empty_cart_response()
+
+        items_data = []
+        item_count = 0
+        subtotal = Decimal('0')
+        discount_total = Decimal('0')
+
+        for item in cart.items.select_related('product').all():
+            product = item.product
+            quantity = item.quantity
+            price = Decimal(str(product.price))
+            discount_price = Decimal(str(product.discount_price)) if product.discount_price else Decimal('0')
+
+            item_subtotal = price * quantity
+            item_discount = (price - discount_price) * quantity if product.discount_price else Decimal('0')
+
+            subtotal += item_subtotal
+            discount_total += item_discount
+            item_count += quantity
+
+            available_colors = product.images.values('color_slug', 'color_label', 'color_hex').distinct()
+            selected_color = self._get_selected_color(request, product.id)
+
+            specs = product.specs.all()[:2]
+            short_specs = ' | '.join([f"{s.label}: {s.value}" for s in specs])
+
+            from datetime import datetime, timedelta
+            delivery_date = datetime.now() + timedelta(days=3)
+
+            items_data.append({
+                'product_id': product.id,
+                'product_name': product.name,
+                'product_slug': product.slug,
+                'product_image': product.cover_image.url if product.cover_image else None,
+                'short_specs': short_specs,
+                'warranty_months': 12,
+                'available_colors': [
+                    {
+                        'slug': c['color_slug'],
+                        'name': c['color_label'],
+                        'hex': c['color_hex'],
+                        'selected': c['color_slug'] == selected_color.get('slug')
+                    }
+                    for c in available_colors
+                ],
+                'selected_color': selected_color,
+                'quantity': quantity,
+                'original_price': int(price),
+                'final_price': int(discount_price) if product.discount_price else int(price),
+                'saving_amount': int(price - discount_price) if product.discount_price else 0,
+                'estimated_delivery': delivery_date.strftime('%d %B %Y'),
+                'item_subtotal': int(item_subtotal),
+                'item_discount': int(item_discount),
+                'total': int(item_subtotal),
             })
 
-        quantity = 2
-        from decimal import Decimal
+        tax_amount = TaxCalculator.calculate_tax(subtotal)
+        shipping_method = request.query_params.get('shipping_method', 'standard')
+        shipping_cost = ShippingCalculator.calculate_shipping(
+            subtotal=subtotal,
+            method=shipping_method,
+            province_id=self._get_user_province_id(user)
+        )
 
-        # ساخت آیتم با دیکشنری
-        items = [{
-            'product': product,
-            'quantity': quantity,
-            'selected_color': {'slug': 'black', 'name': 'مشکی', 'hex': '#1A1A1A'},
-        }]
-
-        # محاسبات
-        price = Decimal(str(product.price))
-        discount_price = Decimal(str(product.discount_price)) if product.discount_price else Decimal('0')
-
-        subtotal = price * Decimal(str(quantity))
-        discount = discount_price * Decimal(str(quantity)) if discount_price else Decimal('0')
-        final_total = subtotal - discount
-        tax = (subtotal * Decimal('0.09')).quantize(Decimal('0'))
-
-        # سریالایز کردن آیتم‌ها
-        serialized_items = CartItemSerializer(items, many=True).data
-
-        data = {
-            'items': serialized_items,
-            'item_count': quantity,
+        available_shipping_methods = ShippingCalculator.get_available_methods(subtotal)
+        final_total = TaxCalculator.calculate_total(
+            subtotal=subtotal,
+            discount=discount_total,
+            shipping_cost=shipping_cost
+        )
+        return Response({
+            'items': items_data,
+            'item_count': item_count,
             'subtotal': int(subtotal),
-            'discount_total': int(discount),
-            'shipping_cost': 'رایگان',
-            'applied_coupon': None,
-            'tax_amount': int(tax),
-            'final_total': int(final_total + tax),
-        }
+            'discount_total': int(discount_total),
+            'shipping_cost': int(shipping_cost),
+            'shipping_methods': available_shipping_methods,
+            'selected_shipping_method': shipping_method,
+            'applied_coupon': cart.coupon_code,
+            'coupon_discount': int(cart.coupon_discount) if cart.coupon_discount else 0,
+            'tax_amount': int(tax_amount),
+            'final_total': int(final_total),
+            'estimated_delivery': ShippingCalculator.get_estimated_delivery(shipping_method),
+        })
 
-        return Response(data)
+    # ===== متدهای کمکی =====
+
+    def _empty_cart_response(self):
+        """پاسخ برای سبد خالی"""
+        return Response({
+            'items': [],
+            'item_count': 0,
+            'subtotal': 0,
+            'discount_total': 0,
+            'shipping_cost': 0,
+            'shipping_methods': [],
+            'selected_shipping_method': 'standard',
+            'applied_coupon': None,
+            'coupon_discount': 0,
+            'tax_amount': 0,
+            'final_total': 0,
+            'estimated_delivery': 3,
+        })
+
+    def _get_selected_color(self, request, product_id):
+        """دریافت رنگ انتخاب‌شده برای محصول"""
+        # از session یا request.GET
+        color_slug = request.query_params.get(f'color_{product_id}', 'black')
+
+        # دریافت اطلاعات رنگ از دیتابیس
+        color = ProductImage.objects.filter(
+            product_id=product_id,
+            color_slug=color_slug
+        ).first()
+
+        if color:
+            return {
+                'slug': color.color_slug,
+                'name': color.color_label,
+                'hex': color.color_hex,
+            }
+
+        # رنگ پیش‌فرض
+        default_color = ProductImage.objects.filter(product_id=product_id).first()
+        if default_color:
+            return {
+                'slug': default_color.color_slug,
+                'name': default_color.color_label,
+                'hex': default_color.color_hex,
+            }
+
+        return {'slug': 'black', 'name': 'مشکی', 'hex': '#1A1A1A'}
+
+    def _get_user_province_id(self, user):
+        """دریافت استان کاربر از آخرین آدرس"""
+        last_address = user.addresses.filter(is_active=True).first()
+        if last_address:
+            return last_address.province_id
+        return None
+
+    def post(self, request):
+        """اضافه کردن محصول به سبد خرید"""
+        product_id = request.data.get('product_id')
+        quantity = int(request.data.get('quantity', 1))
+        color_slug = request.data.get('color_slug', 'black')
+
+        if not product_id:
+            return Response(
+                {'error': 'شناسه محصول الزامی است'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        product = get_object_or_404(Product, id=product_id, is_published=True, is_available=True)
+
+        if product.stock < quantity:
+            return Response(
+                {'error': f'موجودی کافی نیست. موجودی: {product.stock}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cart, created = Cart.objects.get_or_create(
+            user=request.user,
+            is_active=True,
+            defaults={'session_key': request.session.session_key}
+        )
+
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            product=product,
+            defaults={
+                'quantity': quantity,
+                'price_snapshot': product.final_price,
+            }
+        )
+
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.save()
+
+        return Response({
+            'status': 'added',
+            'message': 'محصول به سبد خرید اضافه شد',
+            'item_count': cart.items.aggregate(Sum('quantity'))['quantity__sum'] or 0,
+        }, status=status.HTTP_201_CREATED)
+
+    def put(self, request):
+        """به‌روزرسانی تعداد یک آیتم در سبد خرید"""
+        product_id = request.data.get('product_id')
+        quantity = int(request.data.get('quantity', 1))
+
+        if not product_id:
+            return Response(
+                {'error': 'شناسه محصول الزامی است'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if quantity < 1:
+            return self.delete(request)  # اگر تعداد صفر شد، حذف کن
+
+        cart = Cart.objects.filter(user=request.user, is_active=True).first()
+        if not cart:
+            return Response(
+                {'error': 'سبد خرید یافت نشد'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
+
+        # بررسی موجودی
+        if cart_item.product.stock < quantity:
+            return Response(
+                {'error': f'موجودی کافی نیست. موجودی: {cart_item.product.stock}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cart_item.quantity = quantity
+        cart_item.save()
+
+        return Response({
+            'status': 'updated',
+            'message': 'تعداد آیتم به‌روزرسانی شد',
+            'item': CartItemSerializer(cart_item).data,
+        })
+
+    def delete(self, request):
+        """حذف یک آیتم از سبد خرید"""
+        product_id = request.data.get('product_id')
+
+        if not product_id:
+            return Response(
+                {'error': 'شناسه محصول الزامی است'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cart = Cart.objects.filter(user=request.user, is_active=True).first()
+        if not cart:
+            return Response(
+                {'error': 'سبد خرید یافت نشد'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        deleted = CartItem.objects.filter(cart=cart, product_id=product_id).delete()
+
+        if deleted[0] > 0:
+            return Response({
+                'status': 'removed',
+                'message': 'محصول از سبد خرید حذف شد',
+            })
+        else:
+            return Response(
+                {'error': 'آیتم در سبد خرید یافت نشد'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 
 class CheckoutPageView(TemplateView):
     """صفحه تسویه حساب و پرداخت"""
@@ -480,8 +761,78 @@ class CheckoutPageView(TemplateView):
         return context
 
 
+class CartClearAPIView(APIView):
+    """خالی کردن کامل سبد خرید"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        cart = Cart.objects.filter(user=request.user, is_active=True).first()
+        if cart:
+            cart.items.all().delete()
+            cart.coupon_code = None
+            cart.coupon_discount = 0
+            cart.save()
+
+        return Response({
+            'status': 'cleared',
+            'message': 'سبد خرید خالی شد'
+        })
+
+
+class CartApplyCouponAPIView(APIView):
+    """اعمال کد تخفیف به سبد خرید"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        coupon_code = request.data.get('coupon_code', '').strip()
+
+        if not coupon_code:
+            return Response(
+                {'error': 'کد تخفیف را وارد کنید'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cart = Cart.objects.filter(user=request.user, is_active=True).first()
+        if not cart or not cart.items.exists():
+            return Response(
+                {'error': 'سبد خرید خالی است'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # TODO: اعتبارسنجی کوپن
+        # از مدل Coupon استفاده کن
+        # coupon = get_object_or_404(Coupon, code=coupon_code, is_active=True)
+
+        # مثال:
+        # if coupon.is_expired():
+        #     return Response({'error': 'کد تخفیف منقضی شده است'})
+        # if coupon.usage_limit and coupon.used_count >= coupon.usage_limit:
+        #     return Response({'error': 'تعداد استفاده از این کد به پایان رسیده است'})
+        # if coupon.min_order_amount and cart.subtotal < coupon.min_order_amount:
+        #     return Response({'error': f'حداقل مبلغ برای این کد {coupon.min_order_amount} تومان است'})
+
+        # اعمال کوپن (مثال)
+        discount_amount = 50000  # از مدل Coupon بگیر
+        cart.coupon_code = coupon_code
+        cart.coupon_discount = discount_amount
+        cart.save()
+
+        return Response({
+            'status': 'applied',
+            'message': 'کد تخفیف با موفقیت اعمال شد',
+            'coupon_code': coupon_code,
+            'discount_amount': discount_amount,
+        })
+
+
+# apps/shop/views.py
+
+# ============================================
+# CHECKOUT API
+# ============================================
+
 class CheckoutSubmitAPIView(APIView):
-    """API برای ثبت نهایی سفارش و هدایت به درگاه پرداخت"""
+    """API برای ثبت نهایی سفارش"""
     permission_classes = [IsAuthenticated]
 
     @transaction.atomic
@@ -493,11 +844,25 @@ class CheckoutSubmitAPIView(APIView):
         data = serializer.validated_data
         user = request.user
 
-        # ===== 1. پیدا کردن یا ایجاد آدرس =====
+        # ===== 1. دریافت سبد خرید کاربر =====
+        cart = Cart.objects.filter(user=user, is_active=True).first()
+        if not cart or not cart.items.exists():
+            return Response(
+                {'error': 'سبد خرید شما خالی است'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # ===== 2. بررسی موجودی با استفاده از InventoryManager =====
+        availability = InventoryManager.check_availability(cart.items.all())
+        if not availability['available']:
+            return Response({
+                'error': 'برخی محصولات موجودی کافی ندارند',
+                'details': availability['errors']
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # ===== 3. پیدا کردن یا ایجاد آدرس =====
         province = get_object_or_404(Province, id=data['province_id'])
         city = get_object_or_404(City, id=data['city_id'])
-
-        # آدرس کامل
         full_name = f"{data['first_name']} {data['last_name']}"
 
         address, created = Address.objects.get_or_create(
@@ -513,57 +878,163 @@ class CheckoutSubmitAPIView(APIView):
             }
         )
 
-        # ===== 2. محاسبه قیمت‌ها =====
-        # TODO: گرفتن آیتم‌های سبد خرید از session
-        # فعلاً با دیتای نمونه
-        product = Product.objects.filter(is_published=True, is_available=True).first()
-        if not product:
-            return Response(
-                {'error': 'هیچ محصولی در سبد خرید وجود ندارد'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # ===== 4. محاسبه قیمت‌ها با استفاده از utils =====
+        subtotal = Decimal('0')
+        discount_total = Decimal('0')
+        items_list = []
 
-        quantity = 2  # از session گرفته شود
-        unit_price = product.final_price
-        subtotal = unit_price * quantity
-        discount = 0  # از session گرفته شود
-        shipping_cost = 0  # از session گرفته شود
-        tax = int(subtotal * 0.09)  # ۹% مالیات
-        total = subtotal - discount + shipping_cost + tax
+        for item in cart.items.select_related('product').all():
+            product = item.product
+            quantity = item.quantity
+            unit_price = item.price_snapshot
+            unit_discount = Decimal('0')
 
-        # ===== 3. ایجاد سفارش =====
+            if product.discount_price:
+                unit_discount = Decimal(str(product.price)) - Decimal(str(product.discount_price))
+
+            subtotal += unit_price * quantity
+            discount_total += unit_discount * quantity
+
+            items_list.append({
+                'product': product,
+                'quantity': quantity,
+                'price': product.price,
+                'discount': product.discount_price or 0,
+            })
+
+        # محاسبه مالیات و هزینه ارسال با utils
+        tax_amount = TaxCalculator.calculate_tax(subtotal)
+        shipping_method = request.query_params.get('shipping_method', 'standard')
+        shipping_cost = ShippingCalculator.calculate_shipping(
+            subtotal=subtotal,
+            method=shipping_method,
+            province_id=self._get_user_province_id(user)
+        )
+
+        available_shipping_methods = ShippingCalculator.get_available_methods(subtotal)
+
+        # ===== 5. اعمال کوپن =====
+        coupon_discount = Decimal('0')
+        if cart.coupon_code:
+            # TODO: اعتبارسنجی کوپن
+            coupon_discount = Decimal(str(cart.coupon_discount))
+
+        # ===== 6. محاسبه مبلغ نهایی =====
+        total = TaxCalculator.calculate_total(
+            subtotal=subtotal,
+            discount=discount_total + coupon_discount,
+            shipping_cost=shipping_cost
+        )
+
+        # ===== 7. ایجاد سفارش =====
         order = Order.objects.create(
             user=user,
             address=address,
             subtotal=subtotal,
-            discount_amount=discount,
+            discount_amount=discount_total + coupon_discount,
             shipping_cost=shipping_cost,
+            tax_amount=tax_amount,
             total=total,
             status='pending',
             payment_status='pending',
+            shipping_method=shipping_method,
             notes=f"روش پرداخت: {data['payment_method']}"
         )
 
-        # ===== 4. ایجاد آیتم‌های سفارش =====
-        OrderItem.objects.create(
-            order=order,
-            product=product,
-            quantity=quantity,
-            price=product.price,
-            discount=product.discount_price or 0
-        )
+        # ===== 8. ایجاد آیتم‌های سفارش =====
+        for item_data in items_list:
+            OrderItem.objects.create(
+                order=order,
+                product=item_data['product'],
+                quantity=item_data['quantity'],
+                price=item_data['price'],
+                discount=item_data['discount']
+            )
 
-        # ===== 5. TODO: اتصال به درگاه پرداخت =====
-        # اینجا باید به درگاه پرداخت متصل شود
-        # و user را به صفحه پرداخت هدایت کند
-        # فعلاً یک پاسخ موفق برمی‌گردانیم
+        # ===== 9. کاهش موجودی با استفاده از InventoryManager =====
+        InventoryManager.deduct_stock(cart.items.all())
+
+        # ===== 10. غیرفعال کردن سبد خرید =====
+        cart.is_active = False
+        cart.save()
+
+        # ===== 11. اتصال به درگاه پرداخت =====
+        # TODO: اتصال به زرین‌پال یا دیگر درگاه‌ها
+        payment_url = self._generate_payment_url(order)
 
         return Response({
             'status': 'success',
             'order_id': order.id,
             'order_number': order.order_number,
-            'redirect_url': f'/payment/gateway/{order.id}/',  # TODO: آدرس درگاه پرداخت
-            'message': 'سفارش با موفقیت ثبت شد و در حال انتقال به درگاه پرداخت هستید.'
+            'redirect_url': payment_url,
+            'message': 'سفارش با موفقیت ثبت شد و در حال انتقال به درگاه پرداخت هستید.',
+            'order': {
+                'id': order.id,
+                'order_number': order.order_number,
+                'total': int(total),
+                'status': order.status,
+            }
+        }, status=status.HTTP_201_CREATED)
+
+    def _generate_payment_url(self, order):
+        """تولید لینک درگاه پرداخت"""
+        # TODO: پیاده‌سازی واقعی
+        # مثلاً برای زرین‌پال:
+        # from .services.zarinpal import ZarinpalService
+        # return ZarinpalService.get_payment_url(order)
+        return f'/payment/gateway/{order.id}/'
+
+
+# ============================================
+# ORDER HISTORY & DETAILS
+# ============================================
+
+class OrderListAPIView(generics.ListAPIView):
+    """API برای لیست سفارش‌های کاربر"""
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderListSerializer
+    pagination_class = ProductPagination
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).order_by('-created_at')
+
+
+class OrderDetailAPIView(generics.RetrieveAPIView):
+    """API برای جزئیات یک سفارش"""
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderListSerializer
+    lookup_field = 'order_number'
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+class OrderCancelAPIView(APIView):
+    """API برای لغو سفارش"""
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def post(self, request, order_number):
+        order = get_object_or_404(Order, order_number=order_number, user=request.user)
+
+        # فقط سفارشات در انتظار پرداخت قابل لغو هستند
+        if order.status not in ['pending', 'processing']:
+            return Response(
+                {'error': 'این سفارش قابل لغو نیست'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # بازگرداندن موجودی
+        InventoryManager.restore_stock(order.items.all())
+
+        # لغو سفارش
+        order.status = 'cancelled'
+        order.save()
+
+        return Response({
+            'status': 'cancelled',
+            'message': 'سفارش با موفقیت لغو شد',
+            'order_number': order.order_number
         })
 
 

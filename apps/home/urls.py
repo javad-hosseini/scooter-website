@@ -20,6 +20,7 @@ urlpatterns = [
     re_path(r'^articles/(?P<slug>.+)/$', ArticleDetailPageView.as_view(), name='article_detail'),
     path('categories/', views.CategoryPageView.as_view(), name='categories'),
     path('admin/dashboard/', views.AdminDashboardPageView.as_view(), name='admin_dashboard'),
+    path('about_us/', views.AboutUsPageView.as_view(), name='about_us'),
 
     # ===== صفحه اصلی =====
     path('', views.IndexPageView.as_view(), name='index'),

@@ -34,6 +34,11 @@ ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'accounts.CustomUser'
 # Application definition
 
+# ===== تنظیمات مالیات و هزینه ارسال =====
+TAX_RATE = 0.09  # ۹ درصد مالیات بر ارزش افزوده
+FREE_SHIPPING_THRESHOLD = 500_000  # مبلغ بالای این عدد ارسال رایگان
+SHIPPING_COST = 25_000  # هزینه ارسال معمولی (تومان)
+
 INSTALLED_APPS = [
     "jazzmin",
     'django.contrib.admin',

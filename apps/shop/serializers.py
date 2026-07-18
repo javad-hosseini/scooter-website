@@ -6,7 +6,7 @@ from apps.accounts.models import Province, City
 from .models import (
     Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist
+    ProductReview, Wishlist, CartItem
 )
 from .models import Product, Order, OrderItem, Address
 from ..accounts.serializers import UserProfileSerializer, AddressSerializer
@@ -350,76 +350,65 @@ class AddressSerializer(serializers.ModelSerializer):
 
 # apps/shop/serializers.py
 
-class CartItemSerializer(serializers.Serializer):
-    """سریالایزر برای آیتم‌های سبد خرید (محصول + تعداد + رنگ انتخاب‌شده)"""
+# apps/shop/serializers.py
 
-    # این فیلدها باید با دیکشنری ورودی هماهنگ باشند
-    product = serializers.DictField(child=serializers.CharField(), required=False)
-    quantity = serializers.IntegerField(default=1)
-    selected_color = serializers.DictField(child=serializers.CharField(), required=False)
-    product_name = serializers.CharField(required=False)
-    product_slug = serializers.CharField(required=False)
-    product_image = serializers.CharField(required=False)
-    short_specs = serializers.CharField(required=False)
-    warranty_months = serializers.IntegerField(default=12)
-    available_colors = serializers.ListField(required=False, default=list)
-    original_price = serializers.IntegerField(required=False)
-    final_price = serializers.IntegerField(required=False)
-    saving_amount = serializers.IntegerField(required=False)
-    estimated_delivery = serializers.CharField(required=False)
+# apps/shop/serializers.py
 
-    def to_representation(self, instance):
-        # اگر instance یک دیکشنری باشد
-        if isinstance(instance, dict):
-            # استخراج محصول از دیکشنری
-            product = instance.get('product')
-            quantity = instance.get('quantity', 1)
-            selected_color = instance.get('selected_color', {'slug': 'black', 'name': 'مشکی', 'hex': '#1A1A1A'})
+class CartItemSerializer(serializers.ModelSerializer):
+    """سریالایزر برای آیتم‌های سبد خرید"""
 
-            if product:
-                from decimal import Decimal
-                price = Decimal(str(product.price))
-                discount_price = Decimal(str(product.discount_price)) if product.discount_price else None
-                final_price = discount_price if discount_price else price
-                saving = (price - final_price) * Decimal(str(quantity)) if discount_price else Decimal('0')
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_slug = serializers.CharField(source='product.slug', read_only=True)
+    product_image = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
+    discount_price = serializers.SerializerMethodField()
+    final_price = serializers.SerializerMethodField()
+    total = serializers.SerializerMethodField()
+    selected_color = serializers.CharField(source='attributes.color', read_only=True, default='black')
+    available_colors = serializers.SerializerMethodField()
 
-                specs = product.specs.all()[:2]
-                short_specs = ' | '.join([f"{s.label}: {s.value}" for s in specs])
+    class Meta:
+        model = CartItem
+        fields = [
+            'id', 'product', 'product_name', 'product_slug', 'product_image',
+            'quantity', 'price', 'discount_price', 'final_price', 'total',
+            'price_snapshot', 'selected_color', 'available_colors', 'created_at'
+        ]
 
-                colors = product.images.values('color_slug', 'color_label', 'color_hex').distinct()
-                available_colors = [
-                    {
-                        'slug': c['color_slug'],
-                        'name': c['color_label'],
-                        'hex': c['color_hex'],
-                        'selected': c['color_slug'] == selected_color.get('slug')
-                    }
-                    for c in colors
-                ]
+    def get_product_image(self, obj):
+        """دریافت تصویر محصول"""
+        # obj یک آبجکت CartItem است، نه دیکشنری
+        if hasattr(obj, 'product') and obj.product and obj.product.cover_image:
+            return obj.product.cover_image.url
+        return None
 
-                from datetime import datetime, timedelta
-                delivery_date = datetime.now() + timedelta(days=3)
+    def get_price(self, obj):
+        return obj.product.price if hasattr(obj, 'product') else 0
 
-                return {
-                    'product_id': product.id,
-                    'product_name': product.name,
-                    'product_slug': product.slug,
-                    'product_image': product.cover_image.url if product.cover_image else None,
-                    'short_specs': short_specs,
-                    'warranty_months': 12,
-                    'available_colors': available_colors,
-                    'selected_color': selected_color,
-                    'quantity': quantity,
-                    'original_price': int(price),
-                    'final_price': int(final_price),
-                    'saving_amount': int(saving),
-                    'estimated_delivery': delivery_date.strftime('%d %B %Y'),
+    def get_discount_price(self, obj):
+        return obj.product.discount_price if hasattr(obj, 'product') and obj.product.discount_price else None
+
+    def get_final_price(self, obj):
+        if hasattr(obj, 'product'):
+            return obj.product.final_price
+        return 0
+
+    def get_total(self, obj):
+        return obj.total if hasattr(obj, 'total') else 0
+
+    def get_available_colors(self, obj):
+        """دریافت رنگ‌های موجود برای محصول"""
+        if hasattr(obj, 'product') and obj.product:
+            colors = obj.product.images.values('color_slug', 'color_label', 'color_hex').distinct()
+            return [
+                {
+                    'slug': c['color_slug'],
+                    'name': c['color_label'],
+                    'hex': c['color_hex'],
                 }
-
-            return instance
-
-        # اگر instance یک آبجکت Product باشد (برای استفاده در آینده)
-        return super().to_representation(instance)
+                for c in colors
+            ]
+        return []
 
 
 class CartSerializer(serializers.Serializer):

@@ -3,13 +3,15 @@ import secrets
 from datetime import timedelta
 
 from django.contrib.auth import login as django_login
+from django.contrib.auth import logout as django_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
@@ -290,40 +292,36 @@ class DashboardDataAPIView(APIView):
     def get(self, request):
         user = request.user
 
-        # ===== دریافت سفارشات =====
         orders_qs = user.orders.all()
 
-        # ===== آمار =====
         total_orders = orders_qs.count()
         delivered_orders = orders_qs.filter(status='delivered').count()
         pending_orders = orders_qs.filter(status__in=['pending', 'processing']).count()
 
-        # نظرات محصولات (QuerySet)
+        # نظرات محصولات
         product_comments_qs = ProductReview.objects.filter(user=user)
         approved_product_comments = product_comments_qs.filter(status='approved').count()
         pending_product_comments = product_comments_qs.filter(status='pending').count()
 
-        # نظرات مقالات (QuerySet) - اینجا نباید count() بزنی
-        article_comments_qs = Comment.objects.filter(user=user, is_approved=True)  # ← بدون count()
-        article_comments_count = article_comments_qs.count()  # ← تعداد رو اینجا بگیر
+        # نظرات مقالات - همه‌ی وضعیت‌ها (approved/pending/rejected)، نه فقط approved
+        article_comments_qs = Comment.objects.filter(user=user)
+        approved_article_comments = article_comments_qs.filter(status='approved').count()
+        pending_article_comments = article_comments_qs.filter(status='pending').count()
 
         stats = {
             'total_orders': total_orders,
             'delivered_orders': delivered_orders,
             'pending_orders': pending_orders,
-            'approved_comments': approved_product_comments + article_comments_count,  # ← از عدد استفاده کن
-            'pending_comments': pending_product_comments,
+            'approved_comments': approved_product_comments + approved_article_comments,
+            'pending_comments': pending_product_comments + pending_article_comments,
             'wishlist_count': user.wishlist.count(),
         }
 
-        # ===== آخرین سفارشات =====
         recent_orders = orders_qs.select_related('address').prefetch_related('items__product')[:5]
         recent_orders_data = OrderListSerializer(recent_orders, many=True).data
 
-        # ===== نظرات کاربر (برای نمایش در بخش نظرات) =====
         comments_data = []
 
-        # نظرات محصولات
         for comment in product_comments_qs.select_related('product').order_by('-created_at'):
             comments_data.append({
                 'type': 'product',
@@ -338,8 +336,7 @@ class DashboardDataAPIView(APIView):
                 'title': comment.title,
             })
 
-        # نظرات مقالات - از QuerySet استفاده کن
-        for comment in article_comments_qs.select_related('article').order_by('-created_at'):  # ← حالا درسته
+        for comment in article_comments_qs.select_related('article').order_by('-created_at'):
             comments_data.append({
                 'type': 'article',
                 'article_title': comment.article.title,
@@ -348,15 +345,13 @@ class DashboardDataAPIView(APIView):
                 'date': comment.created_at,
                 'rating': None,
                 'text': comment.content,
-                'status': 'approved' if comment.is_approved else 'pending',
-                'reject_reason': None,
+                'status': comment.status,
+                'reject_reason': comment.rejection_reason if comment.status == 'rejected' else None,
                 'title': None,
             })
 
-        # مرتب‌سازی نظرات بر اساس تاریخ
         comments_data.sort(key=lambda x: x['date'], reverse=True)
 
-        # ===== علاقه‌مندی‌ها =====
         wishlist_data = []
         for item in user.wishlist.select_related('product').all():
             product = item.product
@@ -372,17 +367,14 @@ class DashboardDataAPIView(APIView):
                 'in_stock': product.is_available and product.stock > 0,
             })
 
-        # ===== آدرس‌ها =====
         addresses = user.addresses.filter(is_active=True).select_related('province', 'city')
         addresses_data = AddressSerializer(addresses, many=True).data
 
-        # ===== اعلان‌ها =====
         notifications = [
             {'icon': 'truck', 'title': 'سفارش شما ارسال شد',
              'desc': 'سفارش شما تحویل پست شد', 'time': '۲ ساعت پیش', 'unread': True},
         ]
 
-        # ===== کاربر =====
         user_data = UserProfileSerializer(user).data
 
         data = {
@@ -485,7 +477,17 @@ class CityListAPIView(generics.ListAPIView):
         return City.objects.none()
 
 
+@require_POST  # فقط POST — امن در برابر CSRF logout
+@login_required
+def logout_view(request):
+    django_logout(request)
+    return redirect('home_app:index')
+
+
 @method_decorator(login_required(login_url='/accounts/login/'), name='dispatch')
 class DashboardPageView(TemplateView):
     """صفحه داشبورد کاربر"""
     template_name = 'accounts/user_dashboard.html'
+
+class RulesView(TemplateView):
+    template_name = 'accounts/rules.html'

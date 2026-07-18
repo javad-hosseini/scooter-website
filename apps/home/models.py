@@ -235,6 +235,13 @@ class Article(models.Model):
 
 class Comment(models.Model):
     """نظرات مقالات"""
+
+    STATUS_CHOICES = (
+        ('pending', 'در انتظار تایید'),
+        ('approved', 'تایید شده'),
+        ('rejected', 'رد شده'),
+    )
+
     article = models.ForeignKey(
         Article,
         on_delete=models.CASCADE,
@@ -256,7 +263,21 @@ class Comment(models.Model):
         verbose_name="پاسخ به"
     )
     content = models.TextField(verbose_name="متن نظر")
-    is_approved = models.BooleanField(default=True, verbose_name="تایید شده")
+
+    # ===== جایگزین is_approved =====
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        db_index=True,
+        verbose_name="وضعیت"
+    )
+    rejection_reason = models.TextField(
+        blank=True,
+        verbose_name="دلیل رد شدن",
+        help_text="در صورت رد شدن نظر، دلیل آن را وارد کنید"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="آخرین بروزرسانی")
 
@@ -264,6 +285,9 @@ class Comment(models.Model):
         verbose_name = "نظر"
         verbose_name_plural = "نظرات"
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['article', 'status', 'parent']),
+        ]
 
     def __str__(self):
         return f"نظر {self.user.fullname} - {self.article.title[:30]}"
@@ -271,7 +295,6 @@ class Comment(models.Model):
     @property
     def is_reply(self):
         return self.parent is not None
-
 
 # apps/home/models.py (افزودن به مدل‌های موجود)
 

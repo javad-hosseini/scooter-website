@@ -3,12 +3,13 @@
 from django.contrib import admin
 from django.db import models
 from django.db.models import Count, Avg
+from django.urls import reverse
 from django.utils.html import format_html
 
 from .models import (
     Product, Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist, CategoryHeroProduct
+    ProductReview, Wishlist, CategoryHeroProduct, OrderItem, Order
 )
 
 
@@ -315,3 +316,227 @@ class WishlistAdmin(admin.ModelAdmin):
     list_filter = ['created_at']
     search_fields = ['user__fullname', 'user__email', 'product__name']
     readonly_fields = ['created_at']
+
+
+# ============================================================
+# ORDER ITEM INLINE (برای اضافه کردن محصولات به سفارش)
+# ============================================================
+
+class OrderItemInline(admin.TabularInline):
+    """Inline برای اضافه کردن محصولات به سفارش"""
+    model = OrderItem
+    extra = 1
+    fields = ['product', 'quantity', 'price', 'discount', 'total_display']
+    readonly_fields = ['total_display']
+    autocomplete_fields = ['product']
+    ordering = ['id']
+
+    def total_display(self, obj):
+        if obj.id:
+            return format_html(
+                '<span style="color:var(--gold);font-weight:bold;">{} تومان</span>',
+                obj.total
+            )
+        return '-'
+
+    total_display.short_description = 'جمع آیتم'
+
+
+# ============================================================
+# 🆕 ORDER ADMIN (برای ثبت سفارش دستی)
+# ============================================================
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = [
+        'order_number', 'user_display', 'total_display', 'status_badge',
+        'payment_status_badge', 'created_at', 'order_actions'
+    ]
+    list_filter = ['status', 'payment_status', 'created_at']
+    search_fields = ['order_number', 'tracking_code', 'user__fullname', 'user__email']
+    readonly_fields = ['order_number', 'tracking_code', 'created_at', 'updated_at', 'total_display']
+    list_per_page = 25
+    date_hierarchy = 'created_at'
+    inlines = [OrderItemInline]
+    actions = ['mark_as_pending', 'mark_as_processing', 'mark_as_shipping', 'mark_as_delivered', 'mark_as_cancelled']
+
+    fieldsets = (
+        ('اطلاعات سفارش', {
+            'fields': ('order_number', 'tracking_code', 'user', 'address')
+        }),
+        ('وضعیت', {
+            'fields': ('status', 'payment_status')
+        }),
+        ('قیمت‌ها', {
+            'fields': ('subtotal', 'discount_amount', 'shipping_cost', 'total_display')
+        }),
+        ('زمان', {
+            'fields': ('paid_at', 'delivered_at', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+        ('یادداشت', {
+            'fields': ('notes',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'address')
+
+    def save_model(self, request, obj, form, change):
+        # محاسبه خودکار total
+        if not obj.total:
+            obj.total = obj.subtotal - obj.discount_amount + obj.shipping_cost
+        super().save_model(request, obj, form, change)
+
+    def user_display(self, obj):
+        return obj.user.fullname or obj.user.username
+
+    user_display.short_description = 'کاربر'
+
+    def total_display(self, obj):
+        if obj.total is None:
+            return "۰ تومان"
+        return f"{int(obj.total):,} تومان"
+
+    total_display.short_description = 'مبلغ نهایی'
+
+    def status_badge(self, obj):
+        colors = {
+            'pending': '#eab308',
+            'processing': '#3b82f6',
+            'shipping': '#22d3ee',
+            'delivered': '#22c55e',
+            'cancelled': '#ef4444'
+        }
+        labels = {
+            'pending': 'در انتظار پرداخت',
+            'processing': 'در حال پردازش',
+            'shipping': 'ارسال شده',
+            'delivered': 'تحویل داده شده',
+            'cancelled': 'لغو شده'
+        }
+        return format_html(
+            '<span style="background:{};color:white;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">{}</span>',
+            colors.get(obj.status, '#6b7280'),
+            labels.get(obj.status, obj.status)
+        )
+
+    status_badge.short_description = 'وضعیت سفارش'
+
+    def payment_status_badge(self, obj):
+        colors = {
+            'pending': '#eab308',
+            'paid': '#22c55e',
+            'failed': '#ef4444',
+            'refunded': '#6b7280'
+        }
+        labels = {
+            'pending': 'در انتظار پرداخت',
+            'paid': 'پرداخت شده',
+            'failed': 'ناموفق',
+            'refunded': 'بازگشت وجه'
+        }
+        return format_html(
+            '<span style="background:{};color:white;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">{}</span>',
+            colors.get(obj.payment_status, '#6b7280'),
+            labels.get(obj.payment_status, obj.payment_status)
+        )
+
+    payment_status_badge.short_description = 'وضعیت پرداخت'
+
+    def order_actions(self, obj):
+        """دکمه‌های عملیات سریع روی سفارش"""
+        buttons = []
+        actions = {
+            'pending': ('در انتظار پرداخت', 'processing'),
+            'processing': ('در حال پردازش', 'shipping'),
+            'shipping': ('ارسال شده', 'delivered'),
+            'delivered': ('تحویل داده شده', None),
+            'cancelled': ('لغو شده', None),
+        }
+
+        current_label, next_status = actions.get(obj.status, (obj.status, None))
+
+        if next_status:
+            status_labels = {
+                'pending': 'تغییر به در حال پردازش',
+                'processing': 'تغییر به ارسال شده',
+                'shipping': 'تغییر به تحویل داده شده',
+            }
+            btn_text = status_labels.get(obj.status, f'تغییر وضعیت')
+            url = reverse('admin:shop_order_change', args=[obj.id])
+            buttons.append(
+                format_html(
+                    '<a href="{}" style="background:var(--blue);color:white;padding:4px 10px;border-radius:6px;text-decoration:none;font-size:11px;">{}</a>',
+                    url,
+                    btn_text
+                )
+            )
+
+        return format_html(' '.join(buttons))
+
+    order_actions.short_description = 'عملیات'
+
+    # ===== اکشن‌های گروهی =====
+    @admin.action(description='تغییر وضعیت به در انتظار پرداخت')
+    def mark_as_pending(self, request, queryset):
+        updated = queryset.update(status='pending')
+        self.message_user(request, f'{updated} سفارش به وضعیت در انتظار پرداخت تغییر یافت')
+
+    @admin.action(description='تغییر وضعیت به در حال پردازش')
+    def mark_as_processing(self, request, queryset):
+        updated = queryset.update(status='processing')
+        self.message_user(request, f'{updated} سفارش به وضعیت در حال پردازش تغییر یافت')
+
+    @admin.action(description='تغییر وضعیت به ارسال شده')
+    def mark_as_shipping(self, request, queryset):
+        updated = queryset.update(status='shipping')
+        self.message_user(request, f'{updated} سفارش به وضعیت ارسال شده تغییر یافت')
+
+    @admin.action(description='تغییر وضعیت به تحویل داده شده')
+    def mark_as_delivered(self, request, queryset):
+        from django.utils import timezone
+        updated = queryset.update(status='delivered', delivered_at=timezone.now())
+        self.message_user(request, f'{updated} سفارش به وضعیت تحویل داده شده تغییر یافت')
+
+    @admin.action(description='تغییر وضعیت به لغو شده')
+    def mark_as_cancelled(self, request, queryset):
+        updated = queryset.update(status='cancelled')
+        self.message_user(request, f'{updated} سفارش لغو شد')
+
+
+# ============================================================
+# 🆕 ORDER ITEM ADMIN (برای مدیریت جداگانه آیتم‌ها)
+# ============================================================
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ['order_display', 'product_display', 'quantity', 'price_display', 'total_display']
+    list_filter = ['order__status', 'order__payment_status']
+    search_fields = ['order__order_number', 'product__name', 'order__user__fullname']
+    autocomplete_fields = ['order', 'product']
+    list_per_page = 25
+    readonly_fields = ['price', 'discount', 'total_display']
+
+    def order_display(self, obj):
+        return obj.order.order_number
+
+    order_display.short_description = 'شماره سفارش'
+
+    def product_display(self, obj):
+        return obj.product.name
+
+    product_display.short_description = 'محصول'
+
+    def price_display(self, obj):
+        return f"{obj.price:,} تومان"
+
+    price_display.short_description = 'قیمت واحد'
+
+    def total_display(self, obj):
+        return format_html(
+            '<span style="color:var(--gold);font-weight:bold;">{:,} تومان</span>',
+            obj.total
+        )
+
+    total_display.short_description = 'جمع'

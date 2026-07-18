@@ -3,6 +3,7 @@
 from django.urls import path, re_path
 from . import views
 from apps.accounts.views import CityListAPIView, ProvinceListAPIView
+from .views import CartAPIView
 
 app_name = 'shop'
 
@@ -24,6 +25,7 @@ urlpatterns = [
     re_path(r'^api/products/(?P<slug>.+)/$', views.ProductDetailAPIView.as_view(), name='api_product_detail'),
 
     # ===== سبد خرید و پرداخت =====
+    path('api/cart/add/', CartAPIView.as_view(), name='cart_add'),
     path('api/cart/', views.CartAPIView.as_view(), name='api_cart'),
     path('api/wishlist/toggle/', views.WishlistToggleAPIView.as_view(), name='api_wishlist_toggle'),
     path('api/wishlist/', views.WishlistListAPIView.as_view(), name='api_wishlist_list'),

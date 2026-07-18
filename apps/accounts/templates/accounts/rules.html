@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>قوانین و مقررات | فروشگاه اسکوتر ایسیار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #020617;
+        --surface: #0f172a;
+        --surface-2: #111b30;
+        --accent: #06b6d4;
+        --accent-2: #22d3ee;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --text: #ffffff;
+        --text-mid: rgba(255, 255, 255, 0.66);
+        --text-low: rgba(255, 255, 255, 0.4);
+        --glass: rgba(255, 255, 255, 0.045);
+        --glass-strong: rgba(255, 255, 255, 0.09);
+        --border: rgba(255, 255, 255, 0.13);
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: "Vazirmatn", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      ::selection {
+        background: rgba(6, 182, 212, 0.35);
+      }
+
+      .auth-page {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        perspective: 1400px;
+      }
+      .bg-fx {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      .grid-overlay {
+        position: absolute;
+        inset: -2px;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 46px 46px;
+        mask-image: radial-gradient(
+          ellipse 80% 70% at 50% 45%,
+          #000 35%,
+          transparent 85%
+        );
+        opacity: 0.6;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        will-change: transform;
+      }
+      .blob-1 {
+        width: 560px;
+        height: 560px;
+        top: -180px;
+        right: -160px;
+        background: radial-gradient(
+          circle,
+          rgba(6, 182, 212, 0.32),
+          transparent 70%
+        );
+        animation: drift1 22s ease-in-out infinite;
+      }
+      .blob-2 {
+        width: 480px;
+        height: 480px;
+        bottom: -200px;
+        left: -140px;
+        background: radial-gradient(
+          circle,
+          rgba(139, 92, 246, 0.26),
+          transparent 70%
+        );
+        animation: drift2 26s ease-in-out infinite;
+      }
+      .blob-3 {
+        width: 380px;
+        height: 380px;
+        top: 40%;
+        left: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(34, 211, 238, 0.16),
+          transparent 70%
+        );
+        animation: drift3 30s ease-in-out infinite;
+      }
+      @keyframes drift1 {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        50% {
+          transform: translate(-60px, 60px) scale(1.12);
+        }
+      }
+      @keyframes drift2 {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        50% {
+          transform: translate(50px, -40px) scale(1.08);
+        }
+      }
+      @keyframes drift3 {
+        0%,
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+          transform: translate(-46%, -54%) scale(1.18);
+        }
+      }
+      #particleCanvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .shape {
+        position: absolute;
+        border-radius: 28px;
+        background: linear-gradient(
+          150deg,
+          rgba(255, 255, 255, 0.08),
+          rgba(255, 255, 255, 0.015)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(6px);
+        box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+        will-change: transform;
+      }
+      .shape-a {
+        width: 96px;
+        height: 96px;
+        top: 14%;
+        left: 10%;
+        border-radius: 50%;
+        animation: floatA 9s ease-in-out infinite;
+      }
+      .shape-b {
+        width: 64px;
+        height: 64px;
+        bottom: 18%;
+        right: 9%;
+        transform: rotate(20deg);
+        animation: floatB 11s ease-in-out infinite;
+      }
+      .shape-c {
+        width: 46px;
+        height: 46px;
+        top: 22%;
+        right: 16%;
+        border-radius: 14px;
+        transform: rotate(-12deg);
+        animation: floatC 8s ease-in-out infinite;
+      }
+      .shape-d {
+        width: 130px;
+        height: 130px;
+        bottom: 10%;
+        left: 14%;
+        border-radius: 38% 62% 60% 40%/40% 45% 55% 60%;
+        animation: floatD 13s ease-in-out infinite;
+      }
+      @keyframes floatA {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-26px) rotate(8deg);
+        }
+      }
+      @keyframes floatB {
+        0%,
+        100% {
+          transform: translateY(0) rotate(20deg);
+        }
+        50% {
+          transform: translateY(22px) rotate(34deg);
+        }
+      }
+      @keyframes floatC {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-12deg);
+        }
+        50% {
+          transform: translateY(-16px) rotate(2deg);
+        }
+      }
+      @keyframes floatD {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(18px) rotate(-10deg);
+        }
+      }
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 70% 60% at 50% 50%,
+          transparent 40%,
+          rgba(2, 6, 23, 0.75) 100%
+        );
+      }
+      .noise-veil {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(2, 6, 23, 0) 0%,
+          rgba(2, 6, 23, 0.5) 100%
+        );
+      }
+
+      /* کارت بزرگ شیشه‌ای با محتوای قوانین */
+      .auth-card {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 820px; /* خیلی بزرگتر از حالت لاگین */
+        padding: 2.8rem 2.5rem 2.5rem;
+        border-radius: 32px;
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.07),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid var(--border);
+        backdrop-filter: blur(22px) saturate(140%);
+        box-shadow:
+          0 30px 80px -25px rgba(0, 0, 0, 0.65),
+          0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+          0 0 60px -20px rgba(6, 182, 212, 0.18);
+        opacity: 0;
+        transform: translateY(34px) scale(0.96);
+        animation:
+          cardIn 0.85s var(--ease) 0.15s forwards,
+          floatCard 7s ease-in-out 1.1s infinite;
+        transform-style: preserve-3d;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .auth-card::-webkit-scrollbar {
+        width: 4px;
+        background: transparent;
+      }
+      .auth-card::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 8px;
+      }
+      .auth-card::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      @keyframes cardIn {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      @keyframes floatCard {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-9px);
+        }
+      }
+      .auth-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: 33px;
+        padding: 1px;
+        background: linear-gradient(
+          135deg,
+          rgba(6, 182, 212, 0.55),
+          rgba(255, 255, 255, 0.04) 30%,
+          rgba(139, 92, 246, 0.35) 70%,
+          rgba(6, 182, 212, 0.4)
+        );
+        -webkit-mask:
+          linear-gradient(#000 0 0) content-box,
+          linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      /* برند کوچک در بالای باکس */
+      .brand-area {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.8rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 1.2rem;
+        opacity: 0;
+        animation: fadeUp 0.7s var(--ease) 0.35s forwards;
+      }
+      .brand-mark {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--accent), #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px -6px rgba(6, 182, 212, 0.55);
+        position: relative;
+        animation: markPulse 3.4s ease-in-out infinite;
+      }
+      .brand-mark svg {
+        width: 24px;
+        height: 24px;
+      }
+      .brand-mark::after {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: 20px;
+        border: 1px solid rgba(6, 182, 212, 0.4);
+        opacity: 0;
+        animation: markRing 3.4s ease-out infinite;
+      }
+      @keyframes markPulse {
+        0%,
+        100% {
+          box-shadow: 0 8px 24px -6px rgba(6, 182, 212, 0.55);
+        }
+        50% {
+          box-shadow: 0 8px 32px -4px rgba(6, 182, 212, 0.85);
+        }
+      }
+      @keyframes markRing {
+        0% {
+          opacity: 0.7;
+          transform: scale(0.9);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.2);
+        }
+      }
+
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+      }
+      .brand-text .word {
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        color: var(--accent-2);
+        font-weight: 700;
+        line-height: 1;
+      }
+      .brand-text h2 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.4;
+      }
+      .brand-text .sub {
+        font-size: 0.78rem;
+        color: var(--text-mid);
+        margin: 0;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* محتوای قوانین */
+      .rules-content {
+        opacity: 0;
+        animation: fadeUp 0.7s var(--ease) 0.5s forwards;
+      }
+      .rules-content h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 1.8rem 0 0.8rem;
+        color: var(--accent-2);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .rules-content h3:first-of-type {
+        margin-top: 0;
+      }
+      .rules-content h3 i {
+        font-size: 1.1rem;
+        color: var(--accent);
+      }
+      .rules-content p {
+        font-size: 0.92rem;
+        line-height: 1.8;
+        color: var(--text-mid);
+        margin-bottom: 1rem;
+        text-align: justify;
+      }
+      .rules-content ul {
+        padding-right: 1.6rem;
+        margin-bottom: 1.2rem;
+      }
+      .rules-content ul li {
+        font-size: 0.9rem;
+        color: var(--text-mid);
+        line-height: 1.8;
+        margin-bottom: 0.35rem;
+      }
+      .rules-content ul li strong {
+        color: var(--accent-2);
+        font-weight: 600;
+      }
+
+      .divider {
+        margin: 1.8rem 0 1.2rem;
+        border: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border),
+          transparent
+        );
+      }
+
+      /* دکمه بازگشت / لینک قوانین */
+      .action-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        opacity: 0;
+        animation: fadeUp 0.7s var(--ease) 0.7s forwards;
+      }
+      .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.4rem;
+        border-radius: 30px;
+        background: var(--glass-strong);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.25s var(--ease);
+        backdrop-filter: blur(4px);
+      }
+      .btn-back:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        box-shadow: 0 8px 24px -8px rgba(6, 182, 212, 0.5);
+        transform: translateY(-2px);
+      }
+      .btn-back i {
+        font-size: 1.1rem;
+      }
+
+      .policy-badge {
+        font-size: 0.75rem;
+        color: var(--text-low);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .policy-badge i {
+        color: var(--accent-2);
+      }
+
+      @media (max-width: 640px) {
+        .auth-card {
+          padding: 1.8rem 1.2rem;
+          max-width: 100%;
+          border-radius: 24px;
+        }
+        .brand-area {
+          flex-wrap: wrap;
+          gap: 0.6rem;
+        }
+        .brand-text h2 {
+          font-size: 1rem;
+        }
+        .rules-content h3 {
+          font-size: 1rem;
+        }
+        .rules-content p,
+        .rules-content ul li {
+          font-size: 0.85rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-page">
+      <div class="bg-fx" id="bgFx">
+        <div class="grid-overlay"></div>
+        <div class="blob blob-1" data-depth="18"></div>
+        <div class="blob blob-2" data-depth="26"></div>
+        <div class="blob blob-3" data-depth="12"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="shape shape-a" data-depth="40"></div>
+        <div class="shape shape-b" data-depth="55"></div>
+        <div class="shape shape-c" data-depth="30"></div>
+        <div class="shape shape-d" data-depth="48"></div>
+        <div class="vignette"></div>
+        <div class="noise-veil"></div>
+      </div>
+
+      <!-- باکس بزرگ شیشه‌ای با قوانین -->
+      <div class="auth-card" id="authCard">
+        <!-- هدر با برند -->
+        <div class="brand-area">
+          <div class="brand-mark">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="word">V O L T E X</span>
+            <h2>قوانین و مقررات فروشگاه ایسیار</h2>
+            <span class="sub">شرایط استفاده از خدمات و حریم خصوصی</span>
+          </div>
+        </div>
+
+        <!-- محتوای قوانین (متن طولانی) -->
+        <!-- بخش محتوای قوانین (متن طولانی) - جایگزین کامل -->
+        <div class="rules-content">
+          <p
+            style="
+              font-size: 0.85rem;
+              color: var(--text-low);
+              margin-bottom: 1.8rem;
+            "
+          >
+            آخرین به‌روزرسانی: [تاریخ]
+          </p>
+
+          <p>
+            به فروشگاه اینترنتی ایسیار خوش آمدید. این سند، قرارداد الزام‌آور
+            میان شما و فروشگاه است که بر اساس ماده ۱۰ قانون مدنی، قانون تجارت
+            الکترونیکی مصوب ۱۳۸۲ و قانون حمایت از حقوق مصرف‌کنندگان مصوب ۱۳۸۸
+            تنظیم شده است. لطفاً پیش از ثبت‌نام و استفاده از خدمات سایت، این
+            شرایط را با دقت مطالعه فرمایید. ثبت‌نام در سایت، ثبت سفارش یا هرگونه
+            استفاده از خدمات آن، به منزله مطالعه، آگاهی و پذیرش کامل و بدون قید
+            و شرط تمامی مفاد این سند است.
+          </p>
+
+          <h3><i class="bi bi-1-square"></i> ماده ۱ — تعاریف</h3>
+          <p>
+            <strong>۱–۱. فروشگاه:</strong> فروشگاه اینترنتی ایسیار به نشانی
+            [آدرس وب‌سایت]، متعلق به [نام کامل شخص حقیقی/حقوقی دارنده مجوز] به
+            شماره ثبت/کد ملی [—] و دارنده نماد اعتماد الکترونیکی (اینماد)، که در
+            این سند «فروشگاه» نامیده می‌شود.
+            <br />
+            <strong>۱–۲. کاربر:</strong> هر شخص حقیقی یا حقوقی که از سایت بازدید
+            می‌کند، در آن حساب کاربری می‌سازد یا از هر یک از خدمات آن استفاده
+            می‌نماید.
+            <br />
+            <strong>۱–۳. مشتری/خریدار:</strong> کاربری که در سایت سفارش خرید ثبت
+            می‌کند.
+            <br />
+            <strong>۱–۴. کالا:</strong> کلیه محصولات عرضه‌شده در سایت شامل
+            اسکوتر برقی، اسکوتر بچگانه، دوچرخه، موتورسیکلت، لوازم جانبی و قطعات
+            مرتبط و نیز هر محصول دیگری که در آینده به سبد کالایی فروشگاه افزوده
+            شود (از جمله ماشین و موتور شارژی، سه‌چرخه و سایر وسایل حمل‌ونقل
+            شخصی).
+            <br />
+            <strong>۱–۵. حساب کاربری:</strong> پروفایل اختصاصی کاربر در سایت که
+            با شماره تلفن همراه و/یا نشانی ایمیل وی ایجاد و احراز می‌شود.
+            <br />
+            <strong>۱–۶. شرایط:</strong> مجموعه مفاد همین سند به‌همراه سیاست
+            حریم خصوصی و سایر رویه‌های اعلامی در سایت که جزء لاینفک این سند
+            محسوب می‌شوند.
+          </p>
+
+          <h3><i class="bi bi-2-square"></i> ماده ۲ — پذیرش شرایط</h3>
+          <p>
+            <strong>۲–۱.</strong> استفاده از سایت و خدمات آن منوط به پذیرش کامل
+            این شرایط است. چنانچه با هر یک از مفاد این سند موافق نیستید، از
+            ثبت‌نام و استفاده از خدمات سایت خودداری فرمایید.
+            <br />
+            <strong>۲–۲.</strong> این شرایط از لحظه ثبت‌نام یا ثبت اولین سفارش،
+            در حکم قرارداد معتبر و لازم‌الاجرا میان طرفین است و کاربر حق استناد
+            به عدم اطلاع از مفاد آن را از خود سلب و ساقط می‌نماید.
+            <br />
+            <strong>۲–۳.</strong> تأیید گزینه «شرایط و قوانین را مطالعه کرده و
+            می‌پذیرم» در فرم ثبت‌نام، در حکم امضای الکترونیکی و ابراز اراده صریح
+            کاربر در پذیرش این قرارداد است.
+          </p>
+
+          <h3><i class="bi bi-3-square"></i> ماده ۳ — عضویت و حساب کاربری</h3>
+          <p>
+            <strong>۳–۱.</strong> ثبت‌نام در سایت مستلزم داشتن حداقل ۱۸ سال تمام
+            شمسی و اهلیت قانونی برای انجام معامله است. اشخاص زیر ۱۸ سال صرفاً
+            می‌توانند با اطلاع، رضایت و مسئولیت کامل ولی یا سرپرست قانونی خود از
+            سایت استفاده کنند و در این صورت کلیه مسئولیت‌های ناشی از استفاده بر
+            عهده ولی یا سرپرست قانونی خواهد بود.
+            <br />
+            <strong>۳–۲.</strong> کاربر متعهد است در زمان ثبت‌نام و پس از آن،
+            اطلاعات صحیح، دقیق و به‌روز (شامل نام و نام خانوادگی، شماره تماس،
+            نشانی و کد پستی) ارائه دهد. مسئولیت هرگونه خسارت، تأخیر یا اشتباه در
+            ارسال ناشی از نادرست یا ناقص بودن اطلاعات، تماماً بر عهده کاربر است
+            و فروشگاه در این خصوص هیچ مسئولیتی ندارد.
+            <br />
+            <strong>۳–۳.</strong> هر کاربر مجاز به داشتن تنها یک حساب کاربری
+            است. حساب کاربری قائم به شخص بوده و انتقال، فروش یا واگذاری آن به
+            غیر ممنوع است.
+            <br />
+            <strong>۳–۴.</strong> حفظ محرمانگی نام کاربری، رمز عبور و کدهای
+            یکبارمصرف (OTP) تماماً بر عهده کاربر است. کلیه اقدامات انجام‌شده از
+            طریق حساب کاربری، اقدام شخص کاربر تلقی می‌شود و آثار حقوقی و مالی آن
+            متوجه وی خواهد بود.
+            <br />
+            <strong>۳–۵.</strong> در صورت اطلاع از هرگونه دسترسی غیرمجاز به حساب
+            کاربری، کاربر موظف است بلافاصله مراتب را به فروشگاه اطلاع دهد.
+            فروشگاه مسئولیتی در قبال خسارات ناشی از سهل‌انگاری کاربر در نگهداری
+            اطلاعات ورود ندارد.
+            <br />
+            <strong>۳–۶.</strong> فروشگاه مجاز است جهت احراز هویت، از روش‌هایی
+            نظیر ارسال کد تأیید پیامکی استفاده کند و در صورت عدم احراز هویت یا
+            وجود شواهد سوءاستفاده، از تکمیل ثبت‌نام یا ارائه خدمات خودداری
+            نماید.
+          </p>
+
+          <h3>
+            <i class="bi bi-4-square"></i> ماده ۴ — حریم خصوصی و حفاظت از
+            اطلاعات
+          </h3>
+          <p>
+            <strong>۴–۱.</strong> فروشگاه مطابق مواد ۵۸ تا ۶۶ قانون تجارت
+            الکترونیکی، از اطلاعات شخصی کاربران حفاظت می‌کند و این اطلاعات را
+            صرفاً برای پردازش سفارش، ارسال کالا، پشتیبانی، اطلاع‌رسانی و ایفای
+            تکالیف قانونی به کار می‌برد.
+            <br />
+            <strong>۴–۲.</strong> اطلاعات کاربران به هیچ شخص ثالثی فروخته
+            نمی‌شود و صرفاً در حد ضرورت با شرکای اجرایی (شرکت حمل‌ونقل، درگاه
+            پرداخت) یا بنا به دستور مراجع قضایی و قانونی ذی‌صلاح در اختیار قرار
+            می‌گیرد.
+            <br />
+            <strong>۴–۳.</strong> کاربر با ثبت‌نام، رضایت خود را برای دریافت
+            پیامک‌ها و ایمیل‌های ضروری مرتبط با سفارش (تأیید، ارسال، تحویل)
+            اعلام می‌دارد. ارسال پیام‌های تبلیغاتی با امکان لغو دریافت (Opt-out)
+            انجام می‌شود.
+            <br />
+            <strong>۴–۴.</strong> جزئیات کامل نحوه جمع‌آوری و نگهداری اطلاعات در
+            صفحه «سیاست حریم خصوصی» سایت درج شده و جزء لاینفک این شرایط است.
+          </p>
+
+          <h3>
+            <i class="bi bi-5-square"></i> ماده ۵ — ثبت سفارش و فرآیند خرید
+          </h3>
+          <p>
+            <strong>۵–۱.</strong> نمایش کالا در سایت صرفاً «دعوت به معامله» است
+            و ایجابِ الزام‌آور فروش محسوب نمی‌شود. ثبت سفارش توسط مشتری در حکم
+            ایجاب خرید بوده و قرارداد بیع تنها پس از تأیید نهایی سفارش از سوی
+            فروشگاه (از طریق پیامک، ایمیل یا تغییر وضعیت سفارش به «تأیید شده»)
+            منعقد می‌گردد.
+            <br />
+            <strong>۵–۲.</strong> در صورت بروز خطای آشکار سهوی، فنی یا انسانی در
+            درج قیمت، مشخصات یا موجودی کالا (از جمله قیمت‌های غیرمتعارف و خارج
+            از عرف بازار)، فروشگاه مجاز است حتی پس از ثبت سفارش و پرداخت وجه،
+            سفارش را به‌صورت یک‌طرفه لغو کرده و کل مبلغ پرداختی را حداکثر ظرف
+            [۷] روز کاری به مشتری مسترد نماید. استرداد کامل وجه، تنها تعهد
+            فروشگاه در این حالت است.
+            <br />
+            <strong>۵–۳.</strong> چنانچه پس از ثبت سفارش مشخص شود کالا به هر
+            دلیل (اتمام موجودی، توقف واردات، ایراد کیفی محموله و مانند آن) قابل
+            تأمین نیست، فروشگاه مراتب را به مشتری اطلاع داده و بنا به انتخاب
+            مشتری، کالای جایگزین ارائه یا کل وجه را مسترد می‌کند.
+            <br />
+            <strong>۵–۴.</strong> تصاویر کالاها با هدف معرفی محصول درج شده‌اند و
+            ممکن است رنگ، جزئیات ظاهری یا ملحقات کالای تحویلی تفاوت‌های جزئی و
+            متعارف با تصویر داشته باشد. مشخصات فنی بر اساس اعلام کارخانه سازنده
+            درج می‌شود و تغییرات جزئی اعمال‌شده از سوی سازنده در سری‌های تولیدی
+            مختلف، خارج از اراده و مسئولیت فروشگاه است.
+            <br />
+            <strong>۵–۵.</strong> فروشگاه مجاز است تعداد قابل سفارش از هر کالا
+            را محدود کند. خریدهای عمده و سازمانی مستلزم هماهنگی قبلی با واحد
+            فروش است.
+            <br />
+            <strong>۵–۶.</strong> فاکتور فروش بر اساس اطلاعاتی که مشتری در زمان
+            ثبت سفارش وارد کرده صادر می‌شود و پس از صدور، امکان تغییر مشخصات
+            فاکتور وجود ندارد.
+          </p>
+
+          <h3>
+            <i class="bi bi-6-square"></i> ماده ۶ — قیمت‌ها و شرایط پرداخت
+          </h3>
+          <p>
+            <strong>۶–۱.</strong> کلیه قیمت‌ها به [ریال/تومان] و [با احتساب /
+            بدون احتساب] مالیات بر ارزش افزوده درج می‌شوند.
+            <br />
+            <strong>۶–۲.</strong> با توجه به وارداتی بودن کالاها و نوسانات نرخ
+            ارز، هزینه‌های گمرکی و حمل بین‌المللی، فروشگاه مجاز است قیمت‌ها را
+            در هر زمان و بدون اطلاع قبلی تغییر دهد. ملاک، قیمت درج‌شده در لحظه
+            پرداخت موفق است؛ سفارش‌هایی که وجه آن‌ها به‌طور کامل پرداخت و توسط
+            فروشگاه تأیید شده، مشمول افزایش قیمت بعدی نمی‌شوند.
+            <br />
+            <strong>۶–۳.</strong> پرداخت صرفاً از طریق درگاه‌های پرداخت اینترنتی
+            دارای مجوز رسمی (شاپرک) که در سایت تعبیه شده انجام می‌شود. فروشگاه
+            هیچ‌گاه از مشتریان درخواست واریز کارت‌به‌کارت یا پرداخت خارج از
+            درگاه رسمی سایت نمی‌کند و هرگونه پرداخت خارج از این مسیر، با مسئولیت
+            شخص پرداخت‌کننده است.
+            <br />
+            <strong>۶–۴.</strong> در صورت کسر وجه از حساب مشتری بدون ثبت موفق
+            سفارش، مبلغ مطابق ضوابط بانکی حداکثر ظرف ۷۲ ساعت توسط بانک به حساب
+            مشتری بازگردانده می‌شود. در صورت عدم بازگشت، مشتری می‌تواند با ارائه
+            شماره پیگیری تراکنش به پشتیبانی فروشگاه مراجعه کند.
+            <br />
+            <strong>۶–۵.</strong> در صورت ارائه طرح‌های پرداخت اقساطی یا
+            اعتباری، شرایط اختصاصی آن‌ها در صفحه مربوط اعلام می‌شود و مکمل این
+            سند خواهد بود.
+          </p>
+
+          <h3>
+            <i class="bi bi-7-square"></i> ماده ۷ — ارسال، تحویل و انتقال
+            مسئولیت
+          </h3>
+          <p>
+            <strong>۷–۱.</strong> زمان‌های اعلامی برای آماده‌سازی و ارسال،
+            برآوردی و تقریبی هستند. تأخیرهای ناشی از عملکرد شرکت‌های حمل‌ونقل،
+            شرایط جوی، تعطیلات رسمی، فرآیندهای گمرکی یا قوه قاهره، خارج از اراده
+            فروشگاه بوده و مسئولیتی برای فروشگاه ایجاد نمی‌کند؛ با این حال
+            فروشگاه نهایت همکاری را برای پیگیری مرسوله به عمل می‌آورد.
+            <br />
+            <strong>۷–۲.</strong> تحویل‌گیرنده موظف است در لحظه تحویل، سلامت
+            ظاهری بسته را در حضور مأمور ارسال بررسی کند. در صورت مشاهده
+            آسیب‌دیدگی ظاهری، باید از تحویل خودداری یا مراتب را در رسید مأمور
+            قید و حداکثر ظرف ۲۴ ساعت با ارائه مستندات تصویری به فروشگاه اعلام
+            کند. برای کالاهای نسبتاً گران‌قیمت (اسکوتر برقی، دوچرخه، موتورسیکلت)
+            اکیداً توصیه می‌شود از لحظه باز کردن بسته فیلم‌برداری پیوسته و بدون
+            قطع انجام شود؛ در صورت ادعای نقص یا آسیب‌دیدگی، این فیلم مبنای
+            رسیدگی خواهد بود.
+            <br />
+            <strong>۷–۳.</strong> مسئولیت و ریسک کالا از لحظه تحویل به مشتری یا
+            نماینده وی (هر شخصی که در نشانی اعلامی کالا را تحویل می‌گیرد) به
+            مشتری منتقل می‌شود.
+            <br />
+            <strong>۷–۴.</strong> در صورت نادرست بودن نشانی یا عدم حضور
+            تحویل‌گیرنده و برگشت مرسوله، هزینه ارسال مجدد بر عهده مشتری است.
+            <br />
+            <strong>۷–۵.</strong> در مورد کالاهایی که مطابق مقررات نیازمند
+            شماره‌گذاری، پلاک یا بیمه هستند (از جمله موتورسیکلت)، فروشگاه مدارک
+            قانونی کالا را مطابق رویه مراجع ذی‌ربط تحویل می‌دهد؛ اما انجام امور
+            اداری شماره‌گذاری، اخذ پلاک، بیمه شخص ثالث و پرداخت هزینه‌های مربوط،
+            تماماً بر عهده خریدار است.
+          </p>
+
+          <h3>
+            <i class="bi bi-8-square"></i> ماده ۸ — حق انصراف و بازگشت کالا
+          </h3>
+          <p>
+            <strong>۸–۱.</strong> مطابق ماده ۳۷ قانون تجارت الکترونیکی،
+            مصرف‌کننده می‌تواند ظرف هفت روز کاری از تاریخ تحویل کالا، بدون ذکر
+            دلیل و بدون پرداخت جریمه، انصراف خود را از خرید اعلام کند. در این
+            صورت تنها هزینه بازگرداندن کالا بر عهده مصرف‌کننده است.
+            <br />
+            <strong>۸–۲.</strong> اِعمال حق انصراف مستلزم آن است که کالا از
+            وضعیت اولیه خارج نشده باشد: باز کردن بسته‌بندی صرفاً برای بازدید
+            کالا مانع انصراف نیست، اما استفاده از کالا (از جمله سوار شدن، طی
+            مسافت، شارژ و دشارژ مکرر باتری)، مونتاژ غیرقابل بازگشت، ایجاد خط‌وخش
+            یا آسیب، کسری متعلقات و مخدوش شدن کارتن به نحوی که قابلیت عرضه مجدد
+            را از بین ببرد، کالا را از شمول انصراف بدون دلیل خارج می‌کند.
+            <br />
+            <strong>۸–۳.</strong> مطابق ماده ۳۸ قانون تجارت الکترونیکی، کالاهایی
+            که بنا به سفارش و مشخصات اختصاصی مشتری تهیه، تنظیم یا شخصی‌سازی
+            شده‌اند، مشمول حق انصراف نیستند.
+            <br />
+            <strong>۸–۴.</strong> در صورت وجود عیب، نقص فنی یا مغایرت کالا با
+            مشخصات اعلامی، مشتری موظف است حداکثر ظرف [۷] روز از تاریخ تحویل
+            مراتب را اعلام کند. پس از بررسی و تأیید کارشناس فروشگاه، حسب مورد
+            کالا تعویض، تعمیر یا وجه آن مسترد می‌شود و در این حالت هزینه
+            رفت‌وبرگشت کالا بر عهده فروشگاه است.
+            <br />
+            <strong>۸–۵.</strong> استرداد وجه پس از وصول کالای مرجوعی و تأیید
+            شرایط بازگشت، حداکثر ظرف [۷] روز کاری و از طریق همان روش پرداخت (یا
+            واریز به حساب بانکی به نام مشتری) انجام می‌شود.
+            <br />
+            <strong>۸–۶.</strong> برای ثبت درخواست بازگشت، مشتری باید از طریق
+            حساب کاربری یا تماس با پشتیبانی، شماره سفارش و مستندات لازم را ارائه
+            دهد. ارسال کالای مرجوعی بدون هماهنگی قبلی، مورد پذیرش نیست.
+          </p>
+
+          <h3>
+            <i class="bi bi-9-square"></i> ماده ۹ — گارانتی و خدمات پس از فروش
+          </h3>
+          <p>
+            <strong>۹–۱.</strong> کالاها حسب مورد دارای گارانتی [شرکت/واردکننده]
+            با مدت و شرایط درج‌شده در صفحه محصول و کارت گارانتی هستند. ملاک شروع
+            گارانتی، تاریخ درج‌شده در فاکتور یا کارت گارانتی است.
+            <br />
+            <strong>۹–۲.</strong> گارانتی صرفاً عیوب ناشی از تولید و مواد اولیه
+            را پوشش می‌دهد. موارد زیر موجب ابطال گارانتی می‌شود:
+            <br />
+            &nbsp;&nbsp;&nbsp; نفوذ آب و رطوبت به قطعات الکتریکی، باتری یا
+            موتور؛
+            <br />
+            &nbsp;&nbsp;&nbsp; استفاده از شارژر، باتری یا قطعات غیراصلی و
+            متفرقه؛
+            <br />
+            &nbsp;&nbsp;&nbsp; هرگونه باز کردن، تعمیر یا دستکاری توسط اشخاص
+            غیرمجاز؛
+            <br />
+            &nbsp;&nbsp;&nbsp; ضربه، سقوط، تصادف، واژگونی و آسیب‌های فیزیکی؛
+            <br />
+            &nbsp;&nbsp;&nbsp; استفاده خارج از ظرفیت مجاز (تجاوز از حداکثر وزن
+            سرنشین اعلامی)؛
+            <br />
+            &nbsp;&nbsp;&nbsp; انجام حرکات نمایشی، پرش و استفاده در مسیرهای
+            غیراستاندارد؛
+            <br />
+            &nbsp;&nbsp;&nbsp; استفاده تجاری، اجاره‌ای یا مسابقه‌ای، مگر آنکه در
+            مشخصات کالا تصریح شده باشد؛
+            <br />
+            &nbsp;&nbsp;&nbsp; نگهداری نادرست باتری (از جمله انبار طولانی‌مدت با
+            شارژ خالی) برخلاف دفترچه راهنما؛
+            <br />
+            &nbsp;&nbsp;&nbsp; مخدوش بودن یا حذف برچسب سریال و پلمب کالا.
+            <br />
+            <strong>۹–۳.</strong> قطعات مصرفی و استهلاکی از جمله لاستیک، تیوپ،
+            لنت ترمز، گریپ و لامپ، مشمول گارانتی نیستند. باتری دارای شرایط و مدت
+            گارانتی جداگانه به شرح مندرج در صفحه محصول است.
+            <br />
+            <strong>۹–۴.</strong> افت تدریجی و متعارف ظرفیت باتری در طول زمان،
+            ماهیت فنی این نوع کالاست و عیب محسوب نمی‌شود، مگر آنکه افت ظرفیت از
+            حدود اعلامی سازنده در دوره گارانتی فراتر رود.
+            <br />
+            <strong>۹–۵.</strong> خدمات پس از فروش و تأمین قطعات مطابق ضوابط
+            قانون حمایت از حقوق مصرف‌کنندگان ارائه می‌شود. هزینه ارسال کالا به
+            مرکز خدمات در دوره گارانتی مطابق شرایط اعلامی در کارت گارانتی است.
+          </p>
+
+          <h3>
+            <i class="bi bi-0-square"></i> ماده ۱۰ — شرایط ایمنی و مسئولیت
+            استفاده از کالا
+          </h3>
+          <p>
+            <strong>۱۰–۱.</strong> خریدار متعهد است پیش از استفاده، دفترچه
+            راهنمای کالا را به‌طور کامل مطالعه کرده و کالا را صرفاً مطابق
+            دستورالعمل سازنده به کار گیرد.
+            <br />
+            <strong>۱۰–۲.</strong> استفاده از کلاه ایمنی استاندارد و تجهیزات
+            محافظتی (زانوبند، آرنج‌بند، دستکش) هنگام استفاده از اسکوتر، دوچرخه و
+            موتورسیکلت الزامی است و عدم استفاده از آن‌ها، مسئولیت هرگونه آسیب را
+            متوجه شخص استفاده‌کننده می‌کند.
+            <br />
+            <strong>۱۰–۳.</strong> کالاهای رده کودک (اسکوتر بچگانه، ماشین و
+            موتور شارژی، سه‌چرخه) صرفاً برای رده سنی و محدوده وزنی درج‌شده در
+            مشخصات کالا طراحی شده‌اند و استفاده کودک از آن‌ها باید همواره تحت
+            نظارت مستقیم و مستمر والدین یا سرپرست بزرگسال و در محیط‌های امن و به
+            دور از معابر عمومی و تردد خودرو انجام شود. مسئولیت نظارت بر کودک و
+            پیامدهای عدم نظارت، تماماً بر عهده والدین یا سرپرست قانونی است.
+            <br />
+            <strong>۱۰–۴.</strong> خریدار می‌پذیرد که استفاده از وسایل نقلیه
+            برقی و موتوری در معابر عمومی تابع قوانین و مقررات راهنمایی و رانندگی
+            و سایر مقررات جاری کشور است. احراز و رعایت شرایط قانونی استفاده — از
+            جمله سن مجاز، گواهی‌نامه معتبر (برای موتورسیکلت)، بیمه‌نامه معتبر،
+            کلاه ایمنی الزامی و محدودیت‌های تردد — تماماً بر عهده استفاده‌کننده
+            است. فروشگاه صرفاً عرضه‌کننده کالاست و هیچ‌گونه مسئولیتی در قبال
+            نحوه، محل و شرایط استفاده از کالا و پیامدهای نقض مقررات توسط
+            استفاده‌کننده ندارد.
+            <br />
+            <strong>۱۰–۵.</strong> هرگونه تغییر و دستکاری در کالا — از جمله باز
+            کردن محدودکننده سرعت، تعویض باتری با ظرفیت غیراستاندارد، تغییر موتور
+            یا سیستم ترمز — علاوه بر ابطال گارانتی، کلیه مسئولیت‌های ایمنی،
+            حقوقی و مالی ناشی از آن را به‌طور کامل متوجه شخص استفاده‌کننده
+            می‌سازد.
+            <br />
+            <strong>۱۰–۶.</strong> استفاده از کالا در سطوح خیس و لغزنده، شیب‌های
+            تند، مسیرهای ناهموار خارج از مشخصات کالا و شرایط جوی نامساعد، به
+            تشخیص و مسئولیت استفاده‌کننده است.
+          </p>
+
+          <h3>
+            <i class="bi bi-1-square"></i><i class="bi bi-1-square"></i> ماده ۱۱
+            — نظرات، نقدها و محتوای کاربران
+          </h3>
+          <p>
+            <strong>۱۱–۱.</strong> سایت امکان ثبت نظر، نقد و امتیازدهی به کالاها
+            را فراهم می‌کند. نظرات ثبت‌شده، دیدگاه شخصی نویسندگان آن‌هاست و
+            انتشار آن‌ها به معنای تأیید محتوا از سوی فروشگاه نیست.
+            <br />
+            <strong>۱۱–۲.</strong> درج موارد زیر در نظرات ممنوع است و فروشگاه
+            مجاز است بدون اطلاع قبلی از انتشار آن‌ها خودداری یا آن‌ها را حذف
+            کند:
+            <br />
+            &nbsp;&nbsp;&nbsp; توهین، افترا، تهمت و الفاظ رکیک نسبت به هر شخص
+            حقیقی یا حقوقی؛
+            <br />
+            &nbsp;&nbsp;&nbsp; محتوای مغایر با قوانین و مقررات جمهوری اسلامی
+            ایران و اخلاق عمومی؛
+            <br />
+            &nbsp;&nbsp;&nbsp; تبلیغ کالا، خدمات یا وب‌سایت‌های دیگر و درج لینک؛
+            <br />
+            &nbsp;&nbsp;&nbsp; اطلاعات تماس شخصی (شماره تلفن، نشانی، شبکه‌های
+            اجتماعی)؛
+            <br />
+            &nbsp;&nbsp;&nbsp; محتوای غیرمرتبط با کالا، تکراری (اسپم) یا نظرات
+            ساختگی و سفارشی.
+            <br />
+            <strong>۱۱–۳.</strong> با ثبت هرگونه نظر، نقد، امتیاز، تصویر یا
+            محتوا در سایت، کاربر حق غیرانحصاری، دائمی و بدون قید جغرافیایی
+            استفاده، انتشار، بازنشر و نمایش آن محتوا را بدون پرداخت هرگونه وجه
+            به فروشگاه اعطا می‌کند.
+            <br />
+            <strong>۱۱–۴.</strong> مسئولیت حقوقی و کیفری محتوای ثبت‌شده توسط هر
+            کاربر، تماماً بر عهده شخص وی است و در صورت طرح ادعا از سوی اشخاص
+            ثالث، کاربر پاسخگو خواهد بود.
+          </p>
+
+          <h3>
+            <i class="bi bi-1"></i><i class="bi bi-2"></i> ماده ۱۲ — مالکیت فکری
+          </h3>
+          <p>
+            <strong>۱۲–۱.</strong> کلیه محتوای سایت شامل نام و نشان تجاری، لوگو،
+            متون، توضیحات کالاها، تصاویر، طراحی گرافیکی، ساختار و کدهای
+            نرم‌افزاری، متعلق به فروشگاه یا اعطاکنندگان مجوز به آن است و هرگونه
+            کپی‌برداری، بازنشر، استفاده تجاری یا استخراج داده (Scraping) بدون
+            اجازه کتبی فروشگاه ممنوع بوده و قابل پیگرد قانونی است.
+            <br />
+            <strong>۱۲–۲.</strong> نام‌ها و علائم تجاری سازندگان کالاها متعلق به
+            مالکان قانونی آن‌هاست و استفاده از آن‌ها در سایت صرفاً جهت معرفی
+            کالا صورت می‌گیرد.
+          </p>
+
+          <h3>
+            <i class="bi bi-1"></i><i class="bi bi-3"></i> ماده ۱۳ — حدود
+            مسئولیت فروشگاه
+          </h3>
+          <p>
+            <strong>۱۳–۱.</strong> فروشگاه نهایت تلاش خود را برای ارائه اطلاعات
+            دقیق و خدمات پایدار به کار می‌گیرد؛ با این حال سایت «به همان صورت که
+            هست» ارائه می‌شود و فروشگاه دسترسی بی‌وقفه، بدون خطا و بدون اختلال
+            به آن را تضمین نمی‌کند و مسئولیتی در قبال خسارات ناشی از قطعی
+            اینترنت، اختلالات فنی، حملات سایبری یا خطاهای نرم‌افزاری خارج از
+            کنترل متعارف خود ندارد.
+            <br />
+            <strong>۱۳–۲.</strong> مسئولیت فروشگاه در قبال هر سفارش، حداکثر
+            معادل مبلغ پرداختی مشتری بابت همان سفارش است و فروشگاه مسئولیتی در
+            قبال خسارات غیرمستقیم، تبعی، عدم‌النفع یا خسارات معنوی ندارد.
+            <br />
+            <strong>۱۳–۳.</strong> فروشگاه مسئولیتی در قبال محتوای وب‌سایت‌های
+            ثالثی که احتمالاً از طریق سایت به آن‌ها لینک داده می‌شود ندارد.
+            <br />
+            <strong>۱۳–۴.</strong> مفاد این ماده نافی حقوق قانونی و غیرقابل
+            اسقاط مصرف‌کننده به موجب قوانین آمره جمهوری اسلامی ایران نیست و
+            صرفاً در حدودی که قانون اجازه می‌دهد اعمال می‌شود.
+          </p>
+
+          <h3>
+            <i class="bi bi-1"></i><i class="bi bi-4"></i> ماده ۱۴ — قوه قاهره
+            (فورس ماژور)
+          </h3>
+          <p>
+            <strong>۱۴–۱.</strong> در صورت بروز حوادث خارج از اراده و کنترل
+            متعارف فروشگاه — از جمله جنگ، تحریم، بلایای طبیعی، شیوع بیماری‌های
+            واگیر، اعتصابات، قطع سراسری اینترنت یا شبکه بانکی، تغییرات اساسی و
+            ناگهانی در مقررات وارداتی، گمرکی و ارزی، و دستورات مراجع حاکمیتی —
+            اجرای تعهدات فروشگاه تا رفع مانع معلق می‌شود و فروشگاه مسئول تأخیر
+            یا عدم اجرای ناشی از این شرایط نیست.
+            <br />
+            <strong>۱۴–۲.</strong> چنانچه شرایط قوه قاهره بیش از [۳۰] روز ادامه
+            یابد، هر یک از طرفین می‌تواند سفارش‌های اجرانشده را لغو کند و در این
+            صورت فروشگاه وجوه دریافتی بابت کالاهای تحویل‌نشده را به‌طور کامل
+            مسترد می‌نماید.
+          </p>
+
+          <h3>
+            <i class="bi bi-1"></i><i class="bi bi-5"></i> ماده ۱۵ — تعلیق و
+            مسدودسازی حساب کاربری
+          </h3>
+          <p>
+            <strong>۱۵–۱.</strong> در صورت احراز هر یک از موارد زیر، فروشگاه
+            مجاز است بدون نیاز به اخطار قبلی، حساب کاربری را به‌طور موقت یا دائم
+            تعلیق یا مسدود کند و حق پیگیری قانونی برای فروشگاه محفوظ است:
+            <br />
+            &nbsp;&nbsp;&nbsp; ارائه اطلاعات جعلی یا استفاده از هویت دیگران؛
+            <br />
+            &nbsp;&nbsp;&nbsp; سوءاستفاده از کدهای تخفیف، خطاهای فنی سایت یا
+            فرآیندهای بازگشت کالا؛
+            <br />
+            &nbsp;&nbsp;&nbsp; ثبت نظرات ساختگی، انبوه یا مغرضانه؛
+            <br />
+            &nbsp;&nbsp;&nbsp; استفاده از ربات، اسکریپت یا هر ابزار خودکار برای
+            دسترسی به سایت؛
+            <br />
+            &nbsp;&nbsp;&nbsp; هرگونه اقدام مجرمانه، متقلبانه یا مغایر با این
+            شرایط.
+            <br />
+            <strong>۱۵–۲.</strong> تعلیق یا مسدودسازی حساب، خللی به تعهدات مالی
+            معوق کاربر در قبال فروشگاه وارد نمی‌کند. سفارش‌های معتبر و
+            پرداخت‌شده پیش از مسدودسازی، حسب مورد اجرا یا وجه آن‌ها مسترد
+            می‌شود.
+          </p>
+
+          <h3>
+            <i class="bi bi-1"></i><i class="bi bi-6"></i> ماده ۱۶ — اصلاح و
+            تغییر شرایط
+          </h3>
+          <p>
+            <strong>۱۶–۱.</strong> فروشگاه مجاز است این شرایط را در هر زمان
+            اصلاح یا به‌روزرسانی کند. نسخه جدید با درج در همین صفحه و ذکر تاریخ
+            به‌روزرسانی، از لحظه انتشار لازم‌الاجراست و ادامه استفاده کاربر از
+            سایت پس از انتشار، به منزله پذیرش نسخه جدید است.
+            <br />
+            <strong>۱۶–۲.</strong> سفارش‌هایی که پیش از اعمال تغییرات ثبت و
+            پرداخت شده‌اند، تابع نسخه‌ای از شرایط هستند که در زمان ثبت سفارش
+            حاکم بوده است.
+          </p>
+
+          <h3>
+            <i class="bi bi-1"></i><i class="bi bi-7"></i> ماده ۱۷ — قانون حاکم
+            و مرجع حل اختلاف
+          </h3>
+          <p>
+            <strong>۱۷–۱.</strong> این شرایط تابع قوانین جمهوری اسلامی ایران است
+            و در تفسیر و اجرای آن، قوانین مذکور ملاک عمل خواهد بود.
+            <br />
+            <strong>۱۷–۲.</strong> در صورت بروز هرگونه اختلاف، طرفین ابتدا تلاش
+            می‌کنند موضوع را از طریق واحد پشتیبانی و امور مشتریان فروشگاه
+            به‌صورت مذاکره و ظرف مدت معقول حل‌وفصل کنند.
+            <br />
+            <strong>۱۷–۳.</strong> در صورت عدم حصول توافق، رسیدگی به اختلاف در
+            صلاحیت مراجع قضایی و شبه‌قضایی ذی‌صلاح مطابق قوانین جاری کشور خواهد
+            بود. این بند مانع از مراجعه مصرف‌کننده به مراجع نظارتی مربوط (از
+            جمله سامانه اینماد و اتحادیه کشوری کسب‌وکارهای مجازی) نیست.
+          </p>
+
+          <h3>
+            <i class="bi bi-1"></i><i class="bi bi-8"></i> ماده ۱۸ — اطلاعات
+            تماس
+          </h3>
+          <p>
+            <strong>نام فروشگاه:</strong> ایسیار<br />
+            <strong>نشانی:</strong> [نشانی دفتر مرکزی]<br />
+            <strong>تلفن پشتیبانی:</strong> [شماره تماس]<br />
+            <strong>ایمیل:</strong> [نشانی ایمیل]<br />
+            <strong>ساعات پاسخگویی:</strong> [روزها و ساعات]
+          </p>
+
+          <p
+            style="
+              margin-top: 2rem;
+              color: var(--accent-2);
+              font-weight: 600;
+              border-top: 1px solid var(--border);
+              padding-top: 1.5rem;
+            "
+          >
+            با انتخاب گزینه «شرایط و قوانین را مطالعه کرده و می‌پذیرم» در فرم
+            ثبت‌نام، تأیید می‌کنید که تمامی مفاد این سند را مطالعه کرده،
+            پذیرفته‌اید و به آن ملتزم هستید.
+          </p>
+        </div>
+        <!-- دکمه بازگشت و لینک قوانین (همان صفحه) -->
+        <div class="action-row">
+          <a
+            href="#"
+            class="btn-back"
+            onclick="
+              window.history.back();
+              return false;
+            "
+          >
+            <i class="bi bi-arrow-right"></i> بازگشت
+          </a>
+          <span class="policy-badge">
+            <i class="bi bi-check-circle-fill"></i> قوانین و مقررات
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var canvas = document.getElementById("particleCanvas");
+        var ctx = canvas.getContext("2d");
+        var particles = [];
+        var W, H;
+        var reduceMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        function resize() {
+          W = canvas.width = canvas.offsetWidth;
+          H = canvas.height = canvas.offsetHeight;
+        }
+
+        function initParticles() {
+          var count = window.innerWidth < 600 ? 26 : 48;
+          particles = [];
+          for (var i = 0; i < count; i++) {
+            particles.push({
+              x: Math.random() * W,
+              y: Math.random() * H,
+              r: Math.random() * 1.8 + 0.6,
+              vx: (Math.random() - 0.5) * 0.18,
+              vy: (Math.random() - 0.5) * 0.18,
+              a: Math.random() * 0.5 + 0.25,
+              pulse: Math.random() * Math.PI * 2,
+            });
+          }
+        }
+
+        function drawParticles() {
+          ctx.clearRect(0, 0, W, H);
+          for (var i = 0; i < particles.length; i++) {
+            var p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.pulse += 0.02;
+            if (p.x < -10) p.x = W + 10;
+            if (p.x > W + 10) p.x = -10;
+            if (p.y < -10) p.y = H + 10;
+            if (p.y > H + 10) p.y = -10;
+
+            var alpha = p.a * (0.6 + 0.4 * Math.sin(p.pulse));
+            ctx.beginPath();
+            ctx.fillStyle = "rgba(103,232,249," + alpha + ")";
+            ctx.shadowColor = "rgba(6,182,212,0.9)";
+            ctx.shadowBlur = 6;
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          if (!reduceMotion) requestAnimationFrame(drawParticles);
+        }
+
+        window.addEventListener("resize", function () {
+          resize();
+          initParticles();
+        });
+        resize();
+        initParticles();
+        drawParticles();
+
+        // حرکت عمق با ماوس (اختیاری)
+        if (!reduceMotion && window.matchMedia("(pointer:fine)").matches) {
+          var depthEls = document.querySelectorAll("[data-depth]");
+          var card = document.getElementById("authCard");
+          window.addEventListener("mousemove", function (e) {
+            var mx = e.clientX / window.innerWidth - 0.5;
+            var my = e.clientY / window.innerHeight - 0.5;
+            depthEls.forEach(function (el) {
+              var depth = parseFloat(el.getAttribute("data-depth"));
+              el.style.transform = (el.style.transform || "").split(
+                " translate3d",
+              )[0];
+              el.style.transform +=
+                " translate3d(" + mx * depth + "px," + my * depth + "px,0)";
+            });
+            card.style.transform =
+              "rotateY(" + mx * 4 + "deg) rotateX(" + -my * 4 + "deg)";
+          });
+          window.addEventListener("mouseleave", function () {
+            card.style.transform = "rotateY(0deg) rotateX(0deg)";
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
