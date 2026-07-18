@@ -4,6 +4,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -602,7 +603,7 @@ class Cart(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='carts',
+        related_name='cart',
         verbose_name="کاربر"
     )
     session_key = models.CharField(
@@ -647,6 +648,11 @@ class Cart(models.Model):
         if self.user:
             return f"سبد {self.user.fullname}"
         return f"سبد مهمان ({self.session_key})"
+
+    @property
+    def item_count(self):
+        """تعداد کل آیتم‌های سبد خرید"""
+        return self.items.aggregate(Sum('quantity'))['quantity__sum'] or 0
 
     @property
     def total_items(self):

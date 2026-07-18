@@ -1,6 +1,6 @@
 # apps/shop/views.py
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 from decimal import Decimal
 
 import jdatetime
@@ -483,18 +483,25 @@ class AdminDashboardStatsAPIView(APIView):
             return dt.strftime('%Y/%m/%d')
 
 
-# apps/shop/views.py - CartAPIView
-
-# apps/shop/views.py - CartAPIView
-
 class CartAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
+    def get_cart(self, request):
+        """دریافت یا ایجاد سبد خرید فعال کاربر"""
+        cart, created = Cart.objects.get_or_create(
+            user=request.user,
+            defaults={'is_active': True}
+        )
+        if not cart.is_active:
+            cart.is_active = True
+            cart.save()
+        return cart
 
-        cart = Cart.objects.filter(user=user, is_active=True).first()
-        if not cart or not cart.items.exists():
+    def get(self, request):
+        """نمایش سبد خرید"""
+        cart = self.get_cart(request)
+
+        if not cart.items.exists():
             return self._empty_cart_response()
 
         items_data = []
@@ -521,7 +528,6 @@ class CartAPIView(APIView):
             specs = product.specs.all()[:2]
             short_specs = ' | '.join([f"{s.label}: {s.value}" for s in specs])
 
-            from datetime import datetime, timedelta
             delivery_date = datetime.now() + timedelta(days=3)
 
             items_data.append({
@@ -551,92 +557,29 @@ class CartAPIView(APIView):
                 'total': int(item_subtotal),
             })
 
-        tax_amount = TaxCalculator.calculate_tax(subtotal)
+        # محاسبه مالیات و هزینه ارسال (با توابع فرضی)
+        tax_amount = self._calculate_tax(subtotal)
         shipping_method = request.query_params.get('shipping_method', 'standard')
-        shipping_cost = ShippingCalculator.calculate_shipping(
-            subtotal=subtotal,
-            method=shipping_method,
-            province_id=self._get_user_province_id(user)
-        )
+        shipping_cost = self._calculate_shipping(subtotal, shipping_method)
+        final_total = subtotal - discount_total + shipping_cost + tax_amount
 
-        available_shipping_methods = ShippingCalculator.get_available_methods(subtotal)
-        final_total = TaxCalculator.calculate_total(
-            subtotal=subtotal,
-            discount=discount_total,
-            shipping_cost=shipping_cost
-        )
         return Response({
             'items': items_data,
             'item_count': item_count,
             'subtotal': int(subtotal),
             'discount_total': int(discount_total),
             'shipping_cost': int(shipping_cost),
-            'shipping_methods': available_shipping_methods,
+            'shipping_methods': self._get_shipping_methods(),
             'selected_shipping_method': shipping_method,
-            'applied_coupon': cart.coupon_code,
-            'coupon_discount': int(cart.coupon_discount) if cart.coupon_discount else 0,
+            'applied_coupon': getattr(cart, 'coupon_code', None),
+            'coupon_discount': int(getattr(cart, 'coupon_discount', 0)),
             'tax_amount': int(tax_amount),
             'final_total': int(final_total),
-            'estimated_delivery': ShippingCalculator.get_estimated_delivery(shipping_method),
-        })
-
-    # ===== متدهای کمکی =====
-
-    def _empty_cart_response(self):
-        """پاسخ برای سبد خالی"""
-        return Response({
-            'items': [],
-            'item_count': 0,
-            'subtotal': 0,
-            'discount_total': 0,
-            'shipping_cost': 0,
-            'shipping_methods': [],
-            'selected_shipping_method': 'standard',
-            'applied_coupon': None,
-            'coupon_discount': 0,
-            'tax_amount': 0,
-            'final_total': 0,
             'estimated_delivery': 3,
         })
 
-    def _get_selected_color(self, request, product_id):
-        """دریافت رنگ انتخاب‌شده برای محصول"""
-        # از session یا request.GET
-        color_slug = request.query_params.get(f'color_{product_id}', 'black')
-
-        # دریافت اطلاعات رنگ از دیتابیس
-        color = ProductImage.objects.filter(
-            product_id=product_id,
-            color_slug=color_slug
-        ).first()
-
-        if color:
-            return {
-                'slug': color.color_slug,
-                'name': color.color_label,
-                'hex': color.color_hex,
-            }
-
-        # رنگ پیش‌فرض
-        default_color = ProductImage.objects.filter(product_id=product_id).first()
-        if default_color:
-            return {
-                'slug': default_color.color_slug,
-                'name': default_color.color_label,
-                'hex': default_color.color_hex,
-            }
-
-        return {'slug': 'black', 'name': 'مشکی', 'hex': '#1A1A1A'}
-
-    def _get_user_province_id(self, user):
-        """دریافت استان کاربر از آخرین آدرس"""
-        last_address = user.addresses.filter(is_active=True).first()
-        if last_address:
-            return last_address.province_id
-        return None
-
     def post(self, request):
-        """اضافه کردن محصول به سبد خرید"""
+        """افزودن محصول به سبد خرید"""
         product_id = request.data.get('product_id')
         quantity = int(request.data.get('quantity', 1))
         color_slug = request.data.get('color_slug', 'black')
@@ -647,7 +590,13 @@ class CartAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        product = get_object_or_404(Product, id=product_id, is_published=True, is_available=True)
+        try:
+            product = Product.objects.get(id=product_id, is_published=True, is_available=True)
+        except Product.DoesNotExist:
+            return Response(
+                {'error': 'محصول یافت نشد یا در دسترس نیست'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         if product.stock < quantity:
             return Response(
@@ -655,29 +604,30 @@ class CartAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        cart, created = Cart.objects.get_or_create(
-            user=request.user,
-            is_active=True,
-            defaults={'session_key': request.session.session_key}
-        )
+        cart = self.get_cart(request)
 
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart,
             product=product,
             defaults={
                 'quantity': quantity,
+                'color_slug': color_slug,
                 'price_snapshot': product.final_price,
             }
         )
 
         if not created:
             cart_item.quantity += quantity
+            if color_slug:
+                cart_item.color_slug = color_slug
             cart_item.save()
+
+        total_items = cart.items.aggregate(Sum('quantity'))['quantity__sum'] or 0
 
         return Response({
             'status': 'added',
             'message': 'محصول به سبد خرید اضافه شد',
-            'item_count': cart.items.aggregate(Sum('quantity'))['quantity__sum'] or 0,
+            'item_count': total_items,
         }, status=status.HTTP_201_CREATED)
 
     def put(self, request):
@@ -692,18 +642,18 @@ class CartAPIView(APIView):
             )
 
         if quantity < 1:
-            return self.delete(request)  # اگر تعداد صفر شد، حذف کن
+            return self.delete(request)
 
-        cart = Cart.objects.filter(user=request.user, is_active=True).first()
-        if not cart:
+        cart = self.get_cart(request)
+
+        try:
+            cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+        except CartItem.DoesNotExist:
             return Response(
-                {'error': 'سبد خرید یافت نشد'},
+                {'error': 'آیتم در سبد خرید یافت نشد'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
-
-        # بررسی موجودی
         if cart_item.product.stock < quantity:
             return Response(
                 {'error': f'موجودی کافی نیست. موجودی: {cart_item.product.stock}'},
@@ -719,6 +669,57 @@ class CartAPIView(APIView):
             'item': CartItemSerializer(cart_item).data,
         })
 
+    def patch(self, request):
+        """به‌روزرسانی آیتم سبد خرید (رنگ یا تعداد)"""
+        product_id = request.data.get('product_id')
+        color_slug = request.data.get('color_slug')
+        quantity = request.data.get('quantity')
+
+        if not product_id:
+            return Response(
+                {'detail': 'product_id الزامی است'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response(
+                {'detail': 'محصول یافت نشد'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        cart = self.get_cart(request)
+
+        try:
+            cart_item = CartItem.objects.get(cart=cart, product=product)
+        except CartItem.DoesNotExist:
+            return Response(
+                {'detail': 'آیتم در سبد خرید یافت نشد'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # به‌روزرسانی رنگ
+        if color_slug is not None:
+            cart_item.color_slug = color_slug
+
+        # به‌روزرسانی تعداد
+        if quantity is not None:
+            quantity = int(quantity)
+            if quantity <= 0:
+                cart_item.delete()
+            else:
+                if cart_item.product.stock < quantity:
+                    return Response(
+                        {'detail': f'موجودی کافی نیست. موجودی: {cart_item.product.stock}'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                cart_item.quantity = quantity
+                cart_item.save()
+
+        # ✅ برگرداندن سبد خرید به‌روز شده با متد GET
+        return self.get(request)
+
     def delete(self, request):
         """حذف یک آیتم از سبد خرید"""
         product_id = request.data.get('product_id')
@@ -729,12 +730,7 @@ class CartAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        cart = Cart.objects.filter(user=request.user, is_active=True).first()
-        if not cart:
-            return Response(
-                {'error': 'سبد خرید یافت نشد'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        cart = self.get_cart(request)
 
         deleted = CartItem.objects.filter(cart=cart, product_id=product_id).delete()
 
@@ -748,6 +744,77 @@ class CartAPIView(APIView):
                 {'error': 'آیتم در سبد خرید یافت نشد'},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+    # ===== متدهای کمکی =====
+
+    def _empty_cart_response(self):
+        """پاسخ برای سبد خالی"""
+        return Response({
+            'items': [],
+            'item_count': 0,
+            'subtotal': 0,
+            'discount_total': 0,
+            'shipping_cost': 0,
+            'shipping_methods': self._get_shipping_methods(),
+            'selected_shipping_method': 'standard',
+            'applied_coupon': None,
+            'coupon_discount': 0,
+            'tax_amount': 0,
+            'final_total': 0,
+            'estimated_delivery': 3,
+        })
+
+    def _get_selected_color(self, request, product_id):
+        """دریافت رنگ انتخاب‌شده برای محصول"""
+        color_slug = request.query_params.get(f'color_{product_id}', 'black')
+
+        color = ProductImage.objects.filter(
+            product_id=product_id,
+            color_slug=color_slug
+        ).first()
+
+        if color:
+            return {
+                'slug': color.color_slug,
+                'name': color.color_label,
+                'hex': color.color_hex,
+            }
+
+        default_color = ProductImage.objects.filter(product_id=product_id).first()
+        if default_color:
+            return {
+                'slug': default_color.color_slug,
+                'name': default_color.color_label,
+                'hex': default_color.color_hex,
+            }
+
+        return {'slug': 'black', 'name': 'مشکی', 'hex': '#1A1A1A'}
+
+    def _calculate_tax(self, subtotal):
+        """محاسبه مالیات (مثال: ۹٪)"""
+        return subtotal * Decimal('0.09')
+
+    def _calculate_shipping(self, subtotal, method='standard'):
+        """محاسبه هزینه ارسال"""
+        if method == 'express':
+            return Decimal('250000')
+        elif method == 'standard':
+            return Decimal('150000') if subtotal < Decimal('5000000') else Decimal('0')
+        return Decimal('0')
+
+    def _get_shipping_methods(self):
+        """دریافت روش‌های ارسال"""
+        return [
+            {'id': 'standard', 'name': 'ارسال معمولی', 'price': 150000},
+            {'id': 'express', 'name': 'ارسال فوری', 'price': 250000},
+        ]
+
+    def _get_user_province_id(self, user):
+        """دریافت استان کاربر از آخرین آدرس"""
+        last_address = user.addresses.filter(is_active=True).first()
+        if last_address:
+            return last_address.province_id
+        return None
 
 
 class CheckoutPageView(TemplateView):
