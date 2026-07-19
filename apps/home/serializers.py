@@ -419,3 +419,23 @@ class IndexPageSerializer(serializers.ModelSerializer):
     def get_recent_articles(self, obj):
         articles = Article.objects.filter(is_published=True).order_by('-published_at', '-created_at')[:3]
         return ArticleCardSerializer(articles, many=True).data
+
+class AdminCommentSerializer(serializers.ModelSerializer):
+    """سریالایزر کامنت مقالات برای پنل ادمین (همه‌ی وضعیت‌ها)"""
+    user_name = serializers.CharField(source='user.fullname', read_only=True)
+    user_avatar = serializers.SerializerMethodField()
+    article_title = serializers.CharField(source='article.title', read_only=True)
+    article_slug = serializers.CharField(source='article.slug', read_only=True)
+    is_reply = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'user_name', 'user_avatar', 'article_title', 'article_slug',
+            'content', 'status', 'rejection_reason', 'parent', 'is_reply', 'created_at'
+        ]
+
+    def get_user_avatar(self, obj):
+        if obj.user and obj.user.profile_image:
+            return obj.user.profile_image.url
+        return None

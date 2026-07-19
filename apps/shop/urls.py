@@ -1,8 +1,9 @@
 # apps/shop/urls.py
 
 from django.urls import path, re_path
-from . import views
+
 from apps.accounts.views import CityListAPIView, ProvinceListAPIView
+from . import views
 from .views import CartAPIView
 
 app_name = 'shop'
@@ -16,6 +17,9 @@ urlpatterns = [
     path('api/products/', views.ProductListAPIView.as_view(), name='api_product_list'),
     path('api/categories/', views.CategoryListAPIView.as_view(), name='api_categories'),
     re_path(r'^api/category/(?P<slug>.+)/$', views.CategoryDetailAPIView.as_view(), name='api_category_detail'),
+    path('api/admin/reviews/', views.AdminProductReviewListAPIView.as_view(), name='api_admin_reviews'),
+    path('api/admin/reviews/<int:pk>/moderate/', views.AdminProductReviewModerateAPIView.as_view(),
+         name='api_admin_review_moderate'),
 
     # ===== محصولات (با جزئیات بیشتر اول) =====
     re_path(r'^api/products/(?P<slug>.+)/reviews/$', views.ProductReviewListCreateAPIView.as_view(),

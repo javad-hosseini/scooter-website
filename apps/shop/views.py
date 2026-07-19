@@ -24,7 +24,7 @@ from .models import Category, ProductReview, Wishlist, Cart, CartItem, ProductIm
 from .models import Product, Order, OrderItem, Address
 from .pagination import ProductPagination
 from .serializers import (
-    OrderCreateSerializer, CartItemSerializer, OrderListSerializer
+    OrderCreateSerializer, CartItemSerializer, OrderListSerializer, AdminProductReviewSerializer
 )
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer,
@@ -1114,3 +1114,52 @@ class PaymentGatewayView(TemplateView):
         order_id = self.kwargs.get('order_id')
         context['order'] = get_object_or_404(Order, id=order_id)
         return context
+
+class AdminProductReviewListAPIView(generics.ListAPIView):
+    """لیست همه‌ی نظرات محصولات برای ادمین، با فیلتر status"""
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminProductReviewSerializer
+    pagination_class = ProductPagination
+
+    def get_queryset(self):
+        qs = ProductReview.objects.select_related('user', 'product').order_by('-created_at')
+        status_param = self.request.query_params.get('status', '').strip()
+        if status_param in dict(ProductReview.STATUS_CHOICES):
+            qs = qs.filter(status=status_param)
+        return qs
+
+
+class AdminProductReviewModerateAPIView(APIView):
+    """تایید یا رد نظر محصول"""
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        review = get_object_or_404(ProductReview, pk=pk)
+        action = request.data.get('action')
+
+        if action not in ['approve', 'reject']:
+            return Response(
+                {'error': "مقدار action باید 'approve' یا 'reject' باشد"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if action == 'approve':
+            review.status = 'approved'
+            review.rejection_reason = ''
+        else:
+            reason = request.data.get('rejection_reason', '').strip()
+            if not reason:
+                return Response(
+                    {'error': 'برای رد کردن نظر، وارد کردن دلیل الزامی است'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            review.status = 'rejected'
+            review.rejection_reason = reason
+
+        review.save(update_fields=['status', 'rejection_reason', 'updated_at'])
+
+        return Response({
+            'status': 'success',
+            'message': 'وضعیت نظر با موفقیت به‌روزرسانی شد',
+            'data': AdminProductReviewSerializer(review).data
+        })

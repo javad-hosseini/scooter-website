@@ -223,3 +223,62 @@ class AdminDashboardPageView(TemplateView):
 
 class AboutUsPageView(TemplateView):
     template_name = 'home/about_us.html'
+
+
+from rest_framework.permissions import IsAdminUser
+from .serializers import AdminCommentSerializer  # اگه بالای فایل import گروهی داری، همونجا اضافه کن
+
+
+class AdminCommentListAPIView(generics.ListAPIView):
+    """لیست همه‌ی کامنت‌های مقالات برای ادمین، با فیلتر status"""
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminCommentSerializer
+
+    def get_queryset(self):
+        qs = Comment.objects.select_related('user', 'article').order_by('-created_at')
+        status_param = self.request.query_params.get('status', '').strip()
+        if status_param in dict(Comment.STATUS_CHOICES):
+            qs = qs.filter(status=status_param)
+        return qs
+
+
+class AdminCommentModerateAPIView(APIView):
+    """تایید یا رد کامنت مقاله"""
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        action = request.data.get('action')
+
+        if action not in ['approve', 'reject']:
+            return Response(
+                {'error': "مقدار action باید 'approve' یا 'reject' باشد"},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        if action == 'approve':
+            comment.status = 'approved'
+            comment.rejection_reason = ''
+        else:
+            reason = request.data.get('rejection_reason', '').strip()
+            if not reason:
+                return Response(
+                    {'error': 'برای رد کردن کامنت، وارد کردن دلیل الزامی است'},
+                    status=http_status.HTTP_400_BAD_REQUEST
+                )
+            comment.status = 'rejected'
+            comment.rejection_reason = reason
+
+        comment.save(update_fields=['status', 'rejection_reason', 'updated_at'])
+
+        return Response({
+            'status': 'success',
+            'message': 'وضعیت کامنت با موفقیت به‌روزرسانی شد',
+            'data': AdminCommentSerializer(comment).data
+        })
+
+# apps/home/views.py
+@method_decorator(login_required(login_url='/access-denied/'), name='dispatch')
+@method_decorator(staff_member_required(login_url='/access-denied/'), name='dispatch')
+class CommentsModerationPageView(TemplateView):
+    template_name = 'accounts/comments_moderation.html'

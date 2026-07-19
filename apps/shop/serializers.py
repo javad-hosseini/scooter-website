@@ -454,3 +454,23 @@ class OrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError({'postal_code': 'کد پستی باید ۱۰ رقم باشد'})
 
         return data
+
+class AdminProductReviewSerializer(serializers.ModelSerializer):
+    """سریالایزر نظرات محصول برای پنل ادمین (همه‌ی وضعیت‌ها)"""
+    user_name = serializers.CharField(source='user.fullname', read_only=True)
+    user_avatar = serializers.SerializerMethodField()
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_slug = serializers.CharField(source='product.slug', read_only=True)
+
+    class Meta:
+        model = ProductReview
+        fields = [
+            'id', 'user_name', 'user_avatar', 'product_name', 'product_slug',
+            'rating', 'title', 'comment', 'status', 'rejection_reason',
+            'is_verified_purchase', 'created_at'
+        ]
+
+    def get_user_avatar(self, obj):
+        if obj.user and obj.user.profile_image:
+            return obj.user.profile_image.url
+        return None

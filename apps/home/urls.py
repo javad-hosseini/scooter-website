@@ -21,6 +21,7 @@ urlpatterns = [
     path('categories/', views.CategoryPageView.as_view(), name='categories'),
     path('admin/dashboard/', views.AdminDashboardPageView.as_view(), name='admin_dashboard'),
     path('about_us/', views.AboutUsPageView.as_view(), name='about_us'),
+    path('admin/comments/', views.CommentsModerationPageView.as_view(), name='admin_comments'),
 
     # ===== صفحه اصلی =====
     path('', views.IndexPageView.as_view(), name='index'),
@@ -37,6 +38,9 @@ urlpatterns = [
     path('api/articles/', ArticleListAPIView.as_view(), name='api_articles'),
     path('api/tags/', TagListAPIView.as_view(), name='api_tags'),
     path('api/categories/', views.CategoryListAPIView.as_view(), name='api_categories'),
+    path('api/admin/comments/', views.AdminCommentListAPIView.as_view(), name='api_admin_comments'),
+    path('api/admin/comments/<int:pk>/moderate/', views.AdminCommentModerateAPIView.as_view(),
+         name='api_admin_comment_moderate'),
 
     # ===== API مقالات (موجود) =====
     path('api/articles/', views.ArticleListAPIView.as_view(), name='api_articles'),
