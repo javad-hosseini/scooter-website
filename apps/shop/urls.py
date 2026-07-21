@@ -20,6 +20,8 @@ urlpatterns = [
     path('api/admin/reviews/', views.AdminProductReviewListAPIView.as_view(), name='api_admin_reviews'),
     path('api/admin/reviews/<int:pk>/moderate/', views.AdminProductReviewModerateAPIView.as_view(),
          name='api_admin_review_moderate'),
+    path('api/admin/finance/stats/', views.AdminFinanceStatsAPIView.as_view(), name='api_admin_finance_stats'),
+    path('api/admin/transactions/', views.AdminTransactionListAPIView.as_view(), name='api_admin_transactions'),
 
     # ===== محصولات (با جزئیات بیشتر اول) =====
     re_path(r'^api/products/(?P<slug>.+)/reviews/$', views.ProductReviewListCreateAPIView.as_view(),

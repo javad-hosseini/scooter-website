@@ -49,6 +49,7 @@ urlpatterns = [
     re_path(r'^api/articles/(?P<slug>.+)/comments/$', views.CommentListCreateAPIView.as_view(), name='api_comments'),
     # ===== صفحه عدم دسترسی =====
     path('access-denied/', views.AccessDeniedView.as_view(), name='access_denied'),
+    path('admin/finance/', views.FinancePageView.as_view(), name='admin_finance'),
 ]
 
 if settings.DEBUG:

@@ -947,7 +947,7 @@
           <a href="#" class="nav-link active"
             ><i class="ico fa-solid fa-star"></i> دیدگاه‌ها</a
           >
-          <a href="#" class="nav-link"
+          <a href="/admin/finance/" class="nav-link"
             ><i class="ico fa-solid fa-chart-line"></i> درآمد</a
           >
         </nav>
@@ -971,7 +971,11 @@
             </div>
 
             <div class="profile-chip">
-              <img id="profileAvatar" src="https://i.pravatar.cc/100?img=47" alt="تصویر پروفایل" />
+              <img
+                id="profileAvatar"
+                src="https://i.pravatar.cc/100?img=47"
+                alt="تصویر پروفایل"
+              />
               <div class="who d-none d-sm-block">
                 <b id="profileName">مدیر</b><span>مدیر فروشگاه</span>
               </div>
@@ -1014,7 +1018,10 @@
             </div>
             <div class="col-6 col-xl-3">
               <div class="gcard mini-stat">
-                <div class="ico" style="background: linear-gradient(135deg,#f87171,#ef4444)">
+                <div
+                  class="ico"
+                  style="background: linear-gradient(135deg, #f87171, #ef4444)"
+                >
                   <i class="fa-solid fa-xmark"></i>
                 </div>
                 <div>
@@ -1058,9 +1065,7 @@
               <button class="filter-pill" data-status="approved">
                 تایید شده
               </button>
-              <button class="filter-pill" data-status="rejected">
-                رد شده
-              </button>
+              <button class="filter-pill" data-status="rejected">رد شده</button>
               <button class="filter-pill" data-status="">همه</button>
             </div>
           </div>
@@ -1094,8 +1099,12 @@
           <div class="pager">
             <div class="info" id="pagerInfo"></div>
             <div class="btns">
-              <button id="prevPageBtn"><i class="fa-solid fa-chevron-right"></i></button>
-              <button id="nextPageBtn"><i class="fa-solid fa-chevron-left"></i></button>
+              <button id="prevPageBtn">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+              <button id="nextPageBtn">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -1135,7 +1144,10 @@
     <div class="modal-backdrop-c" id="previewModal">
       <div class="modal-box wide">
         <div class="m-head">
-          <div class="ic" style="background: rgba(47,111,237,.12); color: var(--blue)">
+          <div
+            class="ic"
+            style="background: rgba(47, 111, 237, 0.12); color: var(--blue)"
+          >
             <i class="fa-regular fa-message"></i>
           </div>
           <div>
@@ -1147,8 +1159,14 @@
           <div class="preview-meta">
             <img id="previewAvatar" src="" alt="" />
             <div>
-              <div style="font-weight: 700; font-size: 13.5px" id="previewUserName"></div>
-              <div style="font-size: 11.5px; color: var(--text-muted)" id="previewDate"></div>
+              <div
+                style="font-weight: 700; font-size: 13.5px"
+                id="previewUserName"
+              ></div>
+              <div
+                style="font-size: 11.5px; color: var(--text-muted)"
+                id="previewDate"
+              ></div>
             </div>
           </div>
           <div class="preview-content" id="previewContent"></div>
@@ -1249,7 +1267,12 @@
 
           // پشتیبانی از هر دو حالت: پاجینیت‌شده یا آرایه ساده
           if (Array.isArray(data)) {
-            pageData = { results: data, count: data.length, next: null, previous: null };
+            pageData = {
+              results: data,
+              count: data.length,
+              next: null,
+              previous: null,
+            };
           } else {
             pageData = {
               results: data.results || [],
@@ -1319,19 +1342,23 @@
         }
         document.getElementById("emptyState").classList.add("d-none");
 
-        tbody.innerHTML = items
-          .map((item) => renderRow(item))
-          .join("");
+        tbody.innerHTML = items.map((item) => renderRow(item)).join("");
 
         // wire action buttons
         tbody.querySelectorAll("[data-approve]").forEach((btn) => {
-          btn.addEventListener("click", () => handleApprove(btn.dataset.approve));
+          btn.addEventListener("click", () =>
+            handleApprove(btn.dataset.approve),
+          );
         });
         tbody.querySelectorAll("[data-reject]").forEach((btn) => {
-          btn.addEventListener("click", () => openRejectModal(btn.dataset.reject));
+          btn.addEventListener("click", () =>
+            openRejectModal(btn.dataset.reject),
+          );
         });
         tbody.querySelectorAll("[data-preview]").forEach((el) => {
-          el.addEventListener("click", () => openPreviewModal(el.dataset.preview, items));
+          el.addEventListener("click", () =>
+            openPreviewModal(el.dataset.preview, items),
+          );
         });
       }
 
@@ -1346,16 +1373,20 @@
           ? `<div class="rating">${"★".repeat(item.rating || 0)}${"☆".repeat(5 - (item.rating || 0))}</div>`
           : "";
 
-        const replyHtml = !isReview && item.is_reply
-          ? `<div class="t-type"><i class="fa-solid fa-reply"></i> پاسخ به یک دیدگاه</div>`
-          : "";
+        const replyHtml =
+          !isReview && item.is_reply
+            ? `<div class="t-type"><i class="fa-solid fa-reply"></i> پاسخ به یک دیدگاه</div>`
+            : "";
 
-        const rejectReasonHtml = item.status === "rejected" && item.rejection_reason
-          ? `<div class="reject-reason"><i class="fa-solid fa-circle-info"></i> ${escapeHtml(item.rejection_reason)}</div>`
-          : "";
+        const rejectReasonHtml =
+          item.status === "rejected" && item.rejection_reason
+            ? `<div class="reject-reason"><i class="fa-solid fa-circle-info"></i> ${escapeHtml(item.rejection_reason)}</div>`
+            : "";
 
         const excerpt = (item.content || item.comment || "").trim();
-        const excerptShort = escapeHtml(excerpt.length > 140 ? excerpt.slice(0, 140) + "…" : excerpt);
+        const excerptShort = escapeHtml(
+          excerpt.length > 140 ? excerpt.slice(0, 140) + "…" : excerpt,
+        );
 
         return `
           <tr>
@@ -1409,21 +1440,37 @@
         const cfg = ENDPOINTS[currentSource];
         try {
           const [pending, approved, rejected, all] = await Promise.all([
-            fetch(`${cfg.list}?status=pending&page_size=1`).then((r) => r.json()),
-            fetch(`${cfg.list}?status=approved&page_size=1`).then((r) => r.json()),
-            fetch(`${cfg.list}?status=rejected&page_size=1`).then((r) => r.json()),
+            fetch(`${cfg.list}?status=pending&page_size=1`).then((r) =>
+              r.json(),
+            ),
+            fetch(`${cfg.list}?status=approved&page_size=1`).then((r) =>
+              r.json(),
+            ),
+            fetch(`${cfg.list}?status=rejected&page_size=1`).then((r) =>
+              r.json(),
+            ),
             fetch(`${cfg.list}?page_size=1`).then((r) => r.json()),
           ]);
 
-          const countOf = (d) => (Array.isArray(d) ? d.length : d.count ?? 0);
+          const countOf = (d) => (Array.isArray(d) ? d.length : (d.count ?? 0));
 
-          document.getElementById("statPending").textContent = toPersianNum(countOf(pending));
-          document.getElementById("statApproved").textContent = toPersianNum(countOf(approved));
-          document.getElementById("statRejected").textContent = toPersianNum(countOf(rejected));
-          document.getElementById("statTotal").textContent = toPersianNum(countOf(all));
+          document.getElementById("statPending").textContent = toPersianNum(
+            countOf(pending),
+          );
+          document.getElementById("statApproved").textContent = toPersianNum(
+            countOf(approved),
+          );
+          document.getElementById("statRejected").textContent = toPersianNum(
+            countOf(rejected),
+          );
+          document.getElementById("statTotal").textContent = toPersianNum(
+            countOf(all),
+          );
 
           const tabCountEl = document.getElementById(
-            currentSource === "reviews" ? "reviewsTabCount" : "commentsTabCount",
+            currentSource === "reviews"
+              ? "reviewsTabCount"
+              : "commentsTabCount",
           );
           tabCountEl.textContent = toPersianNum(countOf(pending));
         } catch (error) {
@@ -1460,7 +1507,9 @@
       }
 
       async function confirmReject() {
-        const reason = document.getElementById("rejectReasonInput").value.trim();
+        const reason = document
+          .getElementById("rejectReasonInput")
+          .value.trim();
         const errEl = document.getElementById("rejectReasonErr");
 
         if (!reason) {
@@ -1494,12 +1543,16 @@
         const isReview = currentSource === "reviews";
         document.getElementById("previewAvatar").src =
           item.user_avatar || "https://i.pravatar.cc/100?img=12";
-        document.getElementById("previewUserName").textContent = item.user_name || "کاربر";
-        document.getElementById("previewDate").textContent = formatDate(item.created_at);
+        document.getElementById("previewUserName").textContent =
+          item.user_name || "کاربر";
+        document.getElementById("previewDate").textContent = formatDate(
+          item.created_at,
+        );
         document.getElementById("previewTargetTitle").textContent = isReview
           ? item.product_name
           : item.article_title;
-        document.getElementById("previewContent").textContent = item.content || item.comment || "";
+        document.getElementById("previewContent").textContent =
+          item.content || item.comment || "";
 
         document.getElementById("previewModal").classList.add("show");
       }
@@ -1528,17 +1581,19 @@
         refreshStats();
       });
 
-      document.getElementById("statusFilters").addEventListener("click", (e) => {
-        const btn = e.target.closest("button[data-status]");
-        if (!btn) return;
-        document
-          .querySelectorAll("#statusFilters button")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentStatus = btn.dataset.status;
-        currentPage = 1;
-        fetchList(1);
-      });
+      document
+        .getElementById("statusFilters")
+        .addEventListener("click", (e) => {
+          const btn = e.target.closest("button[data-status]");
+          if (!btn) return;
+          document
+            .querySelectorAll("#statusFilters button")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentStatus = btn.dataset.status;
+          currentPage = 1;
+          fetchList(1);
+        });
 
       document.getElementById("prevPageBtn").addEventListener("click", () => {
         if (pageData.previous) {

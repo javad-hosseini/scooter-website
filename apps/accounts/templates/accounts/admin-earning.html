@@ -1035,59 +1035,15 @@
 
         <nav class="sidebar-nav scroll-thin">
           <div class="sidebar-section-title">اصلی</div>
-          <a href="admin_dashboard.html" class="nav-link"
+          <a href="/admin/dashboard/" class="nav-link"
             ><i class="ico fa-solid fa-grid-2"></i> داشبورد</a
           >
 
-          <a
-            class="nav-link"
-            data-bs-toggle="collapse"
-            href="#menuProducts"
-            role="button"
-            aria-expanded="false"
-          >
-            <i class="ico fa-solid fa-box-open"></i> محصولات
-            <i class="chev fa-solid fa-chevron-left"></i>
-          </a>
-          <div class="collapse sidebar-sub" id="menuProducts">
-            <a href="#" class="nav-link">لیست محصولات</a>
-            <a href="#" class="nav-link">جزئیات محصول</a>
-          </div>
-
-          <a href="#" class="nav-link"
-            ><i class="ico fa-solid fa-cart-shopping"></i> سفارش‌ها
-            <span
-              class="badge text-bg-primary rounded-pill ms-2"
-              style="font-size: 10px"
-              >۱۲</span
-            >
-          </a>
-
-          <a
-            class="nav-link"
-            data-bs-toggle="collapse"
-            href="#menuVisitors"
-            role="button"
-            aria-expanded="false"
-          >
-            <i class="ico fa-solid fa-users"></i> بازدیدکنندگان
-            <i class="chev fa-solid fa-chevron-left"></i>
-          </a>
-          <div class="collapse sidebar-sub" id="menuVisitors">
-            <a href="#" class="nav-link">لیست بازدیدکنندگان</a>
-            <a href="#" class="nav-link">جزئیات بازدیدکننده</a>
-          </div>
-
-          <a href="#" class="nav-link"
+          <a href="/admin/comments/" class="nav-link"
             ><i class="ico fa-solid fa-star"></i> دیدگاه‌ها</a
           >
-          <a href="#" class="nav-link active"
+          <a href="/admin/finance/" class="nav-link active"
             ><i class="ico fa-solid fa-chart-line"></i> درآمد</a
-          >
-
-          <div class="sidebar-section-title">سیستم</div>
-          <a href="#" class="nav-link"
-            ><i class="ico fa-solid fa-gear"></i> تنظیمات</a
           >
         </nav>
       </aside>
@@ -1239,8 +1195,9 @@
                 </div>
                 <div>
                   <div
+                    id="statTotalRevenue"
                     class="stat-value"
-                    data-count="284600000"
+                    data-count="0"
                     data-format="toman"
                   >
                     ۰
@@ -1261,8 +1218,9 @@
                 </div>
                 <div>
                   <div
+                    id="statTodayRevenue"
                     class="stat-value"
-                    data-count="6400000"
+                    data-count="0"
                     data-format="toman"
                   >
                     ۰
@@ -1283,8 +1241,9 @@
                 </div>
                 <div>
                   <div
+                    id="statMonthRevenue"
                     class="stat-value"
-                    data-count="93200000"
+                    data-count="0"
                     data-format="toman"
                   >
                     ۰
@@ -1305,8 +1264,9 @@
                 </div>
                 <div>
                   <div
+                    id="statPendingSettlement"
                     class="stat-value"
-                    data-count="12800000"
+                    data-count="0"
                     data-format="toman"
                   >
                     ۰
@@ -1330,7 +1290,9 @@
                   </div>
                 </div>
                 <div>
-                  <div class="stat-value" data-count="3284">۰</div>
+                  <div id="statSuccessCount" class="stat-value" data-count="0">
+                    ۰
+                  </div>
                   <div class="stat-label">تراکنش‌های موفق</div>
                 </div>
               </div>
@@ -1346,7 +1308,9 @@
                   </div>
                 </div>
                 <div>
-                  <div class="stat-value" data-count="142">۰</div>
+                  <div id="statFailedCount" class="stat-value" data-count="0">
+                    ۰
+                  </div>
                   <div class="stat-label">تراکنش‌های ناموفق</div>
                 </div>
               </div>
@@ -1362,7 +1326,9 @@
                   </div>
                 </div>
                 <div>
-                  <div class="stat-value" data-count="37">۰</div>
+                  <div id="statRefundCount" class="stat-value" data-count="0">
+                    ۰
+                  </div>
                   <div class="stat-label">درخواست‌های بازگشت وجه</div>
                 </div>
               </div>
@@ -1382,13 +1348,14 @@
                 </div>
                 <div>
                   <div
+                    id="statNetProfit"
                     class="stat-value"
-                    data-count="61500000"
+                    data-count="0"
                     data-format="toman"
                   >
                     ۰
                   </div>
-                  <div class="stat-label">سود خالص</div>
+                  <div class="stat-label">سود خالص (این ماه)</div>
                 </div>
               </div>
             </div>
@@ -1400,173 +1367,21 @@
             <div class="line"></div>
             <span class="tag">۴ درگاه فعال</span>
           </div>
-          <div class="row g-4">
-            <div class="col-md-6 col-xl-3">
-              <div class="gcard gw-card">
-                <div class="gw-head">
-                  <div
-                    class="gw-logo"
-                    style="
-                      background: linear-gradient(135deg, #ffb23f, #f4742b);
-                    "
-                  >
-                    ZP
-                  </div>
-                  <div>
-                    <div class="gw-name">زرین‌پال</div>
-                    <div class="gw-sub">درگاه اصلی</div>
-                  </div>
-                </div>
-                <div class="gw-stats">
-                  <div class="gw-stat">
-                    <div class="v">۲,۱۴۰</div>
-                    <div class="l">کل تراکنش</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۲,۰۵۵</div>
-                    <div class="l">پرداخت موفق</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۱۵۲M</div>
-                    <div class="l">درآمد (تومان)</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۹۶٪</div>
-                    <div class="l">نرخ موفقیت</div>
-                  </div>
-                </div>
-                <div class="gw-bar">
-                  <div
-                    style="
-                      width: 96%;
-                      background: linear-gradient(90deg, #ffb23f, #f4742b);
-                    "
-                  ></div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 col-xl-3">
-              <div class="gcard gw-card">
-                <div class="gw-head">
-                  <div
-                    class="gw-logo"
-                    style="
-                      background: linear-gradient(135deg, #2ec4b6, #1a8fe3);
-                    "
-                  >
-                    ID
-                  </div>
-                  <div>
-                    <div class="gw-name">آی‌دی‌پی</div>
-                    <div class="gw-sub">درگاه دوم</div>
-                  </div>
-                </div>
-                <div class="gw-stats">
-                  <div class="gw-stat">
-                    <div class="v">۸۶۴</div>
-                    <div class="l">کل تراکنش</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۵۸M</div>
-                    <div class="l">درآمد (تومان)</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۴۱</div>
-                    <div class="l">پرداخت ناموفق</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۹۲٪</div>
-                    <div class="l">نرخ موفقیت</div>
-                  </div>
-                </div>
-                <div class="gw-bar">
-                  <div
-                    style="
-                      width: 92%;
-                      background: linear-gradient(90deg, #2ec4b6, #1a8fe3);
-                    "
-                  ></div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 col-xl-3">
-              <div class="gcard gw-card">
-                <div class="gw-head">
-                  <div
-                    class="gw-logo"
-                    style="
-                      background: linear-gradient(135deg, #7c5cfc, #2f6fed);
-                    "
-                  >
-                    NP
-                  </div>
-                  <div>
-                    <div class="gw-name">نکست‌پی</div>
-                    <div class="gw-sub">درگاه سوم</div>
-                  </div>
-                </div>
-                <div class="gw-stats">
-                  <div class="gw-stat">
-                    <div class="v">۴۴M</div>
-                    <div class="l">درآمد (تومان)</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۴۰M</div>
-                    <div class="l">تسویه‌شده</div>
-                  </div>
-                  <div class="gw-stat" style="grid-column: span 2">
-                    <div class="v">۹۴٪</div>
-                    <div class="l">درصد موفقیت</div>
-                  </div>
-                </div>
-                <div class="gw-bar">
-                  <div
-                    style="
-                      width: 94%;
-                      background: linear-gradient(90deg, #7c5cfc, #2f6fed);
-                    "
-                  ></div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 col-xl-3">
-              <div class="gcard gw-card">
-                <div class="gw-head">
-                  <div
-                    class="gw-logo"
-                    style="
-                      background: linear-gradient(135deg, #475569, #1e293b);
-                    "
-                  >
-                    B
-                  </div>
-                  <div>
-                    <div class="gw-name">درگاه بانکی مستقیم</div>
-                    <div class="gw-sub">کارت‌به‌کارت / حواله</div>
-                  </div>
-                </div>
-                <div class="gw-stats">
-                  <div class="gw-stat">
-                    <div class="v">۲۱۲</div>
-                    <div class="l">پرداخت مستقیم</div>
-                  </div>
-                  <div class="gw-stat">
-                    <div class="v">۳۰M</div>
-                    <div class="l">درآمد (تومان)</div>
-                  </div>
-                  <div class="gw-stat" style="grid-column: span 2">
-                    <div class="v">۶.۲M</div>
-                    <div class="l">تسویه در انتظار</div>
-                  </div>
-                </div>
-                <div class="gw-bar">
-                  <div
-                    style="
-                      width: 88%;
-                      background: linear-gradient(90deg, #475569, #1e293b);
-                    "
-                  ></div>
-                </div>
+          <div class="row g-4" id="gatewayCardsRow">
+            <!-- JS: renderGatewayCards() -->
+            <div class="col-12">
+              <div
+                class="gcard"
+                style="
+                  padding: 30px;
+                  text-align: center;
+                  color: var(--text-muted);
+                "
+              >
+                <div
+                  class="skel"
+                  style="width: 100%; height: 80px; border-radius: 12px"
+                ></div>
               </div>
             </div>
           </div>
@@ -1595,7 +1410,7 @@
               <div class="gcard h-100">
                 <div class="gcard-head">
                   <div>
-                    <h2>منابع درآمد</h2>
+                    <h2>منابع درآمد (به تفکیک درگاه)</h2>
                     <div class="sub">سهم هر دسته از کل فروش</div>
                   </div>
                 </div>
@@ -1650,11 +1465,17 @@
           </div>
 
           <!-- ============ SETTLEMENT MANAGEMENT ============ -->
+          <!-- ⚠️ این بخش هنوز به بک‌اند وصل نیست: نیاز به مدل Payout/Withdrawal داره که هنوز نساختیم -->
           <div class="section-title">
-            <h3>مدیریت تسویه‌حساب</h3>
+            <h3>
+              مدیریت تسویه‌حساب
+              <span class="badge-status st-pending" style="font-size: 10.5px"
+                >به‌زودی</span
+              >
+            </h3>
             <div class="line"></div>
           </div>
-          <div class="gcard">
+          <div class="gcard" style="opacity: 0.55; pointer-events: none">
             <div class="gcard-body">
               <div class="row g-4">
                 <div class="col-sm-6 col-xl-3">
@@ -1662,7 +1483,7 @@
                     <div class="ic" style="background: var(--grad-green)">
                       <i class="fa-solid fa-wallet"></i>
                     </div>
-                    <div class="v">۴۲,۸۰۰,۰۰۰</div>
+                    <div class="v">—</div>
                     <div class="l">موجودی قابل برداشت (تومان)</div>
                   </div>
                 </div>
@@ -1671,7 +1492,7 @@
                     <div class="ic" style="background: var(--grad-orange)">
                       <i class="fa-solid fa-hourglass-half"></i>
                     </div>
-                    <div class="v">۱۲,۸۰۰,۰۰۰</div>
+                    <div class="v">—</div>
                     <div class="l">در انتظار تسویه (تومان)</div>
                   </div>
                 </div>
@@ -1680,7 +1501,7 @@
                     <div class="ic" style="background: var(--grad-primary)">
                       <i class="fa-solid fa-circle-check"></i>
                     </div>
-                    <div class="v">۲۲۹,۰۰۰,۰۰۰</div>
+                    <div class="v">—</div>
                     <div class="l">مجموع تسویه‌شده (تومان)</div>
                   </div>
                 </div>
@@ -1689,13 +1510,13 @@
                     <div class="ic" style="background: var(--grad-slate)">
                       <i class="fa-regular fa-calendar-check"></i>
                     </div>
-                    <div class="v" style="font-size: 17px">۲ تیر ۱۴۰۵</div>
+                    <div class="v" style="font-size: 17px">—</div>
                     <div class="l">تاریخ تسویه بعدی</div>
                   </div>
                 </div>
               </div>
               <div class="text-center mt-2">
-                <button class="btn-current">
+                <button class="btn-current" disabled>
                   <i class="fa-solid fa-money-bill-transfer"></i> ثبت درخواست
                   برداشت
                 </button>
@@ -1715,19 +1536,25 @@
                   <i class="fa-solid fa-receipt"></i>
                 </div>
                 <div>
-                  <div class="v">۲۴۵,۰۰۰</div>
+                  <div class="v" id="kpiAvgOrder">—</div>
                   <div class="l">میانگین ارزش سفارش</div>
                 </div>
               </div>
             </div>
             <div class="col-sm-6 col-xl-2">
-              <div class="gcard kpi-tile">
+              <div
+                class="gcard kpi-tile"
+                style="opacity: 0.5"
+                title="نیاز به ردیابی بازدید/سشن دارد (هنوز مدل نشده)"
+              >
                 <div class="ic" style="background: var(--grad-green)">
                   <i class="fa-solid fa-percent"></i>
                 </div>
                 <div>
-                  <div class="v">۴.۸٪</div>
-                  <div class="l">نرخ تبدیل</div>
+                  <div class="v">—</div>
+                  <div class="l">
+                    نرخ تبدیل <span style="font-size: 10px">(به‌زودی)</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1737,7 +1564,7 @@
                   <i class="fa-solid fa-arrow-trend-up"></i>
                 </div>
                 <div>
-                  <div class="v">۱۱.۵٪</div>
+                  <div class="v" id="kpiMonthlyGrowth">—</div>
                   <div class="l">رشد ماهانه</div>
                 </div>
               </div>
@@ -1748,19 +1575,26 @@
                   <i class="fa-solid fa-coins"></i>
                 </div>
                 <div>
-                  <div class="v">۲۸.۲٪</div>
+                  <div class="v" id="kpiProfitMargin">—</div>
                   <div class="l">حاشیه سود</div>
                 </div>
               </div>
             </div>
             <div class="col-sm-6 col-xl-2">
-              <div class="gcard kpi-tile">
+              <div
+                class="gcard kpi-tile"
+                style="opacity: 0.5"
+                title="نیاز به تفکیک درآمد به‌ازای هر محصول دارد (هنوز مدل نشده)"
+              >
                 <div class="ic" style="background: var(--blue)">
                   <i class="fa-solid fa-motorcycle"></i>
                 </div>
                 <div>
-                  <div class="v">۳۴.۲M</div>
-                  <div class="l">درآمد فلش پرو</div>
+                  <div class="v">—</div>
+                  <div class="l">
+                    پرفروش‌ترین محصول
+                    <span style="font-size: 10px">(به‌زودی)</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1770,8 +1604,8 @@
                   <i class="fa-regular fa-calendar-star"></i>
                 </div>
                 <div>
-                  <div class="v">۲۵ خرداد</div>
-                  <div class="l">پردرآمدترین روز</div>
+                  <div class="v" id="kpiTopDay" style="font-size: 15px">—</div>
+                  <div class="l">پردرآمدترین روز (۳۰ روز اخیر)</div>
                 </div>
               </div>
             </div>
@@ -1785,36 +1619,50 @@
           <div class="gcard">
             <div class="gcard-head" style="padding-bottom: 14px">
               <div class="filter-bar">
-                <select>
-                  <option>بازه زمانی: ۳۰ روز گذشته</option>
-                  <option>۷ روز گذشته</option>
-                  <option>این ماه</option>
-                  <option>سفارشی...</option>
+                <select id="filterDays">
+                  <option value="30" selected>بازه زمانی: ۳۰ روز گذشته</option>
+                  <option value="7">۷ روز گذشته</option>
+                  <option value="365">یک سال گذشته</option>
+                  <option value="">همه</option>
                 </select>
-                <select>
-                  <option>همه درگاه‌ها</option>
-                  <option>زرین‌پال</option>
-                  <option>آی‌دی‌پی</option>
-                  <option>نکست‌پی</option>
-                  <option>بانکی</option>
+                <select id="filterGateway">
+                  <option value="">همه درگاه‌ها</option>
+                  <option value="zarinpal">زرین‌پال</option>
+                  <option value="idpay">آی‌دی‌پی</option>
+                  <option value="nextpay">نکست‌پی</option>
+                  <option value="bank">بانکی</option>
                 </select>
-                <select>
-                  <option>همه وضعیت‌ها</option>
-                  <option>موفق</option>
-                  <option>در انتظار</option>
-                  <option>ناموفق</option>
-                  <option>بازگشتی</option>
+                <select id="filterStatus">
+                  <option value="">همه وضعیت‌ها</option>
+                  <option value="success">موفق</option>
+                  <option value="pending">در انتظار</option>
+                  <option value="failed">ناموفق</option>
                 </select>
                 <input
                   type="text"
-                  placeholder="حداقل تا حداکثر مبلغ"
-                  style="width: 170px"
+                  id="filterMinAmount"
+                  placeholder="حداقل مبلغ"
+                  style="width: 120px"
                 />
-                <button class="btn-ghost">
+                <input
+                  type="text"
+                  id="filterMaxAmount"
+                  placeholder="حداکثر مبلغ"
+                  style="width: 120px"
+                />
+                <input
+                  type="text"
+                  id="filterSearch"
+                  placeholder="جستجوی شناسه تراکنش، سفارش..."
+                  style="width: 220px"
+                />
+                <button class="btn-ghost" id="applyFilterBtn">
                   <i class="fa-solid fa-filter"></i> اعمال فیلتر
                 </button>
               </div>
-              <span class="link-more">خروجی Excel</span>
+              <span class="link-more" title="این قابلیت هنوز پیاده‌سازی نشده"
+                >خروجی Excel (به‌زودی)</span
+              >
             </div>
             <div class="gcard-body" style="overflow-x: auto">
               <table class="table-modern">
@@ -1831,191 +1679,8 @@
                     <th>عملیات</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td class="num">#TRX-90231</td>
-                    <td>
-                      <div class="cust-cell">
-                        <img src="https://i.pravatar.cc/80?img=12" />
-                        <div>
-                          <div class="nm">نیلوفر جلیلی</div>
-                          <div class="id">CUS-1042</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>اسکوتر برقی نوا X1</td>
-                    <td>
-                      <span class="gw-pill"
-                        ><i
-                          class="fa-solid fa-circle"
-                          style="color: #f4742b"
-                        ></i>
-                        زرین‌پال</span
-                      >
-                    </td>
-                    <td class="num">۲۸,۵۰۰,۰۰۰</td>
-                    <td class="num">۱۴۰۵/۰۳/۳۰</td>
-                    <td class="num">۱۴۰۵/۰۴/۰۱</td>
-                    <td><span class="badge-status st-success">موفق</span></td>
-                    <td class="row-actions">
-                      <a href="#"><i class="fa-solid fa-eye"></i></a
-                      ><a href="#"><i class="fa-solid fa-download"></i></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="num">#TRX-90230</td>
-                    <td>
-                      <div class="cust-cell">
-                        <img src="https://i.pravatar.cc/80?img=23" />
-                        <div>
-                          <div class="nm">میلاد احمدی</div>
-                          <div class="id">CUS-1041</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>اسکوتر شهری اوربیت</td>
-                    <td>
-                      <span class="gw-pill"
-                        ><i
-                          class="fa-solid fa-circle"
-                          style="color: #1a8fe3"
-                        ></i>
-                        آی‌دی‌پی</span
-                      >
-                    </td>
-                    <td class="num">۱۹,۹۰۰,۰۰۰</td>
-                    <td class="num">۱۴۰۵/۰۳/۲۹</td>
-                    <td class="num">—</td>
-                    <td>
-                      <span class="badge-status st-pending">در انتظار</span>
-                    </td>
-                    <td class="row-actions">
-                      <a href="#"><i class="fa-solid fa-eye"></i></a
-                      ><a href="#"><i class="fa-solid fa-download"></i></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="num">#TRX-90229</td>
-                    <td>
-                      <div class="cust-cell">
-                        <img src="https://i.pravatar.cc/80?img=33" />
-                        <div>
-                          <div class="nm">علی مرادی</div>
-                          <div class="id">CUS-0998</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>اسکوتر فلش پرو</td>
-                    <td>
-                      <span class="gw-pill"
-                        ><i
-                          class="fa-solid fa-circle"
-                          style="color: #2f6fed"
-                        ></i>
-                        نکست‌پی</span
-                      >
-                    </td>
-                    <td class="num">۳۴,۲۰۰,۰۰۰</td>
-                    <td class="num">۱۴۰۵/۰۳/۲۸</td>
-                    <td class="num">۱۴۰۵/۰۳/۳۰</td>
-                    <td><span class="badge-status st-success">موفق</span></td>
-                    <td class="row-actions">
-                      <a href="#"><i class="fa-solid fa-eye"></i></a
-                      ><a href="#"><i class="fa-solid fa-download"></i></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="num">#TRX-90228</td>
-                    <td>
-                      <div class="cust-cell">
-                        <img src="https://i.pravatar.cc/80?img=45" />
-                        <div>
-                          <div class="nm">سعید نوری</div>
-                          <div class="id">CUS-0975</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>اسکوتر آفرود ترندر</td>
-                    <td>
-                      <span class="gw-pill"
-                        ><i
-                          class="fa-solid fa-circle"
-                          style="color: #475569"
-                        ></i>
-                        بانکی</span
-                      >
-                    </td>
-                    <td class="num">۴۱,۰۰۰,۰۰۰</td>
-                    <td class="num">۱۴۰۵/۰۳/۲۷</td>
-                    <td class="num">—</td>
-                    <td><span class="badge-status st-failed">ناموفق</span></td>
-                    <td class="row-actions">
-                      <a href="#"><i class="fa-solid fa-eye"></i></a
-                      ><a href="#"><i class="fa-solid fa-download"></i></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="num">#TRX-90227</td>
-                    <td>
-                      <div class="cust-cell">
-                        <img src="https://i.pravatar.cc/80?img=56" />
-                        <div>
-                          <div class="nm">پریسا کاظمی</div>
-                          <div class="id">CUS-0954</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>اسکوتر برقی نوا X1</td>
-                    <td>
-                      <span class="gw-pill"
-                        ><i
-                          class="fa-solid fa-circle"
-                          style="color: #f4742b"
-                        ></i>
-                        زرین‌پال</span
-                      >
-                    </td>
-                    <td class="num">۲۸,۵۰۰,۰۰۰</td>
-                    <td class="num">۱۴۰۵/۰۳/۲۶</td>
-                    <td class="num">۱۴۰۵/۰۳/۲۸</td>
-                    <td>
-                      <span class="badge-status st-refunded">بازگشتی</span>
-                    </td>
-                    <td class="row-actions">
-                      <a href="#"><i class="fa-solid fa-eye"></i></a
-                      ><a href="#"><i class="fa-solid fa-download"></i></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="num">#TRX-90226</td>
-                    <td>
-                      <div class="cust-cell">
-                        <img src="https://i.pravatar.cc/80?img=15" />
-                        <div>
-                          <div class="nm">رضا توکلی</div>
-                          <div class="id">CUS-0932</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>اسکوتر شهری اوربیت</td>
-                    <td>
-                      <span class="gw-pill"
-                        ><i
-                          class="fa-solid fa-circle"
-                          style="color: #1a8fe3"
-                        ></i>
-                        آی‌دی‌پی</span
-                      >
-                    </td>
-                    <td class="num">۱۹,۹۰۰,۰۰۰</td>
-                    <td class="num">۱۴۰۵/۰۳/۲۵</td>
-                    <td class="num">۱۴۰۵/۰۳/۲۷</td>
-                    <td><span class="badge-status st-success">موفق</span></td>
-                    <td class="row-actions">
-                      <a href="#"><i class="fa-solid fa-eye"></i></a
-                      ><a href="#"><i class="fa-solid fa-download"></i></a>
-                    </td>
-                  </tr>
+                <tbody id="transactionsTableBody">
+                  <!-- JS: renderTransactionsTable() fills this -->
                 </tbody>
               </table>
             </div>
@@ -2024,32 +1689,19 @@
             >
               <p
                 class="mb-0"
+                id="txPagerInfo"
                 style="font-size: 12.5px; color: var(--text-muted)"
               >
-                نمایش ۱ تا ۶ از ۱۸۴ تراکنش
+                در حال بارگذاری...
               </p>
-              <nav
-                class="d-flex justify-content-center mb-0"
-                aria-label="navigation"
-              >
-                <ul class="pagination pagination-sm mb-0">
-                  <li class="page-item">
-                    <a class="page-link" href="#"
-                      ><i class="fas fa-angle-right"></i
-                    ></a>
-                  </li>
-                  <li class="page-item active">
-                    <a class="page-link" href="#">1</a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item">
-                    <a class="page-link" href="#"
-                      ><i class="fas fa-angle-left"></i
-                    ></a>
-                  </li>
-                </ul>
-              </nav>
+              <div class="d-flex gap-2">
+                <button class="btn-ghost" id="txPrevBtn">
+                  <i class="fas fa-angle-right"></i> قبلی
+                </button>
+                <button class="btn-ghost" id="txNextBtn">
+                  بعدی <i class="fas fa-angle-left"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -2215,7 +1867,7 @@
           series: [
             {
               name: "درآمد (میلیون تومان)",
-              data: [58, 64, 60, 72, 80, 76, 88, 95, 90, 102, 110, 118],
+              data: [],
             },
           ],
           stroke: { width: 3, curve: "smooth" },
@@ -2226,20 +1878,7 @@
           colors: [palette.blue],
           dataLabels: { enabled: false },
           xaxis: {
-            categories: [
-              "فرو",
-              "ارد",
-              "خرد",
-              "تیر",
-              "مرد",
-              "شهر",
-              "مهر",
-              "آبا",
-              "آذر",
-              "دی",
-              "بهم",
-              "اسف",
-            ],
+            categories: [],
             axisBorder: { show: false },
             axisTicks: { show: false },
           },
@@ -2254,9 +1893,9 @@
         document.querySelector("#chartRevenueSources"),
         {
           chart: { type: "donut", height: 280, fontFamily: baseFont },
-          series: [62, 18, 12, 8],
-          labels: ["فروش اسکوتر", "لوازم جانبی", "قطعات یدکی", "هزینه خدمات"],
-          colors: [palette.blue, palette.purple, palette.cyan, palette.orange],
+          series: [],
+          labels: [],
+          colors: [palette.blue, palette.purple, palette.cyan, palette.slate],
           dataLabels: { enabled: true, style: { fontSize: "11px" } },
           legend: { show: false },
           plotOptions: {
@@ -2267,8 +1906,8 @@
                   show: true,
                   total: {
                     show: true,
-                    label: "کل درآمد",
-                    formatter: () => "۲۸۴M",
+                    label: "درآمد این ماه",
+                    formatter: () => window.__totalGatewayRevenueLabel || "۰",
                   },
                 },
               },
@@ -2341,6 +1980,295 @@
         },
       );
       charts.gatewayCompare.render();
+
+      /* ============================================================
+   FINANCE DATA — fetch از بک‌اند واقعی
+   ============================================================ */
+      const STATS_URL = "/shop/api/admin/finance/stats/";
+      const TX_URL = "/shop/api/admin/transactions/";
+
+      const GATEWAY_META = {
+        zarinpal: {
+          code: "ZP",
+          grad: "linear-gradient(135deg, #ffb23f, #f4742b)",
+        },
+        idpay: {
+          code: "ID",
+          grad: "linear-gradient(135deg, #2ec4b6, #1a8fe3)",
+        },
+        nextpay: {
+          code: "NP",
+          grad: "linear-gradient(135deg, #7c5cfc, #2f6fed)",
+        },
+        bank: { code: "B", grad: "linear-gradient(135deg, #475569, #1e293b)" },
+      };
+
+      const STATUS_LABEL_FA = {
+        success: { label: "موفق", cls: "st-success" },
+        pending: { label: "در انتظار", cls: "st-pending" },
+        failed: { label: "ناموفق", cls: "st-failed" },
+      };
+
+      let txState = { page: 1, next: null, previous: null, count: 0 };
+
+      function setStatValue(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.setAttribute("data-count", Math.round(value));
+        // اگر المان از قبل روی صفحه دیده شده (observer رد شده)، مستقیم انیمیت کن
+        animateCounter(el);
+      }
+
+      function renderGatewayCards(breakdown) {
+        const row = document.getElementById("gatewayCardsRow");
+        if (!breakdown || !breakdown.length) {
+          row.innerHTML = `<div class="col-12 text-center text-muted py-4">هنوز تراکنشی ثبت نشده</div>`;
+          return;
+        }
+        row.innerHTML = breakdown
+          .map((gw) => {
+            const meta = GATEWAY_META[gw.code] || {
+              code: "?",
+              grad: "var(--grad-slate)",
+            };
+            return `
+            <div class="col-md-6 col-xl-3">
+              <div class="gcard gw-card">
+                <div class="gw-head">
+                  <div class="gw-logo" style="background:${meta.grad}">${meta.code}</div>
+                  <div>
+                    <div class="gw-name">${gw.label}</div>
+                    <div class="gw-sub">${toPersianDigits(gw.total_count)} تراکنش کل</div>
+                  </div>
+                </div>
+                <div class="gw-stats">
+                  <div class="gw-stat">
+                    <div class="v">${toPersianDigits(gw.total_count)}</div>
+                    <div class="l">کل تراکنش</div>
+                  </div>
+                  <div class="gw-stat">
+                    <div class="v">${toPersianDigits(gw.success_count)}</div>
+                    <div class="l">پرداخت موفق</div>
+                  </div>
+                  <div class="gw-stat">
+                    <div class="v">${formatToman(gw.revenue)}</div>
+                    <div class="l">درآمد</div>
+                  </div>
+                  <div class="gw-stat">
+                    <div class="v">${toPersianDigits(gw.success_rate)}٪</div>
+                    <div class="l">نرخ موفقیت</div>
+                  </div>
+                </div>
+                <div class="gw-bar">
+                  <div style="width:${gw.success_rate}%; background:${meta.grad}"></div>
+                </div>
+              </div>
+            </div>`;
+          })
+          .join("");
+      }
+
+      function findTopDay(dailySales) {
+        if (!dailySales || !dailySales.length) return "—";
+        const top = dailySales.reduce((a, b) => (b.total > a.total ? b : a));
+        return top.total > 0 ? top.date : "—";
+      }
+
+      async function loadFinanceStats() {
+        try {
+          const res = await fetch(STATS_URL, {
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+          });
+          if (!res.ok) throw new Error("stats fetch failed");
+          const data = await res.json();
+          const s = data.stats;
+
+          setStatValue("statTotalRevenue", s.total_revenue);
+          setStatValue("statTodayRevenue", s.today_revenue);
+          setStatValue("statMonthRevenue", s.month_revenue);
+          setStatValue("statPendingSettlement", s.pending_settlement);
+          setStatValue("statSuccessCount", s.successful_count);
+          setStatValue("statFailedCount", s.failed_count);
+          setStatValue("statRefundCount", s.refund_requests_count);
+          setStatValue("statNetProfit", s.net_profit);
+
+          document.getElementById("kpiAvgOrder").textContent = formatToman(
+            s.avg_order_value,
+          );
+          document.getElementById("kpiProfitMargin").textContent =
+            toPersianDigits(s.profit_margin) + "٪";
+          document.getElementById("kpiTopDay").textContent = findTopDay(
+            data.daily_sales,
+          );
+
+          // رشد ماهانه: مقایسه دو ماه آخر آرایه monthly_revenue
+          const mr = data.monthly_revenue;
+          if (mr && mr.length >= 2) {
+            const prev = mr[mr.length - 2].total;
+            const curr = mr[mr.length - 1].total;
+            const growth =
+              prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : 0;
+            const growthEl = document.getElementById("kpiMonthlyGrowth");
+            growthEl.textContent =
+              (growth >= 0 ? "+" : "") + toPersianDigits(growth) + "٪";
+            growthEl.style.color = growth >= 0 ? "var(--green)" : "var(--red)";
+          }
+
+          // نمودار روند درآمد ماهانه
+          charts.monthlyRevenue.updateOptions({
+            series: [
+              { name: "درآمد (میلیون تومان)", data: mr.map((m) => m.total) },
+            ],
+            xaxis: { categories: mr.map((m) => m.month) },
+          });
+
+          // نمودار منابع درآمد (بر اساس درگاه)
+          const sources = data.revenue_sources || [];
+          const totalSourceRevenue = sources.reduce(
+            (sum, x) => sum + x.value,
+            0,
+          );
+          window.__totalGatewayRevenueLabel = formatToman(totalSourceRevenue);
+          charts.revenueSources.updateOptions({
+            series: sources.map((x) => x.value),
+            labels: sources.map((x) => x.label),
+          });
+
+          // نمودار فروش روزانه
+          charts.dailySales.updateOptions({
+            series: [
+              {
+                name: "فروش روزانه (میلیون تومان)",
+                data: data.daily_sales.map((d) => d.total),
+              },
+            ],
+            xaxis: {
+              categories: data.daily_sales.map((d) => toPersianDigits(d.date)),
+            },
+          });
+
+          // نمودار مقایسه درگاه‌ها
+          const gc = data.gateway_compare;
+          const gatewayLabels = {
+            zarinpal: "زرین‌پال",
+            idpay: "آی‌دی‌پی",
+            nextpay: "نکست‌پی",
+            bank: "بانکی",
+          };
+          charts.gatewayCompare.updateOptions({
+            series: Object.entries(gc.series).map(([code, values]) => ({
+              name: gatewayLabels[code] || code,
+              data: values,
+            })),
+            xaxis: { categories: gc.months },
+          });
+
+          renderGatewayCards(data.gateway_breakdown);
+        } catch (error) {
+          console.error("❌ Error loading finance stats:", error);
+        }
+      }
+
+      function renderTransactionsRow(tx) {
+        const st = STATUS_LABEL_FA[tx.status] || STATUS_LABEL_FA.pending;
+        const products = (tx.product_names || []).join("، ") || "—";
+        return `
+          <tr>
+            <td class="num">#${tx.transaction_id}</td>
+            <td>
+              <div class="cust-cell">
+                <img src="${tx.customer_avatar || "https://i.pravatar.cc/80?img=12"}" />
+                <div>
+                  <div class="nm">${tx.customer_name || "—"}</div>
+                  <div class="id">${tx.order_number || ""}</div>
+                </div>
+              </div>
+            </td>
+            <td>${products}</td>
+            <td><span class="gw-pill">${tx.gateway_label}</span></td>
+            <td class="num">${toPersianDigits(Math.round(tx.amount).toLocaleString("en-US"))}</td>
+            <td class="num">${tx.created_at ? new Date(tx.created_at).toLocaleDateString("fa-IR") : "—"}</td>
+            <td class="num">${tx.settled_at ? new Date(tx.settled_at).toLocaleDateString("fa-IR") : "—"}</td>
+            <td><span class="badge-status ${st.cls}">${st.label}</span></td>
+            <td class="row-actions">
+              <a href="#" title="جزئیات"><i class="fa-solid fa-eye"></i></a>
+            </td>
+          </tr>`;
+      }
+
+      function buildTxQuery(page) {
+        const params = new URLSearchParams();
+        const days = document.getElementById("filterDays").value;
+        const gateway = document.getElementById("filterGateway").value;
+        const status = document.getElementById("filterStatus").value;
+        const minAmount = document
+          .getElementById("filterMinAmount")
+          .value.trim();
+        const maxAmount = document
+          .getElementById("filterMaxAmount")
+          .value.trim();
+        const search = document.getElementById("filterSearch").value.trim();
+
+        if (days) params.set("days", days);
+        if (gateway) params.set("gateway", gateway);
+        if (status) params.set("status", status);
+        if (minAmount) params.set("min_amount", minAmount);
+        if (maxAmount) params.set("max_amount", maxAmount);
+        if (search) params.set("search", search);
+        params.set("page", page);
+        return params.toString();
+      }
+
+      async function loadTransactions(page = 1) {
+        const tbody = document.getElementById("transactionsTableBody");
+        const emptyState = document.getElementById("txEmptyState");
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4"><div class="skel" style="height:20px;border-radius:6px"></div></td></tr>`;
+        if (emptyState) emptyState.classList.add("d-none");
+
+        try {
+          const res = await fetch(`${TX_URL}?${buildTxQuery(page)}`, {
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+          });
+          if (!res.ok) throw new Error("transactions fetch failed");
+          const data = await res.json();
+
+          const results = Array.isArray(data) ? data : data.results || [];
+          txState.next = data.next || null;
+          txState.previous = data.previous || null;
+          txState.count = data.count ?? results.length;
+          txState.page = page;
+
+          if (!results.length) {
+            tbody.innerHTML = "";
+            if (emptyState) emptyState.classList.remove("d-none");
+          } else {
+            tbody.innerHTML = results.map(renderTransactionsRow).join("");
+          }
+
+          const info = document.getElementById("txPagerInfo");
+          if (info)
+            info.textContent = `نمایش ${toPersianDigits(results.length)} از ${toPersianDigits(txState.count)} تراکنش`;
+
+          document.getElementById("txPrevBtn").disabled = !txState.previous;
+          document.getElementById("txNextBtn").disabled = !txState.next;
+        } catch (error) {
+          console.error("❌ Error loading transactions:", error);
+          tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger py-4">خطا در بارگذاری تراکنش‌ها</td></tr>`;
+        }
+      }
+
+      document
+        .getElementById("applyFilterBtn")
+        .addEventListener("click", () => loadTransactions(1));
+      document.getElementById("txPrevBtn").addEventListener("click", () => {
+        if (txState.previous) loadTransactions(txState.page - 1);
+      });
+      document.getElementById("txNextBtn").addEventListener("click", () => {
+        if (txState.next) loadTransactions(txState.page + 1);
+      });
+
+      loadFinanceStats();
+      loadTransactions(1);
     </script>
   </body>
 </html>

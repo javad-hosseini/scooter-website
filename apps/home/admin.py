@@ -205,9 +205,8 @@ class IndexPageSettingsAdmin(admin.ModelAdmin):
             )
         }),
         ('فوتر', {
-            'fields': ('footer_tagline', 'footer_copyright')
-        }),
-    )
+            'fields': ()
+        }))
 
     def has_add_permission(self, request):
         # فقط یک رکورد مجاز است
@@ -243,8 +242,8 @@ class ProductCardAdmin(admin.ModelAdmin):
 
 @admin.register(Testimonial)
 class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ['name', 'avatar_preview', 'rating', 'is_featured', 'order', 'is_active']
-    list_filter = ['rating', 'is_featured', 'is_active']
+    list_display = ['name', 'avatar_preview', 'rating', 'order', 'is_active']
+    list_filter = ['rating', 'is_active']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'quote']
     ordering = ['order']
@@ -260,13 +259,13 @@ class TestimonialAdmin(admin.ModelAdmin):
     avatar_preview.short_description = 'عکس'
 
 
-@admin.register(Promise)
-class PromiseAdmin(admin.ModelAdmin):
-    list_display = ['title', 'label', 'badge_value', 'color', 'order', 'is_active']
-    list_filter = ['color', 'is_active']
-    list_editable = ['order', 'is_active']
-    ordering = ['order']
-
+# @admin.register(Promise)
+# class PromiseAdmin(admin.ModelAdmin):
+#     list_display = ['title', 'label', 'badge_value', 'color', 'order', 'is_active']
+#     list_filter = ['color', 'is_active']
+#     list_editable = ['order', 'is_active']
+#     ordering = ['order']
+#
 
 # apps/home/admin.py
 

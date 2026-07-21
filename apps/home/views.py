@@ -282,3 +282,9 @@ class AdminCommentModerateAPIView(APIView):
 @method_decorator(staff_member_required(login_url='/access-denied/'), name='dispatch')
 class CommentsModerationPageView(TemplateView):
     template_name = 'accounts/comments_moderation.html'
+
+
+@method_decorator(login_required(login_url='/access-denied/'), name='dispatch')
+@method_decorator(staff_member_required(login_url='/access-denied/'), name='dispatch')
+class FinancePageView(TemplateView):
+    template_name = 'accounts/admin-earning.html'

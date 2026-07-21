@@ -6,7 +6,7 @@ from apps.accounts.models import Province, City
 from .models import (
     Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist, CartItem
+    ProductReview, Wishlist, CartItem, Transaction
 )
 from .models import Product, Order, OrderItem, Address
 from ..accounts.serializers import UserProfileSerializer, AddressSerializer
@@ -474,3 +474,31 @@ class AdminProductReviewSerializer(serializers.ModelSerializer):
         if obj.user and obj.user.profile_image:
             return obj.user.profile_image.url
         return None
+
+class AdminTransactionSerializer(serializers.ModelSerializer):
+    """سریالایزر تراکنش برای جدول پنل ادمین"""
+    customer_name = serializers.CharField(source='order.user.fullname', read_only=True)
+    customer_username = serializers.CharField(source='order.user.username', read_only=True)
+    customer_avatar = serializers.SerializerMethodField()
+    order_number = serializers.CharField(source='order.order_number', read_only=True)
+    product_names = serializers.SerializerMethodField()
+    gateway_label = serializers.CharField(source='get_gateway_display', read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = [
+            'id', 'transaction_id', 'order_number', 'customer_name', 'customer_username',
+            'customer_avatar', 'product_names', 'gateway', 'gateway_label', 'reference_id',
+            'amount', 'status', 'status_label', 'failure_reason',
+            'created_at', 'paid_at', 'settled_at'
+        ]
+
+    def get_customer_avatar(self, obj):
+        user = obj.order.user
+        if user and user.profile_image:
+            return user.profile_image.url
+        return None
+
+    def get_product_names(self, obj):
+        return [item.product.name for item in obj.order.items.select_related('product').all()]

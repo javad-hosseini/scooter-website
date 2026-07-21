@@ -319,6 +319,13 @@ class Product(models.Model):
         decimal_places=0,
         verbose_name="قیمت (تومان)"
     )
+    cost_price = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="قیمت تمام‌شده",
+        help_text="هزینه‌ی خرید/تولید محصول — برای محاسبه‌ی سود خالص استفاده می‌شود و به مشتری نمایش داده نمی‌شود"
+    )
     discount_price = models.DecimalField(
         max_digits=15,
         decimal_places=0,
@@ -394,6 +401,11 @@ class Product(models.Model):
         return self.discount_price if self.discount_price else self.price
 
     @property
+    def profit_margin(self):
+        """سود هر واحد از فروش این محصول (با احتساب تخفیف)"""
+        return self.final_price - self.cost_price
+
+    @property
     def average_rating(self):
         """میانگین امتیازات تایید شده"""
         approved = self.reviews.filter(status='approved')
@@ -460,6 +472,11 @@ class Order(models.Model):
         ('refunded', 'بازگشت وجه'),
     ]
 
+    SHIPPING_METHOD_CHOICES = [
+        ('standard', 'ارسال معمولی'),
+        ('express', 'ارسال فوری'),
+    ]
+
     # اطلاعات اصلی
     user = models.ForeignKey(
         CustomUser,
@@ -519,6 +536,18 @@ class Order(models.Model):
         decimal_places=0,
         default=0,
         verbose_name="هزینه ارسال"
+    )
+    shipping_method = models.CharField(
+        max_length=20,
+        choices=SHIPPING_METHOD_CHOICES,
+        default='standard',
+        verbose_name="روش ارسال"
+    )
+    tax_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="مالیات"
     )
     total = models.DecimalField(
         max_digits=15,
@@ -741,3 +770,135 @@ class CartItem(models.Model):
         if not self.pk and not self.price_snapshot:
             self.price_snapshot = self.product.final_price  # قیمت با تخفیف
         super().save(*args, **kwargs)
+
+
+class Transaction(models.Model):
+    """تراکنش‌های پرداخت مرتبط با یک سفارش (هر تلاش پرداخت یک رکورد)"""
+
+    GATEWAY_CHOICES = [
+        ('zarinpal', 'زرین‌پال'),
+        ('idpay', 'آی‌دی‌پی'),
+        ('nextpay', 'نکست‌پی'),
+        ('bank', 'بانکی'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار'),
+        ('success', 'موفق'),
+        ('failed', 'ناموفق'),
+    ]
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='transactions',
+        verbose_name="سفارش"
+    )
+    transaction_id = models.CharField(
+        max_length=30,
+        unique=True,
+        editable=False,
+        verbose_name="شناسه تراکنش"
+    )
+    gateway = models.CharField(
+        max_length=20,
+        choices=GATEWAY_CHOICES,
+        verbose_name="درگاه پرداخت"
+    )
+    reference_id = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="کد رهگیری درگاه",
+        help_text="Authority/RefID که خودِ درگاه برمی‌گرداند"
+    )
+    amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="مبلغ"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="وضعیت"
+    )
+    failure_reason = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="دلیل ناموفق بودن"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد")
+    paid_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان پرداخت")
+    settled_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان تسویه")
+
+    class Meta:
+        verbose_name = "تراکنش"
+        verbose_name_plural = "تراکنش‌ها"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['order', 'status']),
+            models.Index(fields=['gateway', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.transaction_id} - {self.get_gateway_display()} ({self.get_status_display()})"
+
+    def save(self, *args, **kwargs):
+        if not self.transaction_id:
+            self.transaction_id = f"TRX-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
+
+
+class RefundRequest(models.Model):
+    """درخواست بازگشت وجه برای یک سفارش"""
+
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار بررسی'),
+        ('approved', 'تایید شده'),
+        ('rejected', 'رد شده'),
+        ('completed', 'بازگشت انجام شد'),
+    ]
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='refund_requests',
+        verbose_name="سفارش"
+    )
+    transaction = models.ForeignKey(
+        Transaction,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='refund_requests',
+        verbose_name="تراکنش مرتبط"
+    )
+    amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="مبلغ درخواستی"
+    )
+    reason = models.TextField(verbose_name="دلیل درخواست کاربر")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="وضعیت"
+    )
+    admin_note = models.TextField(
+        blank=True,
+        verbose_name="یادداشت ادمین",
+        help_text="در صورت رد شدن، دلیل رد شدن اینجا ثبت می‌شود"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان درخواست")
+    resolved_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان تصمیم‌گیری")
+
+    class Meta:
+        verbose_name = "درخواست بازگشت وجه"
+        verbose_name_plural = "درخواست‌های بازگشت وجه"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"بازگشت وجه سفارش {self.order.order_number} - {self.get_status_display()}"

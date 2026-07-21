@@ -10,6 +10,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone as django_timezone
 from django.utils.text import slugify
+
 from apps.shop.models import Category
 
 ALLOWED_ATTACHMENT_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'mp4', 'mp3', 'pdf']
@@ -296,6 +297,7 @@ class Comment(models.Model):
     def is_reply(self):
         return self.parent is not None
 
+
 # apps/home/models.py (افزودن به مدل‌های موجود)
 
 class IndexPageSettings(models.Model):
@@ -482,18 +484,6 @@ class IndexPageSettings(models.Model):
         max_length=100,
         default='کاوش مجموعه‌ها',
         verbose_name="متن دکمه ثانویه بیانیه پایانی"
-    )
-
-    # ===== Footer =====
-    footer_tagline = models.CharField(
-        max_length=200,
-        default='اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.',
-        verbose_name="شعار فوتر"
-    )
-    footer_copyright = models.CharField(
-        max_length=200,
-        default='© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است.',
-        verbose_name="متن کپی‌رایت"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

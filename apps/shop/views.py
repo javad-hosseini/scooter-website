@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import jdatetime
 from django.db import transaction
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Count, Avg
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -1084,7 +1084,7 @@ class OrderCancelAPIView(APIView):
     def post(self, request, order_number):
         order = get_object_or_404(Order, order_number=order_number, user=request.user)
 
-        # فقط سفارشات در انتظار پرداخت قابل لغو هستند
+        # فقط سفارش های در انتظار پرداخت قابل لغو هستند
         if order.status not in ['pending', 'processing']:
             return Response(
                 {'error': 'این سفارش قابل لغو نیست'},
@@ -1163,3 +1163,207 @@ class AdminProductReviewModerateAPIView(APIView):
             'message': 'وضعیت نظر با موفقیت به‌روزرسانی شد',
             'data': AdminProductReviewSerializer(review).data
         })
+
+from .models import Transaction, RefundRequest
+from .serializers import AdminTransactionSerializer
+from django.db.models.functions import TruncDate
+
+
+class AdminTransactionListAPIView(generics.ListAPIView):
+    """لیست تراکنش‌ها برای پنل مالی ادمین، با فیلتر بازه/درگاه/وضعیت/مبلغ"""
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminTransactionSerializer
+    pagination_class = ProductPagination
+
+    def get_queryset(self):
+        qs = Transaction.objects.select_related('order', 'order__user').order_by('-created_at')
+
+        days = self.request.query_params.get('days')
+        if days:
+            try:
+                since = timezone.now() - timedelta(days=int(days))
+                qs = qs.filter(created_at__gte=since)
+            except ValueError:
+                pass
+
+        gateway = self.request.query_params.get('gateway', '').strip()
+        if gateway in dict(Transaction.GATEWAY_CHOICES):
+            qs = qs.filter(gateway=gateway)
+
+        status_param = self.request.query_params.get('status', '').strip()
+        if status_param in dict(Transaction.STATUS_CHOICES):
+            qs = qs.filter(status=status_param)
+
+        min_amount = self.request.query_params.get('min_amount')
+        max_amount = self.request.query_params.get('max_amount')
+        if min_amount:
+            qs = qs.filter(amount__gte=min_amount)
+        if max_amount:
+            qs = qs.filter(amount__lte=max_amount)
+
+        search = self.request.query_params.get('search', '').strip()
+        if search:
+            qs = qs.filter(
+                Q(transaction_id__icontains=search) |
+                Q(order__order_number__icontains=search) |
+                Q(order__user__fullname__icontains=search)
+            )
+
+        return qs
+
+
+class AdminFinanceStatsAPIView(APIView):
+    """آمار و نمودارهای صفحه مدیریت مالی"""
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        today = timezone.now().date()
+        first_day_of_month = today.replace(day=1)
+
+        successful_tx = Transaction.objects.filter(status='success')
+
+        # ===== ۱. کارت‌های آماری اصلی =====
+        total_revenue = successful_tx.aggregate(total=Sum('amount'))['total'] or 0
+        today_revenue = successful_tx.filter(created_at__date=today).aggregate(
+            total=Sum('amount'))['total'] or 0
+        month_revenue = successful_tx.filter(created_at__gte=first_day_of_month).aggregate(
+            total=Sum('amount'))['total'] or 0
+        pending_settlement = successful_tx.filter(settled_at__isnull=True).aggregate(
+            total=Sum('amount'))['total'] or 0
+
+        successful_count = successful_tx.count()
+        failed_count = Transaction.objects.filter(status='failed').count()
+        refund_count = RefundRequest.objects.filter(status='pending').count()
+
+        # ===== ۲. سود خالص (بر اساس OrderItem های سفارش‌های پرداخت‌شده) =====
+        paid_items = OrderItem.objects.filter(
+            order__payment_status='paid',
+            order__created_at__gte=first_day_of_month
+        ).select_related('product')
+
+        month_cost = sum(
+            (item.product.cost_price or 0) * item.quantity for item in paid_items
+        )
+        net_profit = month_revenue - month_cost
+        profit_margin = round((net_profit / month_revenue * 100), 1) if month_revenue else 0
+
+        # ===== ۳. روند درآمد ماهانه (۱۲ ماه اخیر) =====
+        start_date = today - timedelta(days=365)
+        monthly_data = successful_tx.filter(
+            created_at__date__gte=start_date
+        ).annotate(month=TruncMonth('created_at')).values('month').annotate(
+            total=Sum('amount')
+        ).order_by('month')
+
+        month_names_fa = {
+            1: 'فروردین', 2: 'اردیبهشت', 3: 'خرداد', 4: 'تیر',
+            5: 'مرداد', 6: 'شهریور', 7: 'مهر', 8: 'آبان',
+            9: 'آذر', 10: 'دی', 11: 'بهمن', 12: 'اسفند'
+        }
+        months = []
+        for i in range(11, -1, -1):
+            month_date = today - timedelta(days=30 * i)
+            months.append({'month': month_names_fa.get(month_date.month, ''), 'total': 0})
+        for d in monthly_data:
+            if d['month']:
+                name = month_names_fa.get(d['month'].month, '')
+                for m in months:
+                    if m['month'] == name:
+                        m['total'] = float(d['total']) / 1_000_000
+                        break
+
+        # ===== ۴. منابع درآمد به تفکیک درگاه =====
+        gateway_data = successful_tx.filter(
+            created_at__gte=first_day_of_month
+        ).values('gateway').annotate(total=Sum('amount')).order_by('-total')
+        gateway_labels = dict(Transaction.GATEWAY_CHOICES)
+        revenue_sources = [
+            {'label': gateway_labels.get(g['gateway'], g['gateway']), 'value': float(g['total'])}
+            for g in gateway_data
+        ]
+
+        # ===== ۵. فروش روزانه (۳۰ روز اخیر) =====
+        last_30_start = today - timedelta(days=29)
+        daily_data = successful_tx.filter(
+            created_at__date__gte=last_30_start
+        ).annotate(day=TruncDate('created_at')).values('day').annotate(
+            total=Sum('amount')
+        ).order_by('day')
+        daily_map = {d['day']: float(d['total']) for d in daily_data}
+        daily_sales = [
+            {
+                'date': (last_30_start + timedelta(days=i)).strftime('%m/%d'),
+                'total': daily_map.get(last_30_start + timedelta(days=i), 0) / 1_000_000
+            }
+            for i in range(30)
+        ]
+
+        # ===== ۶. مقایسه درگاه‌ها ماه به ماه (۶ ماه اخیر) =====
+        six_months_start = today - timedelta(days=180)
+        gw_monthly = successful_tx.filter(
+            created_at__date__gte=six_months_start
+        ).annotate(month=TruncMonth('created_at')).values('month', 'gateway').annotate(
+            total=Sum('amount')
+        ).order_by('month')
+
+        gw_compare = {code: [] for code, _ in Transaction.GATEWAY_CHOICES}
+        month_keys = []
+        for i in range(5, -1, -1):
+            m = today - timedelta(days=30 * i)
+            month_keys.append((m.year, m.month))
+
+        gw_lookup = {}
+        for row in gw_monthly:
+            key = (row['month'].year, row['month'].month, row['gateway'])
+            gw_lookup[key] = float(row['total']) / 1_000_000
+
+        for code, _ in Transaction.GATEWAY_CHOICES:
+            gw_compare[code] = [
+                gw_lookup.get((y, m, code), 0) for (y, m) in month_keys
+            ]
+
+            # ===== ۷. تفکیک به ازای هر درگاه (کل تاریخچه) =====
+            gateway_totals = Transaction.objects.values('gateway').annotate(
+                total_count=Count('id'),
+                success_count=Count('id', filter=Q(status='success')),
+                revenue=Sum('amount', filter=Q(status='success')),
+            )
+            gateway_breakdown = []
+            for row in gateway_totals:
+                total = row['total_count'] or 0
+                success = row['success_count'] or 0
+                gateway_breakdown.append({
+                    'code': row['gateway'],
+                    'label': gateway_labels.get(row['gateway'], row['gateway']),
+                    'total_count': total,
+                    'success_count': success,
+                    'revenue': float(row['revenue'] or 0),
+                    'success_rate': round((success / total * 100), 1) if total else 0,
+                })
+
+            # ===== ۸. میانگین ارزش سفارش =====
+            avg_order_value = Order.objects.filter(payment_status='paid').aggregate(
+                avg=Avg('total'))['avg'] or 0
+
+        return Response({
+            'stats': {
+                'total_revenue': float(total_revenue),
+                'today_revenue': float(today_revenue),
+                'month_revenue': float(month_revenue),
+                'pending_settlement': float(pending_settlement),
+                'successful_count': successful_count,
+                'failed_count': failed_count,
+                'refund_requests_count': refund_count,
+                'net_profit': float(net_profit),
+                'profit_margin': profit_margin,
+            },
+            'monthly_revenue': months,
+            'revenue_sources': revenue_sources,
+            'daily_sales': daily_sales,
+            'gateway_compare': {
+                'months': [month_names_fa.get(m, '') for (_, m) in month_keys],
+                'series': gw_compare,
+            },
+            'gateway_breakdown': gateway_breakdown,
+        })
+
