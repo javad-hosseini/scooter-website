@@ -86,7 +86,7 @@ class CustomUserAdmin(UserAdmin):
 
     def comments_count(self, obj):
         """تعداد نظرات ثبت شده"""
-        count = obj.article_comments.filter(is_approved=True).count()
+        count = obj.article_comments.filter(status='approved').count()  # یا status=True
         return format_html(
             '<span style="color:#8b7bff;font-weight:bold;">{}</span>',
             count

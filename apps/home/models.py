@@ -376,7 +376,7 @@ class IndexPageSettings(models.Model):
 
     # ===== Hero Stats (4 عدد) =====
     hero_stat_1_value = models.CharField(max_length=50, default='85', verbose_name="مقدار آمار ۱")
-    hero_stat_1_unit = models.CharField(max_length=20, default='km/h', blank=True, verbose_name="واحد آمار ۱")
+    hero_stat_1_unit = models.CharField(max_length=20, default='km/h',null=True , blank=True, verbose_name="واحد آمار ۱")
     hero_stat_1_label = models.CharField(max_length=50, default='حداکثر سرعت', verbose_name="برچسب آمار ۱")
 
     hero_stat_2_value = models.CharField(max_length=50, default='160', verbose_name="مقدار آمار ۲")
@@ -526,6 +526,7 @@ class CategoryFeature(models.Model):
         help_text="آیکون فونت‌آ‌وسم یا ایموجی"
     )
     value = models.CharField(max_length=100, verbose_name="مقدار")
+    unit = models.CharField(max_length=50, null=True, blank=True)
     label = models.CharField(max_length=100, verbose_name="برچسب")
     color = models.CharField(
         max_length=20,

@@ -4840,6 +4840,286 @@ DESKTOP (1024px+)
           display: none !important;
         }
       }
+      /* ══════════════════════════════════════════
+         FOOTER SLIDE — tokens scoped to #footer-slide so they
+         never touch the site-wide :root variables (--accent, --text, etc.)
+      ══════════════════════════════════════════ */
+      #footer-slide {
+        --f-ink: #06070a;
+        --f-surface: #0b0d12;
+        --f-lift: #101318;
+        --f-lift2: #161b24;
+        --f-rim: rgba(255, 255, 255, 0.055);
+        --f-rim2: rgba(255, 255, 255, 0.1);
+        --f-accent: #5bffb5;
+        --f-text: #dfe2ec;
+        --f-muted: #5e6578;
+        --f-muted2: #3a3f50;
+        --f-max-w: 1760px;
+        --f-side-pad: 4vw;
+        display: block;
+        overflow-y: auto;
+        overflow-x: hidden;
+        align-items: stretch;
+        justify-content: flex-start;
+        background: var(--f-ink);
+        color: var(--f-text);
+      }
+      #footer-slide .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      #footer-slide .fluid {
+        width: 100%;
+        max-width: var(--f-max-w);
+        margin-inline: auto;
+        padding-inline: var(--f-side-pad);
+      }
+      #footer-slide .footer {
+        border-top: 1px solid var(--f-rim);
+        background: var(--f-surface);
+        width: 100%;
+        padding-top: 72px;
+      }
+      #footer-slide .footer-inner {
+        display: grid;
+        grid-template-columns: 1.4fr repeat(4, 1fr);
+        gap: 48px;
+        padding-bottom: 64px;
+      }
+      #footer-slide .footer-newsletter {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+        border: 1px solid var(--f-rim);
+        border-radius: 16px;
+        padding: 28px 32px;
+        margin-bottom: 8px;
+        background: var(--f-lift);
+      }
+      #footer-slide .footer-nl-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+      #footer-slide .footer-nl-sub {
+        font-size: 13px;
+        color: var(--f-muted);
+        font-weight: 300;
+      }
+      #footer-slide .footer-nl-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      #footer-slide .nl-input {
+        height: 40px;
+        padding: 0 16px;
+        min-width: 220px;
+        background: var(--f-lift2);
+        border: 1px solid var(--f-rim2);
+        border-radius: 10px;
+        color: var(--f-text);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        direction: ltr;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+      #footer-slide .nl-input::placeholder {
+        color: var(--f-muted2);
+      }
+      #footer-slide .nl-input:focus {
+        border-color: rgba(91, 255, 181, 0.35);
+        box-shadow: 0 0 0 3px rgba(91, 255, 181, 0.06);
+      }
+      #footer-slide .nl-btn {
+        height: 40px;
+        padding: 0 18px;
+        background: var(--f-accent);
+        border: none;
+        border-radius: 10px;
+        color: #021810;
+        font-family: var(--font-body);
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+      #footer-slide .nl-btn:hover {
+        background: #72ffbf;
+        transform: translateY(-1px);
+      }
+      #footer-slide .nl-btn:focus-visible {
+        outline: 2px solid var(--f-accent);
+        outline-offset: 2px;
+      }
+      #footer-slide .footer-logo {
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        display: block;
+        margin-bottom: 14px;
+        color: var(--f-text);
+      }
+      #footer-slide .footer-tagline {
+        font-size: 13px;
+        color: var(--f-muted);
+        line-height: 1.65;
+        max-width: 240px;
+        margin-bottom: 24px;
+        font-weight: 300;
+      }
+      #footer-slide .footer-social {
+        display: flex;
+        gap: 8px;
+      }
+      #footer-slide .soc-link {
+        width: 36px;
+        height: 36px;
+        background: var(--f-lift);
+        border: 1px solid var(--f-rim);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--f-muted);
+        transition:
+          color 0.2s,
+          border-color 0.2s,
+          background 0.2s,
+          transform 0.2s;
+      }
+      #footer-slide .soc-link:hover {
+        color: var(--f-accent);
+        border-color: rgba(91, 255, 181, 0.25);
+        background: rgba(91, 255, 181, 0.05);
+        transform: translateY(-2px);
+      }
+      #footer-slide .soc-link:focus-visible {
+        outline: 2px solid var(--f-accent);
+        outline-offset: 2px;
+      }
+      #footer-slide .soc-link svg {
+        width: 15px;
+        height: 15px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      #footer-slide .footer-col-title {
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--f-muted2);
+        margin-bottom: 16px;
+        display: block;
+      }
+      #footer-slide .footer-links {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      #footer-slide .footer-links a {
+        font-size: 13px;
+        color: var(--f-muted);
+        font-weight: 300;
+        transition: color 0.2s;
+      }
+      #footer-slide .footer-links a:hover {
+        color: var(--f-text);
+      }
+      #footer-slide .footer-links a:focus-visible {
+        outline: 1px solid var(--f-accent);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
+      #footer-slide .footer-bottom-wrap {
+        border-top: 1px solid var(--f-rim);
+      }
+      #footer-slide .footer-bottom {
+        padding: 20px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      #footer-slide .footer-copy {
+        font-size: 11px;
+        color: var(--f-muted2);
+      }
+      #footer-slide .footer-legal {
+        display: flex;
+        gap: 20px;
+      }
+      #footer-slide .footer-legal a {
+        font-size: 11px;
+        color: var(--f-muted2);
+        transition: color 0.2s;
+      }
+      #footer-slide .footer-legal a:hover {
+        color: var(--f-muted);
+      }
+      @media (max-width: 1200px) {
+        #footer-slide .footer-inner {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+        #footer-slide .footer-brand {
+          grid-column: 1 / -1;
+        }
+      }
+      @media (max-width: 860px) {
+        #footer-slide .footer-inner {
+          grid-template-columns: 1fr 1fr;
+          gap: 28px;
+        }
+        #footer-slide .footer-brand {
+          grid-column: 1 / -1;
+        }
+        #footer-slide .footer-newsletter {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        #footer-slide .nl-input {
+          min-width: 0;
+          width: 100%;
+        }
+        #footer-slide .footer-nl-form {
+          width: 100%;
+        }
+      }
+      @media (max-width: 600px) {
+        #footer-slide .footer-inner {
+          grid-template-columns: 1fr;
+        }
+        #footer-slide .footer-bottom {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        #footer-slide .footer-legal {
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -5124,6 +5404,99 @@ DESKTOP (1024px+)
           <!-- توسط JavaScript پر می‌شود -->
         </div>
         
+      </div>
+
+      <!-- SLIDE 6: FOOTER -->
+      <div class="slide" id="footer-slide" style="top: 600vh">
+        <footer class="footer" aria-label="فوتر ولتکس">
+          <div class="fluid">
+            <div class="footer-inner">
+
+              <div class="footer-newsletter" role="complementary" aria-label="خبرنامه">
+                <div>
+                  <div class="footer-nl-title">در جریان باشید</div>
+                  <div class="footer-nl-sub">مدل‌های جدید، دسترسی زودهنگام، پیشنهادهای انحصاری.</div>
+                </div>
+                <div class="footer-nl-form" role="form">
+                  <label for="footer-nl-email" class="sr-only">ایمیل</label>
+                  <input class="nl-input" type="email" id="footer-nl-email" placeholder="your@email.com" autocomplete="email">
+                  <button class="nl-btn" id="footerNlBtn">عضویت</button>
+                </div>
+              </div>
+
+              <div class="footer-brand">
+                <a href="/" class="footer-logo">VOLTEX</a>
+                <p class="footer-tagline">اسکوترهای برقی پریمیوم برای کسانی که از معمولی امتناع می‌کنند.</p>
+                <div class="footer-social" aria-label="شبکه‌های اجتماعی">
+                  <a href="#" class="soc-link" aria-label="اینستاگرام">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  </a>
+                  <a href="#" class="soc-link" aria-label="توییتر">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+                  </a>
+                  <a href="#" class="soc-link" aria-label="یوتیوب">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <nav aria-label="محصولات">
+                <span class="footer-col-title">محصولات</span>
+                <ul class="footer-links">
+                  <li><a href="#">اسکوترهای شهری</a></li>
+                  <li><a href="#">آفرود</a></li>
+                  <li><a href="#">تاشو</a></li>
+                  <li><a href="#">پرفورمنس</a></li>
+                  <li><a href="#">لوازم جانبی</a></li>
+                </ul>
+              </nav>
+
+              <nav aria-label="شرکت">
+                <span class="footer-col-title">شرکت</span>
+                <ul class="footer-links">
+                  <li><a href="#">درباره ولتکس</a></li>
+                  <li><a href="#">فرصت‌های شغلی</a></li>
+                  <li><a href="#">اخبار</a></li>
+                  <li><a href="#">سرمایه‌گذاران</a></li>
+                </ul>
+              </nav>
+
+              <nav aria-label="پشتیبانی">
+                <span class="footer-col-title">پشتیبانی</span>
+                <ul class="footer-links">
+                  <li><a href="#">مرکز راهنمایی</a></li>
+                  <li><a href="#">پیگیری سفارش</a></li>
+                  <li><a href="#">مرجوعی</a></li>
+                  <li><a href="#">گارانتی</a></li>
+                  <li><a href="#">نمایندگی‌ها</a></li>
+                </ul>
+              </nav>
+
+              <nav aria-label="قانونی">
+                <span class="footer-col-title">قانونی</span>
+                <ul class="footer-links">
+                  <li><a href="#">حریم خصوصی</a></li>
+                  <li><a href="#">شرایط استفاده</a></li>
+                  <li><a href="#">تنظیمات کوکی</a></li>
+                  <li><a href="#">اطلاعات قانونی</a></li>
+                </ul>
+              </nav>
+
+            </div>
+          </div>
+
+          <div class="footer-bottom-wrap">
+            <div class="fluid footer-bottom">
+              <span class="footer-copy">© ۱۴۰۵ ولتکس GmbH. تمامی حقوق محفوظ است.</span>
+              <nav class="footer-legal" aria-label="لینک‌های حقوقی">
+                <a href="#">حریم خصوصی</a>
+                <a href="#">شرایط</a>
+                <a href="#">کوکی‌ها</a>
+                <a href="#">نقشه سایت</a>
+              </nav>
+            </div>
+          </div>
+        </footer>
       </div>
 
     <!-- ============================================================
@@ -6076,41 +6449,6 @@ DESKTOP (1024px+)
               <div class="ps-badge-m" style="color:var(--neon3)">7<span class="ps-badge-unit-m" style="color:var(--neon3)">×24</span></div>
             </div>
           </div>
-          <div class="footer-m">
-            <div class="footer-brand-row-m">
-              <div class="footer-brand-m">
-                <span class="footer-logo-m">VOLTEX</span>
-                <p class="footer-tagline-m">اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.</p>
-                <div class="footer-social-m">
-                  <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
-                  <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
-                  <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
-                </div>
-              </div>
-            </div>
-            <div class="footer-nav-m">
-              <div>
-                <span class="footer-nav-title-m">محصولات</span>
-                <ul class="footer-nav-links-m"><li><a href="#">اسکوترهای شهری</a></li><li><a href="#">آفرود</a></li><li><a href="#">تاشو</a></li><li><a href="#">پرفورمنس</a></li></ul>
-                <span class="footer-nav-title-m">شرکت</span>
-                <ul class="footer-nav-links-m"><li><a href="#">درباره Voltex</a></li><li><a href="#">فرصت‌های شغلی</a></li><li><a href="#">رسانه</a></li></ul>
-              </div>
-              <div>
-                <span class="footer-nav-title-m">پشتیبانی</span>
-                <ul class="footer-nav-links-m"><li><a href="#">مرکز راهنمایی</a></li><li><a href="#">پیگیری سفارش</a></li><li><a href="#">بازگشت کالا</a></li><li><a href="#">گارانتی</a></li></ul>
-                <span class="footer-nav-title-m">قوانین</span>
-                <ul class="footer-nav-links-m"><li><a href="#">حریم خصوصی</a></li><li><a href="#">شرایط استفاده</a></li><li><a href="#">کوکی‌ها</a></li></ul>
-              </div>
-            </div>
-            <div class="newsletter-wrap-m">
-              <span class="newsletter-label-m">خبرنامه</span>
-              <div class="newsletter-row-m">
-                <input class="newsletter-input-m" type="email" placeholder="ایمیل شما">
-                <button class="newsletter-btn-m"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-              </div>
-              <div class="footer-copy-m">© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است.</div>
-            </div>
-          </div>
         `;
       }
 
@@ -6368,6 +6706,30 @@ DESKTOP (1024px+)
           }
         }
       });
+
+      /* ════════════════════════════════════
+         FOOTER NEWSLETTER SUBMIT
+         ════════════════════════════════════ */
+      const footerNlBtn = document.getElementById("footerNlBtn");
+      if (footerNlBtn) {
+        footerNlBtn.addEventListener("click", function () {
+          const input = document.getElementById("footer-nl-email");
+          const email = input.value.trim();
+
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            input.style.borderColor = "rgba(248,113,113,.6)";
+            input.focus();
+            setTimeout(() => (input.style.borderColor = ""), 1800);
+            return;
+          }
+
+          this.textContent = "✓ ثبت شد";
+          this.style.background = "#00c97a";
+          this.disabled = true;
+          input.value = "";
+          input.disabled = true;
+        });
+      }
 
       /* ════════════════════════════════════
          START

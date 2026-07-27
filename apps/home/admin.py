@@ -26,7 +26,7 @@ class CommentInline(admin.TabularInline):
     """نمایش نظرات در صفحه مقاله"""
     model = Comment
     extra = 0
-    fields = ['user', 'content_preview', 'is_approved', 'created_at']
+    fields = ['user', 'content_preview', 'status', 'created_at']
     readonly_fields = ['user', 'content_preview', 'created_at']
     can_delete = True
     show_change_link = True
@@ -85,9 +85,8 @@ class ArticleAdmin(admin.ModelAdmin):
     tag_list.short_description = 'تگ‌ها'
 
     def comments_count(self, obj):
-        count = obj.comments.filter(is_approved=True).count()
+        count = obj.comments.filter(status=True).count()
         return format_html('<span style="color:var(--neon);">{}</span>', count)
-
     comments_count.short_description = 'نظرات'
 
     # ===== تصویر شاخص =====

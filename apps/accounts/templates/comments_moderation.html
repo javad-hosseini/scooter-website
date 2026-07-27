@@ -977,7 +977,7 @@
                 alt="تصویر پروفایل"
               />
               <div class="who d-none d-sm-block">
-                <b id="profileName">مدیر</b><span id="profileRole">مدیر فروشگاه</span>
+                <b id="profileName">مدیر</b><span>مدیر فروشگاه</span>
               </div>
             </div>
           </div>
@@ -1662,28 +1662,6 @@
 ═══════════════════════════════════════ */
       fetchList(1);
       refreshStats();
-      loadUserProfile();
-
-      /* ============================================================
-   HEADER — پروفایل ادمین (همون endpoint داشبورد، چون user رو برمی‌گردونه)
-   ============================================================ */
-      async function loadUserProfile() {
-        try {
-          const res = await fetch("/shop/api/admin/dashboard/stats/", {
-            headers: { "X-Requested-With": "XMLHttpRequest" },
-          });
-          if (!res.ok) throw new Error("profile fetch failed");
-          const data = await res.json();
-          const user = data.user || {};
-
-          document.getElementById("profileAvatar").src =
-            user.profile_image || "https://i.pravatar.cc/100?img=47";
-          document.getElementById("profileName").textContent = user.fullname || "کاربر";
-          document.getElementById("profileRole").textContent = user.bio || "مدیر فروشگاه";
-        } catch (error) {
-          console.error("❌ Error loading user profile:", error);
-        }
-      }
     </script>
   </body>
 </html>

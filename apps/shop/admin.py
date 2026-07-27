@@ -532,23 +532,20 @@ class OrderItemAdmin(admin.ModelAdmin):
 
     def order_display(self, obj):
         return obj.order.order_number
-
     order_display.short_description = 'شماره سفارش'
 
     def product_display(self, obj):
         return obj.product.name
-
     product_display.short_description = 'محصول'
 
     def price_display(self, obj):
         return f"{obj.price:,} تومان"
-
     price_display.short_description = 'قیمت واحد'
 
     def total_display(self, obj):
+        formatted_total = f"{obj.total:,}"
         return format_html(
-            '<span style="color:var(--gold);font-weight:bold;">{:,} تومان</span>',
-            obj.total
+            '<span style="color:var(--gold);font-weight:bold;">{} تومان</span>',
+            formatted_total
         )
-
     total_display.short_description = 'جمع'

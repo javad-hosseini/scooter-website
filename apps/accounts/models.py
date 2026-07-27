@@ -22,7 +22,7 @@ def user_profile_image_path(instance, filename):
 
 class CustomUser(AbstractUser):
     fullname = models.CharField(max_length=100, verbose_name="نام کامل")
-    mobile = models.CharField(max_length=11, unique=True, verbose_name="شماره موبایل")
+    mobile = models.CharField(max_length=11, unique=True, blank=True, null=True, verbose_name="شماره موبایل")
     email = models.EmailField(unique=True, verbose_name="ایمیل")
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

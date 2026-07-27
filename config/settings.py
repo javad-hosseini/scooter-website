@@ -12,10 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-from django.utils.translation import gettext_lazy as _
-from .jazzmin import *
-from .jazzmin import JAZZMIN_SETTINGS
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites', # این دوست عزیز فراموش نشود!!!!!!!
+
+    # allauth => https://docs.allauth.org/en/latest/installation/quickstart.html
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # local apps
     'apps.accounts.apps.AccountsConfig',
@@ -67,7 +72,7 @@ CKEDITOR_CONFIGS = {
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
             ['Image'],
-            ['Source'],  # این خطرناکه - پایین توضیح میدم
+            ['Source'],  # این خطرناکه
         ],
     },
 }
@@ -81,6 +86,10 @@ DEFAULT_THROTTLE_RATES = {
 AUTHENTICATION_BACKENDS = [
     'apps.accounts.backends.UsernameOrMobileBackend',
     'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+
 ]
 
 LOGIN_URL = 'login'
@@ -122,6 +131,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # allauth
+    "allauth.account.middleware.AccountMiddleware",
+
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -206,9 +218,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============ Static files (CSS/JS/فونت - فایل‌های خودت) ============
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']       # جایی که تو dev خودت فایل می‌ذاری
-STATIC_ROOT = BASE_DIR / 'staticfiles'         # مقصد collectstatic برای production
+STATICFILES_DIRS = [BASE_DIR / 'static']  # جایی که تو dev خودت فایل می‌ذاری
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # مقصد collectstatic برای production
 
 # ============ Media files (آپلودهای کاربر - عکس/mp3/pdf مقالات) ============
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+SITE_ID = 1
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID'),
+            'secret': config('GOOGLE_CLIENT_SECRET'),
+            'key': ''
+        },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+}
+
+
+# رفتار بعد از لاگین موفق با گوگل
+LOGIN_REDIRECT_URL = 'home_app:index'   # یا هرچی دوست داری
+ACCOUNT_EMAIL_VERIFICATION = 'none'      # چون از OTP خودت استفاده می‌کنی، نه ایمیل verification allauth
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True   # کاربر مستقیم با کلیک ریدایرکت میشه، بدون صفحه واسط تایید allauth

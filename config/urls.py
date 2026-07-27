@@ -47,6 +47,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls', namespace='accounts_app')),
     path('shop/', include('apps.shop.urls', namespace='shop_app')),
+    path('social-auth/', include('allauth.urls')),
 
 ]
 

@@ -1056,6 +1056,11 @@
             <i class="fa-solid fa-bars"></i>
           </button>
 
+          <div class="search-box">
+            <input type="text" placeholder="جستجوی تراکنش، سفارش، مشتری..." />
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+
           <div class="d-flex align-items-center gap-2 ms-auto">
             <div class="theme-toggle">
               <button id="themeLight" class="active" title="روشن">
@@ -1118,14 +1123,9 @@
 
             <div class="dropdown-wrap">
               <div class="profile-chip" id="profileBtn">
-                <img
-                  id="profileAvatar"
-                  src="https://i.pravatar.cc/100?img=47"
-                  alt="تصویر پروفایل"
-                />
+                <img src="https://i.pravatar.cc/100?img=47" alt="" />
                 <div class="who d-none d-sm-block">
-                  <b id="profileName">کاربر</b
-                  ><span id="profileRole">مدیر فروشگاه</span>
+                  <b>الهام حسینی</b><span>مدیر فروشگاه</span>
                 </div>
                 <i
                   class="fa-solid fa-chevron-down"
@@ -2269,30 +2269,6 @@
 
       loadFinanceStats();
       loadTransactions(1);
-      loadUserProfile();
-
-      /* ============================================================
-   HEADER — پروفایل ادمین (همون endpoint داشبورد، چون user رو برمی‌گردونه)
-   ============================================================ */
-      async function loadUserProfile() {
-        try {
-          const res = await fetch("/shop/api/admin/dashboard/stats/", {
-            headers: { "X-Requested-With": "XMLHttpRequest" },
-          });
-          if (!res.ok) throw new Error("profile fetch failed");
-          const data = await res.json();
-          const user = data.user || {};
-
-          document.getElementById("profileAvatar").src =
-            user.profile_image || "https://i.pravatar.cc/100?img=47";
-          document.getElementById("profileName").textContent =
-            user.fullname || "کاربر";
-          document.getElementById("profileRole").textContent =
-            user.bio || "مدیر فروشگاه";
-        } catch (error) {
-          console.error("❌ Error loading user profile:", error);
-        }
-      }
     </script>
   </body>
 </html>
