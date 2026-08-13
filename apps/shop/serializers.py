@@ -113,6 +113,8 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
 
     def get_cover_image_url(self, obj):
+        if obj.grid_image:
+            return obj.grid_image.url
         if obj.cover_image:
             return obj.cover_image.url
         return None

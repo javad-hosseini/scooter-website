@@ -114,7 +114,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('اطلاعات اصلی', {
-            'fields': ('name', 'slug', 'category', 'cover_image', 'cover_image_preview', 'cover_alt_text')
+            'fields': ('name', 'slug', 'category', 'cover_image', 'cover_image_preview', 'cover_alt_text', 'grid_image')
         }),
         ('محتوای محصول', {
             'fields': ('tagline', 'description')

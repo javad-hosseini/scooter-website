@@ -301,16 +301,25 @@ class Product(models.Model):
     )
     description = models.TextField(verbose_name="توضیحات")
 
-    # تصویر اصلی (کاور)
+    # تصویر اصلی (کاور) — برای صفحه‌ی جزئیات محصول
     cover_image = models.ImageField(
         upload_to='products/covers/',
         verbose_name="تصویر کاور",
-        help_text="تصویر اصلی محصول که در هدر نمایش داده می‌شود"
+        help_text="تصویر اصلی محصول که در صفحه‌ی جزئیات نمایش داده می‌شود"
     )
     cover_alt_text = models.CharField(
         max_length=200,
         blank=True,
         verbose_name="متن جایگزین تصویر کاور"
+    )
+
+    # تصویر گرید — برای کارت محصول در صفحه‌ی دسته‌بندی
+    grid_image = models.ImageField(
+        upload_to='products/grid/',
+        null=True,
+        blank=True,
+        verbose_name="تصویر گرید",
+        help_text="تصویری که در کارت محصول داخل صفحه‌ی دسته‌بندی نمایش داده می‌شود. اگر خالی بماند، از تصویر کاور استفاده می‌شود."
     )
 
     # قیمت
