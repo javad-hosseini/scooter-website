@@ -15,6 +15,7 @@ from .actions import (
     export_selected_orders_to_pdf,
     export_selected_orders_to_excel,
 )
+from apps.home.admin import CategoryFeatureInline, CategoryImageInline, CategoryBadgeInline
 
 
 class ProductSpecInline(admin.TabularInline):
@@ -85,7 +86,7 @@ class CategoryAdmin(admin.ModelAdmin):
         return obj.products.filter(is_published=True).count()
 
     product_count.short_description = 'تعداد محصولات'
-    inlines = [CategoryHeroProductInline]
+    inlines = [CategoryHeroProductInline, CategoryFeatureInline, CategoryImageInline, CategoryBadgeInline]
 
 
 @admin.register(Product)

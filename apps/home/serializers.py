@@ -398,7 +398,10 @@ class IndexPageSerializer(serializers.ModelSerializer):
         return result
 
     def _get_category_image(self, category):
-        """گرفتن تصویر برای دسته‌بندی (از اولین محصول یا پیش‌فرض)"""
+        """گرفتن تصویر برای دسته‌بندی (پایین‌ترین order، صرف‌نظر از is_primary؛ در نبود عکس، عکس محصول)"""
+        lowest_order_image = category.images.order_by('order').first()
+        if lowest_order_image:
+            return lowest_order_image.image.url
         product = category.products.filter(is_published=True).first()
         if product and product.cover_image:
             return product.cover_image.url

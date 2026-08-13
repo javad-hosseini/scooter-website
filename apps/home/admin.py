@@ -402,34 +402,6 @@ class CommentAdmin(admin.ModelAdmin):
 
     reject_comments.short_description = 'رد کردن نظرات انتخاب‌شده'
 
-# @admin.register(Category)
-# class CategoryAdmin(admin.ModelAdmin):
-#     list_display = ['name', 'slug', 'icon', 'is_active', 'order', 'feature_count']
-#     list_filter = ['is_active']
-#     search_fields = ['name', 'slug', 'description']
-#     prepopulated_fields = {'slug': ('name',)}
-#     list_editable = ['order', 'is_active']
-#     inlines = [CategoryFeatureInline, CategoryImageInline, CategoryBadgeInline]
-#
-#     fieldsets = (
-#         ('اطلاعات اصلی', {
-#             'fields': ('name', 'slug', 'icon', 'description')
-#         }),
-#         ('والد', {
-#             'fields': ('parent',)
-#         }),
-#         ('وضعیت', {
-#             'fields': ('is_active', 'order')
-#         }),
-#         ('تاریخ', {
-#             'fields': ('created_at', 'updated_at'),
-#             'classes': ('collapse',)
-#         }),
-#     )
-#
-#     readonly_fields = ['created_at', 'updated_at']
-#
-#     def feature_count(self, obj):
-#         return obj.features.count()
-#
-#     feature_count.short_description = 'تعداد ویژگی‌ها'
+# CategoryAdmin رجیستر نمی‌شود اینجا — مدل Category متعلق به apps.shop است
+# و از قبل در apps/shop/admin.py رجیستر شده. اینلاین‌های بالا (Feature/Image/Badge)
+# از همانجا import و به CategoryAdmin شاپ اضافه می‌شوند.

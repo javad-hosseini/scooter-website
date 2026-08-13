@@ -6031,10 +6031,11 @@ DESKTOP (1024px+)
         // بروزرسانی تصاویر
         ["catScooterImgM", "catScooterImgD"].forEach((id) => {
           const img = document.getElementById(id);
-          if (img && cat.image) {
+          const newSrc = cat.image || "/static/images/default-category.jpg";
+          if (img) {
             img.classList.remove("visible");
             setTimeout(() => {
-              img.src = cat.image;
+              img.src = newSrc;
               img.classList.add("visible");
             }, 200);
           }
