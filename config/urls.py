@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
+from django.http import JsonResponse
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
@@ -23,6 +24,9 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+
+def cache_debug_view(request):
+    return JsonResponse({"test": "no headers set manually"})
 
 urlpatterns = [
     path('', include('apps.home.urls', namespace='home_app')),
@@ -43,6 +47,7 @@ urlpatterns = [
         name="redoc",
     ),
     path("i18n/", include("django.conf.urls.i18n")),
+    path('cache-debug-test/', cache_debug_view),
     path('api/shop/', include('apps.shop.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls', namespace='accounts_app')),

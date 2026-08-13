@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+from .jazzmin import *
+from .jazzmin import JAZZMIN_SETTINGS
 from decouple import config
 from django.utils.translation import gettext_lazy as _
 
@@ -27,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['scooterr.ir', 'www.scooterr.ir', 'pendar.irandns.com', '127.0.0.1']
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 # Application definition
@@ -36,6 +37,8 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 TAX_RATE = 0.09  # ۹ درصد مالیات بر ارزش افزوده
 FREE_SHIPPING_THRESHOLD = 500_000  # مبلغ بالای این عدد ارسال رایگان
 SHIPPING_COST = 25_000  # هزینه ارسال معمولی (تومان)
+
+
 
 INSTALLED_APPS = [
     "jazzmin",
@@ -123,6 +126,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 MIDDLEWARE = [
+    'apps.core.middleware.DisableCachingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django.middleware.locale.LocaleMiddleware",
@@ -218,8 +222,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============ Static files (CSS/JS/فونت - فایل‌های خودت) ============
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']  # جایی که تو dev خودت فایل می‌ذاری
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # مقصد collectstatic برای production
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # مسیر static در ریشه پروژه (کنار manage.py)
+]
+
+STATIC_ROOT = '/home/scotehn/mahta-cycle/public/static'
 
 # ============ Media files (آپلودهای کاربر - عکس/mp3/pdf مقالات) ============
 MEDIA_URL = '/media/'

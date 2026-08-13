@@ -1,4 +1,6 @@
 <!doctype html>
+{% load socialaccount %}
+
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8"/>
@@ -316,6 +318,28 @@
             transform: translateY(-9px);
           }
         }
+        .divider-or{
+          display:flex; align-items:center; gap:.9rem; margin:1.4rem 0;
+        }
+        .divider-or::before, .divider-or::after{
+          content:''; flex:1; height:1px; background:var(--border);
+        }
+        .divider-or span{ font-size:.78rem; color:var(--text-low); }
+
+        .btn-google{
+          display:flex; align-items:center; justify-content:center; gap:.6rem;
+          width:100%; height:54px; border-radius:14px;
+          background:var(--glass); border:1px solid var(--border);
+          color:var(--text); font-family:inherit; font-size:.9rem; font-weight:600;
+          text-decoration:none; cursor:pointer;
+          transition:all .25s var(--ease);
+        }
+        .btn-google:hover{
+          background:var(--glass-strong); border-color:rgba(255,255,255,.28);
+          transform:translateY(-2px);
+          box-shadow:0 12px 30px -10px rgba(0,0,0,.5);
+        }
+        .btn-google:active{ transform:translateY(0); }
         .auth-card::before {
           content: "";
           position: absolute;
@@ -1058,6 +1082,20 @@
             </span>
             </button>
         </form>
+
+        <div class="divider-or">
+            <span>یا</span>
+        </div>
+
+        <a href="{% provider_login_url 'google' %}" class="btn-google">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.8-.4-3.5z"/>
+                <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3c-7.5 0-13.9 4.3-17.1 10.6z"/>
+                <path fill="#4CAF50" d="M24 45c5.5 0 10.5-2.1 14.3-5.5l-6.6-5.6C29.6 35.6 26.9 36.5 24 36.5c-5.3 0-9.7-3.4-11.3-8.1l-6.6 5.1C9.9 40.6 16.4 45 24 45z"/>
+                <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.6 5.6C41.9 35.6 44 29.8 44 24c0-1.4-.1-2.8-.4-3.5z"/>
+            </svg>
+            <span>ثبت‌نام با حساب گوگل</span>
+        </a>
 
         <div class="auth-foot">
             <p class="login-line">

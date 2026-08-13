@@ -87,6 +87,7 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
     permission_classes = [AllowAny]
     serializer_class = ProductDetailSerializer
     lookup_field = 'slug'
+    
 
     def get_queryset(self):
         return Product.objects.filter(is_published=True)

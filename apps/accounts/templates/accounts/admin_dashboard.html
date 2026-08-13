@@ -947,15 +947,28 @@
       }
 
       @media (max-width: 1199.98px) {
+        .app-shell {
+          overflow-x: hidden;
+        }
+        .main {
+          width: 100%;
+          max-width: 100vw;
+          overflow-x: hidden;
+        }
         .sidebar {
           position: fixed;
+          top: 0;
           right: 0;
           height: 100vh;
-          transform: translateX(105%);
+          transform: translateX(calc(100% + 24px));
           transition: transform 0.3s ease;
+          pointer-events: none;
+          visibility: hidden;
         }
         .sidebar.show {
           transform: translateX(0);
+          pointer-events: auto;
+          visibility: visible;
         }
         .sidebar-backdrop.show {
           display: block;
@@ -963,6 +976,17 @@
           inset: 0;
           background: rgba(0, 0, 0, 0.45);
           z-index: 39;
+        }
+        /* Fallback in case the Bootstrap CDN fails to load: guarantees the
+           hamburger button stays hidden on desktop and visible on mobile
+           without depending on the .d-xl-none utility class. */
+        #sbToggle {
+          display: flex;
+        }
+      }
+      @media (min-width: 1200px) {
+        #sbToggle {
+          display: none;
         }
       }
       @media (max-width: 575.98px) {

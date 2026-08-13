@@ -9,6 +9,35 @@
     <title id="page-title">VOLTEX — اسکوترهای برقی پریمیوم</title>
 
     <!-- ============================================================
+     MOBILE SCROLL-MODE DETECTION (runs before CSS paints)
+     Sets html.is-mobile-scroll for true handheld phones only —
+     portrait phones (by width) and landscape phones (short height +
+     coarse pointer). Tablets (portrait or landscape) and laptops/
+     desktop are intentionally NOT matched here, so they keep the
+     existing animated slide-paging system. This is viewport/media-
+     feature based (no User-Agent sniffing) and is the single source
+     of truth that both the CSS and the slide-navigation JS read from,
+     so the two can never disagree with each other.
+     ============================================================ -->
+    <script>
+      (function () {
+        var mobileQuery =
+          "(max-width: 767.98px), (max-height: 500px) and (max-width: 1023.98px) and (orientation: landscape) and (pointer: coarse)";
+        var mq = window.matchMedia(mobileQuery);
+        function applyMobileScrollClass(e) {
+          document.documentElement.classList.toggle("is-mobile-scroll", e.matches);
+        }
+        applyMobileScrollClass(mq);
+        if (mq.addEventListener) {
+          mq.addEventListener("change", applyMobileScrollClass);
+        } else if (mq.addListener) {
+          // Safari < 14 fallback
+          mq.addListener(applyMobileScrollClass);
+        }
+      })();
+    </script>
+
+    <!-- ============================================================
      SEO META TAGS — توسط JavaScript پر می‌شوند
      ============================================================ -->
     <meta name="description" id="meta-description" content="" />
@@ -610,23 +639,55 @@
         transform: translateY(0);
       }
       .mobile-drawer a {
+        position: relative;
         font-family: var(--font-display);
-        font-weight: 500;
-        font-size: 1.9rem;
-        letter-spacing: 0.02em;
+        font-weight: 600;
+        font-size: 1.15rem;
+        letter-spacing: 0.01em;
         color: var(--dim);
         text-decoration: none;
-        padding: 12px 0;
+        padding: 14px 0;
+        width: min(240px, 70vw);
+        border-radius: var(--r-sm);
+        border-bottom: 1px solid var(--border);
         transition:
           color 0.35s var(--ease-smooth),
-          transform 0.35s var(--ease-smooth);
+          transform 0.35s var(--ease-smooth),
+          border-color 0.35s var(--ease-smooth),
+          background 0.35s var(--ease-smooth),
+          box-shadow 0.35s var(--ease-smooth);
         display: block;
         text-align: center;
       }
-      .mobile-drawer a:hover,
+      .mobile-drawer a:last-of-type {
+        border-bottom: none;
+      }
+      /* Premium hover — restricted to true hover-capable pointers so touch
+         phones (no real hover) never get a stuck/sticky hover state */
+      @media (hover: hover) and (pointer: fine) {
+        .mobile-drawer a:hover {
+          color: var(--neon);
+          border-color: var(--border-lit);
+          background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
+          box-shadow: inset 0 0 0 1px rgba(79, 216, 255, 0.08);
+          transform: translateX(-6px);
+        }
+      }
       .mobile-drawer a:active {
         color: var(--neon);
-        transform: translateX(-6px);
+        border-color: var(--border-lit);
+        background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
+        transform: translateX(-4px);
+      }
+      /* Keyboard focus gets the same polished treatment as hover */
+      .mobile-drawer a:focus-visible {
+        color: var(--neon);
+        border-color: var(--border-lit);
+        background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
+        box-shadow:
+          0 0 0 1px var(--border-lit),
+          0 0 20px -8px var(--neon);
+        outline: none;
       }
       .mobile-drawer-cta {
         margin-top: 26px;
@@ -639,6 +700,61 @@
         border: none;
         cursor: pointer;
         border-radius: 100px;
+      }
+
+      /* ══════════════════════════════════════════
+         MOBILE HAMBURGER MENU — refinement (<= 767.98px only)
+         The trigger button (.nav-menu-btn) is only ever visible below
+         768px (hidden by the tablet/desktop nav rules further down),
+         so this drawer is already mobile-only in practice. It's still
+         wrapped in an explicit max-width query here so the smaller,
+         cleaner typography below can never affect Tablet/Desktop even
+         if that visibility rule ever changes. Only type scale, weight,
+         spacing and padding are touched — layout mechanics, colors,
+         functionality and the hamburger button itself are untouched.
+         ══════════════════════════════════════════ */
+      @media (max-width: 767.98px) {
+        .mobile-drawer {
+          gap: 2px;
+          padding-top: 74px;
+          width: 100vw;
+          height: 100vh; /* fallback for browsers without dvh support */
+          height: 100dvh;
+          max-height: 100vh;
+          max-height: 100dvh;
+          overflow-x: hidden;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+        }
+        .mobile-drawer a {
+          font-family: var(--font-ui);
+          font-weight: 500;
+          font-size: 0.92rem;
+          letter-spacing: 0.01em;
+          padding: 11px 0;
+          width: min(210px, 72vw);
+        }
+        .mobile-drawer-cta {
+          margin-top: 20px;
+          padding: 13px 40px;
+        }
+        .drawer-auth {
+          margin-top: 16px;
+          gap: 10px;
+        }
+        .drawer-auth-link {
+          font-size: 0.82rem;
+          padding: 10px 26px;
+        }
+        .drawer-auth-register {
+          padding: 13px 38px;
+        }
+        .drawer-auth-user {
+          margin-top: 16px;
+        }
+        .drawer-user-info {
+          font-size: 0.88rem;
+        }
       }
 
       /* ── SECTIONS WRAPPER ── */
@@ -667,6 +783,24 @@
         margin: 0 auto;
         padding: 0 20px;
         width: 100%;
+      }
+      /* Short-viewport / unusual aspect-ratio safety net (low-height
+         monitors, landscape phones, small laptop windows). Slides keep
+         their fixed 100dvh paging offsets, but become internally
+         scrollable instead of clipping/overlapping content when it
+         doesn't fit the available height. This never engages on normal
+         viewports, so default layout/design is unaffected. */
+      @media (max-height: 680px) {
+        .slide {
+          overflow-y: auto;
+          align-items: flex-start;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .slide::-webkit-scrollbar {
+          display: none;
+        }
       }
       .section-label {
         font-family: var(--font-mono);
@@ -1795,26 +1929,37 @@ SLIDE 5: FINAL — MOBILE (FIXED FOR SCROLLING & OVERFLOW)
         background: var(--black);
         height: 100dvh !important;
         min-height: 100dvh;
-        overflow: visible !important;
+        overflow: hidden !important;
         align-items: flex-start !important;
         display: block !important;
       }
-      .final-mobile-wrap {
+      /* Single scroll container for slide 6: holds the promise section
+         (mobile OR desktop variant, toggled via media queries) followed
+         by the footer, and scrolls internally if content is taller than
+         the viewport — without affecting slide-to-slide navigation. */
+      .final-scroll {
         width: 100%;
-        height: 100dvh;
+        height: 100%;
         box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        padding-top: var(--nav-h);
-        padding-bottom: calc(24px + env(safe-area-inset-bottom));
         overflow-y: auto;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        position: relative;
+        z-index: 1;
+        padding-bottom: env(safe-area-inset-bottom);
       }
-      .final-mobile-wrap::-webkit-scrollbar {
+      .final-scroll::-webkit-scrollbar {
         display: none;
+      }
+      .final-mobile-wrap {
+        width: 100%;
+        height: auto;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        padding-top: var(--nav-h);
       }
       .final-ambient {
         position: fixed;
@@ -2200,6 +2345,71 @@ SLIDE 5: FINAL — MOBILE (FIXED FOR SCROLLING & OVERFLOW)
       .slide.active .fs-anim {
         opacity: 1;
         transform: none;
+      }
+
+      /* ══════════════════════════════════════════
+         SLIDE SYSTEM: TRUE MOBILE ONLY
+         On real handheld phones (html.is-mobile-scroll, set in <head>
+         based on viewport/pointer media features — portrait phones by
+         width, landscape phones by short height + coarse pointer) the
+         whole full-screen slide/paging mechanism is disabled and the
+         page becomes a normal, naturally stacked, vertically scrolling
+         document. Tablets (portrait or landscape) and laptop/desktop
+         are NOT matched by this class, so they keep the existing
+         animated slide-paging system untouched. Nothing here touches
+         colors, fonts, component styling, or animation keyframes —
+         only the layout mechanics of #sections-wrapper/.slide.
+         ══════════════════════════════════════════ */
+      html.is-mobile-scroll {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        height: auto !important;
+      }
+      html.is-mobile-scroll body {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        width: 100% !important;
+        max-width: 100%;
+        min-height: 100dvh;
+        overscroll-behavior: auto;
+      }
+      html.is-mobile-scroll #sections-wrapper {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        transform: none !important;
+        transition: none !important;
+        will-change: auto;
+      }
+      html.is-mobile-scroll .slide {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0;
+        overflow: visible !important;
+      }
+      /* Content should be visible immediately without waiting
+         for the desktop "active slide" JS toggle — an
+         IntersectionObserver re-adds .active per-slide on
+         scroll (see script), but this guarantees nothing is
+         stuck invisible if JS is slow/disabled. */
+      html.is-mobile-scroll .slide .fs-anim,
+      html.is-mobile-scroll .slide .slide-anim,
+      html.is-mobile-scroll .slide .slide-anim-left,
+      html.is-mobile-scroll .slide .slide-anim-right,
+      html.is-mobile-scroll .slide .slide-anim-scale,
+      html.is-mobile-scroll .slide .word-reveal .word span {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      html.is-mobile-scroll #nav-dots,
+      html.is-mobile-scroll #scroll-progress {
+        display: none !important;
       }
 
       /* ══════════════════════════════════════════
@@ -3074,11 +3284,11 @@ TABLET BREAKPOINT (768px–1023px)
         }
         .final-desktop-wrap {
           width: 100%;
-          height: 100dvh;
+          height: auto;
           display: flex;
           flex-direction: column;
           padding-top: var(--nav-h);
-          overflow: hidden;
+          overflow: visible;
         }
         .promise-section-d {
           padding: 22px 36px 18px;
@@ -3181,139 +3391,6 @@ TABLET BREAKPOINT (768px–1023px)
           font-size: 0.73rem;
           color: var(--muted);
           line-height: 1.55;
-        }
-        .stmt-desktop {
-          flex: 1;
-          padding: 0 36px;
-          text-align: center;
-          border-bottom: 1px solid var(--border);
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-        }
-        .stmt-ring {
-          position: absolute;
-          border-radius: 50%;
-          border: 1px solid rgba(79, 216, 255, 0.035);
-          top: 50%;
-          left: 50%;
-          animation: ringExpand 9s linear infinite;
-          pointer-events: none;
-        }
-        .stmt-ring:nth-child(1) {
-          width: 260px;
-          height: 260px;
-          animation-delay: 0s;
-        }
-        .stmt-ring:nth-child(2) {
-          width: 440px;
-          height: 440px;
-          animation-delay: 3s;
-        }
-        @keyframes ringExpand {
-          0% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.7);
-          }
-          30% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(1.3);
-          }
-        }
-        .stmt-inner-d {
-          position: relative;
-          z-index: 2;
-        }
-        .stmt-eyebrow-d {
-          font-family: var(--font-mono);
-          font-size: 0.66rem;
-          letter-spacing: 0;
-          text-transform: none;
-          color: var(--neon);
-          margin-bottom: 10px;
-          display: block;
-        }
-        .stmt-desktop-title {
-          font-family: var(--font-display);
-          font-weight: 700;
-          font-size: clamp(2.5rem, 4.6vw, 4.6rem);
-          line-height: 1.15;
-          color: var(--white);
-          margin-bottom: 10px;
-          letter-spacing: 0;
-        }
-        .stmt-desktop-title em {
-          font-style: normal;
-          background: linear-gradient(
-            90deg,
-            var(--neon),
-            var(--neon2),
-            var(--neon3)
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        .stmt-desktop-desc {
-          font-family: var(--font-body);
-          font-size: 0.86rem;
-          font-weight: 300;
-          color: var(--dim);
-          line-height: 1.75;
-          margin-bottom: 16px;
-          max-width: 420px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        .stmt-desktop-btns {
-          display: flex;
-          gap: 12px;
-          justify-content: center;
-        }
-        .stmt-btn-p-d {
-          font-family: var(--font-ui);
-          font-size: 0.78rem;
-          font-weight: 600;
-          letter-spacing: 0;
-          text-transform: none;
-          background: var(--white);
-          color: var(--black);
-          padding: 14px 38px;
-          border: none;
-          cursor: pointer;
-          border-radius: 100px;
-          transition: all 0.45s var(--ease-luxury);
-          position: relative;
-          overflow: hidden;
-        }
-        .stmt-btn-p-d:hover {
-          background: var(--neon);
-          transform: translateY(-2px);
-          box-shadow: 0 14px 36px -10px rgba(79, 216, 255, 0.4);
-        }
-        .stmt-btn-s-d {
-          font-family: var(--font-ui);
-          font-size: 0.78rem;
-          font-weight: 600;
-          letter-spacing: 0;
-          text-transform: none;
-          background: transparent;
-          color: var(--white);
-          padding: 13px 30px;
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          cursor: pointer;
-          border-radius: 100px;
-          transition: all 0.35s var(--ease-smooth);
-        }
-        .stmt-btn-s-d:hover {
-          border-color: var(--neon);
-          color: var(--neon);
-          transform: translateY(-2px);
         }
         .footer-desktop {
           padding: 18px 36px 16px;
@@ -4343,11 +4420,11 @@ DESKTOP (1024px+)
         }
         .final-desktop-wrap {
           width: 100%;
-          height: 100dvh;
+          height: auto;
           display: flex;
           flex-direction: column;
           padding-top: var(--nav-h);
-          overflow: hidden;
+          overflow: visible;
         }
         .promise-section-d {
           padding: 26px 64px 22px;
@@ -4478,127 +4555,6 @@ DESKTOP (1024px+)
           font-size: 0.78rem;
           color: var(--muted);
           line-height: 1.65;
-        }
-        .stmt-desktop {
-          flex: 1;
-          min-height: 0;
-          padding: 0 64px;
-          text-align: center;
-          border-bottom: 1px solid var(--border);
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-        }
-        .stmt-ring {
-          position: absolute;
-          border-radius: 50%;
-          border: 1px solid rgba(79, 216, 255, 0.035);
-          top: 50%;
-          left: 50%;
-          animation: ringExpand 9s linear infinite;
-          pointer-events: none;
-        }
-        .stmt-ring:nth-child(1) {
-          width: 300px;
-          height: 300px;
-          animation-delay: 0s;
-        }
-        .stmt-ring:nth-child(2) {
-          width: 500px;
-          height: 500px;
-          animation-delay: 3s;
-        }
-        .stmt-inner-d {
-          position: relative;
-          z-index: 2;
-        }
-        .stmt-eyebrow-d {
-          font-family: var(--font-mono);
-          font-size: 0.66rem;
-          letter-spacing: 0;
-          text-transform: none;
-          color: var(--neon);
-          margin-bottom: 12px;
-          display: block;
-        }
-        .stmt-desktop-title {
-          font-family: var(--font-display);
-          font-weight: 700;
-          font-size: clamp(2.8rem, 5vw, 5.6rem);
-          line-height: 1.15;
-          color: var(--white);
-          margin-bottom: 12px;
-          letter-spacing: 0;
-        }
-        .stmt-desktop-title em {
-          font-style: normal;
-          background: linear-gradient(
-            90deg,
-            var(--neon),
-            var(--neon2),
-            var(--neon3)
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        .stmt-desktop-desc {
-          font-family: var(--font-body);
-          font-size: 0.9rem;
-          font-weight: 300;
-          color: var(--dim);
-          line-height: 1.85;
-          margin-bottom: 18px;
-          max-width: 480px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        .stmt-desktop-btns {
-          display: flex;
-          gap: 14px;
-          justify-content: center;
-        }
-        .stmt-btn-p-d {
-          font-family: var(--font-ui);
-          font-size: 0.8rem;
-          font-weight: 600;
-          letter-spacing: 0;
-          text-transform: none;
-          background: var(--white);
-          color: var(--black);
-          padding: 15px 44px;
-          border: none;
-          cursor: pointer;
-          border-radius: 100px;
-          transition: all 0.45s var(--ease-luxury);
-          position: relative;
-          overflow: hidden;
-        }
-        .stmt-btn-p-d:hover {
-          background: var(--neon);
-          transform: translateY(-2px);
-          box-shadow: 0 16px 44px -12px rgba(79, 216, 255, 0.42);
-        }
-        .stmt-btn-s-d:hover {
-          border-color: var(--neon);
-          color: var(--neon);
-          transform: translateY(-2px);
-        }
-        .stmt-btn-s-d {
-          font-family: var(--font-ui);
-          font-size: 0.8rem;
-          font-weight: 600;
-          letter-spacing: 0;
-          text-transform: none;
-          background: transparent;
-          color: var(--white);
-          padding: 14px 38px;
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          cursor: pointer;
-          border-radius: 100px;
-          transition: all 0.35s var(--ease-smooth);
         }
         .footer-desktop {
           padding: 22px 64px 18px;
@@ -4789,9 +4745,6 @@ DESKTOP (1024px+)
         .promise-section-d {
           padding: 28px 84px 22px;
         }
-        .stmt-desktop {
-          padding: 0 84px;
-        }
         .footer-desktop {
           padding: 24px 84px 20px;
         }
@@ -4840,284 +4793,405 @@ DESKTOP (1024px+)
           display: none !important;
         }
       }
+
       /* ══════════════════════════════════════════
-         FOOTER SLIDE — tokens scoped to #footer-slide so they
-         never touch the site-wide :root variables (--accent, --text, etc.)
+      FOOTER LAYOUT FIXES (Desktop & Mobile)
       ══════════════════════════════════════════ */
-      #footer-slide {
-        --f-ink: #06070a;
-        --f-surface: #0b0d12;
-        --f-lift: #101318;
-        --f-lift2: #161b24;
-        --f-rim: rgba(255, 255, 255, 0.055);
-        --f-rim2: rgba(255, 255, 255, 0.1);
-        --f-accent: #5bffb5;
-        --f-text: #dfe2ec;
-        --f-muted: #5e6578;
-        --f-muted2: #3a3f50;
-        --f-max-w: 1760px;
-        --f-side-pad: 4vw;
-        display: block;
-        overflow-y: auto;
-        overflow-x: hidden;
-        align-items: stretch;
+
+      /* Keep footer inside the final slide layout on every device that
+         still uses the animated slide-paging system: tablets (portrait
+         AND landscape), laptops, and desktop. Scoped by the same
+         html.is-mobile-scroll flag used for the paging system itself
+         (see <head>), instead of a width breakpoint, so a portrait
+         10.9" tablet — which is narrower than 1024px but must keep the
+         slide animation — gets this treatment too. */
+      html:not(.is-mobile-scroll) .final-scroll {
+        /* #final already has display:block and 100dvh height */
+        /* .final-scroll must fill the slide and contain both promise + footer */
+        display: flex;
+        flex-direction: column;
         justify-content: flex-start;
-        background: var(--f-ink);
-        color: var(--f-text);
-      }
-      #footer-slide .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-      }
-      #footer-slide .fluid {
+        height: 100%;
         width: 100%;
-        max-width: var(--f-max-w);
-        margin-inline: auto;
-        padding-inline: var(--f-side-pad);
+        overflow-y: auto;
       }
-      #footer-slide .footer {
-        border-top: 1px solid var(--f-rim);
-        background: var(--f-surface);
+
+      /* desktop/tablet wrapper sits inside final-scroll, stacked naturally */
+      html:not(.is-mobile-scroll) .final-desktop-wrap {
+        flex-shrink: 0;
         width: 100%;
-        padding-top: 72px;
+        padding-top: var(--nav-h);
       }
-      #footer-slide .footer-inner {
-        display: grid;
-        grid-template-columns: 1.4fr repeat(4, 1fr);
-        gap: 48px;
-        padding-bottom: 64px;
+
+      /* desktop/tablet footer sits inside final-scroll after the promise section */
+      html:not(.is-mobile-scroll) .footer-desktop {
+        flex-shrink: 0;
+        width: 100%;
+        margin-top: auto; /* pushes footer to bottom if content is short */
+        padding: 22px 64px 18px;
+        background: var(--deep);
+        border-top: 1px solid var(--border);
       }
-      #footer-slide .footer-newsletter {
+
+      /* Ensure footer doesn't cause overflow inside final-scroll */
+      html:not(.is-mobile-scroll) .footer-desktop .ft-top,
+      html:not(.is-mobile-scroll) .footer-desktop .ft-bot {
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Keep the footer content fully visible */
+      html:not(.is-mobile-scroll) .footer-desktop .ft-top {
+        padding-bottom: clamp(32px, 5vw, 60px);
+      }
+      html:not(.is-mobile-scroll) .footer-desktop .ft-bot {
+        padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
+      }
+
+      /* The actual footer element (the .footer-desktop rules above target
+         a class that isn't present in the markup) — give it the same
+         flex behavior so it fills down and sits at the bottom of the
+         slide instead of leaving empty space underneath it. This is the
+         key fix for the final/footer slide clipping on large tablets,
+         landscape tablets, and laptops: previously this rule (and the
+         .final-scroll flex rules above) only activated at min-width:
+         1024px, so any tablet wider than 767px but narrower than 1024px
+         — a 10.9" tablet in portrait, for example — fell through with
+         no flex/scroll layout for its footer while still running the
+         fixed-height 100dvh slide-paging system, which is exactly what
+         clipped/overlapped the footer. */
+      html:not(.is-mobile-scroll) .final-scroll footer {
+        flex-shrink: 0;
+        width: 100%;
+        margin-top: auto;
+      }
+
+      /* True mobile only: footer and final section stack naturally in
+         normal document flow (no fixed-height slide, no internal
+         scroll container). */
+      html.is-mobile-scroll #final {
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+
+      html.is-mobile-scroll .final-scroll {
+        height: auto !important;
+        overflow: visible !important;
+        padding-bottom: 0;
+      }
+
+      html.is-mobile-scroll .final-mobile-wrap {
+        height: auto !important;
+        padding-top: var(--nav-h);
+      }
+
+      /* Footer inside the scroll flow on mobile */
+      html.is-mobile-scroll footer {
+        position: relative;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+        padding: clamp(40px, 6vw, 72px) clamp(16px, 4vw, 36px) 0;
+        margin-top: 0;
+      }
+
+      /* Ensure footer content doesn't overflow */
+      html.is-mobile-scroll .ft-top {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        max-width: 100%;
+        padding-bottom: 32px;
+      }
+
+      html.is-mobile-scroll .ft-brand {
         grid-column: 1 / -1;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
+      }
+
+      html.is-mobile-scroll .ft-tag {
+        max-width: 100%;
+      }
+
+      html.is-mobile-scroll .ft-bot {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 0 24px;
+      }
+
+      html.is-mobile-scroll .ft-legal {
         flex-wrap: wrap;
-        border: 1px solid var(--f-rim);
-        border-radius: 16px;
-        padding: 28px 32px;
-        margin-bottom: 8px;
-        background: var(--f-lift);
+        gap: 12px;
       }
-      #footer-slide .footer-nl-title {
-        font-size: 16px;
+
+      html.is-mobile-scroll .ft-col {
+        width: 100%;
+      }
+
+      html.is-mobile-scroll .ft-col ul {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 12px;
+      }
+
+      html.is-mobile-scroll .ft-col li {
+        margin-bottom: 4px;
+      }
+
+      html.is-mobile-scroll .ft-col a {
+        min-height: 28px;
+        line-height: 28px;
+        font-size: 0.82rem;
+      }
+
+      /* Tablet-specific footer refinements */
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .ft-top {
+          grid-template-columns: 1fr 1fr;
+          gap: 24px 32px;
+        }
+
+        .ft-brand {
+          grid-column: 1 / -1;
+        }
+
+        .ft-col ul {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-desktop {
+          padding: 18px 36px 16px;
+        }
+      }
+
+      /* Small mobile footer refinements */
+      @media (max-width: 480px) {
+        .ft-col ul {
+          grid-template-columns: 1fr;
+        }
+
+        .ft-top {
+          gap: 20px;
+        }
+
+        .ft-bot {
+          gap: 8px;
+        }
+
+        .ft-legal {
+          gap: 8px;
+        }
+
+        .ft-legal a {
+          font-size: 0.6rem;
+          min-height: 24px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .ft-top {
+          gap: 16px;
+        }
+
+        .ft-col a {
+          font-size: 0.75rem;
+          min-height: 24px;
+          line-height: 24px;
+        }
+      }
+
+      /* ============================================================
+   FOOTER BASE STYLES (applies to both desktop & mobile)
+   ============================================================ */
+      footer {
+        position: relative;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.012);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: clamp(40px, 6vw, 72px) clamp(22px, 5vw, 84px) 0;
+      }
+      footer::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          #00f0ff,
+          #a855f7,
+          transparent
+        );
+        opacity: 0.35;
+        pointer-events: none;
+      }
+
+      /* 4-col grid → 2-col → 1-col */
+      .ft-top {
+        display: grid;
+        grid-template-columns: 1.6fr repeat(3, 1fr);
+        gap: clamp(24px, 3vw, 48px);
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-bottom: clamp(32px, 5vw, 60px);
+      }
+
+      .ft-logo {
+        font-family: var(--font-mono);
         font-weight: 700;
-        margin-bottom: 5px;
-      }
-      #footer-slide .footer-nl-sub {
-        font-size: 13px;
-        color: var(--f-muted);
-        font-weight: 300;
-      }
-      #footer-slide .footer-nl-form {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-      #footer-slide .nl-input {
-        height: 40px;
-        padding: 0 16px;
-        min-width: 220px;
-        background: var(--f-lift2);
-        border: 1px solid var(--f-rim2);
-        border-radius: 10px;
-        color: var(--f-text);
-        font-family: var(--font-body);
-        font-size: 13px;
-        outline: none;
-        direction: ltr;
-        transition:
-          border-color 0.2s,
-          box-shadow 0.2s;
-      }
-      #footer-slide .nl-input::placeholder {
-        color: var(--f-muted2);
-      }
-      #footer-slide .nl-input:focus {
-        border-color: rgba(91, 255, 181, 0.35);
-        box-shadow: 0 0 0 3px rgba(91, 255, 181, 0.06);
-      }
-      #footer-slide .nl-btn {
-        height: 40px;
-        padding: 0 18px;
-        background: var(--f-accent);
-        border: none;
-        border-radius: 10px;
-        color: #021810;
-        font-family: var(--font-body);
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        transition:
-          background 0.2s,
-          transform 0.2s;
-      }
-      #footer-slide .nl-btn:hover {
-        background: #72ffbf;
-        transform: translateY(-1px);
-      }
-      #footer-slide .nl-btn:focus-visible {
-        outline: 2px solid var(--f-accent);
-        outline-offset: 2px;
-      }
-      #footer-slide .footer-logo {
-        font-family: var(--font-display);
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: 0.06em;
+        font-size: clamp(1rem, 1.8vw, 1.28rem);
+        background: linear-gradient(135deg, #00f0ff, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.14em;
+        margin-bottom: 12px;
         display: block;
-        margin-bottom: 14px;
-        color: var(--f-text);
       }
-      #footer-slide .footer-tagline {
-        font-size: 13px;
-        color: var(--f-muted);
-        line-height: 1.65;
-        max-width: 240px;
-        margin-bottom: 24px;
-        font-weight: 300;
+      .ft-tag {
+        font-size: clamp(0.78rem, 1vw, 0.85rem);
+        color: rgba(255, 255, 255, 0.32);
+        line-height: 1.85;
+        max-width: 280px;
+        margin-bottom: 22px;
       }
-      #footer-slide .footer-social {
+      .social-row {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
       }
-      #footer-slide .soc-link {
-        width: 36px;
-        height: 36px;
-        background: var(--f-lift);
-        border: 1px solid var(--f-rim);
-        border-radius: 10px;
+      .soc {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.07);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--f-muted);
-        transition:
-          color 0.2s,
-          border-color 0.2s,
-          background 0.2s,
-          transform 0.2s;
+        transition: all 0.35s;
+        color: rgba(255, 255, 255, 0.45);
+        text-decoration: none;
+        flex-shrink: 0;
       }
-      #footer-slide .soc-link:hover {
-        color: var(--f-accent);
-        border-color: rgba(91, 255, 181, 0.25);
-        background: rgba(91, 255, 181, 0.05);
-        transform: translateY(-2px);
+      @media (hover: hover) {
+        .soc:hover {
+          background: rgba(0, 240, 255, 0.08);
+          border-color: rgba(0, 240, 255, 0.28);
+          color: #00f0ff;
+          transform: translateY(-2px);
+        }
       }
-      #footer-slide .soc-link:focus-visible {
-        outline: 2px solid var(--f-accent);
-        outline-offset: 2px;
-      }
-      #footer-slide .soc-link svg {
+      .soc svg {
         width: 15px;
         height: 15px;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+        fill: currentColor;
       }
-      #footer-slide .footer-col-title {
-        font-size: 9px;
-        letter-spacing: 0.18em;
+
+      .ft-col h3 {
+        font-family: var(--font-ui);
+        font-size: clamp(0.68rem, 0.85vw, 0.75rem);
+        letter-spacing: 0.06em;
         text-transform: uppercase;
-        color: var(--f-muted2);
-        margin-bottom: 16px;
-        display: block;
+        color: rgba(255, 255, 255, 0.3);
+        margin-bottom: clamp(12px, 1.5vw, 18px);
       }
-      #footer-slide .footer-links {
+      .ft-col ul {
         list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
       }
-      #footer-slide .footer-links a {
-        font-size: 13px;
-        color: var(--f-muted);
-        font-weight: 300;
-        transition: color 0.2s;
+      .ft-col li {
+        margin-bottom: clamp(7px, 1vw, 11px);
       }
-      #footer-slide .footer-links a:hover {
-        color: var(--f-text);
+      .ft-col a {
+        font-size: clamp(0.78rem, 0.95vw, 0.86rem);
+        color: rgba(255, 255, 255, 0.42);
+        text-decoration: none;
+        transition: color 0.3s;
+        display: block;
+        min-height: 32px;
+        line-height: 32px;
       }
-      #footer-slide .footer-links a:focus-visible {
-        outline: 1px solid var(--f-accent);
-        outline-offset: 2px;
-        border-radius: 2px;
+      @media (hover: hover) {
+        .ft-col a:hover {
+          color: #fff;
+        }
       }
-      #footer-slide .footer-bottom-wrap {
-        border-top: 1px solid var(--f-rim);
-      }
-      #footer-slide .footer-bottom {
-        padding: 20px 0;
+
+      .ft-bot {
+        max-width: 1400px;
+        margin: 0 auto;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
         flex-wrap: wrap;
+        gap: 10px;
       }
-      #footer-slide .footer-copy {
-        font-size: 11px;
-        color: var(--f-muted2);
+      .ft-copy {
+        font-family: var(--font-mono);
+        font-size: clamp(0.5rem, 0.65vw, 0.6rem);
+        color: rgba(255, 255, 255, 0.18);
+        letter-spacing: 0.06em;
       }
-      #footer-slide .footer-legal {
+      .ft-legal {
         display: flex;
-        gap: 20px;
+        flex-wrap: wrap;
+        gap: clamp(10px, 1.5vw, 20px);
       }
-      #footer-slide .footer-legal a {
-        font-size: 11px;
-        color: var(--f-muted2);
-        transition: color 0.2s;
+      .ft-legal a {
+        font-size: clamp(0.62rem, 0.75vw, 0.7rem);
+        color: rgba(255, 255, 255, 0.22);
+        text-decoration: none;
+        transition: color 0.3s;
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
       }
-      #footer-slide .footer-legal a:hover {
-        color: var(--f-muted);
-      }
-      @media (max-width: 1200px) {
-        #footer-slide .footer-inner {
-          grid-template-columns: 1fr 1fr 1fr;
+      @media (hover: hover) {
+        .ft-legal a:hover {
+          color: rgba(255, 255, 255, 0.55);
         }
-        #footer-slide .footer-brand {
-          grid-column: 1 / -1;
+      }
+
+      /* ── Footer responsive breakpoints ── */
+      @media (max-width: 1024px) {
+        .ft-top {
+          grid-template-columns: 1.4fr 1fr 1fr 1fr;
+          gap: clamp(20px, 2.5vw, 36px);
         }
       }
-      @media (max-width: 860px) {
-        #footer-slide .footer-inner {
+      @media (max-width: 820px) {
+        .ft-top {
           grid-template-columns: 1fr 1fr;
           gap: 28px;
         }
-        #footer-slide .footer-brand {
+        .ft-brand {
           grid-column: 1 / -1;
         }
-        #footer-slide .footer-newsletter {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        #footer-slide .nl-input {
-          min-width: 0;
-          width: 100%;
-        }
-        #footer-slide .footer-nl-form {
-          width: 100%;
+        .ft-tag {
+          max-width: 100%;
         }
       }
-      @media (max-width: 600px) {
-        #footer-slide .footer-inner {
-          grid-template-columns: 1fr;
+      @media (max-width: 480px) {
+        .ft-top {
+          grid-template-columns: 1fr 1fr;
         }
-        #footer-slide .footer-bottom {
+        .ft-bot {
           flex-direction: column;
           align-items: flex-start;
         }
-        #footer-slide .footer-legal {
-          flex-wrap: wrap;
-          gap: 12px;
+      }
+      @media (max-width: 360px) {
+        .ft-top {
+          grid-template-columns: 1fr;
+        }
+        .ft-legal {
+          gap: 8px;
         }
       }
     </style>
@@ -5355,7 +5429,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 1: CATEGORIES (داینامیک) -->
-      <div class="slide" id="categories" style="top: 100vh">
+      <div class="slide" id="categories" style="top: 100dvh">
         <div class="cat-mobile-wrap" id="cat-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5365,7 +5439,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 2: BEST SELLERS (داینامیک) -->
-      <div class="slide" id="bestsellers" style="top: 200vh">
+      <div class="slide" id="bestsellers" style="top: 200dvh">
         <div class="bs-mobile-wrap" id="bs-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5375,7 +5449,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 3: TESTIMONIALS (داینامیک) -->
-      <div class="slide" id="testimonials" style="top: 300vh">
+      <div class="slide" id="testimonials" style="top: 300dvh">
         <div class="testi-mobile-wrap" id="testi-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5385,7 +5459,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 4: GUIDE (داینامیک) -->
-      <div class="slide" id="guide" style="top: 400vh">
+      <div class="slide" id="guide" style="top: 400dvh">
         <div class="guide-mobile-wrap" id="guide-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5395,108 +5469,122 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 5: FINAL (داینامیک) -->
-      <div class="slide" id="final" style="top: 500vh">
+      <div class="slide" id="final" style="top: 500dvh">
         <div class="final-ambient"></div>
-        <div class="final-mobile-wrap" id="final-mobile-wrap">
-          <!-- توسط JavaScript پر می‌شود -->
-        </div>
-        <div class="final-desktop-wrap" id="final-desktop-wrap">
-          <!-- توسط JavaScript پر می‌شود -->
-        </div>
-        
-      </div>
+        <div class="final-scroll" id="final-scroll">
+          <div class="final-mobile-wrap" id="final-mobile-wrap">
+            <!-- توسط JavaScript پر می‌شود -->
+          </div>
+          <div class="final-desktop-wrap" id="final-desktop-wrap">
+            <!-- توسط JavaScript پر می‌شود -->
+          </div>
 
-      <!-- SLIDE 6: FOOTER -->
-      <div class="slide" id="footer-slide" style="top: 600vh">
-        <footer class="footer" aria-label="فوتر ولتکس">
-          <div class="fluid">
-            <div class="footer-inner">
-
-              <div class="footer-newsletter" role="complementary" aria-label="خبرنامه">
-                <div>
-                  <div class="footer-nl-title">در جریان باشید</div>
-                  <div class="footer-nl-sub">مدل‌های جدید، دسترسی زودهنگام، پیشنهادهای انحصاری.</div>
-                </div>
-                <div class="footer-nl-form" role="form">
-                  <label for="footer-nl-email" class="sr-only">ایمیل</label>
-                  <input class="nl-input" type="email" id="footer-nl-email" placeholder="your@email.com" autocomplete="email">
-                  <button class="nl-btn" id="footerNlBtn">عضویت</button>
+          <!-- FOOTER -->
+          <footer role="contentinfo">
+            <div class="ft-top">
+              <div class="ft-brand">
+                <span class="ft-logo">VOLTEX</span>
+                <p class="ft-tag">
+                  تعریف دوباره تحرک الکتریکی برای نسلی که متفاوت حرکت می‌کند. جسورانه.
+                  دقیق. پایدار.
+                </p>
+                <div class="social-row" role="list" aria-label="شبکه‌های اجتماعی">
+                  <a
+                    href="#"
+                    class="soc"
+                    aria-label="ولتکس در توییتر/X"
+                    role="listitem"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                      />
+                    </svg>
+                  </a>
+                  <a
+                    href="#"
+                    class="soc"
+                    aria-label="ولتکس در اینستاگرام"
+                    role="listitem"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
+                      />
+                    </svg>
+                  </a>
+                  <a
+                    href="#"
+                    class="soc"
+                    aria-label="ولتکس در یوتیوب"
+                    role="listitem"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                      />
+                    </svg>
+                  </a>
+                  <a
+                    href="#"
+                    class="soc"
+                    aria-label="ولتکس در لینکدین"
+                    role="listitem"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                      />
+                    </svg>
+                  </a>
                 </div>
               </div>
-
-              <div class="footer-brand">
-                <a href="/" class="footer-logo">VOLTEX</a>
-                <p class="footer-tagline">اسکوترهای برقی پریمیوم برای کسانی که از معمولی امتناع می‌کنند.</p>
-                <div class="footer-social" aria-label="شبکه‌های اجتماعی">
-                  <a href="#" class="soc-link" aria-label="اینستاگرام">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                  </a>
-                  <a href="#" class="soc-link" aria-label="توییتر">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
-                  </a>
-                  <a href="#" class="soc-link" aria-label="یوتیوب">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
-                  </a>
-                </div>
-              </div>
-
-              <nav aria-label="محصولات">
-                <span class="footer-col-title">محصولات</span>
-                <ul class="footer-links">
-                  <li><a href="#">اسکوترهای شهری</a></li>
+              <div class="ft-col">
+                <h3>محصولات</h3>
+                <ul>
+                  <li><a href="#">سری شهری</a></li>
                   <li><a href="#">آفرود</a></li>
+                  <li><a href="#">اسپرت</a></li>
                   <li><a href="#">تاشو</a></li>
-                  <li><a href="#">پرفورمنس</a></li>
-                  <li><a href="#">لوازم جانبی</a></li>
+                  <li><a href="#">برد بلند</a></li>
+                  <li><a href="#">پریمیوم</a></li>
                 </ul>
-              </nav>
-
-              <nav aria-label="شرکت">
-                <span class="footer-col-title">شرکت</span>
-                <ul class="footer-links">
+              </div>
+              <div class="ft-col">
+                <h3>شرکت</h3>
+                <ul>
                   <li><a href="#">درباره ولتکس</a></li>
+                  <li><a href="#">فناوری</a></li>
+                  <li><a href="#">پایداری</a></li>
                   <li><a href="#">فرصت‌های شغلی</a></li>
                   <li><a href="#">اخبار</a></li>
                   <li><a href="#">سرمایه‌گذاران</a></li>
                 </ul>
-              </nav>
-
-              <nav aria-label="پشتیبانی">
-                <span class="footer-col-title">پشتیبانی</span>
-                <ul class="footer-links">
+              </div>
+              <div class="ft-col">
+                <h3>پشتیبانی</h3>
+                <ul>
                   <li><a href="#">مرکز راهنمایی</a></li>
-                  <li><a href="#">پیگیری سفارش</a></li>
-                  <li><a href="#">مرجوعی</a></li>
+                  <li><a href="#">یافتن نمایندگی</a></li>
+                  <li><a href="#">مرکز خدمات</a></li>
                   <li><a href="#">گارانتی</a></li>
-                  <li><a href="#">نمایندگی‌ها</a></li>
+                  <li><a href="#">تماس با ما</a></li>
+                  <li><a href="#">جامعه کاربری</a></li>
                 </ul>
-              </nav>
-
-              <nav aria-label="قانونی">
-                <span class="footer-col-title">قانونی</span>
-                <ul class="footer-links">
-                  <li><a href="#">حریم خصوصی</a></li>
-                  <li><a href="#">شرایط استفاده</a></li>
-                  <li><a href="#">تنظیمات کوکی</a></li>
-                  <li><a href="#">اطلاعات قانونی</a></li>
-                </ul>
-              </nav>
-
+              </div>
             </div>
-          </div>
 
-          <div class="footer-bottom-wrap">
-            <div class="fluid footer-bottom">
-              <span class="footer-copy">© ۱۴۰۵ ولتکس GmbH. تمامی حقوق محفوظ است.</span>
-              <nav class="footer-legal" aria-label="لینک‌های حقوقی">
+            <div class="ft-bot">
+              <div class="ft-copy">© ۱۴۰۴ ولتکس الکتریک. تمام حقوق محفوظ است.</div>
+              <nav class="ft-legal" aria-label="لینک‌های قانونی">
                 <a href="#">حریم خصوصی</a>
-                <a href="#">شرایط</a>
-                <a href="#">کوکی‌ها</a>
+                <a href="#">شرایط استفاده</a>
+                <a href="#">تنظیمات کوکی</a>
                 <a href="#">نقشه سایت</a>
               </nav>
             </div>
-          </div>
-        </footer>
+          </footer>
+        </div>
       </div>
 
     <!-- ============================================================
@@ -6494,19 +6582,6 @@ DESKTOP (1024px+)
               </div>
             </div>
           </div>
-          <div class="stmt-desktop fs-anim d-2">
-            <div class="stmt-ring"></div>
-            <div class="stmt-ring"></div>
-            <div class="stmt-inner-d">
-              <span class="stmt-eyebrow-d fs-anim d-2">سفر شما از اینجا آغاز می‌شود</span>
-              <div class="stmt-desktop-title fs-anim d-3">امروز <em>جلوتر</em> برو</div>
-              <p class="stmt-desktop-desc fs-anim d-4">به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند. اسکوترهای پریمیوم، تحویل در ۲۴ ساعت، با ۳ سال گارانتی.</p>
-              <div class="stmt-desktop-btns fs-anim d-5">
-                <button class="stmt-btn-p-d" onclick="goToSlide(2)">مشاهده همه مدل‌ها</button>
-                <button class="stmt-btn-s-d" onclick="goToSlide(1)">کاوش مجموعه‌ها</button>
-              </div>
-            </div>
-          </div>
         `;
       }
     }
@@ -6562,8 +6637,32 @@ DESKTOP (1024px+)
       let currentSlide = 0;
       let isAnimating = false;
 
+      // Slide paging runs on tablets, laptops, and desktop. It is
+      // switched off only on true handheld phones (html.is-mobile-scroll,
+      // set in <head> from the same viewport/pointer media query used by
+      // the CSS above), where the page is a normal scrolling document
+      // instead. Reading the class here — rather than re-declaring a
+      // second, possibly-divergent media query — guarantees the JS and
+      // CSS always agree on which devices get which behavior.
+      const mobileScrollMQ = window.matchMedia(
+        "(max-width: 767.98px), (max-height: 500px) and (max-width: 1023.98px) and (orientation: landscape) and (pointer: coarse)",
+      );
+      const isPagingMode = () => !document.documentElement.classList.contains("is-mobile-scroll");
+
       function goToSlide(index) {
         if (index < 0 || index >= totalSlides) return;
+
+        if (!isPagingMode()) {
+          // True mobile only: just scroll the target section into view
+          // like a normal anchor link, no fixed-viewport paging.
+          slides[index].scrollIntoView({ behavior: "smooth", block: "start" });
+          currentSlide = index;
+          document.querySelectorAll(".nav-dot").forEach((dot, i) => {
+            dot.classList.toggle("active", i === currentSlide);
+          });
+          return;
+        }
+
         if (isAnimating) return;
         isAnimating = true;
         slides[currentSlide].classList.remove("active");
@@ -6583,6 +6682,25 @@ DESKTOP (1024px+)
         }, 60);
       }
 
+      // True mobile only: reveal each section's entrance animations as it
+      // scrolls into view (normal scroll-reveal pattern), instead of the
+      // paging-mode "one active slide at a time" state. The CSS rule
+      // above already forces everything visible as a fallback, so this
+      // is purely a progressive-enhancement animation trigger.
+      if (!isPagingMode() && "IntersectionObserver" in window) {
+        const revealObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("active");
+              }
+            });
+          },
+          { threshold: 0.2 },
+        );
+        slides.forEach((slide) => revealObserver.observe(slide));
+      }
+
       // Nav dots
       const navDots = document.getElementById("nav-dots");
       slides.forEach((_, i) => {
@@ -6595,9 +6713,40 @@ DESKTOP (1024px+)
       // Wheel navigation
       let wheelAccum = 0,
         wheelTimer = null;
+
+      // Finds the nearest ancestor that is actually scrollable right now —
+      // either slide 6's dedicated .final-scroll container, or (on short
+      // viewports / unusual aspect ratios) a .slide itself when its content
+      // doesn't fit the available height. Returns null otherwise.
+      function findScrollableAncestor(el) {
+        const finalScroll = el.closest(".final-scroll");
+        if (finalScroll) return finalScroll;
+        const slide = el.closest(".slide");
+        if (slide && slide.scrollHeight > slide.clientHeight) return slide;
+        return null;
+      }
+
       window.addEventListener(
         "wheel",
         (e) => {
+          // Paging mode only (tablet/laptop/desktop). On true mobile the
+          // page scrolls natively, so just let the browser handle the wheel event.
+          if (!isPagingMode()) return;
+
+          // Let internally-scrollable content (slide 6's promise + footer
+          // stack, or any slide that overflows on a short viewport) scroll
+          // natively unless it's already at its top/bottom edge — only
+          // then hand off to slide navigation.
+          const scrollable = findScrollableAncestor(e.target);
+          if (scrollable) {
+            const atTop = scrollable.scrollTop <= 0;
+            const atBottom =
+              scrollable.scrollTop + scrollable.clientHeight >=
+              scrollable.scrollHeight - 1;
+            if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
+              return; // allow native scroll inside the slide
+            }
+          }
           e.preventDefault();
           wheelAccum += e.deltaY;
           clearTimeout(wheelTimer);
@@ -6612,8 +6761,9 @@ DESKTOP (1024px+)
         { passive: false },
       );
 
-      // Keyboard navigation
+      // Keyboard navigation (paging mode only: tablet/laptop/desktop)
       document.addEventListener("keydown", (e) => {
+        if (!isPagingMode()) return;
         if (e.key === "ArrowDown" || e.key === "PageDown") {
           e.preventDefault();
           goToSlide(currentSlide + 1);
@@ -6639,12 +6789,15 @@ DESKTOP (1024px+)
       document.addEventListener(
         "touchend",
         (e) => {
+          // Paging-mode swipe (tablet/laptop/desktop). On true mobile,
+          // native touch scrolling handles the page.
+          if (!isPagingMode()) return;
           const target = e.target;
           if (
             target.closest(".bs-carousel") ||
             target.closest(".cat-tabs-strip") ||
             target.closest(".guide-list") ||
-            target.closest(".final-mobile-wrap")
+            findScrollableAncestor(target)
           )
             return;
           const diff = touchStartY - e.changedTouches[0].clientY;
@@ -6707,29 +6860,23 @@ DESKTOP (1024px+)
         }
       });
 
-      /* ════════════════════════════════════
-         FOOTER NEWSLETTER SUBMIT
-         ════════════════════════════════════ */
-      const footerNlBtn = document.getElementById("footerNlBtn");
-      if (footerNlBtn) {
-        footerNlBtn.addEventListener("click", function () {
-          const input = document.getElementById("footer-nl-email");
-          const email = input.value.trim();
 
-          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            input.style.borderColor = "rgba(248,113,113,.6)";
-            input.focus();
-            setTimeout(() => (input.style.borderColor = ""), 1800);
-            return;
-          }
-
-          this.textContent = "✓ ثبت شد";
-          this.style.background = "#00c97a";
-          this.disabled = true;
-          input.value = "";
-          input.disabled = true;
-        });
-      }
+      // Keep things sane if the viewport crosses the mobile/paging
+      // boundary at runtime (window resize, orientation change, devtools
+      // device toggle) instead of only on page load. e.matches === true
+      // means we just entered true-mobile (native scroll) mode.
+      mobileScrollMQ.addEventListener("change", (e) => {
+        if (!e.matches) {
+          // Entering paging mode (tablet/laptop/desktop): re-apply the
+          // paging transform for whatever slide is considered current.
+          wrapper.style.transform = `translateY(-${currentSlide * 100}dvh)`;
+          slides.forEach((s, i) => s.classList.toggle("active", i === currentSlide));
+        } else {
+          // Entering true-mobile mode: drop the paging transform so the
+          // wrapper/slides fall back to normal static document flow.
+          wrapper.style.transform = "";
+        }
+      });
 
       /* ════════════════════════════════════
          START

@@ -18,14 +18,17 @@
 }
 
 :root {
-  --bg:       #0A0A0A;
-  --bg2:      #141414;
-  --surface:  #1D1D1D;
+  --bg:       #070B14;
+  --bg2:      #0E1423;
+  --surface:  rgba(255,255,255,.03);
   --text:     #FFFFFF;
-  --muted:    #A1A1AA;
-  --gold:     #D4AF37;
-  --gold-h:   #E5C158;
-  --border:   rgba(255,255,255,0.08);
+  --muted:    rgba(255,255,255,.65);
+  --primary:     #4F46E5;
+  --primary-h:   #6366F1;
+  --secondary: #06B6D4;
+  --accent:   #22C55E;
+  --border:   rgba(255,255,255,.08);
+  --glow:     rgba(79,70,229,.35);
   --font:     'Vazirmatn', system-ui, sans-serif;
 }
 
@@ -52,7 +55,7 @@ img, svg, video { display: block; max-width: 100%; height: auto; }
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
 
 /* ═══════════════════════════════════════════
    NAV
@@ -81,7 +84,7 @@ nav.scrolled {
   flex-shrink: 0;
   white-space: nowrap;
 }
-.nav-logo span { color: var(--gold); }
+.nav-logo span { color: var(--primary); }
 
 .nav-links {
   display: flex;
@@ -96,12 +99,12 @@ nav.scrolled {
   transition: color .3s;
   white-space: nowrap;
 }
-.nav-links a:hover { color: var(--gold); }
+.nav-links a:hover { color: var(--primary); }
 
 .nav-cta {
   padding: .55rem 1.5rem;
-  border: 1px solid var(--gold);
-  color: var(--gold);
+  border: 1px solid var(--primary);
+  color: var(--primary);
   text-decoration: none;
   font-size: .83rem;
   font-weight: 500;
@@ -111,7 +114,7 @@ nav.scrolled {
   flex-shrink: 0;
   white-space: nowrap;
 }
-.nav-cta:hover { background: var(--gold); color: var(--bg); }
+.nav-cta:hover { background: var(--primary); color: var(--bg); }
 
 .nav-hamburger {
   display: none;
@@ -152,13 +155,13 @@ nav.scrolled {
   border-bottom: 1px solid var(--border);
   transition: color .3s;
 }
-.nav-drawer a:hover { color: var(--gold); }
+.nav-drawer a:hover { color: var(--primary); }
 .nav-drawer .nav-drawer-cta {
   margin-top: .5rem;
   padding: .9rem;
   text-align: center;
-  border: 1px solid var(--gold);
-  color: var(--gold);
+  border: 1px solid var(--primary);
+  color: var(--primary);
   border-radius: 2px;
   font-weight: 600;
   border-bottom: none;
@@ -179,7 +182,7 @@ section { padding: 6rem 0; width: 100%; }
   display: inline-flex;
   align-items: center;
   gap: .55rem;
-  color: var(--gold);
+  color: var(--primary);
   font-size: .72rem;
   font-weight: 500;
   letter-spacing: .22em;
@@ -191,7 +194,7 @@ section { padding: 6rem 0; width: 100%; }
   display: block;
   width: 18px;
   height: 1px;
-  background: var(--gold);
+  background: var(--primary);
   flex-shrink: 0;
 }
 
@@ -224,8 +227,8 @@ section { padding: 6rem 0; width: 100%; }
 .btn-primary {
   display: inline-block;
   padding: .9rem 2.6rem;
-  background: var(--gold);
-  color: #000;
+  background: var(--primary);
+  color: #fff;
   font-family: var(--font);
   font-size: .93rem;
   font-weight: 700;
@@ -248,9 +251,9 @@ section { padding: 6rem 0; width: 100%; }
 }
 .btn-primary:hover::after { transform: translateX(-110%); }
 .btn-primary:hover {
-  background: var(--gold-h);
+  background: var(--primary-h);
   transform: translateY(-2px);
-  box-shadow: 0 12px 36px rgba(212,175,55,.28);
+  box-shadow: 0 12px 36px rgba(79,70,229,.28);
 }
 
 .btn-outline {
@@ -269,8 +272,8 @@ section { padding: 6rem 0; width: 100%; }
   white-space: nowrap;
 }
 .btn-outline:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--primary);
+  color: var(--primary);
   transform: translateY(-2px);
 }
 
@@ -290,8 +293,8 @@ section { padding: 6rem 0; width: 100%; }
 .hero-bg {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 70%, rgba(212,175,55,.07) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 80% at 20% 30%, rgba(212,175,55,.04) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% 70%, rgba(79,70,229,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 20% 30%, rgba(79,70,229,.04) 0%, transparent 60%),
     linear-gradient(180deg, #0A0A0A 0%, #080808 100%);
 }
 .hero-grid {
@@ -316,7 +319,7 @@ section { padding: 6rem 0; width: 100%; }
   display: inline-flex;
   align-items: center;
   gap: .6rem;
-  color: var(--gold);
+  color: var(--primary);
   font-size: .76rem;
   font-weight: 500;
   letter-spacing: .2em;
@@ -332,7 +335,7 @@ section { padding: 6rem 0; width: 100%; }
   display: block;
   width: 26px;
   height: 1px;
-  background: var(--gold);
+  background: var(--primary);
   opacity: .5;
   flex-shrink: 0;
 }
@@ -347,7 +350,7 @@ section { padding: 6rem 0; width: 100%; }
   word-break: keep-all;
   overflow-wrap: break-word;
 }
-.hero-h1 .gold { color: var(--gold); }
+.hero-h1 .gold { color: var(--primary); }
 .hero-sub {
   font-size: clamp(.95rem, 2.2vw, 1.3rem);
   color: var(--muted);
@@ -385,7 +388,7 @@ section { padding: 6rem 0; width: 100%; }
 .hero-scroll-line {
   width: 1px;
   height: 46px;
-  background: linear-gradient(to bottom, var(--gold), transparent);
+  background: linear-gradient(to bottom, var(--primary), transparent);
   animation: scrollPulse 2s infinite;
 }
 @keyframes scrollPulse {
@@ -412,7 +415,7 @@ section { padding: 6rem 0; width: 100%; }
   word-break: keep-all;
   overflow-wrap: break-word;
 }
-.philosophy-left .big-quote .gold { color: var(--gold); }
+.philosophy-left .big-quote .gold { color: var(--primary); }
 .philosophy-left p {
   color: var(--muted);
   line-height: 2;
@@ -432,8 +435,8 @@ section { padding: 6rem 0; width: 100%; }
   border: 1px solid var(--border);
   transition: background .3s;
 }
-.pillar-item:hover { background: rgba(212,175,55,.05); }
-.pillar-num { font-size: .68rem; color: var(--gold); letter-spacing: .2em; margin-bottom: .4rem; }
+.pillar-item:hover { background: rgba(79,70,229,.05); }
+.pillar-num { font-size: .68rem; color: var(--primary); letter-spacing: .2em; margin-bottom: .4rem; }
 .pillar-title { font-size: .95rem; font-weight: 600; margin-bottom: .35rem; }
 .pillar-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; }
 
@@ -456,81 +459,15 @@ section { padding: 6rem 0; width: 100%; }
 .philosophy-visual::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(212,175,55,.08) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(79,70,229,.08) 0%, transparent 60%);
   pointer-events: none;
 }
 .gold-frame {
   position: absolute;
   top: 1.4rem; right: 1.4rem; bottom: 1.4rem; left: 1.4rem;
-  border: 1px solid rgba(212,175,55,.2);
+  border: 1px solid rgba(79,70,229,.2);
   pointer-events: none;
 }
-
-/* ═══════════════════════════════════════════
-   SHOWCASE
-═══════════════════════════════════════════ */
-#showcase {
-  background: var(--bg2);
-  padding: 0;
-  overflow: hidden;
-  width: 100%;
-}
-.showcase-item {
-  position: relative;
-  min-height: 420px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  width: 100%;
-}
-.showcase-bg {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
-}
-.showcase-bg-img {
-  position: absolute; inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: .25;
-  transition: opacity .6s, transform 8s;
-}
-.showcase-item:hover .showcase-bg-img { opacity: .35; transform: scale(1.04); }
-.showcase-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgba(10,10,10,.9) 0%, rgba(10,10,10,.4) 60%, transparent 100%);
-}
-.showcase-item.alt .showcase-overlay {
-  background: linear-gradient(270deg, rgba(10,10,10,.9) 0%, rgba(10,10,10,.4) 60%, transparent 100%);
-}
-.showcase-text {
-  position: relative;
-  z-index: 2;
-  padding: 3.5rem 3rem;
-  max-width: 480px;
-  width: 100%;
-}
-.showcase-item.alt .showcase-text {
-  margin-right: auto;
-  margin-left: 0;
-}
-.showcase-text .tag {
-  display: inline-block;
-  padding: .28rem .75rem;
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  font-size: .68rem;
-  letter-spacing: .18em;
-  margin-bottom: 1.1rem;
-}
-.showcase-text h3 {
-  font-size: clamp(1.5rem, 3vw, 2.6rem);
-  font-weight: 700;
-  margin-bottom: .9rem;
-  line-height: 1.25;
-  word-break: keep-all;
-  overflow-wrap: break-word;
-}
-.showcase-text p { color: var(--muted); line-height: 1.8; font-size: .92rem; font-weight: 300; }
 
 /* ═══════════════════════════════════════════
    TIMELINE
@@ -548,7 +485,7 @@ section { padding: 6rem 0; width: 100%; }
   top: 0; bottom: 0;
   right: 50%;
   width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--gold) 10%, var(--gold) 90%, transparent);
+  background: linear-gradient(to bottom, transparent, var(--primary) 10%, var(--primary) 90%, transparent);
   opacity: .3;
 }
 .timeline-items { display: flex; flex-direction: column; }
@@ -577,15 +514,15 @@ section { padding: 6rem 0; width: 100%; }
 .tl-dot-ring {
   width: 13px; height: 13px;
   border-radius: 50%;
-  border: 2px solid var(--gold);
+  border: 2px solid var(--primary);
   background: var(--bg);
   position: relative;
   z-index: 2;
   flex-shrink: 0;
   transition: all .4s;
 }
-.tl-item:hover .tl-dot-ring { background: var(--gold); box-shadow: 0 0 18px rgba(212,175,55,.5); }
-.tl-year { font-size: .68rem; color: var(--gold); font-weight: 600; letter-spacing: .1em; }
+.tl-item:hover .tl-dot-ring { background: var(--primary); box-shadow: 0 0 18px rgba(79,70,229,.5); }
+.tl-year { font-size: .68rem; color: var(--primary); font-weight: 600; letter-spacing: .1em; }
 .tl-content h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: .45rem; }
 .tl-content p { color: var(--muted); font-size: .85rem; line-height: 1.75; font-weight: 300; }
 
@@ -615,27 +552,27 @@ section { padding: 6rem 0; width: 100%; }
 .diff-card::before {
   content: '';
   position: absolute; top: 0; right: 0; left: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
   transform: scaleX(0);
   transition: transform .5s;
 }
 .diff-card:hover::before { transform: scaleX(1); }
-.diff-card:hover { background: rgba(212,175,55,.04); }
+.diff-card:hover { background: rgba(79,70,229,.04); }
 .diff-icon {
   width: 48px; height: 48px;
-  border: 1px solid var(--gold);
+  border: 1px solid var(--primary);
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 1.6rem;
   transition: background .4s;
   flex-shrink: 0;
 }
-.diff-card:hover .diff-icon { background: rgba(212,175,55,.1); }
-.diff-icon svg { color: var(--gold); flex-shrink: 0; }
+.diff-card:hover .diff-icon { background: rgba(79,70,229,.1); }
+.diff-icon svg { color: var(--primary); flex-shrink: 0; }
 .diff-card h3 { font-size: 1.08rem; font-weight: 700; margin-bottom: .7rem; }
 .diff-card p { color: var(--muted); font-size: .85rem; line-height: 1.8; font-weight: 300; }
 .diff-number {
   position: absolute; bottom: 1.4rem; left: 1.4rem;
-  font-size: .62rem; color: rgba(212,175,55,.3); letter-spacing: .15em;
+  font-size: .62rem; color: rgba(79,70,229,.3); letter-spacing: .15em;
 }
 
 /* ═══════════════════════════════════════════
@@ -644,7 +581,7 @@ section { padding: 6rem 0; width: 100%; }
 #metrics { background: var(--bg); position: relative; overflow: hidden; }
 .metrics-bg {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,175,55,.04) 0%, transparent 70%);
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(79,70,229,.04) 0%, transparent 70%);
 }
 .metrics-wrap { position: relative; z-index: 1; text-align: center; }
 .metrics-wrap h2 {
@@ -666,67 +603,16 @@ section { padding: 6rem 0; width: 100%; }
   border-bottom: 2px solid transparent;
   transition: border-color .4s, background .4s;
 }
-.metric-box:hover { border-color: var(--gold); background: rgba(212,175,55,.03); }
+.metric-box:hover { border-color: var(--primary); background: rgba(79,70,229,.03); }
 .metric-num {
   font-size: clamp(2.2rem, 5vw, 4rem);
   font-weight: 800;
-  color: var(--gold);
+  color: var(--primary);
   line-height: 1;
   letter-spacing: -0.03em;
   margin-bottom: .45rem;
 }
 .metric-label { font-size: .9rem; color: var(--muted); font-weight: 300; letter-spacing: .05em; }
-
-/* ═══════════════════════════════════════════
-   EXPERIENCE
-═══════════════════════════════════════════ */
-#experience { background: var(--bg2); }
-.exp-top { text-align: center; margin-bottom: 4rem; }
-.exp-top h2 {
-  font-size: clamp(1.9rem, 4vw, 3.3rem);
-  font-weight: 800; letter-spacing: -0.02em; margin-bottom: .9rem;
-}
-.exp-top p { color: var(--muted); max-width: 520px; margin: 0 auto; line-height: 1.8; font-size: 1rem; font-weight: 300; }
-
-.exp-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto;
-  gap: 1px;
-  background: var(--border);
-  width: 100%;
-}
-.exp-card {
-  background: var(--bg2);
-  padding: 2.8rem 2.2rem;
-  position: relative;
-  overflow: hidden;
-  cursor: default;
-  transition: background .4s;
-}
-.exp-card.tall {
-  grid-row: span 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 440px;
-}
-.exp-card.tall .exp-visual {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, #1a1408, #2a2010, #1a1408);
-}
-.exp-card.tall .exp-visual::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,.82) 40%, transparent 100%);
-}
-.exp-card.tall .exp-card-content { position: relative; z-index: 1; }
-.exp-card:hover { background: rgba(212,175,55,.04); }
-.exp-card.tall:hover .exp-visual { filter: brightness(1.12); }
-.exp-tag { font-size: .68rem; color: var(--gold); letter-spacing: .2em; margin-bottom: .9rem; text-transform: uppercase; }
-.exp-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: .7rem; line-height: 1.35; }
-.exp-card p { color: var(--muted); font-size: .85rem; line-height: 1.8; font-weight: 300; }
-.exp-icon { font-size: 2.2rem; margin-bottom: 1.3rem; opacity: .65; }
 
 /* ═══════════════════════════════════════════
    VALUES
@@ -755,84 +641,416 @@ section { padding: 6rem 0; width: 100%; }
 .value-card::before {
   content: '';
   position: absolute; inset: -1px;
-  background: linear-gradient(135deg, rgba(212,175,55,.18), transparent, rgba(212,175,55,.09));
+  background: linear-gradient(135deg, rgba(79,70,229,.18), transparent, rgba(79,70,229,.09));
   opacity: 0;
   transition: opacity .4s;
 }
 .value-card:hover::before { opacity: 1; }
 .value-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(212,175,55,.28);
+  border-color: rgba(79,70,229,.28);
   box-shadow: 0 18px 52px rgba(0,0,0,.38);
 }
 .value-icon {
   width: 52px; height: 52px;
   margin: 0 auto 1.3rem;
-  background: rgba(212,175,55,.08);
-  border: 1px solid rgba(212,175,55,.2);
+  background: rgba(79,70,229,.08);
+  border: 1px solid rgba(79,70,229,.2);
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
   flex-shrink: 0;
 }
-.value-icon svg { color: var(--gold); flex-shrink: 0; }
+.value-icon svg { color: var(--primary); flex-shrink: 0; }
 .value-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .45rem; }
 .value-card p { font-size: .78rem; color: var(--muted); line-height: 1.7; }
 
 /* ═══════════════════════════════════════════
-   TESTIMONIALS
+   OUR STORY
 ═══════════════════════════════════════════ */
-#testimonials { background: var(--bg2); }
-.test-header { text-align: center; margin-bottom: 3.5rem; }
-.test-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
-.test-header p { color: var(--muted); margin-top: .9rem; font-size: 1rem; font-weight: 300; }
-
-.test-grid {
+#story { background: var(--bg2); overflow: hidden; }
+.story-intro {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.4rem;
-  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  margin-bottom: 5.5rem;
 }
-.test-card {
+.story-intro-left { position: relative; padding-right: 2.2rem; }
+.story-glow-line {
+  position: absolute;
+  top: .2rem; bottom: .2rem; right: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--primary) 15%, var(--secondary) 50%, var(--primary) 85%, transparent);
+  box-shadow: 0 0 16px var(--glow), 0 0 28px var(--glow);
+  animation: storyLinePulse 3.5s ease-in-out infinite;
+}
+@keyframes storyLinePulse {
+  0%, 100% { opacity: .55; }
+  50%      { opacity: 1; }
+}
+.story-subtitle {
+  color: var(--secondary);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  margin-bottom: 1rem;
+}
+.story-title {
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  margin-bottom: 1.6rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.story-title .accent-grad {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.story-lead {
+  color: var(--muted);
+  line-height: 2;
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 2.2rem;
+  max-width: 480px;
+}
+.story-stats {
+  display: flex;
+  gap: 2.4rem;
+  flex-wrap: wrap;
+}
+.story-stat { position: relative; padding-right: 1.2rem; }
+.story-stat::before {
+  content: '';
+  position: absolute;
+  top: .15em; right: 0; bottom: .15em;
+  width: 1px;
+  background: var(--border);
+}
+.story-stat:first-child { padding-right: 0; }
+.story-stat:first-child::before { display: none; }
+.story-stat-num {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+  margin-bottom: .35rem;
+}
+.story-stat-label { font-size: .76rem; color: var(--muted); font-weight: 300; }
+
+.story-visual {
+  position: relative;
+  aspect-ratio: 4/5;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.story-glow-orb {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 65%; height: 65%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+  filter: blur(30px);
+  transform: translate(-50%, -50%);
+  transition: transform .3s ease-out;
+}
+.story-gradient-shape {
+  position: absolute;
+  border-radius: 42% 58% 60% 40% / 45% 40% 60% 55%;
+  filter: blur(2px);
+  opacity: .55;
+  animation: storyMorph 12s ease-in-out infinite;
+}
+.story-shape-1 {
+  width: 62%; height: 62%;
+  top: 6%; right: 4%;
+  background: linear-gradient(135deg, rgba(79,70,229,.4), rgba(6,182,212,.18));
+}
+.story-shape-2 {
+  width: 42%; height: 42%;
+  bottom: 4%; left: 2%;
+  background: linear-gradient(135deg, rgba(6,182,212,.3), rgba(34,197,94,.14));
+  animation-delay: -6s;
+}
+@keyframes storyMorph {
+  0%, 100% { border-radius: 42% 58% 60% 40% / 45% 40% 60% 55%; transform: rotate(0deg) scale(1); }
+  50%      { border-radius: 58% 42% 40% 60% / 55% 60% 40% 45%; transform: rotate(8deg) scale(1.06); }
+}
+.story-float-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  backdrop-filter: blur(6px);
+  animation: storyFloat 7s ease-in-out infinite;
+}
+.story-fc-1 { width: 84px; height: 84px; top: 10%; left: 8%; animation-duration: 8s; }
+.story-fc-2 { width: 46px; height: 46px; bottom: 22%; right: 10%; animation-duration: 6.5s; animation-delay: -2s; }
+.story-fc-3 { width: 30px; height: 30px; top: 46%; left: -2%; animation-duration: 5.5s; animation-delay: -4s; }
+@keyframes storyFloat {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50%      { transform: translateY(-18px) translateX(6px); }
+}
+.story-glass-card {
+  position: absolute;
+  width: 60%;
+  padding: 1.3rem 1.4rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 60px rgba(0,0,0,.4);
+  transition: transform .5s ease, box-shadow .5s ease;
+}
+.story-glass-card:hover { transform: translateY(-6px); box-shadow: 0 30px 70px rgba(0,0,0,.5), 0 0 32px var(--glow); }
+.story-card-main { top: 6%; right: 6%; z-index: 3; }
+.story-card-sub { bottom: 26%; left: 2%; z-index: 2; width: 48%; }
+.story-card-mini {
+  bottom: 6%; right: 14%; z-index: 4;
+  width: auto; padding: .7rem 1rem;
+  display: flex; align-items: center; gap: .6rem;
+}
+.story-card-mini .gc-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: #fff;
+}
+.story-glass-card .gc-label { font-size: .66rem; color: var(--secondary); letter-spacing: .12em; margin-bottom: .5rem; }
+.story-glass-card .gc-num { font-size: 1.9rem; font-weight: 800; margin-bottom: .2rem; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.story-glass-card .gc-text { font-size: .78rem; color: var(--muted); }
+.story-glass-card .gc-bar { height: 3px; border-radius: 2px; background: var(--border); margin-top: .8rem; overflow: hidden; }
+.story-glass-card .gc-bar::after { content: ''; display: block; height: 100%; width: 72%; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+
+/* ── Detailed story roadmap ── */
+.story-roadmap { position: relative; }
+.story-roadmap-track {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.4rem;
+  position: relative;
+}
+.story-roadmap-track::before {
+  content: '';
+  position: absolute;
+  top: 27px; right: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--secondary), var(--primary));
+  opacity: .35;
+}
+.story-stage {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
-  padding: 2.2rem;
-  position: relative;
-  overflow: hidden;
-  transition: all .4s;
-  cursor: default;
+  border-radius: 14px;
+  padding: 1.6rem 1.3rem 1.5rem;
+  transition: transform .4s ease, border-color .4s ease, box-shadow .4s ease;
 }
-.test-card::after {
-  content: '';
-  position: absolute; bottom: 0; right: 0; left: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  transform: scaleX(0);
-  transition: transform .5s;
-}
-.test-card:hover::after { transform: scaleX(1); }
-.test-card:hover {
-  border-color: rgba(212,175,55,.2);
-  transform: translateY(-4px);
-  box-shadow: 0 18px 48px rgba(0,0,0,.38);
-}
-.test-stars { color: var(--gold); font-size: 1rem; letter-spacing: .18em; margin-bottom: 1.1rem; }
-.test-quote {
-  font-size: .9rem; line-height: 1.9;
-  color: var(--muted); margin-bottom: 1.8rem;
-  font-weight: 300; font-style: italic;
-}
-.test-author { display: flex; align-items: center; gap: .9rem; }
-.test-avatar {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold), rgba(212,175,55,.3));
+.story-stage:nth-child(even) { transform: translateY(1.8rem); }
+.story-stage:hover { transform: translateY(-6px); border-color: rgba(79,70,229,.32); box-shadow: 0 20px 48px rgba(0,0,0,.4); }
+.story-stage:nth-child(even):hover { transform: translateY(1.8rem) translateY(-6px); }
+.story-stage-icon {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 2px solid var(--primary);
   display: flex; align-items: center; justify-content: center;
-  font-size: .88rem; font-weight: 700; color: #000; flex-shrink: 0;
+  color: var(--primary);
+  margin-bottom: 1.1rem;
+  transition: all .4s;
+  position: relative;
+  z-index: 1;
 }
-.test-name { font-size: .88rem; font-weight: 600; }
-.test-role { font-size: .73rem; color: var(--muted); }
-.test-card.featured {
-  background: linear-gradient(135deg, rgba(212,175,55,.08) 0%, var(--surface) 100%);
-  border-color: rgba(212,175,55,.24);
+.story-stage:hover .story-stage-icon { background: var(--primary); color: #fff; box-shadow: 0 0 18px var(--glow); }
+.story-stage-num {
+  position: absolute;
+  top: 1.2rem; left: 1.2rem;
+  font-size: .66rem;
+  color: var(--muted);
+  letter-spacing: .12em;
+  opacity: .6;
 }
+.story-stage h4 { font-size: .98rem; font-weight: 700; margin-bottom: .55rem; }
+.story-stage p { font-size: .78rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+/* ═══════════════════════════════════════════
+   OUR TEAM
+═══════════════════════════════════════════ */
+#team { background: var(--bg); position: relative; }
+.team-header { text-align: center; margin-bottom: 3.5rem; }
+.team-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
+.team-header p { color: var(--muted); margin-top: .9rem; font-size: 1rem; font-weight: 300; }
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.6rem;
+  width: 100%;
+}
+.team-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  transition: transform .45s ease, border-color .45s ease, box-shadow .45s ease;
+}
+.team-card::before {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--primary), transparent 40%, var(--secondary));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .45s ease;
+  pointer-events: none;
+}
+.team-card::after {
+  content: '';
+  position: absolute;
+  width: 160px; height: 160px;
+  top: -60px; left: -60px;
+  background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+  filter: blur(20px);
+  opacity: 0;
+  transition: opacity .45s ease;
+  pointer-events: none;
+}
+.team-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(79,70,229,.3);
+  box-shadow: 0 26px 60px rgba(0,0,0,.45);
+}
+.team-card:hover::before,
+.team-card:hover::after { opacity: 1; }
+
+.team-img-wrap {
+  position: relative;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d0f1a, #141a2a, #0d0f1a);
+}
+.team-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .6s ease, filter .6s ease;
+  filter: grayscale(.2);
+}
+.team-card:hover .team-img-wrap img { transform: scale(1.08); filter: grayscale(0); }
+.team-img-wrap::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(7,11,20,.85) 0%, transparent 55%);
+}
+
+.team-body { position: relative; z-index: 1; padding: 1.5rem 1.4rem 1.7rem; }
+.team-name { font-size: 1.05rem; font-weight: 700; margin-bottom: .3rem; }
+.team-underline {
+  width: 26px; height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  margin-bottom: .7rem;
+  transition: width .4s ease;
+}
+.team-card:hover .team-underline { width: 48px; }
+.team-role { font-size: .78rem; color: var(--secondary); font-weight: 500; letter-spacing: .04em; margin-bottom: .8rem; }
+.team-desc { font-size: .82rem; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 1.2rem; }
+.team-socials { display: flex; gap: .6rem; }
+.team-socials a {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  transition: all .3s;
+  flex-shrink: 0;
+}
+.team-socials a:hover { border-color: var(--primary); color: var(--text); background: rgba(79,70,229,.12); }
+
+/* ═══════════════════════════════════════════
+   VISION
+═══════════════════════════════════════════ */
+#vision { background: var(--bg2); position: relative; overflow: hidden; }
+.vision-bg-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 80% 30%, rgba(6,182,212,.08) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 60% at 10% 80%, rgba(79,70,229,.08) 0%, transparent 60%);
+}
+.vision-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.vision-left h2 {
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  margin-bottom: 1.4rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.vision-left p {
+  color: var(--muted);
+  line-height: 2;
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 2.2rem;
+  max-width: 480px;
+}
+.vision-roadmap { position: relative; padding-right: 2.6rem; }
+.vision-roadmap-line {
+  position: absolute;
+  top: 6px; bottom: 6px; right: 17px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary), var(--accent));
+  box-shadow: 0 0 14px var(--glow);
+}
+.vision-milestone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.15rem 0;
+}
+.vision-ms-icon {
+  position: absolute;
+  right: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+  transition: all .4s;
+  z-index: 1;
+}
+.vision-milestone:hover .vision-ms-icon {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 18px var(--glow);
+}
+.vision-ms-content { padding-right: 3.2rem; }
+.vision-ms-year { font-size: .7rem; color: var(--secondary); letter-spacing: .12em; font-weight: 600; margin-bottom: .25rem; }
+.vision-ms-title { font-size: .98rem; font-weight: 700; margin-bottom: .2rem; }
+.vision-ms-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
 
 /* ═══════════════════════════════════════════
    FINAL CTA
@@ -849,7 +1067,7 @@ section { padding: 6rem 0; width: 100%; }
 }
 .cta-bg {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 70% 80% at 50% 60%, rgba(212,175,55,.08) 0%, transparent 65%);
+  background: radial-gradient(ellipse 70% 80% at 50% 60%, rgba(79,70,229,.08) 0%, transparent 65%);
 }
 .cta-grid-bg {
   position: absolute; inset: 0;
@@ -871,7 +1089,7 @@ section { padding: 6rem 0; width: 100%; }
 }
 .cta-line {
   width: 56px; height: 1px;
-  background: var(--gold);
+  background: var(--primary);
   margin: 0 auto 2.2rem;
   opacity: .6;
 }
@@ -884,7 +1102,7 @@ section { padding: 6rem 0; width: 100%; }
   word-break: keep-all;
   overflow-wrap: break-word;
 }
-.cta-content h2 .gold { color: var(--gold); }
+.cta-content h2 .gold { color: var(--primary); }
 .cta-content p { color: var(--muted); font-size: 1.1rem; margin-bottom: 2.8rem; font-weight: 300; }
 .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
@@ -916,7 +1134,7 @@ footer {
   color: var(--text);
   margin-bottom: 1.2rem;
 }
-.footer-brand .footer-logo span { color: var(--gold); }
+.footer-brand .footer-logo span { color: var(--primary); }
 .footer-brand p {
   color: var(--muted);
   font-size: .85rem;
@@ -941,7 +1159,7 @@ footer {
   border-radius: 2px;
   flex-shrink: 0;
 }
-.footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+.footer-social a:hover { border-color: var(--primary); color: var(--primary); }
 
 /* Nav columns */
 .footer-col h5 {
@@ -949,7 +1167,7 @@ footer {
   font-weight: 600;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--primary);
   margin-bottom: 1.5rem;
 }
 .footer-col ul {
@@ -966,7 +1184,7 @@ footer {
   transition: color .3s;
   display: inline-block;
 }
-.footer-col ul li a:hover { color: var(--gold); }
+.footer-col ul li a:hover { color: var(--primary); }
 
 /* Newsletter strip */
 .footer-newsletter {
@@ -1005,12 +1223,12 @@ footer {
   transition: border-color .3s;
   direction: rtl;
 }
-.footer-newsletter-form input:focus { border-color: var(--gold); }
+.footer-newsletter-form input:focus { border-color: var(--primary); }
 .footer-newsletter-form input::placeholder { color: var(--muted); }
 .footer-newsletter-form button {
   padding: .75rem 1.5rem;
-  background: var(--gold);
-  color: #000;
+  background: var(--primary);
+  color: #fff;
   font-family: var(--font);
   font-size: .83rem;
   font-weight: 700;
@@ -1020,7 +1238,7 @@ footer {
   transition: background .3s;
   flex-shrink: 0;
 }
-.footer-newsletter-form button:hover { background: var(--gold-h); }
+.footer-newsletter-form button:hover { background: var(--primary-h); }
 
 /* Bottom bar */
 .footer-bottom {
@@ -1046,16 +1264,16 @@ footer {
   transition: color .3s;
   white-space: nowrap;
 }
-.footer-bottom-links a:hover { color: var(--gold); }
+.footer-bottom-links a:hover { color: var(--primary); }
 .footer-badge {
   display: inline-flex;
   align-items: center;
   gap: .4rem;
   padding: .3rem .8rem;
-  border: 1px solid rgba(212,175,55,.2);
+  border: 1px solid rgba(79,70,229,.2);
   border-radius: 2px;
   font-size: .68rem;
-  color: rgba(212,175,55,.6);
+  color: rgba(79,70,229,.6);
   letter-spacing: .1em;
   white-space: nowrap;
 }
@@ -1089,6 +1307,16 @@ footer {
   .philosophy-visual { aspect-ratio: 16/9; max-height: 360px; }
   .philosophy-left .big-quote { font-size: clamp(1.8rem, 4.5vw, 3rem); }
 
+  /* Story / Vision */
+  .story-intro { grid-template-columns: 1fr; gap: 3rem; margin-bottom: 4rem; }
+  .story-visual { max-height: 420px; }
+  .story-roadmap-track { grid-template-columns: repeat(3, 1fr); gap: 1.2rem 1rem; }
+  .story-stage:nth-child(even) { transform: none; }
+  .story-stage:nth-child(even):hover { transform: translateY(-6px); }
+  .story-roadmap-track::before { display: none; }
+  .vision-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .vision-roadmap { padding-top: .5rem; }
+
   /* Timeline — single-side */
   .timeline-line { right: 28px; left: auto; }
   .tl-item { grid-template-columns: 60px 1fr; }
@@ -1106,9 +1334,7 @@ footer {
   /* Grids */
   .diff-grid { grid-template-columns: repeat(2, 1fr); }
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  .exp-grid { grid-template-columns: repeat(2, 1fr); }
-  .exp-card.tall { grid-row: auto; min-height: 300px; }
-  .test-grid { grid-template-columns: repeat(2, 1fr); }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
   .values-grid { grid-template-columns: repeat(3, 1fr); }
 
   /* Footer */
@@ -1127,8 +1353,6 @@ footer {
   .diff-grid { grid-template-columns: 1fr; }
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }
   .values-grid { grid-template-columns: repeat(2, 1fr); }
-  .exp-grid { grid-template-columns: 1fr; }
-  .test-grid { grid-template-columns: 1fr; }
 
   .footer-top-inner { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: 1 / -1; }
@@ -1161,10 +1385,6 @@ footer {
   .philosophy-pillars { grid-template-columns: 1fr; }
   .pillar-item { padding: 1.2rem; }
 
-  /* Showcase */
-  .showcase-item { min-height: 360px; }
-  .showcase-text { padding: 2.5rem 1.2rem; max-width: 100%; }
-
   /* Timeline */
   .timeline-line { right: 20px; }
   .tl-item { grid-template-columns: 44px 1fr; }
@@ -1177,9 +1397,19 @@ footer {
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }
   .metric-box { padding: 2.2rem 1rem; }
   .values-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-  .exp-grid { grid-template-columns: 1fr; }
-  .exp-card.tall { min-height: 280px; }
-  .test-grid { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: 1fr; }
+
+  /* Story */
+  .story-intro-left { padding-right: 1.6rem; }
+  .story-visual { aspect-ratio: 1/1; max-height: 340px; }
+  .story-glass-card { width: 74%; padding: 1.1rem 1.2rem; }
+  .story-card-sub { width: 60%; }
+  .story-card-mini { display: none; }
+  .story-stats { gap: 1.6rem; }
+  .story-roadmap-track { grid-template-columns: repeat(2, 1fr); }
+
+  /* Vision */
+  .vision-roadmap { padding-right: 2.2rem; }
 
   /* CTA */
   .cta-btns { flex-direction: column; align-items: center; }
@@ -1227,11 +1457,16 @@ footer {
   .metric-num { font-size: clamp(1.8rem, 8vw, 2.8rem); }
   .metric-label { font-size: .78rem; }
 
-  .showcase-text { padding: 2rem 1rem; }
-
   .diff-card { padding: 1.8rem 1.2rem; }
 
-  .test-card { padding: 1.8rem 1.2rem; }
+  .story-title { font-size: clamp(1.7rem, 7vw, 2.3rem); }
+  .story-visual { max-height: 280px; }
+  .story-glass-card { padding: .9rem 1rem; }
+  .story-glass-card .gc-num { font-size: 1.5rem; }
+  .story-roadmap-track { grid-template-columns: 1fr; }
+  .story-stats { gap: 1.2rem; }
+  .team-body { padding: 1.2rem 1.1rem 1.4rem; }
+  .vision-left h2 { font-size: clamp(1.7rem, 7vw, 2.3rem); }
 
   .footer-top-inner { gap: 2rem; }
   .footer-col ul { gap: .7rem; }
@@ -1263,7 +1498,7 @@ footer {
     <a href="#journey">مسیر ما</a>
     <a href="#different">تمایز</a>
     <a href="#metrics">آمار</a>
-    <a href="#testimonials">نظرات</a>
+    <a href="#team">تیم ما</a>
   </div>
   <a href="#final-cta" class="nav-cta">تماس با ما</a>
   <div class="nav-hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="منو">
@@ -1277,7 +1512,7 @@ footer {
   <a href="#journey" onclick="closeDrawer()">مسیر ما</a>
   <a href="#different" onclick="closeDrawer()">تمایز</a>
   <a href="#metrics" onclick="closeDrawer()">آمار</a>
-  <a href="#testimonials" onclick="closeDrawer()">نظرات</a>
+  <a href="#team" onclick="closeDrawer()">تیم ما</a>
   <a href="#final-cta" class="nav-drawer-cta" onclick="closeDrawer()">تماس با ما</a>
 </div>
 
@@ -1341,46 +1576,6 @@ footer {
           </svg>
         </div>
         <div class="gold-frame"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ SECTION 3: SHOWCASE ═══ -->
-<section id="showcase">
-  <div class="showcase-item reveal">
-    <div class="showcase-bg" style="background:linear-gradient(135deg,#0f1015,#1a1818);"></div>
-    <div class="showcase-bg-img" style="background:linear-gradient(120deg,#0d0d0d,#1a1614,#0d0d0d);"></div>
-    <div class="showcase-overlay"></div>
-    <div class="container">
-      <div class="showcase-text">
-        <div class="tag">طراحی اروپایی</div>
-        <h3>فرم که از درون به بیرون شکل می‌گیرد</h3>
-        <p>تیم طراحان ما با الهام از معماری مدرن اروپایی، هر خط و هر انحنا را با دقت پیکره‌بندی کرده‌اند.</p>
-      </div>
-    </div>
-  </div>
-  <div class="showcase-item alt reveal">
-    <div class="showcase-bg" style="background:linear-gradient(135deg,#0c0f0d,#141a13);"></div>
-    <div class="showcase-bg-img" style="background:linear-gradient(120deg,#0c0f0d,#141a13,#0c0f0d);"></div>
-    <div class="showcase-overlay"></div>
-    <div class="container">
-      <div class="showcase-text" style="margin-right:auto;margin-left:0;">
-        <div class="tag">فناوری باتری</div>
-        <h3>۱۲۰ کیلومتر در یک شارژ</h3>
-        <p>سل‌های NMC نسل پنجم با سیستم مدیریت حرارتی هوشمند. شهر برای شما کوچک‌تر می‌شود.</p>
-      </div>
-    </div>
-  </div>
-  <div class="showcase-item reveal">
-    <div class="showcase-bg" style="background:linear-gradient(135deg,#100e0f,#1a1618);"></div>
-    <div class="showcase-bg-img" style="background:linear-gradient(120deg,#0f0d0e,#1a1516,#0f0d0e);"></div>
-    <div class="showcase-overlay"></div>
-    <div class="container">
-      <div class="showcase-text">
-        <div class="tag">تجربه رانندگی</div>
-        <h3>سکوتری که شما را می‌شناسد</h3>
-        <p>هوش مصنوعی تطبیقی VOLTX از اولین رانندگی، سبک حرکت شما را یاد می‌گیرد.</p>
       </div>
     </div>
   </div>
@@ -1542,44 +1737,6 @@ footer {
   </div>
 </section>
 
-<!-- ═══ SECTION 7: EXPERIENCE ═══ -->
-<section id="experience">
-  <div class="container">
-    <div class="exp-top reveal">
-      <div class="section-label" style="justify-content:center;">تجربه VOLTX</div>
-      <h2>این فقط حمل‌ونقل نیست</h2>
-      <p>ما سبک زندگی می‌فروشیم. آزادی می‌فروشیم. احساسی که در هر پیچ و خیابان با شما همراه است.</p>
-    </div>
-    <div class="exp-grid">
-      <div class="exp-card tall reveal">
-        <div class="exp-visual" style="background:linear-gradient(135deg,#1a1408,#2a2010,#1a1408);"></div>
-        <div class="exp-card-content">
-          <div class="exp-tag">آزادی حرکت</div>
-          <h3>شهر متعلق به شماست</h3>
-          <p>ترافیک دیگر مانع نیست. مسیرهای جدید کشف کنید. دیر نرسید.</p>
-        </div>
-      </div>
-      <div class="exp-card reveal">
-        <div class="exp-icon">⚡</div>
-        <div class="exp-tag">فناوری</div>
-        <h3>هوشمند از روز اول</h3>
-        <p>اپلیکیشن اختصاصی، ردیابی زنده، به‌روزرسانی over-the-air. اسکوتر شما با زمان رشد می‌کند.</p>
-      </div>
-      <div class="exp-card reveal">
-        <div class="exp-icon">🌿</div>
-        <div class="exp-tag">پایداری</div>
-        <h3>هر کیلومتر، یک تفاوت</h3>
-        <p>صفر آلودگی. صفر پشیمانی. سبز رانندگی کنید، بزرگ فکر کنید.</p>
-      </div>
-      <div class="exp-card reveal">
-        <div class="exp-icon">✦</div>
-        <div class="exp-tag">سبک زندگی</div>
-        <h3>برای کسانی که متفاوت انتخاب می‌کنند</h3>
-        <p>VOLTX یک بیانیه است. ارزش‌های شما را بازتاب می‌دهد.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ═══ SECTION 8: VALUES ═══ -->
 <section id="values">
@@ -1628,44 +1785,241 @@ footer {
   </div>
 </section>
 
-<!-- ═══ SECTION 9: TESTIMONIALS ═══ -->
-<section id="testimonials">
+<!-- ═══ SECTION 9: OUR STORY ═══ -->
+<section id="story">
   <div class="container">
-    <div class="test-header reveal">
-      <div class="section-label" style="justify-content:center;">نظرات مشتریان</div>
-      <h2>صدای کسانی که ما را انتخاب کردند</h2>
-      <p>هر جمله یک تجربه واقعی است.</p>
+    <div class="story-intro">
+      <div class="story-intro-left reveal-left">
+        <div class="story-glow-line"></div>
+        <div class="section-label">داستان ما</div>
+        <div class="story-subtitle">از یک ایده تا آینده حمل و نقل شهری</div>
+        <h2 class="story-title">داستان <span class="accent-grad">VOLTX</span></h2>
+        <p class="story-lead">This area is only placeholder text because I will replace it later.</p>
+        <div class="story-stats">
+          <div class="story-stat">
+            <div class="story-stat-num">۱۴۰۰</div>
+            <div class="story-stat-label">سال تأسیس</div>
+          </div>
+          <div class="story-stat">
+            <div class="story-stat-num">۲۴</div>
+            <div class="story-stat-label">شهر فعال</div>
+          </div>
+          <div class="story-stat">
+            <div class="story-stat-num">۰۵</div>
+            <div class="story-stat-label">مرحله رشد</div>
+          </div>
+        </div>
+      </div>
+      <div class="story-visual reveal-right" id="story-visual">
+        <div class="story-glow-orb" id="story-orb"></div>
+        <div class="story-gradient-shape story-shape-1"></div>
+        <div class="story-gradient-shape story-shape-2"></div>
+        <div class="story-float-circle story-fc-1"></div>
+        <div class="story-float-circle story-fc-2"></div>
+        <div class="story-float-circle story-fc-3"></div>
+        <div class="story-glass-card story-card-main">
+          <div class="gc-label">رشد سالانه</div>
+          <div class="gc-num">۴۸٪+</div>
+          <div class="gc-text">توسعه بازار در سال گذشته</div>
+          <div class="gc-bar"></div>
+        </div>
+        <div class="story-glass-card story-card-sub">
+          <div class="gc-label">شهر فعال</div>
+          <div class="gc-num">۲۴</div>
+          <div class="gc-text">حضور در سراسر کشور</div>
+        </div>
+        <div class="story-glass-card story-card-mini">
+          <div class="gc-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <div class="gc-text">۹۸٪ رضایت مشتری</div>
+        </div>
+      </div>
     </div>
-    <div class="test-grid">
-      <div class="test-card featured reveal">
-        <div class="test-stars">★★★★★</div>
-        <p class="test-quote">قبل از VOLTX فکر می‌کردم اسکوتر برقی یعنی یک وسیله ارزان‌قیمت. الان می‌فهمم که اشتباه می‌کردم. این یک تجربه کاملاً متفاوت است. احساس می‌کنی سوار چیزی شدی که واقعاً برای تو ساخته شده.</p>
-        <div class="test-author">
-          <div class="test-avatar">ا</div>
-          <div><div class="test-name">احمد کریمی</div><div class="test-role">مدیر استارتاپ | تهران</div></div>
+
+    <div class="story-roadmap">
+      <div class="story-roadmap-track">
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۱</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 22V4a2 2 0 012-2h9l5 5v15"/><path d="M6 2v20"/><path d="M6 9h9"/></svg>
+          </div>
+          <h4>سال تاسیس</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
         </div>
-      </div>
-      <div class="test-card reveal">
-        <div class="test-stars">★★★★★</div>
-        <p class="test-quote">پشتیبانی VOLTX را باید تجربه کنید. در کمتر از ۲ ساعت تکنسین در محل من بود. این سطح از خدمات در ایران نادر است.</p>
-        <div class="test-author">
-          <div class="test-avatar">س</div>
-          <div><div class="test-name">سارا محمدی</div><div class="test-role">پزشک | اصفهان</div></div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۲</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h4>شروع فعالیت</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
         </div>
-      </div>
-      <div class="test-card reveal">
-        <div class="test-stars">★★★★★</div>
-        <p class="test-quote">یک سال است که هر روز با VOLTX X1 به کار می‌روم. نه یک بار خرابی جدی. باتری هنوز مثل روز اول. سرمایه‌گذاری هوشمند بود.</p>
-        <div class="test-author">
-          <div class="test-avatar">م</div>
-          <div><div class="test-name">مهدی رضایی</div><div class="test-role">مهندس نرم‌افزار | مشهد</div></div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۳</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <h4>گسترش بازار</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
+        </div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۴</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.5 7.3L12 12m0 0L3.5 7.3M12 12v9.5M20.5 16.7V7.3a2 2 0 00-1-1.7l-6.5-3.8a2 2 0 00-2 0L3.5 5.6a2 2 0 00-1 1.7v9.4a2 2 0 001 1.7l6.5 3.8a2 2 0 002 0l6.5-3.8a2 2 0 001-1.7z"/></svg>
+          </div>
+          <h4>ورود محصولات جدید</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
+        </div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۵</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h4>چشم انداز آینده</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ SECTION 10: FINAL CTA ═══ -->
+<!-- ═══ SECTION 10: OUR TEAM ═══ -->
+<section id="team">
+  <div class="container">
+    <div class="team-header reveal">
+      <div class="section-label" style="justify-content:center;">تیم ما</div>
+      <h2>افرادی که VOLTX را می‌سازند</h2>
+      <p>یک تیم کوچک، یک هدف بزرگ.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person1.jpg" alt="مدیرعامل">
+        </div>
+        <div class="team-body">
+          <div class="team-name">علی رضایی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیرعامل (CEO)</div>
+          <p class="team-desc">هدایت چشم‌انداز VOLTX و استراتژی رشد شرکت در بازار حمل‌ونقل شهری.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person2.jpg" alt="مدیر فناوری">
+        </div>
+        <div class="team-body">
+          <div class="team-name">سارا احمدی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیر فناوری (CTO)</div>
+          <p class="team-desc">مسئول توسعه فناوری باتری، نرم‌افزار خودرو و زیرساخت‌های هوشمند.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person3.jpg" alt="مدیر بازاریابی">
+        </div>
+        <div class="team-body">
+          <div class="team-name">مهدی کریمی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیر بازاریابی</div>
+          <p class="team-desc">طراحی و اجرای استراتژی برند VOLTX در بازارهای داخلی و منطقه‌ای.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person4.jpg" alt="مدیر پشتیبانی مشتریان">
+        </div>
+        <div class="team-body">
+          <div class="team-name">نیلوفر حسینی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیر پشتیبانی مشتریان</div>
+          <p class="team-desc">اطمینان از تجربه‌ای بی‌نقص برای هر مشتری، پیش و پس از خرید.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 11: VISION ═══ -->
+<section id="vision">
+  <div class="vision-bg-glow"></div>
+  <div class="container">
+    <div class="vision-grid">
+      <div class="vision-left reveal-left">
+        <div class="section-label">آینده VOLTX</div>
+        <h2>چشم انداز آینده</h2>
+        <p>ما در حال ساخت آینده حمل‌ونقل شهری هستیم؛ آینده‌ای که در آن نوآوری، پایداری و فناوری هوشمند در کنار هم به یک تجربه لوکس تبدیل می‌شوند.</p>
+        <button class="btn-primary">بیشتر بدانید</button>
+      </div>
+      <div class="vision-roadmap reveal-right">
+        <div class="vision-roadmap-line"></div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۴</div>
+            <div class="vision-ms-title">نوآوری</div>
+            <div class="vision-ms-desc">عرضه نسل جدید موتور و باتری هوشمند.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۵</div>
+            <div class="vision-ms-title">گسترش</div>
+            <div class="vision-ms-desc">ورود به بازارهای منطقه‌ای و افزایش نمایندگی‌ها.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۶</div>
+            <div class="vision-ms-title">فناوری</div>
+            <div class="vision-ms-desc">یکپارچگی کامل با اکوسیستم شهر هوشمند.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۷</div>
+            <div class="vision-ms-title">پایداری</div>
+            <div class="vision-ms-desc">تولید کربن-خنثی در تمام خطوط مونتاژ.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۸</div>
+            <div class="vision-ms-title">حمل‌ونقل هوشمند</div>
+            <div class="vision-ms-desc">شبکه یکپارچه اسکوترهای خودران VOLTX.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 12: FINAL CTA ═══ -->
 <section id="final-cta">
   <div class="cta-bg"></div>
   <div class="cta-grid-bg"></div>
@@ -1865,6 +2219,25 @@ if (window.matchMedia('(min-width: 769px)').matches) {
     }
     if (heroGrid) heroGrid.style.transform = `translateY(${window.scrollY * 0.13}px)`;
   }, { passive: true });
+}
+
+/* ─ STORY VISUAL — MOUSE REACTIVE GLOW ─ */
+const storyVisual = document.getElementById('story-visual');
+const storyOrb = document.getElementById('story-orb');
+if (storyVisual && storyOrb && window.matchMedia('(min-width: 769px)').matches) {
+  storyVisual.addEventListener('mousemove', (e) => {
+    const rect = storyVisual.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    storyOrb.style.left = `${x}%`;
+    storyOrb.style.top = `${y}%`;
+    storyOrb.style.transform = 'translate(-50%, -50%)';
+  });
+  storyVisual.addEventListener('mouseleave', () => {
+    storyOrb.style.left = '';
+    storyOrb.style.top = '';
+    storyOrb.style.transform = '';
+  });
 }
 </script>
 </body>
