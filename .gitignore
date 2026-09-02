@@ -11,3 +11,4 @@ media/
 staticfiles/
 front files
 documentations
+.venv
