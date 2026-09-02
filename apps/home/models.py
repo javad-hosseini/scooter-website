@@ -446,12 +446,12 @@ class IndexPageSettings(models.Model):
     # ===== Final Section (Promise) =====
     promise_label = models.CharField(
         max_length=100,
-        default='چرا VOLTEX',
+        default='چرا Nex Go',
         verbose_name="برچسب بخش تعهدات"
     )
     promise_title = models.CharField(
         max_length=200,
-        default='تعهد VOLTEX',
+        default='تعهد Nex Go',
         verbose_name="عنوان بخش تعهدات"
     )
 
@@ -472,7 +472,7 @@ class IndexPageSettings(models.Model):
         verbose_name="کلمه برجسته در بیانیه پایانی"
     )
     statement_description = models.TextField(
-        default='به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند. اسکوترهای پریمیوم، تحویل در ۲۴ ساعت، با ۳ سال گارانتی.',
+        default='به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Nex Go را انتخاب کرده‌اند. اسکوترهای پریمیوم، تحویل در ۲۴ ساعت، با ۳ سال گارانتی.',
         verbose_name="توضیحات بیانیه پایانی"
     )
     statement_btn_text = models.CharField(
@@ -726,7 +726,7 @@ class Testimonial(models.Model):
 
 
 class Promise(models.Model):
-    """تعهدات VOLTEX در بخش پایانی"""
+    """تعهدات Nex Go در بخش پایانی"""
     PROMISE_COLORS = [
         ('neon', '#4fd8ff'),
         ('orange', '#ff9a3c'),
