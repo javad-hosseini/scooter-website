@@ -13,11 +13,24 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from .jazzmin import *
 from .jazzmin import JAZZMIN_SETTINGS
-from decouple import config
+from decouple import Config, RepositoryEnv
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ================== انتخاب محیط اجرا ==================
+# بر اساس نیاز فقط یکی از دو خط زیر را از حالت کامنت خارج کن:
+# ENVIRONMENT = 'development'   # محیط توسعه  -> envs/.env.dev  + دیتابیس SQLite
+ENVIRONMENT = 'production'  # محیط پروداکشن -> envs/.env.prod + دیتابیس PostgreSQL
+
+if ENVIRONMENT == 'production':
+    _ENV_FILE = BASE_DIR / 'envs' / '.env.prod'
+else:
+    _ENV_FILE = BASE_DIR / 'envs' / '.env.dev'
+
+config = Config(RepositoryEnv(str(_ENV_FILE)))
+# =====================================================
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -168,16 +181,26 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+if ENVIRONMENT == 'production':
+    # محیط پروداکشن: همان کانفیگ قبلی PostgreSQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT'),
+        }
     }
-}
+else:
+    # محیط توسعه: SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
