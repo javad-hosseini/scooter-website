@@ -1,73 +1,27 @@
 <!doctype html>
-{% load static %}
+{% load static seo_tags compress %}
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title id="page-title">مجله VOLTEX</title>
 
-    <!-- SEO Meta Tags (توسط JavaScript پر می‌شوند) -->
-    <meta name="description" id="meta-description" content="" />
-    <link rel="canonical" id="meta-canonical" href="" />
+    {% include "seo/_head.html" %}
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="article" />
-    <meta property="og:title" id="og-title" content="" />
-    <meta property="og:description" id="og-description" content="" />
-    <meta property="og:image" id="og-image" content="" />
-    <meta property="og:url" id="og-url" content="" />
-    <meta property="og:site_name" content="VOLTEX" />
-    <meta property="og:locale" content="fa_IR" />
+    {% if article.cover_image %}
+    <link rel="preload" as="image" fetchpriority="high" href="{{ article.cover_image.url }}" />
+    {% endif %}
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" id="twitter-title" content="" />
-    <meta name="twitter:description" id="twitter-description" content="" />
-    <meta name="twitter:image" id="twitter-image" content="" />
+    {% include "seo/_fonts.html" %}
 
-    <!-- JSON-LD: BlogPosting (توسط JavaScript پر می‌شود) -->
-    <script id="json-ld-blog" type="application/ld+json"></script>
+    <!-- Tailwind, pre-compiled.
+         This was the Tailwind play CDN script: a ~400 KB
+         render-blocking script that recompiled the framework in the browser on
+         every page load and only produced styles after JS ran. It is now a
+         12 KB static stylesheet built from tools/tailwind/tw.article.js. -->
+    <link rel="stylesheet" href="{% static 'css/article.css' %}" />
 
-    <!-- JSON-LD: BreadcrumbList (توسط JavaScript پر می‌شود) -->
-    <script id="json-ld-breadcrumb" type="application/ld+json"></script>
-
-    <!-- Preconnect / Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              black: "#050507",
-              deep: "#08080d",
-              surface: "#0c0c13",
-              card: "#101018",
-              cardhover: "#14141e",
-              white: "#f6f6f8",
-              neon: "#4fd8ff",
-              neon2: "#8b7bff",
-              neon3: "#ff6cc4",
-              gold: "#e9c97f",
-            },
-            fontFamily: {
-              display: ["Vazirmatn", "Space Grotesk", "sans-serif"],
-              body: ["Vazirmatn", "Inter", "sans-serif"],
-              mono: ["JetBrains Mono", "Vazirmatn", "monospace"],
-            },
-          },
-        },
-      };
-    </script>
-
-    <style>
+    {% compress css %}
+<style>
       /* ===== تمام استایل‌های قبلی را اینجا قرار دهید ===== */
       :root {
         --black: #050507;
@@ -637,6 +591,7 @@
         }
       }
     </style>
+{% endcompress %}
   </head>
   <body class="antialiased">
     <div id="reading-progress"></div>
@@ -725,34 +680,36 @@
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <a href="/blog/" class="hover:text-white transition-colors">مجله</a>
+            <a href="{% url 'home_app:articles' %}" class="hover:text-white transition-colors">مجله</a>
           </li>
           <li aria-hidden="true">/</li>
-          <li id="breadcrumb-current" style="color: var(--dim)">...</li>
+          <li id="breadcrumb-current" style="color: var(--dim)" aria-current="page">{{ article.title }}</li>
         </ol>
       </nav>
 
       <!-- ══════════════════════════════════════════════════════════════
        LOADING / CONTENT
        ══════════════════════════════════════════════════════════════ -->
-      <div id="loading-spinner" class="loading-spinner"></div>
+      <!-- Hidden by default: the article is already in the HTML, so there is
+           nothing to wait for. Only re-shown if the hydration fetch errors. -->
+      <div id="loading-spinner" class="loading-spinner" style="display: none" hidden></div>
 
       <article
         id="article-content"
         itemscope
         itemtype="https://schema.org/BlogPosting"
-        style="display: none"
       >
         <!-- ===== HERO ===== -->
         <header class="hero-cover">
           <img
             id="cover-image"
-            src=""
-            alt=""
+            src="{% if article.cover_image %}{{ article.cover_image.url }}{% else %}{% static 'images/og-default.svg' %}{% endif %}"
+            alt="{{ article.cover_alt_text|default:article.title }}"
             itemprop="image"
             fetchpriority="high"
-            width="1920"
-            height="1080"
+            loading="eager"
+            decoding="async"
+            {% img_dimensions article.cover_image 1920 1080 %}
           />
           <div class="hero-overlay"></div>
           <div class="absolute inset-0 flex items-end">
@@ -767,7 +724,7 @@
                   color: var(--neon);
                   border: 1px solid rgba(79, 216, 255, 0.3);
                 "
-                >...</span
+                >{{ article.tags.first.name|default:"مقاله" }}</span
               >
               <h1
                 id="article-title"
@@ -778,7 +735,7 @@
                   max-width: 900px;
                 "
               >
-                ...
+                {{ article.title }}
               </h1>
               <p
                 id="article-excerpt"
@@ -790,7 +747,7 @@
                 "
                 itemprop="description"
               >
-                ...
+                {{ article.excerpt|default:article.meta_description }}
               </p>
               <div
                 class="hero-fade-in d4 flex items-center flex-wrap gap-5 text-sm"
@@ -815,7 +772,7 @@
                     id="author-name"
                     itemprop="name"
                     style="color: var(--dim)"
-                    >...</span
+                    >{{ article.author.fullname|default:article.author.username }}</span
                   >
                 </div>
                 <span
@@ -824,10 +781,10 @@
                 ></span>
                 <time
                   id="article-date"
-                  datetime=""
+                  datetime="{{ article.published_at|default:article.created_at|date:'c' }}"
                   itemprop="datePublished"
                   class="numeric"
-                  >...</time
+                  >{{ article.published_at|default:article.created_at|date:'Y/m/d' }}</time
                 >
                 <span
                   class="w-1 h-1 rounded-full"
@@ -845,7 +802,7 @@
                     <circle cx="12" cy="12" r="9" />
                     <path d="M12 7v5l3 3" />
                   </svg>
-                  <span id="reading-time" class="numeric">...</span> دقیقه
+                  <span id="reading-time" class="numeric">{{ article.time_to_read|default:"۱" }}</span> دقیقه
                   مطالعه
                 </span>
               </div>
@@ -882,7 +839,10 @@
               itemprop="articleBody"
               class="prose-voltex max-w-[720px]"
             >
-              <!-- محتوای مقاله از API اینجا قرار می‌گیرد -->
+              {# Rendered server-side. The body is the page's whole reason to #}
+              {# exist; injecting it from JS meant the indexable content of #}
+              {# every article was an empty div. #}
+              {{ article.description|safe }}
             </div>
 
             <!-- ===== SHARE ===== -->
@@ -1286,7 +1246,7 @@
           <path d="M18 6 6 18M6 6l12 12" />
         </svg>
       </button>
-      <img id="lightboxImg" src="" alt="" />
+      <img id="lightboxImg" src="" alt="" width="1600" height="900" decoding="async" />
     </div>
 
     <div id="copyToast" class="copy-toast">لینک کپی شد ✓</div>
@@ -1369,80 +1329,32 @@
    RENDER ARTICLE
    ════════════════════════════════════ */
       function renderArticle(article) {
+        // ═══════════════════════════════════════════════════════════════
+        //  Title, meta description, canonical, Open Graph, Twitter cards,
+        //  BlogPosting JSON-LD and BreadcrumbList JSON-LD are all rendered
+        //  by Django into the initial HTML (templates/seo/_head.html).
+        //
+        //  Building them here meant they were invisible to anything that did
+        //  not execute the page, and the BreadcrumbList was hard-coded to
+        //  https://voltex.example.com/ — a placeholder domain that pointed
+        //  the structured data at a site that does not exist.
+        // ═══════════════════════════════════════════════════════════════
         const currentUrl = window.location.href;
-
-        document.title = `${article.title} | مجله VOLTEX`;
-        document.getElementById("page-title").textContent = document.title;
-
-        const metaDesc = article.meta_description || article.excerpt || "";
-        document.getElementById("meta-description").content = metaDesc;
-        document.getElementById("meta-canonical").href =
-          article.canonical_url || currentUrl;
-
-        document.getElementById("og-title").content = article.title;
-        document.getElementById("og-description").content = metaDesc;
-        document.getElementById("og-image").content =
-          article.cover_image_url || "";
-        document.getElementById("og-url").content =
-          article.canonical_url || currentUrl;
-
-        document.getElementById("twitter-title").content = article.title;
-        document.getElementById("twitter-description").content = metaDesc;
-        document.getElementById("twitter-image").content =
-          article.cover_image_url || "";
-
-        const blogJsonLd = {
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: article.title,
-          description: metaDesc,
-          image: article.cover_image_url,
-          author: { "@type": "Person", name: article.author_name },
-          publisher: { "@type": "Organization", name: "VOLTEX" },
-          datePublished: article.published_at || article.created_at,
-          dateModified: article.updated_at,
-          mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": article.canonical_url || currentUrl,
-          },
-        };
-        document.getElementById("json-ld-blog").textContent =
-          JSON.stringify(blogJsonLd);
-
-        const breadcrumbJsonLd = {
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            {
-              "@type": "ListItem",
-              position: 1,
-              name: "خانه",
-              item: "https://voltex.example.com/",
-            },
-            {
-              "@type": "ListItem",
-              position: 2,
-              name: "مجله",
-              item: "https://voltex.example.com/blog/",
-            },
-            {
-              "@type": "ListItem",
-              position: 3,
-              name: article.title,
-              item: currentUrl,
-            },
-          ],
-        };
-        document.getElementById("json-ld-breadcrumb").textContent =
-          JSON.stringify(breadcrumbJsonLd);
 
         document.getElementById("breadcrumb-current").textContent =
           article.title;
 
-        document.getElementById("cover-image").src =
-          article.cover_image_url || "/static/images/default-cover.jpg";
-        document.getElementById("cover-image").alt =
-          article.cover_alt_text || article.title;
+        // Keep the server-rendered cover (and its reserved box) unless the API
+        // genuinely points elsewhere — reassigning an identical src would
+        // discard an already-decoded LCP image.
+        const coverImage = document.getElementById("cover-image");
+        if (
+          article.cover_image_url &&
+          !coverImage.src.endsWith(article.cover_image_url)
+        ) {
+          coverImage.src = article.cover_image_url;
+        }
+        coverImage.alt = article.cover_alt_text || article.title;
 
         const firstTag =
           article.tags && article.tags.length > 0
@@ -1675,15 +1587,38 @@
           .join("");
       }
 
+      /* Comment bodies and display names are user-supplied. Everything below is
+         written with innerHTML, so every interpolated value has to be escaped
+         here — an unescaped one is a stored XSS on the article page. */
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return "";
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
       function renderComment(comment) {
+        const userName = escapeHtml(comment.user_name) || "کاربر ناشناس";
         const initials = comment.user_name
-          ? comment.user_name
-              .split(" ")
-              .map((w) => w[0])
-              .join("")
-              .toUpperCase()
+          ? escapeHtml(
+              comment.user_name
+                .split(" ")
+                .map((w) => w[0])
+                .join("")
+                .toUpperCase(),
+            )
           : "??";
-        const avatarUrl = comment.user_profile_image || null;
+        // Only same-origin media paths are allowed through: a javascript: or
+        // data: URL in this slot would execute on its own.
+        const rawAvatar = comment.user_profile_image || null;
+        const avatarUrl =
+          rawAvatar && /^\/(?!\/)/.test(rawAvatar) ? escapeHtml(rawAvatar) : null;
+        // Used inside a JS string literal in the onclick handlers below, so it
+        // must be a number, not escaped text.
+        const commentId = Number(comment.id) || 0;
 
         let repliesHtml = "";
         if (comment.replies && comment.replies.length > 0) {
@@ -1696,16 +1631,16 @@
         <div class="comment-card">
             <div class="flex items-start gap-3">
                 <div class="comment-avatar" style="background:linear-gradient(135deg,var(--neon),var(--neon2))">
-                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${comment.user_name}" class="w-full h-full rounded-full object-cover">` : initials}
+                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${userName}" width="96" height="96" loading="lazy" decoding="async" class="w-full h-full rounded-full object-cover">` : initials}
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="text-sm font-semibold text-white">${comment.user_name || "کاربر ناشناس"}</span>
-                        <time datetime="${comment.created_at}" class="text-xs numeric" style="color:var(--muted)">${formatDate(new Date(comment.created_at))}</time>
+                        <span class="text-sm font-semibold text-white">${userName}</span>
+                        <time datetime="${escapeHtml(comment.created_at)}" class="text-xs numeric" style="color:var(--muted)">${formatDate(new Date(comment.created_at))}</time>
                     </div>
-                    <p class="text-sm mb-2" style="color:var(--dim);line-height:1.8">${comment.content}</p>
-                    <button class="reply-btn" onclick="toggleReply('${comment.id}')">پاسخ</button>
-                    <form id="reply-form-${comment.id}" class="hidden mt-3" onsubmit="submitReply(event, '${comment.id}')">
+                    <p class="text-sm mb-2" style="color:var(--dim);line-height:1.8">${escapeHtml(comment.content)}</p>
+                    <button class="reply-btn" onclick="toggleReply('${commentId}')">پاسخ</button>
+                    <form id="reply-form-${commentId}" class="hidden mt-3" onsubmit="submitReply(event, '${commentId}')">
                         <textarea rows="2" placeholder="پاسخ شما..." class="w-full px-4 py-2.5 rounded-[10px] text-sm outline-none resize-none mb-2" style="background:var(--card);border:1px solid var(--border);color:var(--white)"></textarea>
                         <button type="submit" class="px-5 py-2 rounded-full text-xs font-semibold" style="background:var(--neon);color:var(--black)">ارسال پاسخ</button>
                     </form>

@@ -15,7 +15,7 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from .jazzmin import *
 from .jazzmin import JAZZMIN_SETTINGS
-from decouple import config
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +29,18 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+# SECURITY WARNING: never use '*' in production — it disables Django's Host
+# header validation and allows cache-poisoning / password-reset poisoning.
+# Set ALLOWED_HOSTS in .env, e.g. ALLOWED_HOSTS=voltex.ir,www.voltex.ir
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,[::1],testserver' if DEBUG else '',
+    cast=Csv(),
+)
+
+# Origins trusted for CSRF (required behind HTTPS on Django 4+).
+# e.g. CSRF_TRUSTED_ORIGINS=https://voltex.ir,https://www.voltex.ir
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 # Application definition
@@ -42,16 +53,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
 
     # local apps
     'apps.accounts.apps.AccountsConfig',
     'apps.home.apps.HomeConfig',
     'apps.shop.apps.ShopConfig',
+    'apps.seo.apps.SeoConfig',
 
     'rest_framework',
     "drf_spectacular",
     'corsheaders',
     'ckeditor',
+    'compressor',
 ]
 
 CKEDITOR_CONFIGS = {
@@ -78,9 +92,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'login'
+# These are reversed by name, so they must include the URLconf namespace —
+# the bare names raised NoReverseMatch whenever @login_required fired.
+LOGIN_URL = 'accounts_app:login'
+LOGIN_REDIRECT_URL = 'accounts_app:dashboard'
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
@@ -91,13 +106,41 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
 
     ],
+    # Endpoints opt in to a permission explicitly, but DRF's own default is
+    # AllowAny — so a view that forgets the line fails open and silently.
+    # Default to closed; the genuinely public views already say AllowAny.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    # A floor under every endpoint. Scoped rates below still override it on the
+    # auth-sensitive views; this is what covers registration, comments, reviews
+    # and avatar uploads, none of which had any limit at all.
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
     'DEFAULT_THROTTLE_RATES': {
+        # Deliberately loose. This is an abuse ceiling for endpoints that
+        # forgot a scope, not a user-facing limit: DRF buckets anonymous
+        # traffic by IP, and Iranian mobile carriers NAT heavily, so a tight
+        # anon rate throttles a whole carrier's users as one visitor.
+        # NOTE: behind nginx/Cloudflare set NUM_PROXIES (or make sure
+        # X-Forwarded-For is trusted), otherwise every request looks like it
+        # comes from the proxy and shares a single bucket.
+        'anon': '600/hour',
+        'user': '5000/day',
         'login': '5/min',  #
         'password_reset_request': '3/hour',  # جلوگیری از spam SMS/email — این هزینه واقعی داره
         'password_reset_verify': '10/hour',  # چند بار تلاش غلط مجازه ولی نه بی‌نهایت
         'password_reset_confirm': '5/hour',  # حداکثر ۵ تلاش لاگین در دقیقه به ازای هر IPپ
-        'change_password': '10/hour'
-
+        'change_password': '10/hour',
+        # Open registration was the entry ticket for comment spam and for the
+        # stored-XSS path; cap it per source address.
+        'register': '10/hour',
+        'comment': '20/hour',
+        'review': '10/hour',
+        'profile_update': '20/hour',
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -106,10 +149,16 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "My API",
     "DESCRIPTION": "API documentation",
     "VERSION": "1.0.0",
+    # The schema is a complete map of every endpoint, parameter and serializer
+    # field, including the authenticated ones. Staff only.
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
 }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise serves collected static files with far-future cache headers.
+    # Must sit directly after SecurityMiddleware.
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django.middleware.locale.LocaleMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -117,11 +166,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Canonicalises URL casing so /Shop/Product/X/ 301s to /shop/product/x/
+    # instead of serving duplicate content on both.
+    'apps.seo.middleware.CanonicalUrlMiddleware',
+    # Cache-Control for HTML + X-Robots-Tag: noindex for JSON endpoints.
+    'apps.seo.middleware.SEOHeadersMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 APPS_DIR = BASE_DIR / 'apps'
 
@@ -129,6 +181,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
+            BASE_DIR / 'templates',
             BASE_DIR / 'apps' / 'accounts' / 'templates',
         ],
         'APP_DIRS': True,
@@ -137,11 +190,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.seo.context_processors.seo_defaults',
             ],
         },
     },
 ]
-LOGOUT_REDIRECT_URL = "/admin/"
+LOGOUT_REDIRECT_URL = "/"
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
@@ -155,6 +209,10 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
+        # Reuse connections between requests — cuts a TCP+TLS handshake off
+        # every request's TTFB.
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
+        'CONN_HEALTH_CHECKS': True,
     }
 }
 
@@ -182,17 +240,16 @@ LANGUAGES = [
     ("en", _("English")),
     ("fa", _("Persian")),
 ]
-LANGUAGE_CODE = 'en-us'
+# Every template declares <html lang="fa" dir="rtl"> and all content is Persian,
+# so the default language must match — otherwise Django advertises en-us in
+# Content-Language while serving Persian, which confuses language detection.
+LANGUAGE_CODE = config('LANGUAGE_CODE', default='fa')
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = config('TIME_ZONE', default='Asia/Tehran')
 
 USE_I18N = True
 
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -204,6 +261,145 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']       # جایی که تو dev خودت فایل می‌ذاری
 STATIC_ROOT = BASE_DIR / 'staticfiles'         # مقصد collectstatic برای production
 
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+]
+
+# ManifestStaticFilesStorage hashes every static filename, which is what makes
+# the 1-year Cache-Control below safe: a changed file gets a new URL.
+# In DEBUG we skip the manifest so the dev server works without collectstatic.
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage'
+            if DEBUG
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
+    },
+}
+
+# WhiteNoise: 1 year immutable caching for hashed filenames + brotli/gzip.
+WHITENOISE_MAX_AGE = 31536000
+# Left off deliberately. django-ckeditor's bundled CSS references assets with
+# cache-busting query strings (icons_hidpi.png?t=b47abaf); WhiteNoise's
+# "delete the unhashed original" pass then tries to unlink a path containing
+# "?", which collectstatic cannot do on Windows. Keeping both copies costs a
+# few MB of disk and changes nothing about what gets served — the hashed name
+# is still what the templates emit.
+WHITENOISE_KEEP_ONLY_HASHED_FILES = False
+
 # ============ Media files (آپلودهای کاربر - عکس/mp3/pdf مقالات) ============
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ============ Asset bundling / minification (django-compressor) ============
+COMPRESS_ENABLED = config('COMPRESS_ENABLED', default=not DEBUG, cast=bool)
+COMPRESS_OFFLINE = False
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_OUTPUT_DIR = 'CACHE'
+COMPRESS_FILTERS = {
+    'css': [
+        'compressor.filters.css_default.CssAbsoluteFilter',
+        'compressor.filters.cssmin.rCSSMinFilter',
+    ],
+    'js': [
+        'compressor.filters.jsmin.JSMinFilter',
+    ],
+}
+COMPRESS_CSS_HASHING_METHOD = 'content'
+
+# ============ Cache ============
+# Defaults to in-process memory so the project works out of the box; point
+# CACHE_BACKEND/CACHE_LOCATION at Redis or Memcached in production so the
+# per-view page cache is shared across workers.
+CACHES = {
+    'default': {
+        'BACKEND': config(
+            'CACHE_BACKEND',
+            default='django.core.cache.backends.locmem.LocMemCache',
+        ),
+        'LOCATION': config('CACHE_LOCATION', default='voltex-default-cache'),
+        'TIMEOUT': 300,
+        'KEY_PREFIX': 'voltex',
+    }
+}
+
+# How long anonymous product/category/article pages stay in the page cache.
+SEO_PAGE_CACHE_SECONDS = config('SEO_PAGE_CACHE_SECONDS', default=300, cast=int)
+
+# ============ Security ============
+# Trust the reverse proxy's protocol header so SECURE_SSL_REDIRECT does not
+# loop when TLS terminates at nginx/Cloudflare.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not DEBUG, cast=bool)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=0 if DEBUG else 31536000, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+# Nothing frames this site within itself, so DENY rather than SAMEORIGIN
+# (Django's own deploy check flags SAMEORIGIN as security.W019).
+X_FRAME_OPTIONS = 'DENY'
+
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Redirect http:// -> https:// and, optionally, apex -> www (or leave off).
+PREPEND_WWW = config('PREPEND_WWW', default=False, cast=bool)
+APPEND_SLASH = True
+
+# ============ SEO / site identity ============
+# Canonical origin used for canonical tags, Open Graph URLs, sitemap entries
+# and JSON-LD @id values. Leave blank to derive it from the incoming request.
+SITE_URL = config('SITE_URL', default='').rstrip('/')
+SITE_NAME = config('SITE_NAME', default='VOLTEX')
+SITE_LOCALE = 'fa_IR'
+
+SEO_DEFAULT_TITLE = 'ولتکس | فروش اسکوتر برقی پریمیوم'
+SEO_DEFAULT_DESCRIPTION = (
+    'خرید اسکوتر برقی پریمیوم ولتکس با گارانتی ۳ ساله، ارسال سریع و پشتیبانی '
+    'تخصصی. مقایسه مدل‌ها، بررسی قیمت و مشاوره رایگان خرید اسکوتر برقی.'
+)
+SEO_DEFAULT_IMAGE = 'images/og-default.svg'
+SEO_TWITTER_SITE = config('SEO_TWITTER_SITE', default='')
+
+# Used to build the Organization / Store JSON-LD blocks.
+SEO_ORGANIZATION = {
+    'name': SITE_NAME,
+    'legal_name': config('ORG_LEGAL_NAME', default='Voltex GmbH'),
+    'logo': 'images/logo.svg',
+    'email': config('ORG_EMAIL', default='info@voltex.ir'),
+    'telephone': config('ORG_PHONE', default='+98-21-00000000'),
+    'founding_date': config('ORG_FOUNDING_DATE', default=''),
+    'social_profiles': config(
+        'ORG_SOCIAL_PROFILES',
+        default='',
+        cast=Csv(),
+    ),
+}
+
+# Physical showroom — powers the Store schema on the contact page.
+SEO_STORE = {
+    'name': f'{SITE_NAME} — شوروم',
+    'street_address': config('STORE_STREET', default=''),
+    'locality': config('STORE_CITY', default='تهران'),
+    'region': config('STORE_REGION', default='تهران'),
+    'postal_code': config('STORE_POSTAL_CODE', default=''),
+    'country': 'IR',
+    'latitude': config('STORE_LATITUDE', default=''),
+    'longitude': config('STORE_LONGITUDE', default=''),
+    'price_range': config('STORE_PRICE_RANGE', default='$$'),
+    'opening_hours': [
+        'Sa-We 10:00-19:00',
+        'Th 10:00-15:00',
+    ],
+}

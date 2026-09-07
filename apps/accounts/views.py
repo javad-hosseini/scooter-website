@@ -1,6 +1,10 @@
 import logging
+import os
 import secrets
 from datetime import timedelta
+
+import filetype
+from PIL import Image
 
 from django.contrib.auth import login as django_login
 from django.contrib.auth import update_session_auth_hash
@@ -30,6 +34,8 @@ logger = logging.getLogger(__name__)
 class UserRegistrationAPIView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserRegistrationSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'register'
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -163,7 +169,7 @@ class PasswordResetVerifyAPIView(generics.GenericAPIView):
         if not otp or otp.is_expired() or otp.is_locked():
             return generic_error
 
-        if otp.code_hash != PasswordResetOTP.hash_code(code):
+        if not PasswordResetOTP.matches(otp.code_hash, code):
             otp.attempts = models.F('attempts') + 1
             otp.save(update_fields=['attempts'])
             return generic_error
@@ -172,7 +178,8 @@ class PasswordResetVerifyAPIView(generics.GenericAPIView):
         raw_token = secrets.token_urlsafe(32)
         otp.reset_token = PasswordResetOTP.hash_code(raw_token)  # هش شده ذخیره میشه
         otp.is_used = True
-        otp.save(update_fields=['reset_token', 'is_used'])
+        otp.verified_at = timezone.now()
+        otp.save(update_fields=['reset_token', 'is_used', 'verified_at'])
 
         return Response({
             'success': True,
@@ -208,7 +215,10 @@ class PasswordResetConfirmAPIView(generics.GenericAPIView):
         if not otp:
             return generic_error
 
-        token_expiry = otp.created_at + timedelta(minutes=PasswordResetOTP.RESET_TOKEN_LIFETIME_MINUTES)
+        # From verified_at, not created_at: the latter charged the user for
+        # however long they took to type the code.
+        issued_at = otp.verified_at or otp.created_at
+        token_expiry = issued_at + timedelta(minutes=PasswordResetOTP.RESET_TOKEN_LIFETIME_MINUTES)
         if timezone.now() > token_expiry:
             return generic_error
 
@@ -382,16 +392,68 @@ class DashboardDataAPIView(APIView):
 
 # apps/accounts/views.py
 
+#: Avatars are served back from our own origin and embedded in comment and
+#: review markup, so an .svg or .html "image" is a stored-XSS delivery vector.
+#: Extension, declared type and sniffed magic bytes all have to agree.
+ALLOWED_AVATAR_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp', 'gif'}
+ALLOWED_AVATAR_MIME_TYPES = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
+MAX_AVATAR_BYTES = 3 * 1024 * 1024  # 3 MB
+
+
+def validate_avatar(uploaded):
+    """Return an error message for a rejected avatar, or None if it passes."""
+    if uploaded.size > MAX_AVATAR_BYTES:
+        return 'حجم عکس نباید بیشتر از ۳ مگابایت باشد'
+
+    ext = os.path.splitext(uploaded.name or '')[1].lstrip('.').lower()
+    if ext not in ALLOWED_AVATAR_EXTENSIONS:
+        return 'فرمت عکس مجاز نیست (فقط JPG، PNG، WebP یا GIF)'
+
+    # content_type is client-supplied; checked so an obvious mismatch is
+    # rejected early, but the magic-byte check below is what actually decides.
+    if uploaded.content_type and uploaded.content_type not in ALLOWED_AVATAR_MIME_TYPES:
+        return 'فرمت عکس مجاز نیست (فقط JPG، PNG، WebP یا GIF)'
+
+    head = uploaded.read(261)
+    uploaded.seek(0)
+    kind = filetype.guess(head)
+    if kind is None or kind.mime not in ALLOWED_AVATAR_MIME_TYPES:
+        return 'فایل ارسالی یک تصویر معتبر نیست'
+
+    # Last gate: Pillow has to be able to parse it as an actual image. This is
+    # the check Model.save() skips.
+    try:
+        image = Image.open(uploaded)
+        image.verify()
+    except Exception:
+        return 'فایل ارسالی یک تصویر معتبر نیست'
+    finally:
+        uploaded.seek(0)
+
+    return None
+
+
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'profile_update'
 
     def put(self, request):
         user = request.user
 
-        # ===== ۱. اول عکس رو ذخیره کن =====
-        if 'avatar' in request.FILES:
-            user.profile_image = request.FILES['avatar']
-            user.save(update_fields=['profile_image'])
+        # ===== ۱. اعتبارسنجی عکس =====
+        # Assigning request.FILES straight onto the model field skipped every
+        # check: Model.save() does not run full_clean(), so ImageField's
+        # Pillow verification never fired, the extension came from the client
+        # verbatim, and there was no size ceiling. Validate first, and only
+        # persist once the rest of the payload has validated too.
+        avatar = request.FILES.get('avatar')
+        if avatar is not None:
+            error = validate_avatar(avatar)
+            if error:
+                return Response(
+                    {'avatar': [error]}, status=status.HTTP_400_BAD_REQUEST
+                )
 
         # ===== ۲. بعد بقیه فیلدها رو با serializer بروزرسانی کن =====
         # اما profile_image رو نادیده بگیر
@@ -403,6 +465,8 @@ class UserProfileUpdateAPIView(APIView):
         )
 
         if serializer.is_valid():
+            if avatar is not None:
+                user.profile_image = avatar
             # فقط فیلدهایی که میخوای رو جداگانه ست کن
             allowed_fields = ['fullname', 'username', 'email', 'mobile',
                               'national_code', 'birth_date', 'gender', 'bio']

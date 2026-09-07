@@ -1,51 +1,32 @@
 <!doctype html>
+{% load static seo_tags compress %}
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title id="page-title">VOLTEX — اسکوترهای برقی پریمیوم</title>
+    {# maximum-scale=1 / user-scalable=no blocked pinch-zoom entirely, which #}
+    {# fails WCAG 1.4.4 and is flagged by Lighthouse accessibility. #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ============================================================
-     SEO META TAGS — توسط JavaScript پر می‌شوند
-     ============================================================ -->
-    <meta name="description" id="meta-description" content="" />
-    <link rel="canonical" id="meta-canonical" href="" />
+    {% include "seo/_head.html" %}
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" id="og-title" content="" />
-    <meta property="og:description" id="og-description" content="" />
-    <meta property="og:image" id="og-image" content="" />
-    <meta property="og:url" id="og-url" content="" />
-    <meta property="og:site_name" content="VOLTEX" />
-    <meta property="og:locale" content="fa_IR" />
+    {% if index_settings.hero_image %}
+    <link rel="preload" as="image" fetchpriority="high"
+          href="{{ index_settings.hero_image.url }}"
+          media="(min-width: 900px)" />
+    {% endif %}
+    {% if index_settings.hero_mobile_image %}
+    <link rel="preload" as="image" fetchpriority="high"
+          href="{{ index_settings.hero_mobile_image.url }}"
+          media="(max-width: 899px)" />
+    {% endif %}
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" id="twitter-title" content="" />
-    <meta name="twitter:description" id="twitter-description" content="" />
-    <meta name="twitter:image" id="twitter-image" content="" />
-
-    <!-- JSON-LD: WebSite -->
-    <script id="json-ld-website" type="application/ld+json"></script>
-
-    <!-- ============================================================
-     FONTS — لینک‌های فونت
-     ============================================================ -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    {% include "seo/_fonts.html" %}
 
     <!-- ============================================================
      STYLES — تمام استایل‌های فایل index.html رو اینجا کپی کن
      (از <style> تا </style> فایل اصلی)
      ============================================================ -->
+{% compress css %}
     <style>
       /* ══════════════════════════════════════════
    DESIGN TOKENS — refined dark "instrument cluster" system
@@ -627,6 +608,89 @@
       }
 
       /* ── SECTIONS WRAPPER ── */
+      /* ===== Crawlable site footer (inside the final slide) ===== */
+      .site-footer {
+        position: absolute;
+        inset-inline: 0;
+        bottom: 0;
+        z-index: 4;
+        padding: 18px clamp(16px, 4vw, 48px) 14px;
+        background: linear-gradient(
+          to top,
+          rgba(5, 5, 7, 0.96),
+          rgba(5, 5, 7, 0)
+        );
+        font-size: 12px;
+        pointer-events: auto;
+      }
+      .site-footer-inner {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .site-footer h2 {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin: 0 0 6px;
+        text-transform: none;
+      }
+      .site-footer ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .site-footer a {
+        color: var(--dim);
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
+      .site-footer a:hover,
+      .site-footer a:focus-visible {
+        color: var(--neon);
+      }
+      .site-footer-copy {
+        text-align: center;
+        color: var(--muted);
+        margin: 12px 0 0;
+        font-size: 11px;
+      }
+      @media (max-height: 760px), (max-width: 640px) {
+        /* Compact on small screens rather than hidden. Google crawls
+           mobile-first, so hiding the footer below 640px would take these
+           links away from exactly the rendering that matters most. */
+        .site-footer {
+          padding: 10px 12px 8px;
+          max-height: 34vh;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+        }
+        .site-footer-inner {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 6px 14px;
+        }
+        .site-footer h2 {
+          font-size: 10px;
+          margin-bottom: 3px;
+        }
+        .site-footer ul {
+          gap: 2px;
+        }
+        .site-footer a,
+        .site-footer-copy {
+          font-size: 10px;
+        }
+      }
+
       #sections-wrapper {
         position: fixed;
         top: 0;
@@ -4824,6 +4888,7 @@ DESKTOP (1024px+)
         }
       }
     </style>
+{% endcompress %}
   </head>
   <body>
     <!-- ============================================================
@@ -4842,56 +4907,14 @@ DESKTOP (1024px+)
     <nav id="nav">
       <div class="nav-logo">VOLTEX</div>
       <ul class="nav-links">
+        <li><a href="{% url 'shop:product_list' %}">مدل‌ها</a></li>
+        <li><a href="{% url 'shop:product_list' %}">فروشگاه</a></li>
         <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(1);
-              return false;
-            "
-            >مدل‌ها</a
-          >
+          <a href="#testimonials" onclick="goToSlide(3); return false;">نظرات</a>
         </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(2);
-              return false;
-            "
-            >فروشگاه</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(3);
-              return false;
-            "
-            >نظرات</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(4);
-              return false;
-            "
-            >راهنما</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(5);
-              return false;
-            "
-            >درباره ما</a
-          >
-        </li>
+        <li><a href="{% url 'home_app:articles' %}">راهنما</a></li>
+        <li><a href="{% url 'seo:about' %}">درباره ما</a></li>
+        <li><a href="{% url 'seo:contact' %}">تماس</a></li>
       </ul>
 
       <div class="nav-right-cluster">
@@ -5035,8 +5058,60 @@ DESKTOP (1024px+)
       <div class="slide" id="hero" style="top: 0">
         <div class="hero-ambient"></div>
         <div class="hero-grid"></div>
-        <div class="hero-inner" id="hero-inner">
-          <!-- توسط JavaScript پر می‌شود -->
+        <!-- Rendered server-side. This was an empty div: the home page
+             shipped with no top-level heading at all and no text for a crawler
+             to read.
+             renderHero() below leaves this markup alone. -->
+        <div class="hero-inner" id="hero-inner" data-server-rendered="1">
+          <div style="flex: 1; min-width: 0">
+            <div class="hero-tag slide-anim d-1">{{ index_settings.hero_tag|default:"آینده جابه‌جایی شهری" }}</div>
+            <div class="hero-mobile-img-wrap slide-anim d-2">
+              {% if index_settings.hero_mobile_image %}
+              <img class="hero-mobile-img"
+                   src="{{ index_settings.hero_mobile_image.url }}"
+                   alt="{{ index_settings.hero_image_alt|default:'اسکوتر برقی ولتکس' }}"
+                   {% img_dimensions index_settings.hero_mobile_image 600 400 %}
+                   fetchpriority="high" loading="eager" decoding="async" />
+              {% endif %}
+            </div>
+            <h1 class="hero-title">
+              <div class="word-reveal"><span class="word"><span style="transition-delay:0.15s">{{ index_settings.hero_title_part1|default:"متفاوت" }}</span></span></div>
+              <div class="word-reveal"><span class="word"><span class="line-grad" style="transition-delay:0.28s">{{ index_settings.hero_title_part2|default:"برقی" }}</span></span></div>
+              <div class="word-reveal"><span class="word"><span style="transition-delay:0.41s">{{ index_settings.hero_title_part3|default:"برانید" }}</span></span></div>
+            </h1>
+            <div class="hero-mini-stats slide-anim d-4">
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_1_value|default:"85" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_1_unit|default:"km/h" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_1_label|default:"حداکثر سرعت" }}</div>
+              </div>
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_2_value|default:"160" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_2_unit|default:"km" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_2_label|default:"برد" }}</div>
+              </div>
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_3_value|default:"2" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_3_unit|default:"hr" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_3_label|default:"زمان شارژ" }}</div>
+              </div>
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_4_value|default:"40k" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_4_unit|default:"+" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_4_label|default:"کاربران" }}</div>
+              </div>
+            </div>
+            <p class="hero-desc slide-anim d-5">{{ index_settings.hero_description|default:"اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند." }}</p>
+            <div class="hero-btns slide-anim d-6">
+              <button class="btn-primary" type="button" onclick="goToSlide(2)">{{ index_settings.hero_btn_text|default:"مشاهده مجموعه" }}</button>
+              <button class="btn-secondary" type="button" onclick="goToSlide(1)">{{ index_settings.hero_btn_secondary_text|default:"کاوش مدل‌ها" }}</button>
+            </div>
+          </div>
+          <div class="hero-right-desktop">
+            {% if index_settings.hero_image %}
+            <img class="hero-desktop-img"
+                 src="{{ index_settings.hero_image.url }}"
+                 alt="{{ index_settings.hero_image_alt|default:'اسکوتر برقی ولتکس' }}"
+                 {% img_dimensions index_settings.hero_image 1200 800 %}
+                 fetchpriority="high" loading="eager" decoding="async" />
+            {% endif %}
+          </div>
         </div>
         <div class="scroll-hint">
           <span>اسکرول</span>
@@ -5093,8 +5168,67 @@ DESKTOP (1024px+)
         <div class="final-desktop-wrap" id="final-desktop-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
+    <!-- ============================================================
+     SITE FOOTER — ناوبری قابل خزش
+
+     The nav at the top of this page is entirely href="#" + goToSlide(),
+     so before this footer existed the home page linked to nothing: no
+     crawler could reach a category, a product or an article from the most
+     authoritative page on the site. These are real anchors, rendered
+     server-side, and they are what distributes link equity into the rest
+     of the site.
+     ============================================================ -->
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <nav aria-labelledby="footer-shop-heading">
+          <h2 id="footer-shop-heading">دسته‌بندی‌ها</h2>
+          <ul>
+            <li><a href="{% url 'shop:product_list' %}">همه اسکوترهای برقی</a></li>
+            {% for category in categories %}
+            <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </nav>
+
+        {% if featured_products %}
+        <nav aria-labelledby="footer-products-heading">
+          <h2 id="footer-products-heading">مدل‌های پرفروش</h2>
+          <ul>
+            {% for product in featured_products %}
+            <li><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        {% if latest_articles %}
+        <nav aria-labelledby="footer-magazine-heading">
+          <h2 id="footer-magazine-heading">تازه‌های مجله</h2>
+          <ul>
+            {% for article in latest_articles %}
+            <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
+            {% endfor %}
+            <li><a href="{% url 'home_app:articles' %}">همه مقالات</a></li>
+          </ul>
+        </nav>
+        {% endif %}
+
+        <nav aria-labelledby="footer-company-heading">
+          <h2 id="footer-company-heading">ولتکس</h2>
+          <ul>
+            <li><a href="{% url 'seo:about' %}">درباره ما</a></li>
+            <li><a href="{% url 'seo:contact' %}">تماس با ما</a></li>
+            <li><a href="{% url 'home_app:articles' %}">مجله</a></li>
+          </ul>
+        </nav>
+      </div>
+      <p class="site-footer-copy">
+        {{ index_settings.footer_copyright|default:"© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است." }}
+      </p>
+    </footer>
       </div>
     </div>
+
 
     <!-- ============================================================
      JAVASCRIPT — همه دیتاها از API میاد
@@ -5177,6 +5311,14 @@ DESKTOP (1024px+)
       function renderHero(data) {
         const container = document.getElementById("hero-inner");
         if (!container) return;
+
+        // The hero is already in the HTML. Rebuilding it here would append a
+        // second top-level heading to the page and re-request the LCP image
+        // for nothing.
+        if (container.dataset.serverRendered === "1") {
+          container.dataset.serverRendered = "0";
+          return;
+        }
 
         const h = data;
 
@@ -5422,7 +5564,7 @@ DESKTOP (1024px+)
           visualPanel.innerHTML = `
             <div class="cat-d-grid"></div>
             <div class="cat-d-scooter">
-              <img id="catScooterImgD" src="${firstCat?.image || "/static/images/default-category.jpg"}" alt="تصویر دسته‌بندی اسکوتر" class="visible">
+              <img id="catScooterImgD" src="${firstCat?.image || "/static/images/default-category.jpg"}" alt="تصویر دسته‌بندی اسکوتر" class="visible" width="800" height="600" loading="lazy" decoding="async">
             </div>
           `;
           desktopWrap.appendChild(visualPanel);
@@ -5644,7 +5786,7 @@ DESKTOP (1024px+)
                     <div class="pc-accent-bar-m"></div>
                     <div class="pc-img-m">
                       <div class="pc-img-m-bg" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
-                      ${card.product_cover ? `<img class="pc-scooter-img-m" src="${card.product_cover}" alt="${card.product_name}">` : ""}
+                      ${card.product_cover ? `<img class="pc-scooter-img-m" src="${card.product_cover}" alt="${card.product_name}" width="600" height="750" loading="lazy" decoding="async">` : ""}
                       ${card.badge_text ? `<div class="pc-badge-m">${card.badge_text}</div>` : ""}
                     </div>
                     <div class="pc-body-m">
@@ -5727,7 +5869,7 @@ DESKTOP (1024px+)
                     <div class="pc-accent-bar-d" style="background:${color}"></div>
                     <div class="pc-img-d">
                       <div class="pc-img-bg-d" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
-                      ${card.product_cover ? `<img class="pc-scooter-img-d" src="${card.product_cover}" alt="${card.product_name}">` : ""}
+                      ${card.product_cover ? `<img class="pc-scooter-img-d" src="${card.product_cover}" alt="${card.product_name}" width="600" height="750" loading="lazy" decoding="async">` : ""}
                       ${card.badge_text ? `<div class="pc-badge-d" style="background:${color}">${card.badge_text}</div>` : ""}
                     </div>
                     <div class="pc-body-d">
@@ -5861,7 +6003,7 @@ DESKTOP (1024px+)
       ${
         t.avatar_url
           ? `<div class="testi-avatar-d" style="background:transparent;padding:0;overflow:hidden;border:2px solid var(--gold);">
-          <img src="${t.avatar_url}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          <img src="${t.avatar_url}" alt="${t.name}" width="96" height="96" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
          </div>`
           : `<div class="testi-avatar-d" style="background:linear-gradient(135deg,${t.color_start_hex || "var(--neon)"},${t.color_end_hex || "var(--neon2)"})">${t.initials || "??"}</div>`
       }                <div><div class="testi-name-d">${t.name}</div></div>
@@ -5905,7 +6047,7 @@ DESKTOP (1024px+)
                   return `
                   <a href="/articles/${article.slug}/" class="guide-card-m">
                     <div class="guide-img-m ${article.cover_url ? "" : "placeholder"}">
-                      ${article.cover_url ? `<img src="${article.cover_url}" alt="${article.title}">` : `<div class="guide-placeholder-icon">📄</div>`}
+                      ${article.cover_url ? `<img src="${article.cover_url}" alt="${article.title}" width="1200" height="630" loading="lazy" decoding="async">` : `<div class="guide-placeholder-icon">📄</div>`}
                     </div>
                     <div class="guide-content-m">
                       <div class="guide-cat-m">${tag}</div>
@@ -5942,7 +6084,7 @@ DESKTOP (1024px+)
                       <div class="guide-img-inner-d" style="background:linear-gradient(135deg,#040d18,#081828)">
                         ${
                           article.cover_url
-                            ? `<img src="${article.cover_url}" alt="${article.title}" style="width:100%;height:100%;object-fit:cover;">`
+                            ? `<img src="${article.cover_url}" alt="${article.title}" width="1200" height="630" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;">`
                             : `
                           <div class="guide-img-placeholder">
                             <div class="guide-placeholder-emoji">${emojis[i] || "📄"}</div>
@@ -6095,42 +6237,17 @@ DESKTOP (1024px+)
          UPDATE SEO
          ════════════════════════════════════ */
       function updateSEO(data) {
-        const title = data.meta_title || "VOLTEX — اسکوترهای برقی پریمیوم";
-        const desc =
-          data.meta_description ||
-          "اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.";
-        const url = window.location.href;
-        const image = data.hero_image || "/images/1.png";
-
-        document.title = title;
-        document.getElementById("page-title").textContent = title;
-        document.getElementById("meta-description").content = desc;
-        document.getElementById("meta-canonical").href = url;
-
-        document.getElementById("og-title").content = title;
-        document.getElementById("og-description").content = desc;
-        document.getElementById("og-image").content = image;
-        document.getElementById("og-url").content = url;
-
-        document.getElementById("twitter-title").content = title;
-        document.getElementById("twitter-description").content = desc;
-        document.getElementById("twitter-image").content = image;
-
-        // JSON-LD
-        const jsonLd = {
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "VOLTEX",
-          description: desc,
-          url: url,
-          potentialAction: {
-            "@type": "SearchAction",
-            target: url + "?s={search_term_string}",
-            "query-input": "required name=search_term_string",
-          },
-        };
-        document.getElementById("json-ld-website").textContent =
-          JSON.stringify(jsonLd);
+        // ===============================================================
+        //  No-op. Title, description, canonical, Open Graph, Twitter cards
+        //  and the Organization + WebSite JSON-LD are rendered by Django
+        //  into the initial HTML (templates/seo/_head.html).
+        //
+        //  The old implementation set the canonical to window.location.href,
+        //  so every visit carrying ?utm_source=... declared itself canonical
+        //  and split the home page across as many URLs as there were
+        //  campaigns. It also declared a SearchAction pointing at "?s=",
+        //  a search parameter this site does not implement.
+        // ===============================================================
       }
 
       /* ════════════════════════════════════

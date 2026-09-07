@@ -1,11 +1,18 @@
 # apps/home/views.py
-from django.db.models import Q, Prefetch
+from django.db.models import F, Prefetch, Q
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView
+from django.urls import reverse
+from django.views.generic import DetailView, ListView, TemplateView
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
+
+from apps.seo import schema
+from apps.seo.cache import cached_page_class
+from apps.seo.seo import SEOMixin
+from apps.seo.utils import canonical_url, image_url, meta_description, meta_title
 
 from .models import Article, Tag, Comment
 from .pagination import ArticlePagination
@@ -63,10 +70,10 @@ class ArticleDetailAPIView(generics.RetrieveAPIView):
         )
 
     def retrieve(self, request, *args, **kwargs):
-        # افزایش تعداد بازدید
+        # افزایش تعداد بازدید — atomic, so concurrent hits are not lost and
+        # updated_at is left alone (it feeds sitemap <lastmod>).
         instance = self.get_object()
-        instance.view_count += 1
-        instance.save(update_fields=['view_count'])
+        Article.objects.filter(pk=instance.pk).update(view_count=F('view_count') + 1)
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -84,6 +91,8 @@ class TagListAPIView(generics.ListAPIView):
 
 class CommentListCreateAPIView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'comment'
 
     def get(self, request, slug):
         """گرفتن نظرات یک مقاله"""
@@ -118,19 +127,146 @@ class CommentListCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ArticleListPageView(TemplateView):
+# ══════════════════════════════════════════════════════════════════════
+#  HTML pages — rendered server-side (see apps/shop/views.py for the
+#  rationale; these were the same empty JS-hydrated shells).
+# ══════════════════════════════════════════════════════════════════════
+
+ARTICLES_PER_PAGE = 12
+
+
+@cached_page_class()
+class ArticleListPageView(SEOMixin, ListView):
     """صفحه لیست مقالات (برای رندر HTML)"""
     template_name = 'home/articles.html'
+    context_object_name = 'articles'
+    paginate_by = ARTICLES_PER_PAGE
 
+    seo_title = 'مجله اسکوتر برقی'
+    seo_description = (
+        'راهنمای خرید، نگهداری و مقایسه اسکوتر برقی در مجله ولتکس؛ مقالات '
+        'تخصصی درباره باتری، برد، سرعت و قوانین تردد اسکوتر برقی.'
+    )
 
-class ArticleDetailPageView(TemplateView):
-    """صفحه جزئیات مقاله (برای رندر HTML)"""
-    template_name = 'home/article_detail.html'
+    def get_queryset(self):
+        qs = (
+            Article.objects.filter(is_published=True)
+            .select_related('author')
+            .prefetch_related('tags')
+            .order_by('-published_at', '-created_at')
+        )
+        tag = self.request.GET.get('tag', '').strip()
+        if tag:
+            qs = qs.filter(tags__slug=tag).distinct()
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['slug'] = self.kwargs.get('slug')
+        context['tags'] = Tag.objects.filter(articles__is_published=True).distinct()
+        context['active_tag'] = self.request.GET.get('tag', '')
         return context
+
+    def get_breadcrumbs(self, context):
+        return [('خانه', '/'), ('مجله', reverse('home_app:articles'))]
+
+    def get_seo(self, context):
+        seo = super().get_seo(context)
+        page_obj = context.get('page_obj')
+        base = canonical_url(self.request, reverse('home_app:articles'))
+
+        # A tag filter is a facet over the same articles: crawlable, but not
+        # its own indexable page.
+        if self.request.GET.get('tag'):
+            seo.robots = 'noindex, follow'
+            seo.canonical = base
+            return seo
+
+        if page_obj and page_obj.number > 1:
+            seo.canonical = f'{base}?page={page_obj.number}'
+            seo.title = meta_title(f'{self.seo_title} — صفحه {page_obj.number}')
+            seo.description = meta_description(
+                f'صفحه {page_obj.number} از مقالات و راهنماهای خرید اسکوتر برقی ولتکس.'
+            )
+        if page_obj and page_obj.has_previous():
+            prev_num = page_obj.previous_page_number()
+            seo.prev_url = base if prev_num == 1 else f'{base}?page={prev_num}'
+        if page_obj and page_obj.has_next():
+            seo.next_url = f'{base}?page={page_obj.next_page_number()}'
+        return seo
+
+    def get_json_ld(self, context, seo):
+        return [schema.breadcrumbs(seo.breadcrumbs, self.request)]
+
+
+@cached_page_class()
+class ArticleDetailPageView(SEOMixin, DetailView):
+    """صفحه جزئیات مقاله (برای رندر HTML)"""
+    template_name = 'home/article_detail.html'
+    context_object_name = 'article'
+    seo_og_type = 'article'
+
+    def get_queryset(self):
+        return (
+            Article.objects.filter(is_published=True)
+            .select_related('author')
+            .prefetch_related(
+                'tags',
+                Prefetch(
+                    'comments',
+                    queryset=Comment.objects.filter(is_approved=True)
+                    .select_related('user')
+                    .order_by('-created_at'),
+                ),
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        article = self.object
+        self.seo_title = article.title
+        self.seo_description = meta_description(
+            article.meta_description, article.excerpt, article.description
+        )
+
+        context = super().get_context_data(**kwargs)
+        context['slug'] = article.slug
+        context['comments'] = list(article.comments.all())
+        context['related_articles'] = (
+            Article.objects.filter(is_published=True, tags__in=article.tags.all())
+            .exclude(pk=article.pk)
+            .select_related('author')
+            .distinct()[:3]
+        )
+        return context
+
+    def get_canonical_path(self):
+        return self.object.get_absolute_url()
+
+    def get_seo(self, context):
+        seo = super().get_seo(context)
+        # An explicit canonical_url on the model means the article was
+        # syndicated from elsewhere and this copy must not compete with it.
+        if self.object.canonical_url:
+            seo.canonical = self.object.canonical_url
+        seo.image_alt = self.object.cover_alt_text or self.object.title
+        seo.published_time = self.object.published_at or self.object.created_at
+        seo.modified_time = self.object.updated_at
+        return seo
+
+    def get_seo_image(self, context):
+        return image_url(self.object.cover_image, self.request)
+
+    def get_breadcrumbs(self, context):
+        return [
+            ('خانه', '/'),
+            ('مجله', reverse('home_app:articles')),
+            (self.object.title, self.object.get_absolute_url()),
+        ]
+
+    def get_json_ld(self, context, seo):
+        return [
+            schema.article(self.object, self.request),
+            schema.breadcrumbs(seo.breadcrumbs, self.request),
+        ]
 
 
 # apps/home/views.py (افزودن به ویوهای موجود)
@@ -153,10 +289,51 @@ class IndexPageAPIView(generics.RetrieveAPIView):
         return IndexPageSettings.objects.first()
 
 
-class IndexPageView(TemplateView):
+@cached_page_class()
+class IndexPageView(SEOMixin, TemplateView):
     """صفحه اصلی سایت"""
     template_name = 'home/index.html'
 
     def get_context_data(self, **kwargs):
+        from apps.shop.models import Category, Product
+
+        settings_obj = IndexPageSettings.objects.first()
+        if settings_obj:
+            self.seo_title = settings_obj.meta_title or ''
+            self.seo_description = settings_obj.meta_description or ''
+
         context = super().get_context_data(**kwargs)
+        context['index_settings'] = settings_obj
+        context['categories'] = (
+            Category.objects.filter(is_active=True, parent__isnull=True)
+            .prefetch_related('index_features')
+        )
+        context['featured_products'] = (
+            Product.objects.for_listing().filter(is_featured=True)[:8]
+        )
+        context['latest_articles'] = (
+            Article.objects.filter(is_published=True)
+            .select_related('author')
+            .order_by('-published_at', '-created_at')[:3]
+        )
         return context
+
+    def get_canonical_path(self):
+        return '/'
+
+    def get_seo_image(self, context):
+        settings_obj = context.get('index_settings')
+        if settings_obj:
+            return image_url(settings_obj.hero_image, self.request)
+        return ''
+
+    def get_breadcrumbs(self, context):
+        # The home page is the root of every trail, so it has no breadcrumb of
+        # its own — a one-item BreadcrumbList is ignored anyway.
+        return []
+
+    def get_json_ld(self, context, seo):
+        return [
+            schema.organization(self.request),
+            schema.website(self.request),
+        ]

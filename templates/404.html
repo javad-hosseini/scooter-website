@@ -1,0 +1,43 @@
+{% extends "seo/_page_base.html" %}
+{% comment %}
+Returned with a real 404 status (see apps/seo/views.page_not_found) and marked
+noindex. It links onward to the main sections so a mistyped or retired URL is
+a detour rather than a dead end — which is also what keeps Google from
+classifying it as a soft 404.
+{% endcomment %}
+
+{% block content %}
+<h1>این صفحه پیدا نشد</h1>
+<p class="lede">
+  نشانی‌ای که دنبال آن بودید وجود ندارد یا جابه‌جا شده است. از این‌جا می‌توانید
+  ادامه دهید:
+</p>
+
+<div class="cards">
+  <article class="card">
+    <h3><a href="{% url 'shop:product_list' %}">فروشگاه اسکوتر برقی</a></h3>
+    <p>همه مدل‌های موجود، همراه با قیمت و مشخصات فنی.</p>
+  </article>
+  <article class="card">
+    <h3><a href="{% url 'home_app:articles' %}">مجله ولتکس</a></h3>
+    <p>راهنمای خرید، نگهداری و مقایسه اسکوترهای برقی.</p>
+  </article>
+  <article class="card">
+    <h3><a href="{% url 'seo:contact' %}">تماس با ما</a></h3>
+    <p>اگر دنبال چیز مشخصی بودید، بپرسید تا راهنمایی کنیم.</p>
+  </article>
+  <article class="card">
+    <h3><a href="/">صفحه اصلی</a></h3>
+    <p>بازگشت به ابتدای سایت.</p>
+  </article>
+</div>
+
+{% if categories %}
+<h2>دسته‌بندی‌ها</h2>
+<ul>
+  {% for category in categories %}
+  <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

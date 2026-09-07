@@ -33,6 +33,21 @@ class Category(models.Model):
     )
     order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
     is_active = models.BooleanField(default=True, verbose_name="فعال")
+
+    # ===== SEO =====
+    meta_title = models.CharField(
+        max_length=60,
+        blank=True,
+        verbose_name="عنوان متا",
+        help_text="حداکثر ۶۰ کاراکتر. اگر خالی باشد از نام دسته‌بندی ساخته می‌شود."
+    )
+    meta_description = models.CharField(
+        max_length=160,
+        blank=True,
+        verbose_name="توضیحات متا",
+        help_text="حداکثر ۱۶۰ کاراکتر. اگر خالی باشد از توضیحات دسته‌بندی ساخته می‌شود."
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -48,6 +63,10 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('shop:category_products', kwargs={'slug': self.slug})
 
 
 class ProductSpec(models.Model):
@@ -168,8 +187,15 @@ class ProductImage(models.Model):
     )
     image = models.ImageField(
         upload_to='products/gallery/',
-        verbose_name="تصویر"
+        verbose_name="تصویر",
+        width_field='image_width',
+        height_field='image_height',
     )
+    # Cached intrinsic dimensions. Without them the template cannot emit
+    # width/height attributes without opening every file with Pillow on each
+    # render, and missing attributes are the main source of layout shift.
+    image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     color_slug = models.SlugField(
         max_length=50,
         verbose_name="اسلاگ رنگ",
@@ -279,8 +305,53 @@ class Wishlist(models.Model):
         return f"{self.user.fullname} - {self.product.name}"
 
 
+class ProductQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(is_published=True)
+
+    def with_ratings(self):
+        """Annotate approved-review count/average in one pass.
+
+        Product cards show a star rating, so without this every card on a
+        listing page triggers its own COUNT and AVG — the single biggest
+        contributor to slow TTFB on category pages.
+        """
+        approved = models.Q(reviews__status='approved')
+        return self.annotate(
+            approved_review_count=models.Count(
+                'reviews', filter=approved, distinct=True
+            ),
+            approved_review_average=models.Avg('reviews__rating', filter=approved),
+        )
+
+    def for_listing(self):
+        """Everything a product card renders, with no N+1 left behind."""
+        return (
+            self.published()
+            .filter(is_discontinued=False)
+            .select_related('category')
+            .with_ratings()
+            # Explicit and total. annotate() drops the model's default
+            # ordering, and an unordered queryset makes pagination
+            # non-deterministic — the same product can appear on page 1 and
+            # page 2, or on neither, across two crawls of the same listing.
+            .order_by('-is_featured', '-created_at', 'pk')
+        )
+
+    def for_detail(self):
+        return (
+            self.published()
+            .select_related('category', 'category__parent')
+            .prefetch_related('specs', 'trust_badges', 'marketing_features',
+                              'stat_features', 'images')
+            .with_ratings()
+        )
+
+
 class Product(models.Model):
     """مدل اصلی محصول"""
+    objects = ProductQuerySet.as_manager()
+
     # اطلاعات پایه
     name = models.CharField(max_length=255, verbose_name="نام محصول")
     slug = models.SlugField(max_length=280, unique=True, allow_unicode=True, verbose_name="اسلاگ")
@@ -304,12 +375,17 @@ class Product(models.Model):
     cover_image = models.ImageField(
         upload_to='products/covers/',
         verbose_name="تصویر کاور",
-        help_text="تصویر اصلی محصول که در هدر نمایش داده می‌شود"
+        help_text="تصویر اصلی محصول که در هدر نمایش داده می‌شود",
+        width_field='cover_image_width',
+        height_field='cover_image_height',
     )
+    cover_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    cover_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     cover_alt_text = models.CharField(
         max_length=200,
         blank=True,
-        verbose_name="متن جایگزین تصویر کاور"
+        verbose_name="متن جایگزین تصویر کاور",
+        help_text="برای سئوی تصویر و دسترسی‌پذیری. اگر خالی باشد از نام محصول ساخته می‌شود."
     )
 
     # قیمت
@@ -329,21 +405,65 @@ class Product(models.Model):
     # موجودی
     stock = models.PositiveIntegerField(default=0, verbose_name="موجودی")
     is_available = models.BooleanField(default=True, verbose_name="موجود")
+    restock_expected = models.BooleanField(
+        default=True,
+        verbose_name="به‌زودی شارژ می‌شود",
+        help_text="اگر تیک بخورد، صفحه‌ی محصول ناموجود زنده و ایندکس‌شده می‌ماند."
+    )
+    is_discontinued = models.BooleanField(
+        default=False,
+        verbose_name="تولید متوقف شده",
+        help_text=(
+            "محصولی که دیگر تولید/فروخته نمی‌شود. صفحه با ریدایرکت ۳۰۱ به محصول "
+            "جایگزین یا به دسته‌بندی والد منتقل می‌شود تا ارزش لینک‌ها از بین نرود."
+        )
+    )
+    replacement_product = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='replaces',
+        verbose_name="محصول جایگزین",
+        help_text="مقصد ریدایرکت ۳۰۱ برای محصول متوقف‌شده. اگر خالی باشد به دسته‌بندی می‌رود."
+    )
 
     # وضعیت
     is_published = models.BooleanField(default=True, verbose_name="منتشر شده")
     is_featured = models.BooleanField(default=False, verbose_name="ویژه")
 
+    # شناسه‌های کالا (برای Product schema و گوگل شاپینگ)
+    sku = models.CharField(
+        max_length=64,
+        blank=True,
+        db_index=True,
+        verbose_name="کد کالا (SKU)",
+        help_text="اگر خالی باشد به‌صورت خودکار ساخته می‌شود."
+    )
+    brand = models.CharField(
+        max_length=100,
+        blank=True,
+        default='VOLTEX',
+        verbose_name="برند"
+    )
+    mpn = models.CharField(
+        max_length=64,
+        blank=True,
+        verbose_name="شماره قطعه سازنده (MPN)"
+    )
+
     # متادیتا
     meta_title = models.CharField(
         max_length=60,
         blank=True,
-        verbose_name="عنوان متا"
+        verbose_name="عنوان متا",
+        help_text="حداکثر ۶۰ کاراکتر. اگر خالی باشد از نام محصول ساخته می‌شود."
     )
     meta_description = models.CharField(
         max_length=160,
         blank=True,
-        verbose_name="توضیحات متا"
+        verbose_name="توضیحات متا",
+        help_text="حداکثر ۱۶۰ کاراکتر. اگر خالی باشد از توضیحات محصول ساخته می‌شود."
     )
 
     # آمار
@@ -364,15 +484,26 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
+        if not self.cover_alt_text:
+            # Never ship an empty alt on the product's primary image.
+            self.cover_alt_text = f'{self.name} — اسکوتر برقی {self.brand or "ولتکس"}'
         super().save(*args, **kwargs)
+        if not self.sku:
+            # Needs the PK, so it has to happen after the first insert.
+            type(self).objects.filter(pk=self.pk).update(sku=f'VLX-{self.pk:05d}')
+            self.sku = f'VLX-{self.pk:05d}'
 
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('shop:product_detail', kwargs={'slug': self.slug})
 
     @property
-    def reviews_count(self):
-        return self.reviews.filter(status='approved').count()
+    def seo_title(self):
+        return self.meta_title or self.name
+
+    @property
+    def is_in_stock(self):
+        return self.is_available and self.stock > 0 and not self.is_discontinued
 
     @property
     def final_price(self):
@@ -381,15 +512,26 @@ class Product(models.Model):
 
     @property
     def average_rating(self):
-        """میانگین امتیازات تایید شده"""
-        approved = self.reviews.filter(status='approved')
-        if approved.exists():
-            return round(approved.aggregate(models.Avg('rating'))['rating__avg'], 1)
-        return 0
+        """میانگین امتیازات تایید شده
+
+        Uses the ``approved_review_average`` annotation added by
+        ``Product.objects.with_ratings()`` when it is present. Without it a
+        listing page would fire two extra queries per product.
+        """
+        annotated = getattr(self, 'approved_review_average', None)
+        if annotated is not None:
+            return round(annotated, 1) if annotated else 0
+        result = self.reviews.filter(status='approved').aggregate(
+            avg=models.Avg('rating')
+        )['avg']
+        return round(result, 1) if result else 0
 
     @property
     def reviews_count(self):
         """تعداد نظرات تایید شده"""
+        annotated = getattr(self, 'approved_review_count', None)
+        if annotated is not None:
+            return annotated
         return self.reviews.filter(status='approved').count()
 
     @property

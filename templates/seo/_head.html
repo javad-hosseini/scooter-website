@@ -1,0 +1,44 @@
+{% load static seo_tags %}{% comment %}
+Single source of truth for every page's <head> metadata.
+
+All of it is rendered server-side. The `id` attributes are kept only so that
+the pages' existing hydration scripts can still find these nodes without
+throwing; the scripts no longer need to write to them.
+{% endcomment %}
+<title id="page-title">{{ seo.title|default:SITE_NAME }}</title>
+<meta name="description" id="meta-description" content="{{ seo.description }}" />
+<meta name="robots" content="{{ seo.robots }}" />
+{% if seo.canonical %}<link rel="canonical" id="meta-canonical" href="{{ seo.canonical }}" />{% endif %}
+{% comment %}
+rel=prev/next is no longer used by Google for indexing, but Bing and other
+crawlers still consume it and it costs nothing to emit correctly.
+{% endcomment %}
+{% if seo.prev_url %}<link rel="prev" href="{{ seo.prev_url }}" />{% endif %}
+{% if seo.next_url %}<link rel="next" href="{{ seo.next_url }}" />{% endif %}
+
+<!-- Open Graph -->
+<meta property="og:type" content="{{ seo.og_type }}" />
+<meta property="og:title" id="og-title" content="{{ seo.title }}" />
+<meta property="og:description" id="og-description" content="{{ seo.description }}" />
+<meta property="og:image" id="og-image" content="{{ seo.image }}" />
+{% if seo.image_alt %}<meta property="og:image:alt" content="{{ seo.image_alt }}" />{% endif %}
+<meta property="og:url" id="og-url" content="{{ seo.canonical }}" />
+<meta property="og:site_name" content="{{ SITE_NAME }}" />
+<meta property="og:locale" content="{{ SITE_LOCALE }}" />
+{% if seo.published_time %}<meta property="article:published_time" content="{{ seo.published_time|date:'c' }}" />{% endif %}
+{% if seo.modified_time %}<meta property="article:modified_time" content="{{ seo.modified_time|date:'c' }}" />{% endif %}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+{% if SEO_TWITTER_SITE %}<meta name="twitter:site" content="{{ SEO_TWITTER_SITE }}" />{% endif %}
+<meta name="twitter:title" id="twitter-title" content="{{ seo.title }}" />
+<meta name="twitter:description" id="twitter-description" content="{{ seo.description }}" />
+<meta name="twitter:image" id="twitter-image" content="{{ seo.image }}" />
+{% if seo.image_alt %}<meta name="twitter:image:alt" content="{{ seo.image_alt }}" />{% endif %}
+
+<meta name="theme-color" content="#06070a" />
+<link rel="icon" href="{% static 'images/favicon.svg' %}" type="image/svg+xml" />
+
+{% for block in seo.json_ld %}{% if block %}
+<script type="application/ld+json">{{ block|json_ld }}</script>
+{% endif %}{% endfor %}

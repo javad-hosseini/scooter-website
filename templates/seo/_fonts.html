@@ -1,0 +1,15 @@
+{% load static %}{% comment %}
+Self-hosted fonts.
+
+The previous Google Fonts <link> was a render-blocking stylesheet on a third
+-party origin: two extra connections (DNS + TCP + TLS) had to complete before
+the browser could even discover the font files. Serving the faces from our own
+origin removes both round trips, and preloading the Persian 400 face — the one
+that paints the LCP text on every page — starts its download in the same burst
+as the HTML instead of after the CSS parses.
+
+Every @font-face in fonts.css carries font-display: swap, so text paints
+immediately in the fallback and re-renders when the webfont lands.
+{% endcomment %}
+<link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
+<link rel="stylesheet" href="{% static 'css/fonts.css' %}" />

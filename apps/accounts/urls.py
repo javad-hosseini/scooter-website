@@ -1,5 +1,3 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
 from django.urls import path, re_path
 from . import views
@@ -37,5 +35,5 @@ urlpatterns = [
     path('api/cities/', views.CityListAPIView.as_view(), name='api_cities'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Media serving in DEBUG is wired up once, in config/urls.py — repeating it in
+# each app's URLconf just added duplicate patterns to the resolver.

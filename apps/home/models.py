@@ -96,8 +96,14 @@ class Article(models.Model):
         verbose_name="تصویر کاور",
         blank=True,
         null=True,
-        help_text="تصویر اصلی مقاله که در هدر و کارت‌ها نمایش داده می‌شود.\n📐 ابعاد: 1200 × 630 پیکسل (نسبت 1.91:1)\n📁 فرمت: WebP (بهترین) یا JPEG\n📦 حجم: حداکثر 200 کیلوبایت\n🖥️ رزولوشن: 72 DPI (مناسب برای وب)"
+        help_text="تصویر اصلی مقاله که در هدر و کارت‌ها نمایش داده می‌شود.\n📐 ابعاد: 1200 × 630 پیکسل (نسبت 1.91:1)\n📁 فرمت: WebP (بهترین) یا JPEG\n📦 حجم: حداکثر 200 کیلوبایت\n🖥️ رزولوشن: 72 DPI (مناسب برای وب)",
+        width_field='cover_image_width',
+        height_field='cover_image_height',
     )
+    # Cached intrinsic size so templates can emit width/height without a
+    # Pillow read per render (CLS).
+    cover_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    cover_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     cover_alt_text = models.CharField(
         max_length=200,
         verbose_name="متن جایگزین تصویر",
@@ -194,6 +200,10 @@ class Article(models.Model):
         if not self.meta_description and self.excerpt:
             self.meta_description = self.excerpt[:155]
 
+        # ===== متن جایگزین تصویر (alt) =====
+        if self.cover_image and not self.cover_alt_text:
+            self.cover_alt_text = self.title[:200]
+
         # ===== محاسبه زمان مطالعه =====
         if not self.time_to_read and self.description:
             from django.utils.html import strip_tags
@@ -206,7 +216,9 @@ class Article(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('home:article_detail', kwargs={'slug': self.slug})
+        # The URLconf namespace is 'home_app'; 'home' raised NoReverseMatch,
+        # which meant every sitemap/canonical built from this method failed.
+        return reverse('home_app:article_detail', kwargs={'slug': self.slug})
 
     @property
     def attachment_type(self):
@@ -257,7 +269,10 @@ class Comment(models.Model):
         verbose_name="پاسخ به"
     )
     content = models.TextField(verbose_name="متن نظر")
-    is_approved = models.BooleanField(default=True, verbose_name="تایید شده")
+    # Comments are user-supplied HTML-bearing text rendered into the article
+    # page. Publishing them unreviewed made every article a stored-XSS sink,
+    # so new comments wait for a moderator.
+    is_approved = models.BooleanField(default=False, verbose_name="تایید شده")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="آخرین بروزرسانی")
 
@@ -335,15 +350,25 @@ class IndexPageSettings(models.Model):
         verbose_name="تصویر هیرو",
         blank=True,
         null=True,
-        help_text="تصویر اصلی هیرو (Desktop)\n📐 ابعاد: 1200 × 800 پیکسل\n📁 فرمت: WebP یا JPEG"
+        help_text="تصویر اصلی هیرو (Desktop)\n📐 ابعاد: 1200 × 800 پیکسل\n📁 فرمت: WebP یا JPEG",
+        width_field='hero_image_width',
+        height_field='hero_image_height',
     )
+    # The hero image is the LCP element on the home page: its dimensions must
+    # be in the HTML so the box is reserved before the bytes arrive.
+    hero_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    hero_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     hero_mobile_image = models.ImageField(
         upload_to='home/index/hero/',
         verbose_name="تصویر هیرو موبایل",
         blank=True,
         null=True,
-        help_text="تصویر هیرو برای موبایل\n📐 ابعاد: 600 × 400 پیکسل"
+        help_text="تصویر هیرو برای موبایل\n📐 ابعاد: 600 × 400 پیکسل",
+        width_field='hero_mobile_image_width',
+        height_field='hero_mobile_image_height',
     )
+    hero_mobile_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    hero_mobile_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     hero_image_alt = models.CharField(
         max_length=200,
         blank=True,

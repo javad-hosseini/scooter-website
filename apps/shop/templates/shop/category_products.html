@@ -1,40 +1,26 @@
-<!DOCTYPE html>
+{% load static seo_tags compress %}<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-<title id="page-title">محصولات | ولتکس</title>
-<meta name="description" id="meta-description" content="">
-<meta name="keywords" content="اسکوتر برقی, ولتکس, اسکوتر لوکس, خرید اسکوتر برقی">
-<meta name="author" content="Voltex GmbH">
-<meta name="robots" content="index, follow">
-<link rel="canonical" id="meta-canonical" href="">
+{# "keywords" has been ignored by every major engine for over a decade and is #}
+{# dropped; author/robots/canonical/OG/Twitter now come from the shared head. #}
+{% include "seo/_head.html" %}
 
-<meta property="og:type" content="website">
-<meta property="og:title" id="og-title" content="">
-<meta property="og:description" id="og-description" content="">
-<meta property="og:image" id="og-image" content="">
-<meta property="og:url" id="og-url" content="">
-<meta property="og:locale" content="fa_IR">
+{% if hero_products.0.cover_image %}
+<link rel="preload" as="image" fetchpriority="high" href="{{ hero_products.0.cover_image.url }}">
+{% elif products.0.cover_image %}
+<link rel="preload" as="image" fetchpriority="high" href="{{ products.0.cover_image.url }}">
+{% endif %}
 
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" id="twitter-title" content="">
-<meta name="twitter:description" id="twitter-description" content="">
-<meta name="twitter:image" id="twitter-image" content="">
-
-<meta name="theme-color" content="#06070a">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2306070a'/><text y='23' x='5' font-size='20' font-family='Arial' font-weight='900' fill='%235bffb5'>V</text></svg>">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% include "seo/_fonts.html" %}
 
 <!-- ============================================================
    STYLES — تمام استایل‌های فایل category_products.html رو اینجا کپی کن
    (از <style> تا </style> فایل اصلی)
    ============================================================ -->
+{% compress css %}
 <style>
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TOKENS
@@ -81,6 +67,31 @@ a{text-decoration:none;color:inherit}
 
 .skip{position:absolute;top:-100%;left:50%;transform:translateX(-50%);background:var(--accent);color:#021810;font-weight:700;padding:8px 20px;border-radius:0 0 8px 8px;z-index:9999;font-size:13px}
 .skip:focus{top:0}
+
+/* ━━ Breadcrumb / heading / pagination (server-rendered SEO markup) ━━ */
+.breadcrumb{padding:88px 0 0;font-size:13px}
+.breadcrumb ol{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0;color:var(--muted)}
+.breadcrumb li + li::before{content:"‹";margin-left:8px;color:var(--muted2)}
+.breadcrumb a{color:var(--muted);text-decoration:none}
+.breadcrumb a:hover,.breadcrumb a:focus-visible{color:var(--accent);text-decoration:underline}
+
+.page-heading{padding:24px 0 4px}
+.page-h1{font-family:'Syne',var(--font,sans-serif);font-size:clamp(28px,5vw,46px);line-height:1.15;margin:0 0 10px;color:var(--text)}
+.page-intro{max-width:70ch;color:var(--muted);line-height:1.9;margin:0}
+
+.nav-links{display:none;gap:22px;list-style:none;margin:0;padding:0}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px}
+.nav-links a:hover,.nav-links a:focus-visible{color:var(--accent)}
+@media (min-width:900px){.nav-links{display:flex}}
+
+.grid-empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted)}
+.card-name a{color:inherit;text-decoration:none}
+.card-name a:hover,.card-name a:focus-visible{color:var(--accent)}
+
+.pagination{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:40px 0 72px}
+.page-link{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border:1px solid var(--rim2);border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
+.page-link:hover,.page-link:focus-visible{border-color:var(--accent);color:var(--accent)}
+.page-link.is-current{background:var(--accent);border-color:var(--accent);color:#021810;font-weight:700}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -735,6 +746,7 @@ a{text-decoration:none;color:inherit}
 
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 </style>
+{% endcompress %}
 </head>
 <body>
 
@@ -745,6 +757,12 @@ a{text-decoration:none;color:inherit}
   <nav class="nav" id="mainNav" aria-label="ناوبری اصلی ولتکس">
     <div class="fluid nav-inner">
       <a href="/" class="nav-logo" aria-label="ولتکس — صفحه اصلی">VOLT<span>EX</span></a>
+      <ul class="nav-links">
+        <li><a href="{% url 'shop:product_list' %}">محصولات</a></li>
+        <li><a href="{% url 'home_app:articles' %}">مجله</a></li>
+        <li><a href="{% url 'seo:about' %}">درباره ما</a></li>
+        <li><a href="{% url 'seo:contact' %}">تماس</a></li>
+      </ul>
       <div class="nav-actions">
         <button class="nav-btn" aria-label="جستجو">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -759,6 +777,32 @@ a{text-decoration:none;color:inherit}
     </div>
   </nav>
 </header>
+
+<!-- ━━ BREADCRUMB ━━
+     Visible on the page as well as in BreadcrumbList JSON-LD, which Google
+     requires for the breadcrumb rich result. -->
+<nav class="breadcrumb" aria-label="مسیر صفحه">
+  <div class="fluid">
+    <ol>
+      {% for label, url in seo.breadcrumbs %}
+      <li>
+        {% if not forloop.last %}<a href="{{ url }}">{{ label }}</a>
+        {% else %}<span aria-current="page">{{ label }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</nav>
+
+<!-- ━━ PAGE HEADING ━━
+     Exactly one H1 per page. The carousel slides below used to each render
+     their own top-level heading, giving the page five competing H1s. -->
+<div class="fluid page-heading">
+  <h1 class="page-h1">{{ category.name|default:"اسکوتر برقی ولتکس" }}</h1>
+  {% if category.description %}
+  <p class="page-intro">{{ category.description }}</p>
+  {% endif %}
+</div>
 
 <!-- ━━ HERO SLIDER ━━ -->
 <section class="hero" id="heroSlider" aria-label="کلکسیون اسکوترهای برقی ولتکس" aria-roledescription="carousel">
@@ -812,10 +856,75 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
-<!-- ━━ MAIN ━━ -->
+<!-- ━━ MAIN ━━
+     The grid is rendered server-side. It used to be an empty div that
+     JavaScript filled from the API, which meant a crawler saw a category page
+     with zero products and zero links to them — no internal linking, and
+     nothing to index. The hydration script now leaves this markup alone
+     unless the visitor actually filters or sorts. -->
 <main id="main">
   <div class="fluid page">
-    <div class="grid" id="productGrid" role="list" aria-label="محصولات"></div>
+    <div class="grid" id="productGrid" role="list" aria-label="محصولات" data-server-rendered="1">
+      {% for product in products %}
+      <article class="card" data-id="{{ product.id }}" role="listitem" tabindex="0"
+               aria-label="{{ product.name }}" data-name="{{ product.name }}"
+               data-price="{{ product.price }}">
+        <div class="card-img-wrap">
+          <div class="card-img-inner">
+            {% if product.cover_image %}
+            <img class="card-img"
+                 src="{{ product.cover_image.url }}"
+                 alt="{{ product.cover_alt_text|default:product.name }}"
+                 {% img_dimensions product.cover_image 400 500 %}
+                 {% if forloop.counter <= 4 %}loading="eager" fetchpriority="{% if forloop.first %}high{% else %}auto{% endif %}"{% else %}loading="lazy"{% endif %}
+                 decoding="async"
+                 draggable="false">
+            {% endif %}
+          </div>
+          <div class="card-bloom" aria-hidden="true"></div>
+          <div class="card-shine" aria-hidden="true"></div>
+        </div>
+        <div class="card-body">
+          <h2 class="card-name"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
+          <div class="card-price-row">
+            <span class="card-price">{{ product.final_price|floatformat:0 }} تومان</span>
+            {% if product.discount_price %}
+            <span class="card-price-old">{{ product.price|floatformat:0 }} تومان</span>
+            {% endif %}
+          </div>
+          <div class="card-actions">
+            <a href="{{ product.get_absolute_url }}" class="btn-view"
+               aria-label="مشاهده جزئیات {{ product.name }}">مشاهده جزئیات</a>
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <p class="grid-empty">هیچ محصولی در این دسته‌بندی یافت نشد.</p>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <!-- Crawlable pagination: real <a href> elements, so every page of the
+         listing can be discovered without executing JavaScript. -->
+    <nav class="pagination" aria-label="صفحه‌بندی محصولات">
+      {% if page_obj.has_previous %}
+      <a class="page-link" rel="prev"
+         href="{% if page_obj.previous_page_number == 1 %}{{ request.path }}{% else %}?page={{ page_obj.previous_page_number }}{% endif %}">قبلی</a>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+        <span class="page-link is-current" aria-current="page">{{ num }}</span>
+        {% elif num == 1 %}
+        <a class="page-link" href="{{ request.path }}">۱</a>
+        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+      <a class="page-link" rel="next" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+      {% endif %}
+    </nav>
+    {% endif %}
   </div>
 </main>
 
@@ -989,28 +1098,18 @@ function updateThemeColor(colorHex) {
 }
 
 /* ═══════════════════════════════════════
-   SEO UPDATE
+   SEO — rendered by Django, not here.
+
+   This function used to overwrite the title, description, canonical, OG and
+   Twitter tags after the API responded. Two problems: a crawler that did not
+   run the script saw them empty, and the canonical was set to
+   window.location.href, so /shop/category/x/?sort=price declared itself the
+   canonical version of a page that already existed at the clean URL.
+
+   All of it now ships in the HTML from templates/seo/_head.html. Kept as a
+   no-op so the existing call site does not throw.
 ═══════════════════════════════════════ */
-function updateSEO(data) {
-  const title = `${data.name} | ولتکس`;
-  const desc = data.description || `محصولات ${data.name} ولتکس`;
-  const url = window.location.href;
-  const image = data.hero_products && data.hero_products.length > 0 && data.hero_products[0].cover_image_url || '/images/og-cover.jpg';
-  
-  document.title = title;
-  document.getElementById('page-title').textContent = title;
-  document.getElementById('meta-description').content = desc;
-  document.getElementById('meta-canonical').href = url;
-  
-  document.getElementById('og-title').content = title;
-  document.getElementById('og-description').content = desc;
-  document.getElementById('og-image').content = image;
-  document.getElementById('og-url').content = url;
-  
-  document.getElementById('twitter-title').content = title;
-  document.getElementById('twitter-description').content = desc;
-  document.getElementById('twitter-image').content = image;
-}
+function updateSEO(data) { /* intentionally empty — see comment above */ }
 
 /* ═══════════════════════════════════════
    FORMAT PRICE (تومان با جداکننده)
@@ -1041,21 +1140,21 @@ function buildSlides() {
     slide.setAttribute('aria-label', p.product_name);
     slide.setAttribute('aria-roledescription', 'slide');
     
-    const coverUrl = p.cover_image_url || '/images/default-product.jpg';
+    const coverUrl = p.cover_image_url || '/static/images/default-product.svg';
     const finalPrice = p.product_discount_price || p.product_price;
     
     slide.innerHTML = `
       <div class="slide-bg">
-        <img class="slide-bg-img" src="${coverUrl}" alt="" aria-hidden="true" loading="${i===0?'eager':'lazy'}" ${i===0?'fetchpriority="high"':''}>
+        <img class="slide-bg-img" src="${coverUrl}" alt="" aria-hidden="true" width="1600" height="900" decoding="async" loading="${i===0?'eager':'lazy'}" ${i===0?'fetchpriority="high"':''}>
       </div>
       <div class="slide-product" aria-hidden="true">
         <div class="slide-product-glow"></div>
-        <img class="slide-product-img" src="${coverUrl}" alt="${p.cover_alt_text || p.product_name}" loading="${i===0?'eager':'lazy'}">
+        <img class="slide-product-img" src="${coverUrl}" alt="${p.cover_alt_text || p.product_name}" width="800" height="1000" decoding="async" loading="${i===0?'eager':'lazy'}">
       </div>
       <div class="slide-inner">
         <div class="slide-content">
           <div class="slide-brand">${p.product_tagline || categoryData.name}</div>
-          <h1 class="slide-title">${p.product_name}</h1>
+          <h2 class="slide-title">${p.product_name}</h2>
           <p class="slide-desc">${p.product_description || ''}</p>
           <div class="slide-price">
             ${p.product_discount_price ? `<span style="text-decoration:line-through;color:var(--muted);font-size:0.7em;margin-left:12px;">${formatPrice(p.product_price)}</span>` : ''}
@@ -1113,7 +1212,7 @@ function resetSlideTimer() {
    PRODUCT CARD BUILDER
 ═══════════════════════════════════════ */
 function makeCard(p) {
-  const coverUrl = p.cover_image_url || '/images/default-product.jpg';
+  const coverUrl = p.cover_image_url || '/static/images/default-product.svg';
   const finalPrice = p.discount_price || p.price;
   const hasDiscount = p.discount_price && p.discount_price < p.price;
   const isInWishlist = p.is_in_wishlist || false;
@@ -1160,7 +1259,19 @@ function makeCard(p) {
 ═══════════════════════════════════════ */
 const grid = document.getElementById('productGrid');
 
-function renderGrid(data) {
+function renderGrid(data, { force = false } = {}) {
+  // The first paint already contains every product, rendered by Django.
+  // Re-rendering it from the API would throw away decoded images and
+  // re-trigger layout for no visual change, so the server markup is kept
+  // until the visitor actually filters or sorts (force = true).
+  if (!force && grid.dataset.serverRendered === '1') {
+    grid.dataset.serverRendered = '0';
+    const count = grid.querySelectorAll('.card').length;
+    document.getElementById('visibleCount').textContent = toPersianNum(count);
+    initReveal();
+    return;
+  }
+
   if (!data || data.length === 0) {
     grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted);">
@@ -1308,7 +1419,7 @@ function applyFilters() {
   if (sort === 'name') data.sort((a, b) => a.name.localeCompare(b.name));
   
   countEl.textContent = toPersianNum(data.length);
-  renderGrid(data);
+  renderGrid(data, { force: true });
 }
 
 let searchDebounce;

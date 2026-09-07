@@ -130,6 +130,22 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['content', 'parent']
 
+    def validate_parent(self, value):
+        """A reply must belong to the article it is being posted under.
+
+        ``parent`` is a bare PK, so without this any comment id was accepted —
+        including one from a different article, which then rendered inside that
+        other article's reply thread.
+        """
+        if value is None:
+            return value
+        article_id = self.context.get('article_id')
+        if article_id is not None and value.article_id != article_id:
+            raise serializers.ValidationError('پاسخ باید مربوط به همین مقاله باشد')
+        if value.parent_id is not None:
+            raise serializers.ValidationError('پاسخ به پاسخ مجاز نیست')
+        return value
+
     def validate(self, data):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:

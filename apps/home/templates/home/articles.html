@@ -1,4 +1,5 @@
 <!doctype html>
+{% load static seo_tags compress %}
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -6,20 +7,26 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <title>مقالات | VOLTEX</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
+    {% include "seo/_head.html" %}
+    {% include "seo/_fonts.html" %}
+
+    <!-- Icon font: decorative only, so it must not block the first paint. -->
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'; this.onload=null;"
     />
+    <noscript>
+      <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+      />
+    </noscript>
 
-    <style>
+    {% compress css %}
+<style>
       :root {
         --bg: #020617;
         --surface: #0f172a;
@@ -150,6 +157,111 @@
         box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
       }
       .tag-chip.all {
+        font-weight: 700;
+      }
+
+      /* ===== Server-rendered nav / breadcrumb / pagination ===== */
+      .skip-link {
+        position: absolute;
+        top: -100px;
+        right: 12px;
+        z-index: 999;
+        padding: 10px 18px;
+        background: var(--accent);
+        color: #041016;
+        border-radius: 0 0 8px 8px;
+        font-weight: 700;
+        transition: top 0.2s;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+      .site-nav {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 18px 1.25rem;
+        font-size: 14px;
+        color: var(--text-mid);
+      }
+      .site-nav a:hover,
+      .site-nav a:focus-visible {
+        color: var(--accent-2);
+      }
+      .site-logo {
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        margin-inline-end: auto;
+        color: var(--text);
+      }
+      .breadcrumb {
+        font-size: 12px;
+        margin-bottom: 18px;
+      }
+      .breadcrumb ol {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        color: var(--text-low);
+      }
+      .breadcrumb li + li::before {
+        content: "‹";
+        margin-left: 8px;
+        color: var(--text-low);
+      }
+      .breadcrumb a {
+        color: var(--text-mid);
+      }
+      .breadcrumb a:hover,
+      .breadcrumb a:focus-visible {
+        color: var(--accent-2);
+        text-decoration: underline;
+      }
+      .card-excerpt {
+        color: var(--text-mid);
+        font-size: 13px;
+        line-height: 1.9;
+        margin: 8px 0 0;
+      }
+      .grid-empty {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-low);
+      }
+      .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        padding: 32px 0 8px;
+      }
+      .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 14px;
+      }
+      .page-link:hover,
+      .page-link:focus-visible {
+        border-color: var(--accent);
+        color: var(--accent-2);
+      }
+      .page-link.is-current {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #041016;
         font-weight: 700;
       }
 
@@ -331,12 +443,34 @@
         }
       }
     </style>
+{% endcompress %}
   </head>
   <body>
-    <div class="page-wrap">
+    <a href="#articlesGrid" class="skip-link">رفتن به فهرست مقالات</a>
+    <header>
+      <nav class="site-nav" aria-label="ناوبری اصلی">
+        <a href="/" class="site-logo">VOLT<span>EX</span></a>
+        <a href="{% url 'shop:product_list' %}">محصولات</a>
+        <a href="{% url 'home_app:articles' %}" aria-current="page">مجله</a>
+        <a href="{% url 'seo:about' %}">درباره ما</a>
+        <a href="{% url 'seo:contact' %}">تماس</a>
+      </nav>
+    </header>
+    <main class="page-wrap">
+      <nav class="breadcrumb" aria-label="مسیر صفحه">
+        <ol>
+          {% for label, url in seo.breadcrumbs %}
+          <li>
+            {% if not forloop.last %}<a href="{{ url }}">{{ label }}</a>
+            {% else %}<span aria-current="page">{{ label }}</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+      </nav>
+
       <div class="page-head">
-        <h1>مقالات</h1>
-        <p>آخرین مطالب و راهنماهای فروش و نگهداری اسکوتر</p>
+        <h1>مقالات اسکوتر برقی</h1>
+        <p>آخرین مطالب و راهنماهای خرید و نگهداری اسکوتر برقی</p>
       </div>
 
       <div class="search-box">
@@ -356,7 +490,59 @@
         <span class="tag-chip all active" data-tag="">همه</span>
       </div>
 
-      <div class="articles-grid" id="articlesGrid"></div>
+      <div class="articles-grid" id="articlesGrid" data-server-rendered="1">
+        {% for article in articles %}
+        <a class="article-card" href="{{ article.get_absolute_url }}">
+          {% if article.cover_image %}
+          <img
+            class="card-thumb"
+            src="{{ article.cover_image.url }}"
+            alt="{{ article.cover_alt_text|default:article.title }}"
+            {% img_dimensions article.cover_image 1200 630 %}
+            {% if forloop.counter <= 3 %}loading="eager"{% else %}loading="lazy"{% endif %}
+            decoding="async"
+          />
+          {% endif %}
+          <div class="card-body">
+            <div class="card-tags">
+              {% for tag in article.tags.all %}<span>{{ tag.name }}</span>{% endfor %}
+            </div>
+            <h2 class="card-title">{{ article.title }}</h2>
+            <p class="card-excerpt">{{ article.excerpt|meta_text:140 }}</p>
+            <div class="card-meta">
+              <span>{{ article.author.fullname|default:article.author.username }}</span>
+              <span>{{ article.time_to_read|default:1 }} دقیقه</span>
+              <time datetime="{{ article.published_at|default:article.created_at|date:'c' }}">
+                {{ article.published_at|default:article.created_at|date:'Y/m/d' }}
+              </time>
+            </div>
+          </div>
+        </a>
+        {% empty %}
+        <p class="grid-empty">هنوز مقاله‌ای منتشر نشده است.</p>
+        {% endfor %}
+      </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="pagination" aria-label="صفحه‌بندی مقالات">
+        {% if page_obj.has_previous %}
+        <a class="page-link" rel="prev"
+           href="{% if page_obj.previous_page_number == 1 %}{{ request.path }}{% else %}?page={{ page_obj.previous_page_number }}{% endif %}">قبلی</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+          <span class="page-link is-current" aria-current="page">{{ num }}</span>
+          {% elif num == 1 %}
+          <a class="page-link" href="{{ request.path }}">۱</a>
+          {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <a class="page-link" rel="next" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+        {% endif %}
+      </nav>
+      {% endif %}
 
       <div class="state-msg" id="emptyState">
         <i class="bi bi-inbox"></i>
@@ -369,7 +555,7 @@
       </div>
 
       <div class="pagination-row" id="paginationRow"></div>
-    </div>
+    </main>
 
     <script>
       (function () {
@@ -431,7 +617,7 @@
               escapeAttr(a.cover_image_url) +
               '" alt="' +
               escapeAttr(a.title) +
-              '" loading="lazy">'
+              '" width="1200" height="630" decoding="async" loading="lazy">'
             );
           }
 
@@ -447,7 +633,7 @@
               escapeAttr(imgSrc) +
               '" alt="' +
               escapeAttr(a.title) +
-              '" loading="lazy">'
+              '" width="1200" height="630" decoding="async" loading="lazy">'
             );
           }
 
@@ -468,6 +654,20 @@
         }
 
         function renderCards(articles) {
+          // Page 1 with no search/tag is already rendered by Django. Leaving
+          // that markup in place keeps the decoded images and avoids a
+          // pointless full-grid reflow on load.
+          if (
+            grid.dataset.serverRendered === "1" &&
+            !state.search &&
+            !state.tag &&
+            state.page === 1
+          ) {
+            grid.dataset.serverRendered = "0";
+            emptyState.classList.remove("show");
+            return;
+          }
+
           if (articles.length === 0) {
             grid.innerHTML = "";
             emptyState.classList.add("show");

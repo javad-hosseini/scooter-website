@@ -1,48 +1,38 @@
-{% load static %}
+{% load static compress seo_tags %}
 <!doctype html>
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title id="page-title">محصول | VOLTEX</title>
 
-    <!-- SEO Meta Tags -->
-    <meta name="description" id="meta-description" content="" />
-    <link rel="canonical" id="meta-canonical" href="" />
+    {% include "seo/_head.html" %}
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="product" />
-    <meta property="og:title" id="og-title" content="" />
-    <meta property="og:description" id="og-description" content="" />
-    <meta property="og:image" id="og-image" content="" />
-    <meta property="og:url" id="og-url" content="" />
-    <meta property="og:site_name" content="VOLTEX" />
-    <meta property="og:locale" content="fa_IR" />
+    <!-- Preload the LCP image so it starts downloading with the HTML rather
+         than after the CSS and the hero markup have been parsed. -->
+    {% if product.cover_image %}
+    <link rel="preload" as="image" fetchpriority="high" href="{{ product.cover_image.url }}" />
+    {% endif %}
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" id="twitter-title" content="" />
-    <meta name="twitter:description" id="twitter-description" content="" />
-    <meta name="twitter:image" id="twitter-image" content="" />
+    {% include "seo/_fonts.html" %}
 
-    <!-- JSON-LD: Product -->
-    <script id="json-ld-product" type="application/ld+json"></script>
-
-    <!-- Preconnect / Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Font Awesome for wishlist icon -->
+    <!-- Font Awesome supplies two icons on this page, so it must not block the
+         first paint: the sheet is fetched at low priority and swapped in on
+         load, with a <noscript> copy for the no-JS case. -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      media="print"
+      onload="this.media='all'; this.onload=null;"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      />
+    </noscript>
 
-    <style>
+    {% compress css %}
+<style>
       /* ===== تمام استایل‌های فایل product.html اینجا قرار می‌گیرند ===== */
       /* (همون استایل‌هایی که قبلاً دادی) */
       *,
@@ -2509,6 +2499,130 @@
         font-size: 16px;
       }
 
+      /* ===== Accessibility & SEO additions ===== */
+      .skip-link {
+        position: absolute;
+        top: -100px;
+        right: 12px;
+        z-index: 999;
+        padding: 10px 18px;
+        background: var(--gold);
+        color: #060810;
+        border-radius: 0 0 8px 8px;
+        font-weight: 700;
+        transition: top 0.2s;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+
+      .breadcrumb {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 88px 24px 0;
+        font-size: 13px;
+      }
+      .breadcrumb ol {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .breadcrumb li + li::before {
+        content: "‹";
+        margin-left: 8px;
+        color: rgba(255, 255, 255, 0.25);
+      }
+      .breadcrumb a {
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+      }
+      .breadcrumb a:hover,
+      .breadcrumb a:focus-visible {
+        color: var(--gold);
+        text-decoration: underline;
+      }
+
+      .hero-price {
+        margin: 18px 0 6px;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .hero-price strong {
+        color: var(--gold);
+        font-size: 26px;
+      }
+      .hero-price-old {
+        color: rgba(255, 255, 255, 0.35);
+        font-size: 15px;
+      }
+      .stock-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+      }
+      .stock-in {
+        color: #4ade80;
+      }
+      .stock-out {
+        color: #fbbf24;
+      }
+
+      .related-products {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+      .related-products h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+      .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .related-grid a {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+      }
+      .related-grid img {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .footer-nav {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 14px 0;
+      }
+      .footer-nav a {
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .footer-nav a:hover,
+      .footer-nav a:focus-visible {
+        color: var(--gold);
+        text-decoration: underline;
+      }
+
       .loading-spinner {
         display: flex;
         justify-content: center;
@@ -2530,21 +2644,44 @@
         }
       }
     </style>
+{% endcompress %}
   </head>
   <body>
+    <a href="#hero" class="skip-link">رفتن به محتوای اصلی</a>
+
     <!-- ===== NAV ===== -->
-    <nav class="nav">
-      <a href="/" class="nav-logo">VOLT<span>EX</span></a>
-      <ul class="nav-links">
-        <li><a href="/">خانه</a></li>
-        <li><a href="/products/">محصولات</a></li>
-        <li><a href="/blog/">مجله</a></li>
-      </ul>
-      <button class="nav-reserve" onclick="location.href = '/cart/'">
-        سبد خرید
-      </button>
+    <header>
+      <nav class="nav" aria-label="ناوبری اصلی">
+        <a href="/" class="nav-logo" aria-label="ولتکس — صفحه اصلی">VOLT<span>EX</span></a>
+        <ul class="nav-links">
+          <li><a href="/">خانه</a></li>
+          <li><a href="{% url 'shop:product_list' %}">محصولات</a></li>
+          <li><a href="{% url 'home_app:articles' %}">مجله</a></li>
+          <li><a href="{% url 'seo:about' %}">درباره ما</a></li>
+          <li><a href="{% url 'seo:contact' %}">تماس</a></li>
+        </ul>
+        <button class="nav-reserve" type="button" onclick="location.href = '/cart/'">
+          سبد خرید
+        </button>
+      </nav>
+    </header>
+
+    <!-- ===== BREADCRUMB =====
+         Rendered in the markup as well as in BreadcrumbList JSON-LD: Google
+         requires the trail to be visible on the page for the rich result to
+         be eligible. -->
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      <ol>
+        {% for label, url in seo.breadcrumbs %}
+        <li>
+          {% if not forloop.last %}<a href="{{ url }}">{{ label }}</a>
+          {% else %}<span aria-current="page">{{ label }}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
     </nav>
 
+    <main>
     <!-- ===== SECTION 1 — HERO ===== -->
     <section id="hero">
       <div class="bg-base"></div>
@@ -2555,29 +2692,54 @@
       <div class="bg-vignette"></div>
       <canvas id="hero-particles"></canvas>
 
-      <div id="loading-spinner" class="loading-spinner"></div>
+      <!-- The spinner starts hidden: the product is already in the HTML, so
+           there is nothing to wait for. It is only shown again if the
+           hydration fetch fails and needs to surface an error. -->
+      <div id="loading-spinner" class="loading-spinner" style="display: none" hidden></div>
 
-      <div id="product-content" style="display: none">
+      <div id="product-content">
         <div class="hero-layout">
           <div class="hero-copy">
-            <div class="hero-brand" id="product-category">...</div>
-            <h1 class="hero-title" id="product-name">...</h1>
-            <p class="hero-tagline" id="product-tagline">...</p>
+            <div class="hero-brand" id="product-category">{{ product.category.name }}</div>
+            <h1 class="hero-title" id="product-name">{{ product.name }}</h1>
+            <p class="hero-tagline" id="product-tagline">{{ product.tagline }}</p>
             <div class="hero-divider"></div>
-            <p class="hero-desc" id="product-description">...</p>
+            <p class="hero-desc" id="product-description">{{ product.description }}</p>
+
+            <p class="hero-price">
+              {% if product.discount_price %}
+              <s class="hero-price-old">{{ product.price|floatformat:0 }} تومان</s>
+              {% endif %}
+              <strong>{{ product.final_price|floatformat:0 }} تومان</strong>
+              {% if product.is_in_stock %}
+              <span class="stock-badge stock-in">موجود در انبار</span>
+              {% elif product.restock_expected %}
+              <span class="stock-badge stock-out">ناموجود — به‌زودی شارژ می‌شود</span>
+              {% endif %}
+            </p>
 
             <div class="hero-btns">
               <a href="#" class="btn btn-primary" id="add-to-cart-btn">
-                <i class="fas fa-shopping-cart"></i> خرید کنید
+                <i class="fas fa-shopping-cart" aria-hidden="true"></i> خرید کنید
               </a>
-              <button class="wishlist-btn" id="wishlist-btn">
-                <i class="far fa-heart"></i>
+              <button class="wishlist-btn" id="wishlist-btn" type="button">
+                <i class="far fa-heart" aria-hidden="true"></i>
                 <span id="wishlist-text">علاقه‌مندی</span>
               </button>
             </div>
 
             <div class="hero-specs" id="product-specs">
-              <!-- توسط JavaScript پر می‌شود -->
+              {% for spec in specs %}
+              <div class="spec-row">
+                <div class="spec-card">
+                  {% if spec.icon %}<div class="spec-icon" aria-hidden="true">{{ spec.icon }}</div>{% endif %}
+                  <div>
+                    <div class="spec-val">{{ spec.value }}</div>
+                    <div class="spec-lbl">{{ spec.label }}</div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
             </div>
           </div>
 
@@ -2600,10 +2762,16 @@
               "
             ></div>
             <div class="hero-img-wrap">
+              <!-- LCP element: eagerly loaded, high priority, never lazy, and
+                   with intrinsic dimensions so the box is reserved up front. -->
               <img
                 id="hero-img"
-                src=""
-                alt=""
+                src="{% if product.cover_image %}{{ product.cover_image.url }}{% else %}{% static 'images/default-product.svg' %}{% endif %}"
+                alt="{{ product.cover_alt_text|default:product.name }}"
+                {% img_dimensions product.cover_image 1200 900 %}
+                fetchpriority="high"
+                loading="eager"
+                decoding="async"
                 style="
                   width: 100%;
                   height: auto;
@@ -2866,9 +3034,43 @@
       </div>
     </section>
 
+    {% if related_products %}
+    <!-- Out of stock: give crawlers and shoppers a live route onward instead
+         of a dead end, which is what turns an out-of-stock page into a soft
+         404 in Google's eyes. -->
+    <section class="related-products" aria-labelledby="related-heading">
+      <h2 id="related-heading">محصولات مشابه</h2>
+      <ul class="related-grid">
+        {% for related in related_products %}
+        <li>
+          <a href="{{ related.get_absolute_url }}">
+            {% if related.cover_image %}
+            <img
+              src="{{ related.cover_image.url }}"
+              alt="{{ related.cover_alt_text|default:related.name }}"
+              {% img_dimensions related.cover_image 600 450 %}
+              loading="lazy"
+              decoding="async"
+            />
+            {% endif %}
+            <span>{{ related.name }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+    </main>
+
     <!-- ===== FOOTER ===== -->
     <footer>
       <div class="footer-logo">VOLT<span>EX</span></div>
+      <nav class="footer-nav" aria-label="ناوبری فوتر">
+        <a href="{% url 'shop:product_list' %}">محصولات</a>
+        <a href="{% url 'home_app:articles' %}">مجله</a>
+        <a href="{% url 'seo:about' %}">درباره ما</a>
+        <a href="{% url 'seo:contact' %}">تماس با ما</a>
+      </nav>
       <div class="footer-copy">© ۱۴۰۳ VOLTEX. تمامی حقوق محفوظ است.</div>
     </footer>
 
@@ -2915,6 +3117,20 @@
           month: "long",
           day: "numeric",
         }).format(date);
+      }
+
+      /* Review bodies, titles and display names are user-supplied and are
+         written with innerHTML below, so every interpolated value has to be
+         escaped here. Approval gates the body a moderator reads — it does not
+         gate the author's display name, which rides along unreviewed. */
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return "";
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
       }
 
       function starGlyphs(rating) {
@@ -2969,52 +3185,21 @@
    RENDER PRODUCT
    ════════════════════════════════════ */
       function renderProduct(product) {
-        const currentUrl = window.location.href;
-
-        // ===== SEO =====
-        document.title = `${product.name} | VOLTEX`;
-        document.getElementById("page-title").textContent = document.title;
-        document.getElementById("meta-description").content =
-          product.meta_description || product.description.substring(0, 155);
-        document.getElementById("meta-canonical").href = currentUrl;
-
-        document.getElementById("og-title").content = product.name;
-        document.getElementById("og-description").content =
-          product.meta_description || product.description.substring(0, 155);
-        document.getElementById("og-image").content =
-          product.cover_image_url || "";
-        document.getElementById("og-url").content = currentUrl;
-
-        document.getElementById("twitter-title").content = product.name;
-        document.getElementById("twitter-description").content =
-          product.meta_description || product.description.substring(0, 155);
-        document.getElementById("twitter-image").content =
-          product.cover_image_url || "";
-
-        // ===== JSON-LD =====
-        const jsonLd = {
-          "@context": "https://schema.org",
-          "@type": "Product",
-          name: product.name,
-          description: product.description,
-          image: product.cover_image_url,
-          sku: product.slug,
-          offers: {
-            "@type": "Offer",
-            price: product.final_price,
-            priceCurrency: "IRR",
-            availability: product.is_available
-              ? "https://schema.org/InStock"
-              : "https://schema.org/OutOfStock",
-          },
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: product.average_rating || 0,
-            reviewCount: product.reviews_count || 0,
-          },
-        };
-        document.getElementById("json-ld-product").textContent =
-          JSON.stringify(jsonLd);
+        // ═══════════════════════════════════════════════════════════════
+        //  Title, meta description, canonical, Open Graph, Twitter cards
+        //  and Product JSON-LD are all rendered by Django into the initial
+        //  HTML response (see templates/seo/_head.html).
+        //
+        //  They are deliberately NOT rewritten here. Writing them from JS
+        //  meant a crawler that did not execute the page saw empty tags,
+        //  and the canonical was being set to window.location.href — which
+        //  carries the query string, so every ?utm_source=... visit
+        //  self-canonicalised to a brand new duplicate URL.
+        //
+        //  The hero copy below is likewise already in the HTML; it is
+        //  refreshed here only so the page stays correct if the product
+        //  changed between the cached render and now.
+        // ═══════════════════════════════════════════════════════════════
 
         // ===== Hero =====
         // Category
@@ -3022,8 +3207,7 @@
           product.category ? product.category.name : "محصول";
 
         // Name
-        document.getElementById("product-name").innerHTML =
-          product.name.replace(/\s/g, " ");
+        document.getElementById("product-name").textContent = product.name;
 
         // Tagline
         document.getElementById("product-tagline").textContent =
@@ -3033,11 +3217,14 @@
         document.getElementById("product-description").textContent =
           product.description;
 
-        // Hero Image
-        document.getElementById("hero-img").src =
-          product.cover_image_url || "/static/images/default-product.jpg";
-        document.getElementById("hero-img").alt =
-          product.cover_alt_text || product.name;
+        // Hero Image — keep the server-rendered src (and its reserved
+        // width/height) unless the API actually points somewhere else, so we
+        // do not discard an already-decoded LCP image.
+        const heroImg = document.getElementById("hero-img");
+        if (product.cover_image_url && !heroImg.src.endsWith(product.cover_image_url)) {
+          heroImg.src = product.cover_image_url;
+        }
+        heroImg.alt = product.cover_alt_text || product.name;
 
         // ===== Specs =====
         const specsContainer = document.getElementById("product-specs");
@@ -3239,7 +3426,7 @@
                 aria-label="${item.alt_text || item.color_label}"
                 style="transition-delay:${Math.min(i, 8) * 0.05}s;">
                 <div class="gcard-img">
-                    <img src="${item.image_url}" alt="${item.alt_text || item.color_label}" loading="lazy" decoding="async">
+                    <img src="${item.image_url}" alt="${item.alt_text || item.color_label}" width="800" height="1000" loading="lazy" decoding="async">
                 </div>
                 <div class="gcard-overlay">
                     <div class="overlay-label">
@@ -3466,30 +3653,36 @@
           card.className = "rv-card rv-glass";
           card.style.transitionDelay = `${Math.min(i, 5) * 0.06}s`;
 
+          const userName = escapeHtml(review.user_name) || "کاربر ناشناس";
           const initials = review.user_name
-            ? review.user_name.trim().charAt(0)
+            ? escapeHtml(review.user_name.trim().charAt(0))
             : "؟";
-          const avatarUrl = review.user_avatar || null;
+          // Only same-origin media paths: a javascript: or data: URL here would
+          // execute on its own, without needing the review body at all.
+          const rawAvatar = review.user_avatar || null;
+          const avatarUrl =
+            rawAvatar && /^\/(?!\/)/.test(rawAvatar) ? escapeHtml(rawAvatar) : null;
+          const ratingValue = Number(review.rating) || 0;
 
           card.innerHTML = `
             <div class="rv-card-head">
                 <div class="rv-avatar" style="${avatarUrl ? "background:transparent;padding:0;overflow:hidden;" : ""}">
-                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${review.user_name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials}
+                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${userName}" width="96" height="96" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials}
                 </div>
                 <div class="rv-card-headinfo">
                     <div class="rv-name-row">
-                        <span class="rv-name">${review.user_name || "کاربر ناشناس"}</span>
+                        <span class="rv-name">${userName}</span>
                         ${review.is_verified_purchase ? '<span class="rv-verified">✓ خرید تأیید‌شده</span>' : ""}
                     </div>
                     <div class="rv-card-sub">
-                        <div class="rv-card-stars" aria-label="${review.rating} از ۵ ستاره">${starGlyphs(review.rating)}</div>
-                        <time class="rv-date" datetime="${review.created_at}">${formatDate(new Date(review.created_at))}</time>
+                        <div class="rv-card-stars" aria-label="${ratingValue} از ۵ ستاره">${starGlyphs(ratingValue)}</div>
+                        <time class="rv-date" datetime="${escapeHtml(review.created_at)}">${formatDate(new Date(review.created_at))}</time>
                     </div>
                 </div>
             </div>
-            ${review.title ? `<h4 class="rv-card-title">${review.title}</h4>` : ""}
-            <p class="rv-card-text">${review.comment}</p>
-            <button type="button" class="rv-helpful-btn" data-id="${review.id}">
+            ${review.title ? `<h4 class="rv-card-title">${escapeHtml(review.title)}</h4>` : ""}
+            <p class="rv-card-text">${escapeHtml(review.comment)}</p>
+            <button type="button" class="rv-helpful-btn" data-id="${Number(review.id) || 0}">
                 <span class="rv-helpful-icon">👍</span>
                 <span class="rv-helpful-label">مفید بود</span>
                 <span class="rv-helpful-count">(${review.helpful_count || 0})</span>

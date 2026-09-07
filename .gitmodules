@@ -1,0 +1,6 @@
+[submodule ".claude/skills/security-audit"]
+	path = .claude/skills/security-audit
+	url = git@github.com:toshipon/claude-code-security-audit-skill.git
+[submodule "skills/security-audit"]
+	path = skills/security-audit
+	url = git@github.com:toshipon/claude-code-security-audit-skill.git
