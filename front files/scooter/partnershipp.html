@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>همکاری با ما | اسکوتر برقی لوکس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy-primary:   #0F172A;
+    --navy-secondary: #1E293B;
+    --navy-deep:      #020617;
+    --accent-blue:    #2563EB;
+    --accent-light:   #60A5FA;
+    --text-primary:   #F8FAFC;
+    --text-secondary: #94A3B8;
+    --border:         rgba(96,165,250,0.12);
+    --border-strong:  rgba(96,165,250,0.25);
+    --gold:           #D4AF37;
+    --gold-hover:     #E5C158;
+    --font:           'Vazirmatn', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy-deep);
+    color: var(--text-primary);
+    font-family: var(--font);
+    direction: rtl;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--navy-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 2px; }
+
+  /* ======= NAV ======= */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(2,6,23,0.98), transparent);
+    backdrop-filter: blur(0px);
+    transition: backdrop-filter 0.4s, background 0.4s, border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled {
+    background: rgba(2,6,23,0.97);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent-light); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--accent-light); }
+
+  /* ======= HERO ======= */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 30%, rgba(37,99,235,0.18) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(96,165,250,0.06) 0%, transparent 55%),
+      linear-gradient(180deg, var(--navy-deep) 0%, var(--navy-primary) 100%);
+    z-index: 0;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    opacity: 0.15;
+  }
+  .hero-grid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(96,165,250,0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(96,165,250,0.5) 1px, transparent 1px);
+    background-size: 80px 80px;
+    transform: perspective(600px) rotateX(55deg) translateY(-100px) scale(2.5);
+    transform-origin: center top;
+    animation: gridMove 14s linear infinite;
+  }
+  @keyframes gridMove {
+    from { background-position: 0 0; }
+    to { background-position: 0 80px; }
+  }
+
+  .particles {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    animation: float linear infinite;
+    opacity: 0;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.7; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(-20vh) translateX(30px); opacity: 0; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 820px;
+    padding: 0 24px;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.3s forwards;
+  }
+  .hero-eyebrow::before,
+  .hero-eyebrow::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--accent-blue);
+  }
+  .hero-eyebrow-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--accent-light);
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 200;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.5s forwards;
+  }
+  .hero-title strong {
+    font-weight: 800;
+    display: block;
+    background: linear-gradient(135deg, #fff 20%, var(--accent-light) 80%, var(--accent-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: 300;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    max-width: 560px;
+    margin: 0 auto 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.7s forwards;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.9s forwards;
+  }
+
+  /* ======= BUTTONS ======= */
+  .btn-primary {
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
+    color: #fff;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-primary:hover::after { left: 100%; }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #3b82f6, var(--accent-blue));
+    transform: translateY(-3px);
+    box-shadow: 0 20px 50px rgba(37,99,235,0.45);
+  }
+
+  .btn-outline {
+    padding: 16px 40px;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 0.95rem;
+    font-weight: 500;
+    border: 1px solid var(--border-strong);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+  }
+  .btn-outline:hover {
+    border-color: var(--accent-light);
+    color: var(--accent-light);
+    background: rgba(96,165,250,0.07);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(96,165,250,0.12);
+  }
+
+  .hero-scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.5s forwards;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--accent-blue), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  .scroll-text {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.15em;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { transform: scaleY(1); opacity: 0.6; }
+    50% { transform: scaleY(1.3); opacity: 1; }
+  }
+
+  /* ======= SECTION BASE ======= */
+  section { padding: 120px 60px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent-blue);
+  }
+  .section-label-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--accent-light);
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 200;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-title strong { font-weight: 800; }
+
+  .section-desc {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.9;
+    max-width: 560px;
+  }
+
+  /* ======= WHY PARTNER ======= */
+  .why-section { background: var(--navy-primary); }
+
+  .why-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 40px;
+    margin-bottom: 80px;
+    flex-wrap: wrap;
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .why-card {
+    background: var(--navy-secondary);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: background 0.4s, transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .why-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(to left, var(--accent-blue), var(--accent-light));
+    transition: width 0.5s ease;
+  }
+  .why-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(96,165,250,0.07) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .why-card:hover {
+    background: #263352;
+    box-shadow: 0 32px 80px rgba(2,6,23,0.6), 0 0 0 1px var(--border);
+  }
+  .why-card:hover::before { width: 100%; }
+  .why-card:hover::after { opacity: 1; }
+
+  .why-card-number {
+    font-size: 0.65rem;
+    color: var(--accent-light);
+    letter-spacing: 0.2em;
+    margin-bottom: 32px;
+    font-weight: 600;
+    opacity: 0.6;
+  }
+  .why-card-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 24px;
+    color: var(--accent-light);
+    transition: color 0.3s, transform 0.4s;
+  }
+  .why-card:hover .why-card-icon { color: #fff; transform: scale(1.08); }
+  .why-card-icon svg { width: 100%; height: 100%; }
+
+  .why-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .why-card-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  /* ======= STATS ======= */
+  .stats-section {
+    padding: 100px 60px;
+    background: var(--navy-deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .stats-section::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .stat-item {
+    padding: 48px 40px;
+    text-align: center;
+    position: relative;
+    background: rgba(30,41,59,0.4);
+    backdrop-filter: blur(4px);
+    transition: background 0.3s;
+  }
+  .stat-item:hover { background: rgba(37,99,235,0.07); }
+  .stat-item::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 20%; bottom: 20%;
+    width: 1px;
+    background: var(--border);
+  }
+  .stat-item:last-child::after { display: none; }
+
+  .stat-number {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 30%, var(--accent-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  /* ======= PARTNERSHIP TYPES ======= */
+  .types-section { background: var(--navy-primary); }
+
+  .types-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 72px;
+  }
+
+  .type-card {
+    background: var(--navy-deep);
+    border: 1px solid var(--border);
+    padding: 60px 48px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: border-color 0.4s, transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s;
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+  }
+  .type-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(37,99,235,0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .type-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-8px);
+    box-shadow: 0 40px 80px rgba(2,6,23,0.7), 0 0 0 1px rgba(96,165,250,0.2);
+  }
+  .type-card:hover::before { opacity: 1; }
+  .type-card.featured {
+    border-color: var(--accent-blue);
+    background: linear-gradient(160deg, rgba(37,99,235,0.12) 0%, var(--navy-deep) 100%);
+  }
+
+  .type-badge {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.4);
+  }
+
+  .type-icon {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    color: var(--accent-light);
+    transition: border-color 0.3s, background 0.3s, transform 0.4s;
+  }
+  .type-card:hover .type-icon,
+  .type-card.featured .type-icon {
+    border-color: var(--accent-blue);
+    background: rgba(37,99,235,0.12);
+    transform: scale(1.05);
+  }
+
+  .type-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .type-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.9;
+    margin-bottom: 32px;
+    flex: 1;
+  }
+  .type-features {
+    list-style: none;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .type-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    transition: color 0.3s;
+  }
+  .type-card:hover .type-features li { color: var(--text-primary); }
+  .type-features li::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 1px;
+    background: var(--accent-blue);
+    flex-shrink: 0;
+  }
+  .type-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: var(--accent-light);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: gap 0.3s, color 0.3s;
+  }
+  .type-cta:hover { gap: 16px; color: #fff; }
+  .type-cta svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ======= PROCESS ======= */
+  .process-section {
+    background: var(--navy-secondary);
+    overflow: hidden;
+  }
+  .process-header { margin-bottom: 80px; }
+  .process-steps {
+    display: flex;
+    gap: 0;
+    position: relative;
+  }
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    right: 0; left: 0;
+    height: 1px;
+    background: linear-gradient(to left, transparent, var(--accent-blue) 20%, var(--accent-blue) 80%, transparent);
+    opacity: 0.3;
+  }
+  .process-step {
+    flex: 1;
+    padding: 0 24px;
+    position: relative;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .process-step.visible { opacity: 1; transform: translateY(0); }
+  .step-dot {
+    width: 72px;
+    height: 72px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    position: relative;
+    background: var(--navy-secondary);
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+  .process-step:hover .step-dot {
+    border-color: var(--accent-blue);
+    background: rgba(37,99,235,0.12);
+    box-shadow: 0 0 30px rgba(37,99,235,0.3);
+  }
+  .step-dot-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-light);
+  }
+  .step-title { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+  .step-desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7; }
+
+  /* ======= TRUST / TESTIMONIALS ======= */
+  .trust-section { background: var(--navy-deep); }
+  .trust-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 80px;
+  }
+  .trust-testimonials {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .testimonial-card {
+    background: var(--navy-secondary);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .testimonial-card:hover {
+    background: #263352;
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .testimonial-card::after {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 32px;
+    font-size: 8rem;
+    color: var(--accent-blue);
+    opacity: 0.06;
+    font-family: serif;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .testimonial-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+  .star { color: var(--accent-light); font-size: 0.9rem; }
+  .testimonial-text {
+    font-size: 0.92rem;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+  }
+  .testimonial-author { display: flex; align-items: center; gap: 14px; }
+  .author-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy-primary), #334155);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-light);
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  .author-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+  .author-company { font-size: 0.78rem; color: var(--text-secondary); }
+
+  .trust-achievements {
+    background: var(--navy-secondary);
+    padding: 60px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 40px;
+  }
+  .achievement-item { display: flex; gap: 20px; align-items: flex-start; }
+  .achievement-icon {
+    width: 48px; height: 48px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent-light);
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .achievement-item:hover .achievement-icon {
+    border-color: var(--accent-blue);
+    background: rgba(37,99,235,0.1);
+  }
+  .achievement-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+  .achievement-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+
+  /* ======= FORM ======= */
+  .form-section {
+    background: var(--navy-primary);
+    position: relative;
+    overflow: hidden;
+  }
+  .form-section::before {
+    content: '';
+    position: absolute;
+    bottom: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .form-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 80px;
+  }
+  .form-side-info { position: sticky; top: 120px; }
+  .form-side-title {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    color: var(--text-secondary);
+  }
+  .form-side-title strong {
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+  }
+  .form-guarantee {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 32px;
+    border: 1px solid var(--border);
+    margin-top: 40px;
+    background: rgba(30,41,59,0.5);
+    backdrop-filter: blur(8px);
+  }
+  .guarantee-item { display: flex; gap: 14px; align-items: center; }
+  .guarantee-dot {
+    width: 8px; height: 8px;
+    background: var(--accent-blue);
+    flex-shrink: 0;
+    border-radius: 50%;
+  }
+  .guarantee-text { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+
+  .partner-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: span 2; }
+  .form-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+  }
+  .form-input,
+  .form-select,
+  .form-textarea {
+    background: var(--navy-deep);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 0.92rem;
+    padding: 14px 18px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+    appearance: none;
+    -webkit-appearance: none;
+    direction: rtl;
+  }
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    border-color: var(--accent-blue);
+    background: rgba(37,99,235,0.04);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  .form-input::placeholder,
+  .form-textarea::placeholder { color: rgba(148,163,184,0.35); }
+  .form-textarea { resize: vertical; min-height: 130px; }
+  .form-select option { background: var(--navy-secondary); }
+
+  .form-submit {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-end;
+    margin-top: 8px;
+  }
+  .form-submit-btn {
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
+    color: #fff;
+    border: none;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    transition: left 0.5s ease;
+  }
+  .form-submit-btn:hover::after { left: 100%; }
+  .form-submit-btn:hover {
+    background: linear-gradient(135deg, #3b82f6, var(--accent-blue));
+    box-shadow: 0 16px 50px rgba(37,99,235,0.4);
+    transform: translateY(-2px);
+  }
+  .form-privacy {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+    width: 100%;
+    opacity: 0.7;
+  }
+
+  /* ======= FINAL CTA ======= */
+  .final-cta {
+    padding: 160px 60px;
+    background: var(--navy-deep);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+  }
+  .final-cta::before {
+    content: '';
+    position: absolute;
+    top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 900px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .final-cta-inner { position: relative; z-index: 1; }
+  .final-cta-title {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 200;
+    line-height: 1.2;
+    margin-bottom: 24px;
+  }
+  .final-cta-title strong {
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 20%, var(--accent-light) 70%, var(--accent-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .final-cta-sub {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 56px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
+  }
+
+  /* ======= FOOTER ======= */
+  footer {
+    background: var(--navy-primary);
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  /* Newsletter */
+  .footer-newsletter {
+    padding: 80px 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .footer-newsletter::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .newsletter-card {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+    background: rgba(30,41,59,0.6);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    padding: 64px 56px;
+    position: relative;
+    z-index: 1;
+  }
+  .newsletter-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(37,99,235,0.06), transparent 60%);
+    pointer-events: none;
+  }
+  .newsletter-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--accent-light);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .newsletter-title {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+  .newsletter-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    max-width: 460px;
+    margin: 0 auto 40px;
+  }
+  .newsletter-form {
+    display: flex;
+    gap: 12px;
+    max-width: 440px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .newsletter-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 14px 20px;
+    background: var(--navy-deep);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 0.92rem;
+    outline: none;
+    direction: rtl;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .newsletter-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  }
+  .newsletter-input::placeholder { color: rgba(148,163,184,0.4); }
+  .newsletter-btn {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
+    color: #fff;
+    border: none;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .newsletter-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.4s;
+  }
+  .newsletter-btn:hover::after { left: 100%; }
+  .newsletter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(37,99,235,0.4);
+  }
+
+  /* Footer main */
+  .footer-main {
+    padding: 72px 60px 56px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+    gap: 48px;
+  }
+
+  .footer-brand {}
+  .footer-brand-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+  }
+  .footer-brand-logo span { color: var(--accent-light); }
+  .footer-brand-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.85;
+    margin-bottom: 32px;
+    max-width: 240px;
+  }
+  .footer-social {
+    display: flex;
+    gap: 12px;
+  }
+  .social-icon {
+    width: 40px; height: 40px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: border-color 0.3s, color 0.3s, background 0.3s, transform 0.3s;
+  }
+  .social-icon:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-light);
+    background: rgba(37,99,235,0.1);
+    transform: translateY(-3px);
+  }
+  .social-icon svg { width: 16px; height: 16px; }
+
+  .footer-col {}
+  .footer-col-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .footer-col-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .footer-col-links a {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s, padding-right 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .footer-col-links a::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 1px;
+    background: var(--accent-blue);
+    transition: width 0.3s;
+    flex-shrink: 0;
+  }
+  .footer-col-links a:hover { color: var(--text-primary); }
+  .footer-col-links a:hover::before { width: 12px; }
+
+  /* Footer bottom */
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding: 28px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-copy {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+  .footer-bottom-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .footer-bottom-links a {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-bottom-links a:hover { color: var(--accent-light); }
+
+  /* ======= ANIMATIONS ======= */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(36px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.7; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(48px) scale(0.97);
+    filter: blur(4px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  /* Success message */
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 60px 40px;
+    border: 1px solid var(--accent-blue);
+    background: rgba(37,99,235,0.06);
+  }
+  .form-success.show { display: block; }
+  .form-success-icon {
+    width: 64px; height: 64px;
+    border: 2px solid var(--accent-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    color: var(--accent-light);
+  }
+  .form-success-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; }
+  .form-success-desc { color: var(--text-secondary); line-height: 1.8; }
+
+  /* ======= RESPONSIVE ======= */
+  @media (max-width: 1200px) {
+    .footer-main {
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 40px;
+      padding: 64px 48px 48px;
+    }
+    .footer-brand { grid-column: 1 / -1; max-width: 400px; }
+    .footer-brand-desc { max-width: 100%; }
+  }
+
+  @media (max-width: 1024px) {
+    section { padding: 80px 40px; }
+    nav { padding: 20px 40px; }
+    .why-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .types-grid { grid-template-columns: 1fr 1fr; }
+    .form-layout { grid-template-columns: 1fr; gap: 48px; }
+    .form-side-info { position: static; }
+    .trust-grid { grid-template-columns: 1fr; }
+    .final-cta { padding: 100px 40px; }
+    .footer-newsletter { padding: 64px 40px; }
+    .newsletter-card { padding: 48px 40px; }
+    .footer-bottom { padding: 24px 40px; }
+  }
+
+  @media (max-width: 768px) {
+    section { padding: 64px 24px; }
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .why-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stat-item::after { display: none; }
+    .stat-item { padding: 36px 24px; }
+    .types-grid { grid-template-columns: 1fr; }
+    .process-steps { flex-direction: column; gap: 32px; }
+    .process-steps::before { display: none; }
+    .partner-form { grid-template-columns: 1fr; }
+    .form-group.full, .form-submit { grid-column: span 1; }
+    .hero-buttons { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-outline { width: 260px; text-align: center; }
+    .final-cta { padding: 80px 24px; }
+    .why-header { flex-direction: column; align-items: flex-start; }
+    .form-submit { align-items: stretch; }
+    .footer-newsletter { padding: 48px 24px; }
+    .newsletter-card { padding: 40px 28px; }
+    .newsletter-form { flex-direction: column; }
+    .newsletter-btn { width: 100%; }
+    .footer-main {
+      grid-template-columns: 1fr 1fr;
+      padding: 48px 24px 40px;
+      gap: 32px;
+    }
+    .footer-brand { grid-column: 1 / -1; }
+    .footer-bottom {
+      padding: 20px 24px;
+      flex-direction: column;
+      text-align: center;
+      gap: 16px;
+    }
+    .footer-bottom-links { justify-content: center; flex-wrap: wrap; gap: 20px; }
+    /* Mobile card enhancements */
+    .why-card { padding: 44px 32px; }
+    .product-image { aspect-ratio: 3/2.8 !important; }
+    .testimonial-card { padding: 36px 28px; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .stat-item { padding: 32px 24px; }
+    .footer-main { grid-template-columns: 1fr; }
+    .types-grid { grid-template-columns: 1fr; }
+    .footer-bottom-links { gap: 16px; }
+    .newsletter-input { min-width: 100%; }
+  }
+
+  /* ======= REDUCED MOTION ======= */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">اسکوتر<span>لوکس</span></a>
+  <ul class="nav-links">
+    <li><a href="#why">مزایا</a></li>
+    <li><a href="#types">انواع همکاری</a></li>
+    <li><a href="#process">فرآیند</a></li>
+    <li><a href="#form">درخواست همکاری</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-text">شبکه نمایندگان رسمی</span>
+    </div>
+    <h1 class="hero-title">
+      <span style="font-weight:300">همکاری</span>
+      <strong>با ما</strong>
+    </h1>
+    <p class="hero-sub">به شبکه نمایندگان و همکاران رسمی ما بپیوندید و کسب‌وکار خود را توسعه دهید.</p>
+    <div class="hero-buttons">
+      <a href="#form" class="btn-primary">درخواست همکاری</a>
+      <a href="#why" class="btn-outline">مشاهده مزایا</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll-indicator">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">اسکرول کنید</span>
+  </div>
+</section>
+
+<!-- WHY PARTNER -->
+<section class="why-section" id="why">
+  <div class="section-inner">
+    <div class="why-header">
+      <div>
+        <div class="section-label reveal">
+          <span class="section-label-text">چرا با ما</span>
+        </div>
+        <h2 class="section-title reveal reveal-delay-1">
+          مزایای <strong>همکاری</strong><br>با ما
+        </h2>
+      </div>
+      <p class="section-desc reveal reveal-delay-2">ما به همکاران خود به عنوان شریک تجاری واقعی نگاه می‌کنیم و تمام ابزارهای لازم برای موفقیت را در اختیارشان قرار می‌دهیم.</p>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="why-card-number">۰۱</div>
+        <div class="why-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="why-card-title">قیمت همکاری ویژه</div>
+        <div class="why-card-desc">دسترسی به قیمت‌گذاری انحصاری و تخفیفات ویژه‌ای که تنها برای شبکه رسمی همکاران ما در نظر گرفته شده است.</div>
+      </div>
+      <div class="why-card reveal reveal-delay-1">
+        <div class="why-card-number">۰۲</div>
+        <div class="why-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+        <div class="why-card-title">حاشیه سود مناسب</div>
+        <div class="why-card-desc">ساختار قیمت‌گذاری شفاف و عادلانه که حاشیه سود رقابتی را برای همکاران تضمین می‌کند.</div>
+      </div>
+      <div class="why-card reveal reveal-delay-2">
+        <div class="why-card-number">۰۳</div>
+        <div class="why-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="why-card-title">پشتیبانی اختصاصی</div>
+        <div class="why-card-desc">یک مدیر اکانت اختصاصی در تمام مراحل همکاری در کنار شماست تا پاسخگوی تمامی سوالات و نیازهای شما باشد.</div>
+      </div>
+      <div class="why-card reveal reveal-delay-1">
+        <div class="why-card-number">۰۴</div>
+        <div class="why-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="3" width="15" height="13" rx="1"/>
+            <path d="M16 8h4l3 3v5h-7V8z"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <div class="why-card-title">ارسال سریع</div>
+        <div class="why-card-desc">سیستم لجستیک پیشرفته و انبارداری استراتژیک برای تضمین تحویل به موقع در سراسر کشور.</div>
+      </div>
+      <div class="why-card reveal reveal-delay-2">
+        <div class="why-card-number">۰۵</div>
+        <div class="why-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div class="why-card-title">دسترسی به مدل‌های جدید</div>
+        <div class="why-card-desc">همکاران رسمی ما اولین دسترسی به جدیدترین مدل‌ها و محصولات را پیش از عرضه عمومی دارند.</div>
+      </div>
+      <div class="why-card reveal reveal-delay-3">
+        <div class="why-card-number">۰۶</div>
+        <div class="why-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/>
+            <line x1="10" y1="1" x2="10" y2="4"/>
+            <line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+        </div>
+        <div class="why-card-title">منابع بازاریابی</div>
+        <div class="why-card-desc">مجموعه کاملی از مواد بازاریابی، عکاسی حرفه‌ای، محتوای دیجیتال و راهنماهای فروش در اختیار شماست.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <span class="stat-number" data-target="5000">۰</span>
+      <span class="stat-label">دستگاه فروخته شده</span>
+    </div>
+    <div class="stat-item reveal reveal-delay-1">
+      <span class="stat-number" data-target="150">۰</span>
+      <span class="stat-label">همکار فعال</span>
+    </div>
+    <div class="stat-item reveal reveal-delay-2">
+      <span class="stat-number" data-percent="true">۹۸٪</span>
+      <span class="stat-label">رضایت همکاران</span>
+    </div>
+    <div class="stat-item reveal reveal-delay-3">
+      <span class="stat-number" style="-webkit-text-fill-color: unset; background: none; color: var(--accent-light); font-size: clamp(2rem, 4vw, 3.2rem);">۲۴ ساعته</span>
+      <span class="stat-label">پشتیبانی تجاری</span>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERSHIP TYPES -->
+<section class="types-section" id="types">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="section-label-text">انواع همکاری</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">مدل‌های <strong>همکاری</strong></h2>
+    <p class="section-desc reveal reveal-delay-2">سه مسیر متفاوت برای شروع همکاری. کدام مدل با کسب‌وکار شما تناسب دارد؟</p>
+
+    <div class="types-grid">
+      <div class="type-card reveal">
+        <div class="type-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="type-title">نمایندگی فروش</div>
+        <div class="type-desc">مناسب برای کسب‌وکارهای کوچک و متوسط که می‌خواهند با سرمایه‌گذاری اولیه کم، محصولات ما را به صورت محلی بفروشند.</div>
+        <ul class="type-features">
+          <li>سهمیه ماهانه از ۵ دستگاه</li>
+          <li>قرارداد یک‌ساله قابل تمدید</li>
+          <li>آموزش و گواهینامه فروش</li>
+          <li>پشتیبانی فنی اولیه</li>
+        </ul>
+        <a href="#form" class="type-cta">
+          شروع همکاری
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="type-card featured reveal reveal-delay-1">
+        <div class="type-badge">محبوب‌ترین</div>
+        <div class="type-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="type-title">توزیع منطقه‌ای</div>
+        <div class="type-desc">برای توزیع‌کنندگان با شبکه فروش گسترده که به دنبال حق انحصاری در یک منطقه جغرافیایی خاص هستند.</div>
+        <ul class="type-features">
+          <li>حق انحصاری منطقه‌ای</li>
+          <li>سهمیه ماهانه از ۵۰ دستگاه</li>
+          <li>قرارداد دو تا پنج‌ساله</li>
+          <li>مدیر اکانت اختصاصی</li>
+          <li>اعتبار بازاریابی ماهانه</li>
+        </ul>
+        <a href="#form" class="type-cta">
+          درخواست این مدل
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="type-card reveal reveal-delay-2">
+        <div class="type-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <div class="type-title">همکاری سازمانی</div>
+        <div class="type-desc">برای سازمان‌ها، شهرداری‌ها و شرکت‌های بزرگ که نیاز به خرید انبوه برای ناوگان داخلی یا مدیریت جابجایی دارند.</div>
+        <ul class="type-features">
+          <li>قیمت‌گذاری ویژه ناوگانی</li>
+          <li>نصب و راه‌اندازی اختصاصی</li>
+          <li>قراردادهای سفارشی</li>
+          <li>پشتیبانی سطح سازمانی</li>
+        </ul>
+        <a href="#form" class="type-cta">
+          مشاوره رایگان
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <div class="section-inner">
+    <div class="process-header">
+      <div class="section-label reveal">
+        <span class="section-label-text">فرآیند همکاری</span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1">چگونه <strong>شروع کنیم؟</strong></h2>
+      <p class="section-desc reveal reveal-delay-2">فرآیند پذیرش همکار جدید در ۵ مرحله ساده و شفاف.</p>
+    </div>
+
+    <div class="process-steps">
+      <div class="process-step" data-step="1">
+        <div class="step-dot"><span class="step-dot-number">۱</span></div>
+        <div class="step-title">ثبت درخواست</div>
+        <div class="step-desc">فرم درخواست همکاری را با اطلاعات کسب‌وکار خود تکمیل کنید.</div>
+      </div>
+      <div class="process-step" data-step="2">
+        <div class="step-dot"><span class="step-dot-number">۲</span></div>
+        <div class="step-title">بررسی اطلاعات</div>
+        <div class="step-desc">تیم ما در طول ۴۸ ساعت درخواست شما را بررسی می‌کند.</div>
+      </div>
+      <div class="process-step" data-step="3">
+        <div class="step-dot"><span class="step-dot-number">۳</span></div>
+        <div class="step-title">تماس کارشناسان</div>
+        <div class="step-desc">کارشناس ما با شما تماس می‌گیرد تا جزئیات همکاری را بررسی کنیم.</div>
+      </div>
+      <div class="process-step" data-step="4">
+        <div class="step-dot"><span class="step-dot-number">۴</span></div>
+        <div class="step-title">تایید همکاری</div>
+        <div class="step-desc">قرارداد امضا می‌شود و به شبکه رسمی همکاران ما اضافه می‌شوید.</div>
+      </div>
+      <div class="process-step" data-step="5">
+        <div class="step-dot"><span class="step-dot-number">۵</span></div>
+        <div class="step-title">ثبت اولین سفارش</div>
+        <div class="step-desc">اولین سفارش خود را ثبت کرده و کسب‌وکار خود را توسعه دهید.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust-section">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="section-label-text">اعتماد</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">همکاران <strong>موفق</strong> ما</h2>
+
+    <div class="trust-grid">
+      <div class="trust-testimonials">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <div class="testimonial-text">از زمانی که به شبکه همکاران رسمی پیوستیم، فروش ما سه برابر شده. پشتیبانی اختصاصی و دسترسی زودهنگام به مدل‌های جدید واقعاً تفاوت ایجاد می‌کند.</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">ر</div>
+            <div>
+              <div class="author-name">رضا محمدی</div>
+              <div class="author-company">فروشگاه تهران الکتریک — تهران</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <div class="testimonial-text">به عنوان توزیع‌کننده منطقه‌ای، حق انحصاری منطقه‌ای که دریافت کردیم ارزش بیزینس ما را به‌طور قابل توجهی افزایش داد. برند واقعاً به تعهداتش عمل می‌کند.</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">م</div>
+            <div>
+              <div class="author-name">مریم رضایی</div>
+              <div class="author-company">گروه حرکت سبز — اصفهان</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <div class="testimonial-text">همکاری سازمانی ما برای ناوگان داخلی شرکت، نه تنها هزینه‌ها را کاهش داد بلکه تصویر محیط‌زیستی برند ما را بهبود بخشید.</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">ا</div>
+            <div>
+              <div class="author-name">امیر کاظمی</div>
+              <div class="author-company">مدیر تدارکات — گروه صنعتی پارس</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trust-achievements reveal reveal-delay-1">
+        <div class="achievement-item">
+          <div class="achievement-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="achievement-title">شبکه فروش گسترده</div>
+            <div class="achievement-desc">بیش از ۱۵۰ نقطه فروش فعال در سراسر کشور که به نمایندگی رسمی ما تبدیل شده‌اند.</div>
+          </div>
+        </div>
+        <div class="achievement-item">
+          <div class="achievement-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="7"/>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+            </svg>
+          </div>
+          <div>
+            <div class="achievement-title">دستاوردهای شراکتی</div>
+            <div class="achievement-desc">برنده جایزه بهترین شبکه توزیع در صنعت حمل‌ونقل الکتریکی برای سومین سال متوالی.</div>
+          </div>
+        </div>
+        <div class="achievement-item">
+          <div class="achievement-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="achievement-title">سوابق همکاری</div>
+            <div class="achievement-desc">بیش از ۵ سال تجربه موفق در همکاری با مشاغل کوچک تا شرکت‌های بزرگ سازمانی.</div>
+          </div>
+        </div>
+        <div class="achievement-item">
+          <div class="achievement-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div>
+            <div class="achievement-title">نظرات همکاران</div>
+            <div class="achievement-desc">میانگین رضایت ۴.۹ از ۵ ستاره در بین تمامی همکاران فعال شبکه ما.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATION FORM -->
+<section class="form-section" id="form">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="section-label-text">شروع همکاری</span>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">درخواست <strong>همکاری</strong></h2>
+    <p class="section-desc reveal reveal-delay-2">فرم زیر را تکمیل کنید. در طول ۴۸ ساعت کاری با شما تماس می‌گیریم.</p>
+
+    <div class="form-layout">
+      <div class="form-side-info reveal">
+        <div class="form-side-title">
+          یک قدم تا
+          <strong>همکاری رسمی</strong>
+          با ما فاصله دارید
+        </div>
+        <div class="form-guarantee">
+          <div class="guarantee-item">
+            <div class="guarantee-dot"></div>
+            <span class="guarantee-text">اطلاعات شما محرمانه نگه داشته می‌شود</span>
+          </div>
+          <div class="guarantee-item">
+            <div class="guarantee-dot"></div>
+            <span class="guarantee-text">پاسخ در کمتر از ۴۸ ساعت کاری</span>
+          </div>
+          <div class="guarantee-item">
+            <div class="guarantee-dot"></div>
+            <span class="guarantee-text">بدون هیچ تعهدی در مرحله اول</span>
+          </div>
+          <div class="guarantee-item">
+            <div class="guarantee-dot"></div>
+            <span class="guarantee-text">مشاوره اولیه کاملاً رایگان</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <form class="partner-form reveal reveal-delay-1" id="partnerForm" onsubmit="handleSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">نام شرکت *</label>
+            <input type="text" class="form-input" placeholder="نام شرکت یا برند خود را وارد کنید" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">نام و نام خانوادگی *</label>
+            <input type="text" class="form-input" placeholder="نام مدیر یا نماینده" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">شماره تماس *</label>
+            <input type="tel" class="form-input" placeholder="۰۹۱۲۰۰۰۰۰۰۰" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ایمیل *</label>
+            <input type="email" class="form-input" placeholder="email@company.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">شهر</label>
+            <input type="text" class="form-input" placeholder="شهر محل کسب‌وکار">
+          </div>
+          <div class="form-group">
+            <label class="form-label">کشور</label>
+            <select class="form-select">
+              <option value="">انتخاب کشور</option>
+              <option value="iran">ایران</option>
+              <option value="uae">امارات متحده عربی</option>
+              <option value="turkey">ترکیه</option>
+              <option value="germany">آلمان</option>
+              <option value="other">سایر کشورها</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">نوع کسب‌وکار</label>
+            <select class="form-select">
+              <option value="">انتخاب نوع همکاری</option>
+              <option value="dealer">نمایندگی فروش</option>
+              <option value="distributor">توزیع منطقه‌ای</option>
+              <option value="corporate">همکاری سازمانی</option>
+              <option value="other">سایر</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">حجم سفارش ماهانه (تخمینی)</label>
+            <select class="form-select">
+              <option value="">انتخاب حجم سفارش</option>
+              <option value="1-10">۱ تا ۱۰ دستگاه</option>
+              <option value="10-50">۱۰ تا ۵۰ دستگاه</option>
+              <option value="50-100">۵۰ تا ۱۰۰ دستگاه</option>
+              <option value="100+">بیش از ۱۰۰ دستگاه</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">توضیحات</label>
+            <textarea class="form-textarea" placeholder="درباره کسب‌وکار خود، تجربیات فروش، و اهداف همکاری بیشتر بنویسید..."></textarea>
+          </div>
+          <div class="form-submit">
+            <button type="submit" class="form-submit-btn">ارسال درخواست همکاری</button>
+            <span class="form-privacy">اطلاعات شما محرمانه بوده و هرگز به اشخاص ثالث منتقل نخواهد شد.</span>
+          </div>
+        </form>
+
+        <div class="form-success" id="formSuccess">
+          <div class="form-success-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="form-success-title">درخواست شما ارسال شد</div>
+          <div class="form-success-desc">با تشکر از اعتماد شما. تیم ما در طول ۴۸ ساعت کاری با شما تماس خواهد گرفت.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <div class="section-label reveal" style="justify-content:center">
+      <span class="section-label-text">همین امروز</span>
+    </div>
+    <h2 class="final-cta-title reveal reveal-delay-1">
+      آماده همکاری
+      <strong>هستید؟</strong>
+    </h2>
+    <p class="final-cta-sub reveal reveal-delay-2">همین امروز به شبکه همکاران رسمی ما بپیوندید.</p>
+    <div class="reveal reveal-delay-3">
+      <a href="#form" class="btn-primary" style="font-size:1.05rem;padding:20px 56px;">درخواست همکاری</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <!-- Newsletter -->
+  <div class="footer-newsletter">
+    <div class="newsletter-card">
+      <span class="newsletter-eyebrow">شبکه همکاران</span>
+      <h3 class="newsletter-title">عضویت در شبکه همکاران</h3>
+      <p class="newsletter-desc">از موجودی‌های جدید، شرایط همکاری ویژه و قیمت‌های عمده پیش از سایرین مطلع شوید.</p>
+      <div class="newsletter-form">
+        <input type="email" class="newsletter-input" placeholder="ایمیل شما">
+        <button class="newsletter-btn">عضویت</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main columns -->
+  <div class="footer-main">
+    <!-- Brand -->
+    <div class="footer-brand">
+      <a href="#" class="footer-brand-logo">اسکوتر<span>لوکس</span></a>
+      <p class="footer-brand-desc">مرجع تخصصی فروش عمده و همکاری در حوزه محصولات لوکس و پریمیوم.</p>
+      <div class="footer-social">
+        <!-- Instagram -->
+        <a href="#" class="social-icon" aria-label="اینستاگرام">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+        </a>
+        <!-- LinkedIn -->
+        <a href="#" class="social-icon" aria-label="لینکدین">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+            <rect x="2" y="9" width="4" height="12"/>
+            <circle cx="4" cy="4" r="2"/>
+          </svg>
+        </a>
+        <!-- Telegram -->
+        <a href="#" class="social-icon" aria-label="تلگرام">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 5L2 12.5l7 1M21 5l-5 15-7-6.5M21 5L9 13.5m0 0V19l3.5-3"/>
+          </svg>
+        </a>
+        <!-- Twitter/X -->
+        <a href="#" class="social-icon" aria-label="توییتر">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 4l16 16M4 20L20 4"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="footer-col">
+      <div class="footer-col-title">محصولات</div>
+      <ul class="footer-col-links">
+        <li><a href="#">محصولات جدید</a></li>
+        <li><a href="#">پرفروش‌ها</a></li>
+        <li><a href="#">برندها</a></li>
+        <li><a href="#">همکاری عمده</a></li>
+      </ul>
+    </div>
+
+    <!-- Company -->
+    <div class="footer-col">
+      <div class="footer-col-title">شرکت</div>
+      <ul class="footer-col-links">
+        <li><a href="#">درباره ما</a></li>
+        <li><a href="#">همکاری</a></li>
+        <li><a href="#">فرصت‌های شغلی</a></li>
+        <li><a href="#">تماس با ما</a></li>
+      </ul>
+    </div>
+
+    <!-- Support -->
+    <div class="footer-col">
+      <div class="footer-col-title">پشتیبانی</div>
+      <ul class="footer-col-links">
+        <li><a href="#">سوالات متداول</a></li>
+        <li><a href="#">شرایط همکاری</a></li>
+        <li><a href="#">پیگیری سفارش</a></li>
+        <li><a href="#">ضمانت</a></li>
+      </ul>
+    </div>
+
+    <!-- Legal -->
+    <div class="footer-col">
+      <div class="footer-col-title">قوانین</div>
+      <ul class="footer-col-links">
+        <li><a href="#">حریم خصوصی</a></li>
+        <li><a href="#">قوانین استفاده</a></li>
+        <li><a href="#">شرایط فروش</a></li>
+        <li><a href="#">نقشه سایت</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 تمامی حقوق محفوظ است</span>
+    <ul class="footer-bottom-links">
+      <li><a href="#">حریم خصوصی</a></li>
+      <li><a href="#">قوانین</a></li>
+      <li><a href="#">نقشه سایت</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+// ===== PARTICLES =====
+(function() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 24; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      animation-duration: ${7 + Math.random() * 10}s;
+      animation-delay: ${Math.random() * 10}s;
+      width: ${1 + Math.random() * 2}px;
+      height: ${1 + Math.random() * 2}px;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// ===== NAV SCROLL =====
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+// ===== PREMIUM SCROLL REVEAL (blur + scale + fade + depth) =====
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ===== PROCESS STEPS (staggered) =====
+const stepObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const steps = entry.target.querySelectorAll('.process-step');
+      steps.forEach((step, i) => {
+        setTimeout(() => step.classList.add('visible'), i * 120);
+      });
+    }
+  });
+}, { threshold: 0.15 });
+
+const processSteps = document.querySelector('.process-steps');
+if (processSteps) stepObserver.observe(processSteps);
+
+// ===== 3D CARD TILT (why-card, type-card, testimonial-card) =====
+function initCardTilt() {
+  const cards = document.querySelectorAll('.why-card, .type-card, .testimonial-card');
+
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+
+      const tiltX = dy * -6;
+      const tiltY = dx * 6;
+      const glowX = ((e.clientX - rect.left) / rect.width) * 100;
+      const glowY = ((e.clientY - rect.top) / rect.height) * 100;
+
+      card.style.transform = `perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(6px)`;
+      card.style.setProperty('--mx', glowX + '%');
+      card.style.setProperty('--my', glowY + '%');
+    }, { passive: true });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
+initCardTilt();
+
+// ===== MAGNETIC BUTTONS =====
+function initMagneticButtons() {
+  const btns = document.querySelectorAll('.btn-primary, .btn-outline, .form-submit-btn, .newsletter-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const dx = (e.clientX - rect.left - rect.width / 2) * 0.18;
+      const dy = (e.clientY - rect.top - rect.height / 2) * 0.18;
+      btn.style.transform = `translate(${dx}px, ${dy}px) translateY(-3px)`;
+    }, { passive: true });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
+}
+initMagneticButtons();
+
+// ===== FORM SUBMIT =====
+function handleSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('partnerForm');
+  const success = document.getElementById('formSuccess');
+  form.style.opacity = '0';
+  form.style.transform = 'translateY(-16px) scale(0.98)';
+  form.style.filter = 'blur(4px)';
+  form.style.transition = 'all 0.5s ease';
+  setTimeout(() => {
+    form.style.display = 'none';
+    success.classList.add('show');
+    success.style.opacity = '0';
+    success.style.transform = 'translateY(16px)';
+    success.style.transition = 'all 0.5s ease';
+    setTimeout(() => {
+      success.style.opacity = '1';
+      success.style.transform = 'translateY(0)';
+    }, 50);
+  }, 480);
+}
+
+// ===== SMOOTH ANCHOR SCROLL =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      const offset = 80;
+      const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  });
+});
+
+// ===== HERO GRID PARALLAX =====
+window.addEventListener('scroll', () => {
+  const scrolled = window.pageYOffset;
+  const heroGrid = document.querySelector('.hero-grid');
+  if (heroGrid && scrolled < window.innerHeight) {
+    heroGrid.style.transform = `translateY(${scrolled * 0.28}px)`;
+  }
+}, { passive: true });
+</script>
+</body>
+</html>

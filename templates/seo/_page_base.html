@@ -1,0 +1,134 @@
+{% load static seo_tags compress %}<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {% include "seo/_head.html" %}
+    {% include "seo/_fonts.html" %}
+
+{% compress css %}
+    <style>
+      :root {
+        --black: #050507;
+        --surface: #0c0c13;
+        --card: #101018;
+        --border: rgba(255, 255, 255, 0.08);
+        --white: #f6f6f8;
+        --dim: rgba(246, 246, 248, 0.6);
+        --muted: rgba(246, 246, 248, 0.34);
+        --neon: #4fd8ff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--black);
+        color: var(--white);
+        font-family: "Vazirmatn", "Inter", system-ui, sans-serif;
+        font-weight: 300;
+        line-height: 1.9;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      :focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; border-radius: 4px; }
+
+      .skip-link {
+        position: absolute; top: -100px; right: 12px; z-index: 999;
+        padding: 10px 18px; background: var(--neon); color: #041016;
+        font-weight: 700; border-radius: 0 0 8px 8px; text-decoration: none;
+        transition: top 0.2s;
+      }
+      .skip-link:focus { top: 0; }
+
+      .wrap { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+      .site-nav {
+        display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+        max-width: 900px; margin: 0 auto; padding: 20px;
+        font-size: 14px; color: var(--dim);
+      }
+      .site-nav a { text-decoration: none; }
+      .site-nav a:hover, .site-nav a:focus-visible { color: var(--neon); }
+      .site-logo { font-weight: 900; letter-spacing: 0.05em; color: var(--white); margin-inline-end: auto; }
+
+      .breadcrumb { font-size: 12px; padding: 8px 0 20px; }
+      .breadcrumb ol { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; color: var(--muted); }
+      .breadcrumb li + li::before { content: "‹"; margin-left: 8px; color: var(--muted); }
+      .breadcrumb a { color: var(--dim); text-decoration: none; }
+      .breadcrumb a:hover, .breadcrumb a:focus-visible { color: var(--neon); text-decoration: underline; }
+
+      h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.25; margin: 0 0 8px; font-weight: 700; }
+      .lede { color: var(--dim); font-size: 17px; margin: 0 0 40px; max-width: 62ch; }
+      h2 { font-size: clamp(20px, 3vw, 26px); margin: 40px 0 12px; font-weight: 600; }
+      h3 { font-size: 17px; margin: 24px 0 8px; font-weight: 600; }
+      p { color: var(--dim); max-width: 70ch; }
+
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin: 24px 0 8px; }
+      .card {
+        background: var(--card); border: 1px solid var(--border);
+        border-radius: 16px; padding: 22px;
+      }
+      .card h3 { margin-top: 0; }
+      .card p { margin: 0; font-size: 14px; }
+
+      dl.contact { display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; margin: 0; }
+      dl.contact dt { color: var(--muted); font-size: 14px; }
+      dl.contact dd { margin: 0; color: var(--dim); }
+      dl.contact a { color: var(--neon); }
+
+      .faq { border-top: 1px solid var(--border); padding: 18px 0; }
+      .faq h3 { margin: 0 0 6px; }
+      .faq p { margin: 0; font-size: 14px; }
+
+      footer.site-footer {
+        margin-top: 72px; border-top: 1px solid var(--border);
+        padding: 28px 20px 48px; text-align: center; color: var(--muted); font-size: 13px;
+      }
+      footer.site-footer nav { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+      footer.site-footer a { color: var(--dim); text-decoration: none; }
+      footer.site-footer a:hover, footer.site-footer a:focus-visible { color: var(--neon); }
+    </style>
+{% endcompress %}
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    <a href="#main" class="skip-link">رفتن به محتوای اصلی</a>
+
+    <header>
+      <nav class="site-nav" aria-label="ناوبری اصلی">
+        <a href="/" class="site-logo">VOLTEX</a>
+        <a href="{% url 'shop:product_list' %}">محصولات</a>
+        <a href="{% url 'home_app:articles' %}">مجله</a>
+        <a href="{% url 'seo:about' %}">درباره ما</a>
+        <a href="{% url 'seo:contact' %}">تماس</a>
+      </nav>
+    </header>
+
+    <main id="main" class="wrap">
+      {% if seo.breadcrumbs %}
+      <nav class="breadcrumb" aria-label="مسیر صفحه">
+        <ol>
+          {% for label, url in seo.breadcrumbs %}
+          <li>
+            {% if not forloop.last %}<a href="{{ url }}">{{ label }}</a>
+            {% else %}<span aria-current="page">{{ label }}</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+      </nav>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <nav aria-label="ناوبری فوتر">
+        <a href="{% url 'shop:product_list' %}">محصولات</a>
+        <a href="{% url 'home_app:articles' %}">مجله</a>
+        <a href="{% url 'seo:about' %}">درباره ما</a>
+        <a href="{% url 'seo:contact' %}">تماس با ما</a>
+      </nav>
+      <p>© ۲۰۲۶ {{ SEO_ORGANIZATION.legal_name }}. تمامی حقوق محفوظ است.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+User-agent: *
+
+# --- Private / low-value areas: no crawl budget should be spent here ---
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /order/
+Disallow: /i18n/
+Disallow: /search/
+Disallow: /api/schema/
+Disallow: /api/docs/
+Disallow: /api/redoc/
+
+# --- Faceted navigation, sorting and internal search ---
+# These generate near-infinite permutations of the same products. The pages
+# themselves also carry <meta name="robots" content="noindex, follow"> so an
+# already-indexed variant can be dropped: a Disallow alone never removes a URL
+# from the index, it only stops it being re-crawled.
+Disallow: /*?*q=
+Disallow: /*?*search=
+Disallow: /*?*sort=
+Disallow: /*?*order=
+Disallow: /*?*color=
+Disallow: /*?*price=
+Disallow: /*?*min_price=
+Disallow: /*?*max_price=
+Disallow: /*?*filter=
+Disallow: /*?*tag=
+
+# --- Tracking parameters: same page, different URL ---
+Disallow: /*?*utm_
+Disallow: /*?*gclid=
+Disallow: /*?*fbclid=
+
+# --- Products, categories, articles and static pages stay fully crawlable ---
+# The JSON endpoints under /shop/api/ and /articles' API are intentionally NOT
+# disallowed: the pages hydrate from them, and a blocked fetch would degrade
+# how Googlebot renders the page. They are kept out of the index with an
+# X-Robots-Tag: noindex response header instead.
+Allow: /shop/
+Allow: /articles/
+Allow: /static/
+Allow: /media/
+
+Sitemap: {{ sitemap_url }}

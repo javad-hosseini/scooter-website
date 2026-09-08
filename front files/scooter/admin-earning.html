@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>اسکوتیکس | مدیریت مالی</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- Bootstrap 5 RTL -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — shared with admin-dashboard.html
+   ============================================================ */
+:root{
+  --navy:#0B1120; --navy-deep:#070B16;
+  --blue:#2F6FED; --purple:#7C5CFC; --cyan:#22D3EE;
+  --green:#10B981; --orange:#F59E0B; --red:#EF4444;
+
+  --bg:#F2F4FA; --surface:#FFFFFF; --surface-glass:rgba(255,255,255,.72);
+  --text:#0B1120; --text-muted:#646E84; --border:rgba(11,17,32,.08);
+  --shadow:0 10px 30px -12px rgba(20,30,60,.16);
+  --shadow-lg:0 24px 48px -16px rgba(20,30,60,.22);
+
+  --grad-primary:linear-gradient(135deg,var(--blue) 0%,var(--purple) 100%);
+  --grad-current:linear-gradient(90deg,var(--cyan) 0%,var(--blue) 45%,var(--purple) 100%);
+  --grad-green:linear-gradient(135deg,#34D399 0%,#0EA5E9 100%);
+  --grad-orange:linear-gradient(135deg,#FBBF24 0%,#F97316 100%);
+  --grad-purple:linear-gradient(135deg,#A78BFA 0%,#6366F1 100%);
+  --grad-red:linear-gradient(135deg,#FB7185 0%,#EF4444 100%);
+  --grad-slate:linear-gradient(135deg,#64748B 0%,#334155 100%);
+
+  --radius:18px; --radius-sm:12px;
+  --font-display:'Vazirmatn',sans-serif;
+  --font-mono:'JetBrains Mono','Vazirmatn',monospace;
+}
+[data-theme="dark"]{
+  --bg:#080B14; --surface:#101728; --surface-glass:rgba(16,23,40,.66);
+  --text:#E9ECF5; --text-muted:#8B93AC; --border:rgba(255,255,255,.08);
+  --shadow:0 10px 30px -12px rgba(0,0,0,.55);
+  --shadow-lg:0 24px 48px -16px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{font-family:var(--font-display);background:var(--bg);color:var(--text);transition:background .35s ease,color .35s ease;letter-spacing:-.1px;overflow-x:hidden;}
+::selection{background:var(--blue);color:#fff;}
+a{text-decoration:none;}
+.num{font-family:var(--font-mono);}
+.scroll-thin::-webkit-scrollbar{width:6px;}
+.scroll-thin::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+
+/* ============================================================
+   SHELL (sidebar + topbar) — identical to dashboard
+   ============================================================ */
+.app-shell{display:flex;min-height:100vh;}
+.sidebar{width:272px;flex-shrink:0;background:radial-gradient(120% 140% at 0% 0%, #131B36 0%, var(--navy) 45%, var(--navy-deep) 100%);color:#C9CEDD;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:40;border-left:1px solid rgba(255,255,255,.05);}
+.sidebar-brand{display:flex;align-items:center;gap:12px;padding:26px 22px 22px;}
+.sidebar-brand .mark{width:40px;height:40px;border-radius:12px;background:var(--grad-primary);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -6px rgba(124,92,252,.6);flex-shrink:0;}
+.sidebar-brand .mark i{color:#fff;font-size:18px;}
+.sidebar-brand .name{font-weight:800;font-size:18px;color:#fff;line-height:1.1;}
+.sidebar-brand .name span{display:block;font-size:11px;font-weight:500;color:#8C93AE;letter-spacing:.5px;margin-top:2px;}
+.sidebar-section-title{font-size:11px;font-weight:700;color:#5B6480;text-transform:uppercase;letter-spacing:1px;padding:18px 22px 8px;}
+.sidebar-nav{flex:1;overflow-y:auto;padding-bottom:10px;}
+.sidebar-nav .nav-link{display:flex;align-items:center;gap:12px;color:#AEB4CB;font-size:14.5px;font-weight:500;padding:11px 22px;margin:2px 12px;border-radius:10px;position:relative;transition:.2s ease;}
+.sidebar-nav .nav-link i.ico{width:18px;text-align:center;font-size:15px;color:#7E86A3;transition:.2s;}
+.sidebar-nav .nav-link:hover{background:rgba(255,255,255,.05);color:#fff;}
+.sidebar-nav .nav-link:hover i.ico{color:var(--cyan);}
+.sidebar-nav .nav-link.active{background:linear-gradient(90deg,rgba(47,111,237,.18),rgba(124,92,252,.10));color:#fff;}
+.sidebar-nav .nav-link.active i.ico{color:var(--cyan);}
+.sidebar-nav .nav-link.active::before{content:'';position:absolute;right:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--grad-current);box-shadow:0 0 10px 1px rgba(34,211,238,.7);}
+.sidebar-nav .nav-link .chev{margin-right:auto;font-size:11px;transition:.25s;color:#5B6480;}
+.sidebar-nav .nav-link[aria-expanded="true"] .chev{transform:rotate(-90deg);color:var(--cyan);}
+.sidebar-sub{padding-right:18px;}
+.sidebar-sub .nav-link{font-size:13.5px;padding:9px 22px 9px 16px;color:#8B92AB;}
+.sidebar-sub .nav-link::before{content:'';width:5px;height:5px;border-radius:50%;background:#3A4262;margin-left:2px;}
+.sidebar-sub .nav-link:hover,.sidebar-sub .nav-link.active{color:#fff;background:rgba(255,255,255,.05);}
+.sidebar-sub .nav-link.active::before{background:var(--cyan);box-shadow:0 0 6px var(--cyan);}
+.sidebar-footer{padding:16px 18px 20px;border-top:1px solid rgba(255,255,255,.06);}
+.battery-widget{background:linear-gradient(135deg,rgba(47,111,237,.16),rgba(124,92,252,.10));border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;}
+.battery-widget .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.battery-widget .top span{font-size:12px;color:#9AA1BD;font-weight:600;}
+.battery-widget .top b{color:#fff;font-size:13px;}
+.battery-track{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;}
+.battery-fill{height:100%;width:78%;border-radius:6px;background:var(--grad-current);background-size:200% 100%;animation:currentFlow 3s linear infinite;}
+@keyframes currentFlow{0%{background-position:0% 0;}100%{background-position:200% 0;}}
+
+.main{flex:1;min-width:0;}
+.topbar{position:sticky;top:0;z-index:30;background:var(--surface-glass);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:16px;}
+.search-box{flex:1;max-width:380px;position:relative;}
+.search-box input{width:100%;border:1px solid var(--border);background:var(--bg);border-radius:12px;padding:10px 42px 10px 14px;font-size:13.5px;color:var(--text);transition:.2s;}
+.search-box input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,111,237,.15);}
+.search-box i{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;}
+.icon-btn{width:40px;height:40px;border-radius:11px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--text-muted);position:relative;transition:.2s;cursor:pointer;flex-shrink:0;}
+.icon-btn:hover{color:var(--blue);border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow);}
+.dot-badge{position:absolute;top:-3px;left:-3px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid var(--surface);}
+.profile-chip{display:flex;align-items:center;gap:10px;cursor:pointer;padding:5px 10px 5px 6px;border-radius:12px;transition:.2s;}
+.profile-chip:hover{background:var(--bg);}
+.profile-chip img{width:36px;height:36px;border-radius:10px;object-fit:cover;}
+.profile-chip .who{line-height:1.2;}
+.profile-chip .who b{font-size:13px;display:block;color:var(--text);}
+.profile-chip .who span{font-size:11px;color:var(--text-muted);}
+.theme-toggle{display:flex;align-items:center;border-radius:11px;border:1px solid var(--border);background:var(--surface);padding:3px;gap:2px;}
+.theme-toggle button{width:32px;height:32px;border:none;background:transparent;border-radius:9px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;font-size:13px;}
+.theme-toggle button.active{background:var(--grad-primary);color:#fff;}
+.dropdown-panel{position:absolute;top:calc(100% + 12px);left:0;width:340px;max-height:420px;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);padding:16px;opacity:0;pointer-events:none;transform:translateY(-8px) scale(.98);transition:.2s ease;z-index:50;}
+.dropdown-panel.show{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+.dropdown-wrap{position:relative;}
+.sidebar-backdrop{display:none;}
+@media (max-width:1199.98px){
+  .sidebar{position:fixed;right:0;height:100vh;transform:translateX(105%);transition:transform .3s ease;}
+  .sidebar.show{transform:translateX(0);}
+  .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:39;}
+}
+@media (max-width:575.98px){ .search-box{display:none;} }
+
+.page-wrap{padding:28px;max-width:1480px;margin:0 auto;}
+
+/* ============================================================
+   SHARED COMPONENTS
+   ============================================================ */
+.page-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:24px;}
+.page-head h1{font-size:23px;font-weight:800;margin:0;}
+.page-head p{font-size:13.5px;color:var(--text-muted);margin:4px 0 0;}
+.btn-current{background:var(--grad-primary);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:13.5px;font-weight:700;display:inline-flex;align-items:center;gap:8px;box-shadow:0 10px 22px -8px rgba(124,92,252,.55);transition:.2s;}
+.btn-current:hover{transform:translateY(-2px);box-shadow:0 14px 28px -8px rgba(124,92,252,.65);color:#fff;}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-size:13.3px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:.2s;}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px);}
+
+.gcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .25s ease, box-shadow .25s ease;}
+.gcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-current);background-size:200% 100%;opacity:.85;}
+.gcard:hover{box-shadow:var(--shadow-lg);}
+.gcard .gcard-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 4px;}
+.gcard .gcard-head h2{font-size:15.5px;font-weight:700;margin:0;}
+.gcard .gcard-head .sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.gcard .gcard-body{padding:14px 22px 22px;}
+.link-more{font-size:12.5px;font-weight:700;color:var(--blue);}
+
+/* section heading */
+.section-title{display:flex;align-items:center;gap:10px;margin:34px 0 16px;}
+.section-title h3{font-size:16.5px;font-weight:800;margin:0;}
+.section-title .line{flex:1;height:1px;background:var(--border);}
+.section-title .tag{font-size:11.5px;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);padding:4px 10px;border-radius:20px;}
+
+/* ---- stat cards ---- */
+.stat-card{padding:20px;display:flex;flex-direction:column;gap:12px;}
+.stat-card:hover{transform:translateY(-5px);}
+.stat-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.stat-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;}
+.stat-trend{font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;}
+.trend-up{color:var(--green);background:rgba(16,185,129,.12);}
+.trend-down{color:var(--red);background:rgba(239,68,68,.12);}
+.stat-value{font-size:23px;font-weight:800;font-family:var(--font-mono);}
+.stat-label{font-size:12.5px;color:var(--text-muted);font-weight:500;}
+
+/* ---- payment gateway cards ---- */
+.gw-card{padding:20px;}
+.gw-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.gw-logo{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;letter-spacing:.5px;}
+.gw-name{font-weight:800;font-size:15px;}
+.gw-sub{font-size:11.5px;color:var(--text-muted);}
+.gw-rate{margin-right:auto;text-align:left;}
+.gw-rate b{font-size:18px;font-family:var(--font-mono);display:block;}
+.gw-rate span{font-size:10.5px;color:var(--text-muted);}
+.gw-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.gw-stat{background:var(--bg);border-radius:11px;padding:10px 12px;}
+.gw-stat .v{font-family:var(--font-mono);font-weight:700;font-size:14.5px;}
+.gw-stat .l{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.gw-bar{height:6px;border-radius:6px;background:var(--bg);overflow:hidden;margin-top:14px;}
+.gw-bar > div{height:100%;border-radius:6px;}
+
+/* ---- settlement tiles ---- */
+.settle-tile{padding:20px;text-align:center;}
+.settle-tile .ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:18px;color:#fff;}
+.settle-tile .v{font-size:21px;font-weight:800;font-family:var(--font-mono);}
+.settle-tile .l{font-size:12px;color:var(--text-muted);margin-top:3px;}
+
+/* ---- KPI strip ---- */
+.kpi-tile{padding:16px 18px;display:flex;align-items:center;gap:12px;}
+.kpi-tile .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;flex-shrink:0;}
+.kpi-tile .v{font-size:16.5px;font-weight:800;font-family:var(--font-mono);line-height:1.1;}
+.kpi-tile .l{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+
+/* ---- filter bar ---- */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px;}
+.filter-bar select, .filter-bar input{
+  border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:10px;
+  padding:9px 12px;font-size:12.8px;font-family:var(--font-display);
+}
+.filter-bar select:focus, .filter-bar input:focus{outline:none;border-color:var(--blue);}
+
+/* ---- tables ---- */
+.table-modern{width:100%;border-collapse:collapse;font-size:13.3px;}
+.table-modern thead th{text-align:right;font-size:11.3px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.table-modern tbody td{padding:13px 10px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap;}
+.table-modern tbody tr:hover{background:var(--bg);}
+.table-modern tbody tr:last-child td{border-bottom:none;}
+.cust-cell{display:flex;align-items:center;gap:10px;}
+.cust-cell img{width:32px;height:32px;border-radius:9px;object-fit:cover;}
+.cust-cell .nm{font-weight:600;font-size:13.3px;}
+.cust-cell .id{font-size:10.5px;color:var(--text-muted);font-family:var(--font-mono);}
+.gw-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;background:var(--bg);}
+.gw-pill i{font-size:8px;}
+
+.badge-status{font-size:11.3px;font-weight:700;padding:5px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;}
+.badge-status::before{content:'';width:6px;height:6px;border-radius:50%;}
+.st-success{color:#047857;background:rgba(16,185,129,.13);} .st-success::before{background:var(--green);}
+.st-pending{color:#B45309;background:rgba(245,158,11,.13);} .st-pending::before{background:var(--orange);}
+.st-failed{color:#B91C1C;background:rgba(239,68,68,.13);} .st-failed::before{background:var(--red);}
+.st-refunded{color:#5B21B6;background:rgba(124,92,252,.13);} .st-refunded::before{background:var(--purple);}
+
+.row-actions a{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted);transition:.2s;margin-left:4px;}
+.row-actions a:hover{background:var(--grad-primary);color:#fff;border-color:transparent;}
+
+.legend-row{display:flex;gap:18px;flex-wrap:wrap;font-size:12.3px;color:var(--text-muted);margin-top:10px;}
+.legend-row span{display:inline-flex;align-items:center;gap:6px;}
+.legend-row i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+@media (max-width:575.98px){ .page-wrap{padding:18px;} .topbar{padding:12px 16px;} }
+</style>
+</head>
+
+<body data-theme="light">
+
+<div class="sidebar-backdrop" id="sbBackdrop"></div>
+<div class="app-shell">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="mark"><i class="fa-solid fa-bolt"></i></div>
+      <div class="name">اسکوتیکس<span>پنل مدیریت فروشگاه</span></div>
+    </div>
+
+    <nav class="sidebar-nav scroll-thin">
+      <div class="sidebar-section-title">اصلی</div>
+      <a href="admin-dashboard.html" class="nav-link"><i class="ico fa-solid fa-grid-2"></i> داشبورد</a>
+
+      <a class="nav-link" data-bs-toggle="collapse" href="#menuProducts" role="button" aria-expanded="false">
+        <i class="ico fa-solid fa-box-open"></i> محصولات <i class="chev fa-solid fa-chevron-left"></i>
+      </a>
+      <div class="collapse sidebar-sub" id="menuProducts">
+        <a href="#" class="nav-link">لیست محصولات</a>
+        <a href="#" class="nav-link">جزئیات محصول</a>
+      </div>
+
+      <a href="#" class="nav-link"><i class="ico fa-solid fa-cart-shopping"></i> سفارش‌ها
+        <span class="badge text-bg-primary rounded-pill ms-2" style="font-size:10px;">۱۲</span>
+      </a>
+
+      <a class="nav-link" data-bs-toggle="collapse" href="#menuVisitors" role="button" aria-expanded="false">
+        <i class="ico fa-solid fa-users"></i> بازدیدکنندگان <i class="chev fa-solid fa-chevron-left"></i>
+      </a>
+      <div class="collapse sidebar-sub" id="menuVisitors">
+        <a href="#" class="nav-link">لیست بازدیدکنندگان</a>
+        <a href="#" class="nav-link">جزئیات بازدیدکننده</a>
+      </div>
+
+      <a href="#" class="nav-link"><i class="ico fa-solid fa-star"></i> دیدگاه‌ها</a>
+      <a href="#" class="nav-link active"><i class="ico fa-solid fa-chart-line"></i> درآمد</a>
+
+      <div class="sidebar-section-title">سیستم</div>
+      <a href="#" class="nav-link"><i class="ico fa-solid fa-gear"></i> تنظیمات</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="battery-widget">
+        <div class="top"><span>وضعیت سرور</span><b>۷۸٪</b></div>
+        <div class="battery-track"><div class="battery-fill"></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn d-xl-none" id="sbToggle"><i class="fa-solid fa-bars"></i></button>
+
+      <div class="search-box">
+        <input type="text" placeholder="جستجوی تراکنش، سفارش، مشتری...">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <div class="theme-toggle">
+          <button id="themeLight" class="active" title="روشن"><i class="fa-solid fa-sun"></i></button>
+          <button id="themeDark" title="تیره"><i class="fa-solid fa-moon"></i></button>
+        </div>
+
+        <div class="dropdown-wrap">
+          <div class="icon-btn" id="notifBtn"><i class="fa-regular fa-bell"></i><span class="dot-badge"></span></div>
+          <div class="dropdown-panel" id="notifPanel">
+            <h6 class="fw-bold mb-2" style="font-size:14px;">اعلان‌های مالی</h6>
+            <div class="d-flex gap-2 py-2 border-bottom" style="border-color:var(--border)!important;">
+              <i class="fa-solid fa-circle-check text-success mt-1"></i>
+              <div><p class="m-0" style="font-size:13px;font-weight:600;">تسویه ۱۸,۲۰۰,۰۰۰ تومانی انجام شد</p><small style="color:var(--text-muted);">۱۰ دقیقه پیش</small></div>
+            </div>
+            <div class="d-flex gap-2 py-2 border-bottom" style="border-color:var(--border)!important;">
+              <i class="fa-solid fa-triangle-exclamation text-danger mt-1"></i>
+              <div><p class="m-0" style="font-size:13px;font-weight:600;">تراکنش ناموفق در درگاه IDPay</p><small style="color:var(--text-muted);">۴۵ دقیقه پیش</small></div>
+            </div>
+            <div class="d-flex gap-2 py-2">
+              <i class="fa-solid fa-rotate-left text-purple mt-1" style="color:var(--purple)!important;"></i>
+              <div><p class="m-0" style="font-size:13px;font-weight:600;">درخواست بازگشت وجه ثبت شد</p><small style="color:var(--text-muted);">۲ ساعت پیش</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown-wrap">
+          <div class="profile-chip" id="profileBtn">
+            <img src="https://i.pravatar.cc/100?img=47" alt="">
+            <div class="who d-none d-sm-block"><b>الهام حسینی</b><span>مدیر فروشگاه</span></div>
+            <i class="fa-solid fa-chevron-down" style="font-size:10px;color:var(--text-muted);"></i>
+          </div>
+          <div class="dropdown-panel" id="profilePanel" style="width:220px;left:auto;right:0;padding:10px;">
+            <a href="#" class="d-flex align-items-center gap-2 p-2 rounded-3" style="color:var(--text);font-size:13.5px;"><i class="fa-regular fa-user fa-fw"></i> پروفایل من</a>
+            <a href="#" class="d-flex align-items-center gap-2 p-2 rounded-3" style="color:var(--text);font-size:13.5px;"><i class="fa-solid fa-gear fa-fw"></i> تنظیمات</a>
+            <hr class="my-1" style="border-color:var(--border);">
+            <a href="#" class="d-flex align-items-center gap-2 p-2 rounded-3" style="color:var(--red);font-size:13.5px;"><i class="fa-solid fa-power-off fa-fw"></i> خروج از حساب</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="page-wrap">
+
+      <div class="page-head">
+        <div>
+          <h1>مدیریت مالی</h1>
+          <p>نظارت بر درآمد، تراکنش‌ها و تسویه‌حساب فروشگاه اسکوتر برقی</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn-ghost"><i class="fa-regular fa-calendar"></i> ۱ تا ۳۰ خرداد ۱۴۰۵</button>
+          <button class="btn-current"><i class="fa-solid fa-wallet"></i> درخواست برداشت</button>
+        </div>
+      </div>
+
+      <!-- ============ STAT CARDS ROW 1 ============ -->
+      <div class="row g-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-primary);"><i class="fa-solid fa-sack-dollar"></i></div><div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۱۴.۲٪</div></div>
+            <div><div class="stat-value" data-count="284600000" data-format="toman">۰</div><div class="stat-label">درآمد کل</div></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-green);"><i class="fa-solid fa-calendar-day"></i></div><div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۹.۸٪</div></div>
+            <div><div class="stat-value" data-count="6400000" data-format="toman">۰</div><div class="stat-label">درآمد امروز</div></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-purple);"><i class="fa-solid fa-calendar-days"></i></div><div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۱۱.۵٪</div></div>
+            <div><div class="stat-value" data-count="93200000" data-format="toman">۰</div><div class="stat-label">درآمد این ماه</div></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-orange);"><i class="fa-solid fa-hourglass-half"></i></div><div class="stat-trend trend-down"><i class="fa-solid fa-arrow-trend-down"></i> ۳.۱٪</div></div>
+            <div><div class="stat-value" data-count="12800000" data-format="toman">۰</div><div class="stat-label">تسویه‌های در انتظار</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ STAT CARDS ROW 2 ============ -->
+      <div class="row g-4 mt-1">
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-green);"><i class="fa-solid fa-circle-check"></i></div><div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۶.۴٪</div></div>
+            <div><div class="stat-value" data-count="3284">۰</div><div class="stat-label">تراکنش‌های موفق</div></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-red);"><i class="fa-solid fa-circle-xmark"></i></div><div class="stat-trend trend-down"><i class="fa-solid fa-arrow-trend-down"></i> ۱.۲٪</div></div>
+            <div><div class="stat-value" data-count="142">۰</div><div class="stat-label">تراکنش‌های ناموفق</div></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-slate);"><i class="fa-solid fa-rotate-left"></i></div><div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۰.۸٪</div></div>
+            <div><div class="stat-value" data-count="37">۰</div><div class="stat-label">درخواست‌های بازگشت وجه</div></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:var(--grad-primary);"><i class="fa-solid fa-chart-pie"></i></div><div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۷.۹٪</div></div>
+            <div><div class="stat-value" data-count="61500000" data-format="toman">۰</div><div class="stat-label">سود خالص</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PAYMENT GATEWAYS ============ -->
+      <div class="section-title"><h3>درگاه‌های پرداخت</h3><div class="line"></div><span class="tag">۴ درگاه فعال</span></div>
+      <div class="row g-4">
+        <div class="col-md-6 col-xl-3">
+          <div class="gcard gw-card">
+            <div class="gw-head">
+              <div class="gw-logo" style="background:linear-gradient(135deg,#FFB23F,#F4742B);">ZP</div>
+              <div><div class="gw-name">زرین‌پال</div><div class="gw-sub">درگاه اصلی</div></div>
+            </div>
+            <div class="gw-stats">
+              <div class="gw-stat"><div class="v">۲,۱۴۰</div><div class="l">کل تراکنش</div></div>
+              <div class="gw-stat"><div class="v">۲,۰۵۵</div><div class="l">پرداخت موفق</div></div>
+              <div class="gw-stat"><div class="v">۱۵۲M</div><div class="l">درآمد (تومان)</div></div>
+              <div class="gw-stat"><div class="v">۹۶٪</div><div class="l">نرخ موفقیت</div></div>
+            </div>
+            <div class="gw-bar"><div style="width:96%;background:linear-gradient(90deg,#FFB23F,#F4742B);"></div></div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="gcard gw-card">
+            <div class="gw-head">
+              <div class="gw-logo" style="background:linear-gradient(135deg,#2EC4B6,#1A8FE3);">ID</div>
+              <div><div class="gw-name">آی‌دی‌پی</div><div class="gw-sub">درگاه دوم</div></div>
+            </div>
+            <div class="gw-stats">
+              <div class="gw-stat"><div class="v">۸۶۴</div><div class="l">کل تراکنش</div></div>
+              <div class="gw-stat"><div class="v">۵۸M</div><div class="l">درآمد (تومان)</div></div>
+              <div class="gw-stat"><div class="v">۴۱</div><div class="l">پرداخت ناموفق</div></div>
+              <div class="gw-stat"><div class="v">۹۲٪</div><div class="l">نرخ موفقیت</div></div>
+            </div>
+            <div class="gw-bar"><div style="width:92%;background:linear-gradient(90deg,#2EC4B6,#1A8FE3);"></div></div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="gcard gw-card">
+            <div class="gw-head">
+              <div class="gw-logo" style="background:linear-gradient(135deg,#7C5CFC,#2F6FED);">NP</div>
+              <div><div class="gw-name">نکست‌پی</div><div class="gw-sub">درگاه سوم</div></div>
+            </div>
+            <div class="gw-stats">
+              <div class="gw-stat"><div class="v">۴۴M</div><div class="l">درآمد (تومان)</div></div>
+              <div class="gw-stat"><div class="v">۴۰M</div><div class="l">تسویه‌شده</div></div>
+              <div class="gw-stat" style="grid-column:span 2;"><div class="v">۹۴٪</div><div class="l">درصد موفقیت</div></div>
+            </div>
+            <div class="gw-bar"><div style="width:94%;background:linear-gradient(90deg,#7C5CFC,#2F6FED);"></div></div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="gcard gw-card">
+            <div class="gw-head">
+              <div class="gw-logo" style="background:linear-gradient(135deg,#475569,#1E293B);">B</div>
+              <div><div class="gw-name">درگاه بانکی مستقیم</div><div class="gw-sub">کارت‌به‌کارت / حواله</div></div>
+            </div>
+            <div class="gw-stats">
+              <div class="gw-stat"><div class="v">۲۱۲</div><div class="l">پرداخت مستقیم</div></div>
+              <div class="gw-stat"><div class="v">۳۰M</div><div class="l">درآمد (تومان)</div></div>
+              <div class="gw-stat" style="grid-column:span 2;"><div class="v">۶.۲M</div><div class="l">تسویه در انتظار</div></div>
+            </div>
+            <div class="gw-bar"><div style="width:88%;background:linear-gradient(90deg,#475569,#1E293B);"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ REVENUE ANALYTICS ============ -->
+      <div class="section-title"><h3>تحلیل درآمد</h3><div class="line"></div></div>
+      <div class="row g-4">
+        <div class="col-xl-7">
+          <div class="gcard h-100">
+            <div class="gcard-head"><div><h2>روند درآمد ماهانه</h2><div class="sub">۱۲ ماه گذشته</div></div><span class="link-more">گزارش کامل</span></div>
+            <div class="gcard-body"><div id="chartMonthlyRevenue"></div></div>
+          </div>
+        </div>
+        <div class="col-xl-5">
+          <div class="gcard h-100">
+            <div class="gcard-head"><div><h2>منابع درآمد</h2><div class="sub">سهم هر دسته از کل فروش</div></div></div>
+            <div class="gcard-body">
+              <div id="chartRevenueSources"></div>
+              <div class="legend-row">
+                <span><i style="background:var(--blue);"></i> فروش اسکوتر</span>
+                <span><i style="background:var(--purple);"></i> لوازم جانبی</span>
+                <span><i style="background:var(--cyan);"></i> قطعات یدکی</span>
+                <span><i style="background:var(--orange);"></i> هزینه خدمات</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mt-1">
+        <div class="col-xl-7">
+          <div class="gcard h-100">
+            <div class="gcard-head"><div><h2>فروش روزانه</h2><div class="sub">۳۰ روز گذشته</div></div></div>
+            <div class="gcard-body"><div id="chartDailySales"></div></div>
+          </div>
+        </div>
+        <div class="col-xl-5">
+          <div class="gcard h-100">
+            <div class="gcard-head"><div><h2>مقایسه درگاه‌های پرداخت</h2><div class="sub">درآمد هر درگاه طی ۶ ماه</div></div></div>
+            <div class="gcard-body"><div id="chartGatewayCompare"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SETTLEMENT MANAGEMENT ============ -->
+      <div class="section-title"><h3>مدیریت تسویه‌حساب</h3><div class="line"></div></div>
+      <div class="gcard">
+        <div class="gcard-body">
+          <div class="row g-4">
+            <div class="col-sm-6 col-xl-3">
+              <div class="settle-tile">
+                <div class="ic" style="background:var(--grad-green);"><i class="fa-solid fa-wallet"></i></div>
+                <div class="v">۴۲,۸۰۰,۰۰۰</div><div class="l">موجودی قابل برداشت (تومان)</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="settle-tile">
+                <div class="ic" style="background:var(--grad-orange);"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div class="v">۱۲,۸۰۰,۰۰۰</div><div class="l">در انتظار تسویه (تومان)</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="settle-tile">
+                <div class="ic" style="background:var(--grad-primary);"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="v">۲۲۹,۰۰۰,۰۰۰</div><div class="l">مجموع تسویه‌شده (تومان)</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="settle-tile">
+                <div class="ic" style="background:var(--grad-slate);"><i class="fa-regular fa-calendar-check"></i></div>
+                <div class="v" style="font-size:17px;">۲ تیر ۱۴۰۵</div><div class="l">تاریخ تسویه بعدی</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-2">
+            <button class="btn-current"><i class="fa-solid fa-money-bill-transfer"></i> ثبت درخواست برداشت</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ REVENUE KPIs ============ -->
+      <div class="section-title"><h3>شاخص‌های کلیدی درآمد</h3><div class="line"></div></div>
+      <div class="row g-3">
+        <div class="col-sm-6 col-xl-2">
+          <div class="gcard kpi-tile"><div class="ic" style="background:var(--grad-primary);"><i class="fa-solid fa-receipt"></i></div><div><div class="v">۲۴۵,۰۰۰</div><div class="l">میانگین ارزش سفارش</div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-2">
+          <div class="gcard kpi-tile"><div class="ic" style="background:var(--grad-green);"><i class="fa-solid fa-percent"></i></div><div><div class="v">۴.۸٪</div><div class="l">نرخ تبدیل</div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-2">
+          <div class="gcard kpi-tile"><div class="ic" style="background:var(--grad-purple);"><i class="fa-solid fa-arrow-trend-up"></i></div><div><div class="v">۱۱.۵٪</div><div class="l">رشد ماهانه</div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-2">
+          <div class="gcard kpi-tile"><div class="ic" style="background:var(--grad-orange);"><i class="fa-solid fa-coins"></i></div><div><div class="v">۲۸.۲٪</div><div class="l">حاشیه سود</div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-2">
+          <div class="gcard kpi-tile"><div class="ic" style="background:var(--blue);"><i class="fa-solid fa-motorcycle"></i></div><div><div class="v">۳۴.۲M</div><div class="l">درآمد فلش پرو</div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-2">
+          <div class="gcard kpi-tile"><div class="ic" style="background:var(--grad-slate);"><i class="fa-regular fa-calendar-star"></i></div><div><div class="v">۲۵ خرداد</div><div class="l">پردرآمدترین روز</div></div></div>
+        </div>
+      </div>
+
+      <!-- ============ TRANSACTIONS TABLE ============ -->
+      <div class="section-title"><h3>تراکنش‌های مالی</h3><div class="line"></div></div>
+      <div class="gcard">
+        <div class="gcard-head" style="padding-bottom:14px;">
+          <div class="filter-bar">
+            <select><option>بازه زمانی: ۳۰ روز گذشته</option><option>۷ روز گذشته</option><option>این ماه</option><option>سفارشی...</option></select>
+            <select><option>همه درگاه‌ها</option><option>زرین‌پال</option><option>آی‌دی‌پی</option><option>نکست‌پی</option><option>بانکی</option></select>
+            <select><option>همه وضعیت‌ها</option><option>موفق</option><option>در انتظار</option><option>ناموفق</option><option>بازگشتی</option></select>
+            <input type="text" placeholder="حداقل تا حداکثر مبلغ" style="width:170px;">
+            <button class="btn-ghost"><i class="fa-solid fa-filter"></i> اعمال فیلتر</button>
+          </div>
+          <span class="link-more">خروجی Excel</span>
+        </div>
+        <div class="gcard-body" style="overflow-x:auto;">
+          <table class="table-modern">
+            <thead><tr>
+              <th>شناسه تراکنش</th><th>مشتری</th><th>محصول</th><th>درگاه پرداخت</th><th>مبلغ</th><th>تاریخ تراکنش</th><th>تاریخ تسویه</th><th>وضعیت</th><th>عملیات</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td class="num">#TRX-90231</td>
+                <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=12"><div><div class="nm">نیلوفر جلیلی</div><div class="id">CUS-1042</div></div></div></td>
+                <td>اسکوتر برقی نوا X1</td>
+                <td><span class="gw-pill"><i class="fa-solid fa-circle" style="color:#F4742B;"></i> زرین‌پال</span></td>
+                <td class="num">۲۸,۵۰۰,۰۰۰</td><td class="num">۱۴۰۵/۰۳/۳۰</td><td class="num">۱۴۰۵/۰۴/۰۱</td>
+                <td><span class="badge-status st-success">موفق</span></td>
+                <td class="row-actions"><a href="#"><i class="fa-solid fa-eye"></i></a><a href="#"><i class="fa-solid fa-download"></i></a></td>
+              </tr>
+              <tr>
+                <td class="num">#TRX-90230</td>
+                <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=23"><div><div class="nm">میلاد احمدی</div><div class="id">CUS-1041</div></div></div></td>
+                <td>اسکوتر شهری اوربیت</td>
+                <td><span class="gw-pill"><i class="fa-solid fa-circle" style="color:#1A8FE3;"></i> آی‌دی‌پی</span></td>
+                <td class="num">۱۹,۹۰۰,۰۰۰</td><td class="num">۱۴۰۵/۰۳/۲۹</td><td class="num">—</td>
+                <td><span class="badge-status st-pending">در انتظار</span></td>
+                <td class="row-actions"><a href="#"><i class="fa-solid fa-eye"></i></a><a href="#"><i class="fa-solid fa-download"></i></a></td>
+              </tr>
+              <tr>
+                <td class="num">#TRX-90229</td>
+                <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=33"><div><div class="nm">علی مرادی</div><div class="id">CUS-0998</div></div></div></td>
+                <td>اسکوتر فلش پرو</td>
+                <td><span class="gw-pill"><i class="fa-solid fa-circle" style="color:#2F6FED;"></i> نکست‌پی</span></td>
+                <td class="num">۳۴,۲۰۰,۰۰۰</td><td class="num">۱۴۰۵/۰۳/۲۸</td><td class="num">۱۴۰۵/۰۳/۳۰</td>
+                <td><span class="badge-status st-success">موفق</span></td>
+                <td class="row-actions"><a href="#"><i class="fa-solid fa-eye"></i></a><a href="#"><i class="fa-solid fa-download"></i></a></td>
+              </tr>
+              <tr>
+                <td class="num">#TRX-90228</td>
+                <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=45"><div><div class="nm">سعید نوری</div><div class="id">CUS-0975</div></div></div></td>
+                <td>اسکوتر آفرود ترندر</td>
+                <td><span class="gw-pill"><i class="fa-solid fa-circle" style="color:#475569;"></i> بانکی</span></td>
+                <td class="num">۴۱,۰۰۰,۰۰۰</td><td class="num">۱۴۰۵/۰۳/۲۷</td><td class="num">—</td>
+                <td><span class="badge-status st-failed">ناموفق</span></td>
+                <td class="row-actions"><a href="#"><i class="fa-solid fa-eye"></i></a><a href="#"><i class="fa-solid fa-download"></i></a></td>
+              </tr>
+              <tr>
+                <td class="num">#TRX-90227</td>
+                <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=56"><div><div class="nm">پریسا کاظمی</div><div class="id">CUS-0954</div></div></div></td>
+                <td>اسکوتر برقی نوا X1</td>
+                <td><span class="gw-pill"><i class="fa-solid fa-circle" style="color:#F4742B;"></i> زرین‌پال</span></td>
+                <td class="num">۲۸,۵۰۰,۰۰۰</td><td class="num">۱۴۰۵/۰۳/۲۶</td><td class="num">۱۴۰۵/۰۳/۲۸</td>
+                <td><span class="badge-status st-refunded">بازگشتی</span></td>
+                <td class="row-actions"><a href="#"><i class="fa-solid fa-eye"></i></a><a href="#"><i class="fa-solid fa-download"></i></a></td>
+              </tr>
+              <tr>
+                <td class="num">#TRX-90226</td>
+                <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=15"><div><div class="nm">رضا توکلی</div><div class="id">CUS-0932</div></div></div></td>
+                <td>اسکوتر شهری اوربیت</td>
+                <td><span class="gw-pill"><i class="fa-solid fa-circle" style="color:#1A8FE3;"></i> آی‌دی‌پی</span></td>
+                <td class="num">۱۹,۹۰۰,۰۰۰</td><td class="num">۱۴۰۵/۰۳/۲۵</td><td class="num">۱۴۰۵/۰۳/۲۷</td>
+                <td><span class="badge-status st-success">موفق</span></td>
+                <td class="row-actions"><a href="#"><i class="fa-solid fa-eye"></i></a><a href="#"><i class="fa-solid fa-download"></i></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 pb-4 d-sm-flex justify-content-sm-between align-items-sm-center">
+          <p class="mb-0" style="font-size:12.5px;color:var(--text-muted);">نمایش ۱ تا ۶ از ۱۸۴ تراکنش</p>
+          <nav class="d-flex justify-content-center mb-0" aria-label="navigation">
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item"><a class="page-link" href="#"><i class="fas fa-angle-right"></i></a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#"><i class="fas fa-angle-left"></i></a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <div class="text-center py-4" style="color:var(--text-muted);font-size:12px;">
+        © ۱۴۰۵ اسکوتیکس — پنل مدیریت مالی فروشگاه اسکوتر برقی
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   THEME ENGINE (in-memory, no storage APIs)
+   ============================================================ */
+const body = document.body;
+const btnLight = document.getElementById('themeLight');
+const btnDark = document.getElementById('themeDark');
+let charts = {};
+
+function applyChartTheme(isDark){
+  Object.values(charts).forEach(c=>{
+    if(!c) return;
+    c.updateOptions({
+      theme:{ mode: isDark ? 'dark' : 'light' },
+      chart:{ foreColor: isDark ? '#9099B3' : '#646E84' },
+      grid:{ borderColor: isDark ? 'rgba(255,255,255,.08)' : 'rgba(11,17,32,.08)' },
+      tooltip:{ theme: isDark ? 'dark' : 'light' }
+    }, false, true);
+  });
+}
+function setTheme(mode){
+  body.setAttribute('data-theme', mode);
+  btnLight.classList.toggle('active', mode==='light');
+  btnDark.classList.toggle('active', mode==='dark');
+  applyChartTheme(mode==='dark');
+}
+btnLight.addEventListener('click', ()=>setTheme('light'));
+btnDark.addEventListener('click', ()=>setTheme('dark'));
+if(window.matchMedia('(prefers-color-scheme: dark)').matches){ setTheme('dark'); }
+
+/* ============================================================
+   DROPDOWNS
+   ============================================================ */
+function wireDropdown(btnId, panelId){
+  const btn = document.getElementById(btnId);
+  const panel = document.getElementById(panelId);
+  btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    document.querySelectorAll('.dropdown-panel').forEach(p=>{ if(p!==panel) p.classList.remove('show'); });
+    panel.classList.toggle('show');
+  });
+}
+wireDropdown('notifBtn','notifPanel');
+wireDropdown('profileBtn','profilePanel');
+document.addEventListener('click', ()=> document.querySelectorAll('.dropdown-panel').forEach(p=>p.classList.remove('show')) );
+
+/* ============================================================
+   MOBILE SIDEBAR
+   ============================================================ */
+const sidebar = document.getElementById('sidebar');
+const sbBackdrop = document.getElementById('sbBackdrop');
+document.getElementById('sbToggle').addEventListener('click', ()=>{
+  sidebar.classList.add('show'); sbBackdrop.classList.add('show');
+});
+sbBackdrop.addEventListener('click', ()=>{
+  sidebar.classList.remove('show'); sbBackdrop.classList.remove('show');
+});
+
+/* ============================================================
+   ANIMATED COUNTERS (supports plain numbers + toman formatting)
+   ============================================================ */
+function toPersianDigits(n){ return n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]); }
+function formatToman(n){
+  if(n>=1000000000) return toPersianDigits((n/1000000000).toFixed(1)) + ' میلیارد تومان';
+  if(n>=1000000) return toPersianDigits(Math.round(n/1000000)) + ' میلیون تومان';
+  return toPersianDigits(n.toLocaleString('en-US')) + ' تومان';
+}
+function animateCounter(el){
+  const target = parseInt(el.getAttribute('data-count'),10);
+  const isToman = el.getAttribute('data-format')==='toman';
+  const duration = 1400;
+  const start = performance.now();
+  function tick(now){
+    const p = Math.min(1, (now-start)/duration);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = Math.floor(eased*target);
+    el.textContent = isToman ? formatToman(val) : toPersianDigits(val.toLocaleString('en-US'));
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+const counterObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ animateCounter(e.target); counterObserver.unobserve(e.target); } });
+},{threshold:.4});
+document.querySelectorAll('[data-count]').forEach(el=>counterObserver.observe(el));
+
+/* ============================================================
+   APEXCHARTS
+   ============================================================ */
+const palette = { blue:'#2F6FED', purple:'#7C5CFC', cyan:'#22D3EE', green:'#10B981', orange:'#F59E0B', red:'#EF4444', slate:'#64748B' };
+const baseFont = "'Vazirmatn', sans-serif";
+
+// Monthly revenue trend
+charts.monthlyRevenue = new ApexCharts(document.querySelector('#chartMonthlyRevenue'), {
+  chart:{ type:'area', height:300, fontFamily:baseFont, toolbar:{show:false} },
+  series:[{ name:'درآمد (میلیون تومان)', data:[58,64,60,72,80,76,88,95,90,102,110,118] }],
+  stroke:{ width:3, curve:'smooth' },
+  fill:{ type:'gradient', gradient:{ shadeIntensity:1, opacityFrom:.45, opacityTo:0 } },
+  colors:[palette.blue],
+  dataLabels:{ enabled:false },
+  xaxis:{ categories:['فرو','ارد','خرد','تیر','مرد','شهر','مهر','آبا','آذر','دی','بهم','اسف'], axisBorder:{show:false}, axisTicks:{show:false} },
+  yaxis:{ opposite:true },
+  grid:{ borderColor:'rgba(11,17,32,.08)', strokeDashArray:4 }
+});
+charts.monthlyRevenue.render();
+
+// Revenue sources donut
+charts.revenueSources = new ApexCharts(document.querySelector('#chartRevenueSources'), {
+  chart:{ type:'donut', height:280, fontFamily:baseFont },
+  series:[62,18,12,8],
+  labels:['فروش اسکوتر','لوازم جانبی','قطعات یدکی','هزینه خدمات'],
+  colors:[palette.blue, palette.purple, palette.cyan, palette.orange],
+  dataLabels:{ enabled:true, style:{fontSize:'11px'} },
+  legend:{ show:false },
+  plotOptions:{ pie:{ donut:{ size:'68%', labels:{ show:true, total:{ show:true, label:'کل درآمد', formatter:()=> '۲۸۴M' } } } } }
+});
+charts.revenueSources.render();
+
+// Daily sales (30 days)
+charts.dailySales = new ApexCharts(document.querySelector('#chartDailySales'), {
+  chart:{ type:'bar', height:300, fontFamily:baseFont, toolbar:{show:false} },
+  series:[{ name:'فروش روزانه (میلیون تومان)', data:Array.from({length:30}, (_,i)=> Math.round(8 + Math.sin(i/3)*4 + (i/30)*10 + (i%7===0?6:0))) }],
+  plotOptions:{ bar:{ borderRadius:5, columnWidth:'55%' } },
+  colors:[palette.cyan],
+  dataLabels:{ enabled:false },
+  xaxis:{ categories:Array.from({length:30}, (_,i)=> toPersianDigits(i+1)), labels:{ style:{fontSize:'10px'}, rotate:0 }, tickAmount:10 },
+  grid:{ borderColor:'rgba(11,17,32,.08)', strokeDashArray:4 }
+});
+charts.dailySales.render();
+
+// Gateway comparison
+charts.gatewayCompare = new ApexCharts(document.querySelector('#chartGatewayCompare'), {
+  chart:{ type:'bar', height:300, fontFamily:baseFont, toolbar:{show:false}, stacked:false },
+  series:[
+    { name:'زرین‌پال', data:[120,128,135,140,148,152] },
+    { name:'آی‌دی‌پی', data:[40,44,48,50,55,58] },
+    { name:'نکست‌پی', data:[28,30,33,35,38,44] },
+    { name:'بانکی', data:[18,20,22,24,26,30] }
+  ],
+  plotOptions:{ bar:{ borderRadius:5, columnWidth:'60%' } },
+  colors:['#F4742B', palette.cyan, palette.purple, palette.slate],
+  xaxis:{ categories:['فرو','ارد','خرد','تیر','مرد','شهر'] },
+  legend:{ position:'top', fontSize:'11.5px' },
+  grid:{ borderColor:'rgba(11,17,32,.08)', strokeDashArray:4 }
+});
+charts.gatewayCompare.render();
+</script>
+</body>
+</html>

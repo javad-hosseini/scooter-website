@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>اسکوتیکس | داشبورد مدیریت</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- Bootstrap 5 RTL -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — Electric Scooter Admin / "Current" system
+   ============================================================ */
+:root{
+  --navy:#0B1120;
+  --navy-deep:#070B16;
+  --blue:#2F6FED;
+  --purple:#7C5CFC;
+  --cyan:#22D3EE;
+  --green:#10B981;
+  --orange:#F59E0B;
+  --red:#EF4444;
+
+  --bg:#F2F4FA;
+  --surface:#FFFFFF;
+  --surface-glass:rgba(255,255,255,.72);
+  --text:#0B1120;
+  --text-muted:#646E84;
+  --border:rgba(11,17,32,.08);
+  --shadow:0 10px 30px -12px rgba(20,30,60,.16);
+  --shadow-lg:0 24px 48px -16px rgba(20,30,60,.22);
+
+  --grad-primary:linear-gradient(135deg,var(--blue) 0%,var(--purple) 100%);
+  --grad-current:linear-gradient(90deg,var(--cyan) 0%,var(--blue) 45%,var(--purple) 100%);
+  --grad-green:linear-gradient(135deg,#34D399 0%,#0EA5E9 100%);
+  --grad-orange:linear-gradient(135deg,#FBBF24 0%,#F97316 100%);
+  --grad-purple:linear-gradient(135deg,#A78BFA 0%,#6366F1 100%);
+
+  --radius:18px;
+  --radius-sm:12px;
+  --font-display:'Vazirmatn',sans-serif;
+  --font-mono:'JetBrains Mono','Vazirmatn',monospace;
+}
+
+[data-theme="dark"]{
+  --bg:#080B14;
+  --surface:#101728;
+  --surface-glass:rgba(16,23,40,.66);
+  --text:#E9ECF5;
+  --text-muted:#8B93AC;
+  --border:rgba(255,255,255,.08);
+  --shadow:0 10px 30px -12px rgba(0,0,0,.55);
+  --shadow-lg:0 24px 48px -16px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:var(--font-display);
+  background:var(--bg);
+  color:var(--text);
+  transition:background .35s ease,color .35s ease;
+  letter-spacing:-.1px;
+  overflow-x:hidden;
+}
+::selection{background:var(--blue);color:#fff;}
+a{text-decoration:none;}
+.num{font-family:var(--font-mono);}
+
+/* scrollbar */
+.scroll-thin::-webkit-scrollbar{width:6px;}
+.scroll-thin::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+
+/* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+.app-shell{display:flex;min-height:100vh;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  width:272px;
+  flex-shrink:0;
+  background:radial-gradient(120% 140% at 0% 0%, #131B36 0%, var(--navy) 45%, var(--navy-deep) 100%);
+  color:#C9CEDD;
+  position:sticky;
+  top:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  z-index:40;
+  border-left:1px solid rgba(255,255,255,.05);
+}
+.sidebar-brand{
+  display:flex;align-items:center;gap:12px;
+  padding:26px 22px 22px;
+}
+.sidebar-brand .mark{
+  width:40px;height:40px;border-radius:12px;
+  background:var(--grad-primary);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 20px -6px rgba(124,92,252,.6);
+  position:relative;
+  flex-shrink:0;
+}
+.sidebar-brand .mark i{color:#fff;font-size:18px;}
+.sidebar-brand .name{font-weight:800;font-size:18px;color:#fff;line-height:1.1;}
+.sidebar-brand .name span{display:block;font-size:11px;font-weight:500;color:#8C93AE;letter-spacing:.5px;margin-top:2px;}
+
+.sidebar-section-title{
+  font-size:11px;font-weight:700;color:#5B6480;
+  text-transform:uppercase;letter-spacing:1px;
+  padding:18px 22px 8px;
+}
+.sidebar-nav{flex:1;overflow-y:auto;padding-bottom:10px;}
+.sidebar-nav .nav-link{
+  display:flex;align-items:center;gap:12px;
+  color:#AEB4CB;font-size:14.5px;font-weight:500;
+  padding:11px 22px;margin:2px 12px;border-radius:10px;
+  position:relative;transition:.2s ease;
+}
+.sidebar-nav .nav-link i.ico{width:18px;text-align:center;font-size:15px;color:#7E86A3;transition:.2s;}
+.sidebar-nav .nav-link:hover{background:rgba(255,255,255,.05);color:#fff;}
+.sidebar-nav .nav-link:hover i.ico{color:var(--cyan);}
+.sidebar-nav .nav-link.active{
+  background:linear-gradient(90deg,rgba(47,111,237,.18),rgba(124,92,252,.10));
+  color:#fff;
+}
+.sidebar-nav .nav-link.active i.ico{color:var(--cyan);}
+.sidebar-nav .nav-link.active::before{
+  content:'';position:absolute;right:0;top:8px;bottom:8px;width:3px;border-radius:3px;
+  background:var(--grad-current);
+  box-shadow:0 0 10px 1px rgba(34,211,238,.7);
+}
+.sidebar-nav .nav-link .chev{margin-right:auto;font-size:11px;transition:.25s;color:#5B6480;}
+.sidebar-nav .nav-link[aria-expanded="true"] .chev{transform:rotate(-90deg);color:var(--cyan);}
+.sidebar-sub{padding-right:18px;}
+.sidebar-sub .nav-link{font-size:13.5px;padding:9px 22px 9px 16px;color:#8B92AB;}
+.sidebar-sub .nav-link::before{content:'';width:5px;height:5px;border-radius:50%;background:#3A4262;margin-left:2px;}
+.sidebar-sub .nav-link:hover,.sidebar-sub .nav-link.active{color:#fff;background:rgba(255,255,255,.05);}
+.sidebar-sub .nav-link.active::before{background:var(--cyan);box-shadow:0 0 6px var(--cyan);}
+
+.sidebar-footer{
+  padding:16px 18px 20px;border-top:1px solid rgba(255,255,255,.06);
+}
+.battery-widget{
+  background:linear-gradient(135deg,rgba(47,111,237,.16),rgba(124,92,252,.10));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;padding:14px;
+}
+.battery-widget .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.battery-widget .top span{font-size:12px;color:#9AA1BD;font-weight:600;}
+.battery-widget .top b{color:#fff;font-size:13px;}
+.battery-track{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;}
+.battery-fill{height:100%;width:78%;border-radius:6px;background:var(--grad-current);
+  background-size:200% 100%;animation:currentFlow 3s linear infinite;}
+
+@keyframes currentFlow{0%{background-position:0% 0;}100%{background-position:200% 0;}}
+
+/* ---------- Topbar ---------- */
+.main{flex:1;min-width:0;}
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:var(--surface-glass);
+  backdrop-filter:blur(16px) saturate(160%);
+  border-bottom:1px solid var(--border);
+  padding:14px 28px;
+  display:flex;align-items:center;gap:16px;
+}
+.search-box{
+  flex:1;max-width:380px;position:relative;
+}
+.search-box input{
+  width:100%;border:1px solid var(--border);background:var(--bg);
+  border-radius:12px;padding:10px 42px 10px 14px;font-size:13.5px;color:var(--text);
+  transition:.2s;
+}
+.search-box input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,111,237,.15);}
+.search-box i{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;}
+
+.icon-btn{
+  width:40px;height:40px;border-radius:11px;border:1px solid var(--border);
+  background:var(--surface);display:flex;align-items:center;justify-content:center;
+  color:var(--text-muted);position:relative;transition:.2s;cursor:pointer;flex-shrink:0;
+}
+.icon-btn:hover{color:var(--blue);border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow);}
+.dot-badge{position:absolute;top:-3px;left:-3px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid var(--surface);}
+
+.profile-chip{display:flex;align-items:center;gap:10px;cursor:pointer;padding:5px 10px 5px 6px;border-radius:12px;transition:.2s;}
+.profile-chip:hover{background:var(--bg);}
+.profile-chip img{width:36px;height:36px;border-radius:10px;object-fit:cover;}
+.profile-chip .who{line-height:1.2;}
+.profile-chip .who b{font-size:13px;display:block;color:var(--text);}
+.profile-chip .who span{font-size:11px;color:var(--text-muted);}
+
+.page-wrap{padding:28px;max-width:1480px;margin:0 auto;}
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+.page-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:24px;}
+.page-head h1{font-size:23px;font-weight:800;margin:0;}
+.page-head p{font-size:13.5px;color:var(--text-muted);margin:4px 0 0;}
+.btn-current{
+  background:var(--grad-primary);color:#fff;border:none;border-radius:12px;
+  padding:11px 20px;font-size:13.5px;font-weight:700;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 10px 22px -8px rgba(124,92,252,.55);transition:.2s;
+}
+.btn-current:hover{transform:translateY(-2px);box-shadow:0 14px 28px -8px rgba(124,92,252,.65);color:#fff;}
+
+/* card shell w/ signature current-line */
+.gcard{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+.gcard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--grad-current);background-size:200% 100%;
+  opacity:.85;
+}
+.gcard:hover{box-shadow:var(--shadow-lg);}
+.gcard .gcard-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 4px;}
+.gcard .gcard-head h2{font-size:15.5px;font-weight:700;margin:0;}
+.gcard .gcard-head .sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.gcard .gcard-body{padding:14px 22px 22px;}
+.link-more{font-size:12.5px;font-weight:700;color:var(--blue);}
+
+/* stat cards */
+.stat-card{padding:22px;display:flex;flex-direction:column;gap:14px;cursor:default;}
+.stat-card:hover{transform:translateY(-5px);}
+.stat-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.stat-icon{
+  width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+  font-size:19px;color:#fff;flex-shrink:0;
+}
+.stat-trend{font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:8px;}
+.trend-up{color:var(--green);background:rgba(16,185,129,.12);}
+.trend-down{color:var(--red);background:rgba(239,68,68,.12);}
+.stat-value{font-size:28px;font-weight:800;font-family:var(--font-mono);letter-spacing:0;}
+.stat-label{font-size:13px;color:var(--text-muted);font-weight:500;}
+.stat-spark{height:34px;margin-top:-6px;}
+
+/* tables */
+.table-modern{width:100%;border-collapse:collapse;font-size:13.5px;}
+.table-modern thead th{
+  text-align:right;font-size:11.5px;color:var(--text-muted);font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:0 10px 12px;border-bottom:1px solid var(--border);
+}
+.table-modern tbody td{padding:14px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.table-modern tbody tr{transition:.2s;}
+.table-modern tbody tr:hover{background:var(--bg);}
+.table-modern tbody tr:last-child td{border-bottom:none;}
+.cust-cell{display:flex;align-items:center;gap:10px;}
+.cust-cell img{width:34px;height:34px;border-radius:9px;object-fit:cover;}
+.cust-cell .nm{font-weight:600;font-size:13.5px;}
+.cust-cell .id{font-size:11px;color:var(--text-muted);font-family:var(--font-mono);}
+
+.badge-status{font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;}
+.badge-status::before{content:'';width:6px;height:6px;border-radius:50%;}
+.st-pending{color:#B45309;background:rgba(245,158,11,.13);}
+.st-pending::before{background:var(--orange);}
+.st-processing{color:#0E7490;background:rgba(34,211,238,.14);}
+.st-processing::before{background:var(--cyan);}
+.st-shipped{color:#1D4ED8;background:rgba(47,111,237,.13);}
+.st-shipped::before{background:var(--blue);}
+.st-delivered{color:#047857;background:rgba(16,185,129,.13);}
+.st-delivered::before{background:var(--green);}
+.st-cancelled{color:#B91C1C;background:rgba(239,68,68,.13);}
+.st-cancelled::before{background:var(--red);}
+
+/* best selling product cards */
+.product-row{
+  display:flex;align-items:center;gap:14px;padding:13px;border-radius:14px;
+  border:1px solid var(--border);transition:.2s;margin-bottom:10px;
+}
+.product-row:last-child{margin-bottom:0;}
+.product-row:hover{border-color:transparent;box-shadow:var(--shadow);transform:translateY(-2px);}
+.product-thumb{
+  width:54px;height:54px;border-radius:13px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:21px;
+  position:relative;overflow:hidden;
+}
+.product-thumb::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.35), transparent 60%);}
+.product-info{flex:1;min-width:0;}
+.product-info .pname{font-weight:700;font-size:13.8px;}
+.product-info .pmeta{font-size:11.5px;color:var(--text-muted);margin-top:2px;display:flex;gap:10px;}
+.stock-bar{height:5px;border-radius:5px;background:var(--bg);width:80px;overflow:hidden;margin-top:6px;}
+.stock-bar > div{height:100%;border-radius:5px;}
+.qbtn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--bg);
+  display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:.2s;flex-shrink:0;
+}
+.qbtn:hover{background:var(--grad-primary);color:#fff;border-color:transparent;}
+
+/* activity feed */
+.feed-item{display:flex;gap:13px;padding:13px 0;border-bottom:1px dashed var(--border);}
+.feed-item:last-child{border-bottom:none;padding-bottom:0;}
+.feed-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.feed-txt p{margin:0;font-size:13.3px;font-weight:600;}
+.feed-txt span{font-size:11.5px;color:var(--text-muted);}
+
+/* notifications */
+.notif-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);position:relative;}
+.notif-item:last-child{border-bottom:none;}
+.notif-prio{width:7px;border-radius:6px;flex-shrink:0;align-self:stretch;}
+.notif-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.notif-body p{margin:0;font-size:13.2px;font-weight:600;}
+.notif-body span.d{font-size:12px;color:var(--text-muted);display:block;margin-top:1px;}
+.notif-body small{font-size:11px;color:var(--text-muted);}
+
+.dropdown-panel{
+  position:absolute;top:calc(100% + 12px);left:0;width:360px;max-height:420px;overflow:auto;
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);
+  padding:16px;opacity:0;pointer-events:none;transform:translateY(-8px) scale(.98);transition:.2s ease;z-index:50;
+}
+.dropdown-panel.show{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+.dropdown-wrap{position:relative;}
+
+/* theme toggle */
+.theme-toggle{display:flex;align-items:center;border-radius:11px;border:1px solid var(--border);background:var(--surface);padding:3px;gap:2px;}
+.theme-toggle button{width:32px;height:32px;border:none;background:transparent;border-radius:9px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;font-size:13px;}
+.theme-toggle button.active{background:var(--grad-primary);color:#fff;}
+
+/* misc */
+.legend-row{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--text-muted);margin-top:10px;}
+.legend-row span{display:inline-flex;align-items:center;gap:6px;}
+.legend-row i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+.sidebar-backdrop{display:none;}
+
+@media (max-width:1199.98px){
+  .sidebar{position:fixed;right:0;height:100vh;transform:translateX(105%);transition:transform .3s ease;}
+  .sidebar.show{transform:translateX(0);}
+  .sidebar-backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:39;}
+}
+@media (max-width:575.98px){
+  .page-wrap{padding:18px;}
+  .topbar{padding:12px 16px;}
+  .search-box{display:none;}
+}
+</style>
+</head>
+
+<body data-theme="light">
+
+<div class="sidebar-backdrop" id="sbBackdrop"></div>
+<div class="app-shell">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="mark"><i class="fa-solid fa-bolt"></i></div>
+      <div class="name">اسکوتیکس<span>پنل مدیریت فروشگاه</span></div>
+    </div>
+
+    <nav class="sidebar-nav scroll-thin">
+      <div class="sidebar-section-title">اصلی</div>
+      <a href="#" class="nav-link active"><i class="ico fa-solid fa-grid-2"></i> داشبورد</a>
+
+      <a class="nav-link" data-bs-toggle="collapse" href="#menuProducts" role="button" aria-expanded="false">
+        <i class="ico fa-solid fa-box-open"></i> محصولات <i class="chev fa-solid fa-chevron-left"></i>
+      </a>
+      <div class="collapse sidebar-sub" id="menuProducts">
+        <a href="#" class="nav-link">لیست محصولات</a>
+        <a href="#" class="nav-link">جزئیات محصول</a>
+      </div>
+
+      <a href="#" class="nav-link"><i class="ico fa-solid fa-cart-shopping"></i> سفارش‌ها
+        <span class="badge text-bg-primary rounded-pill ms-2" style="font-size:10px;">۱۲</span>
+      </a>
+
+      <a class="nav-link" data-bs-toggle="collapse" href="#menuVisitors" role="button" aria-expanded="false">
+        <i class="ico fa-solid fa-users"></i> بازدیدکنندگان <i class="chev fa-solid fa-chevron-left"></i>
+      </a>
+      <div class="collapse sidebar-sub" id="menuVisitors">
+        <a href="#" class="nav-link">لیست بازدیدکنندگان</a>
+        <a href="#" class="nav-link">جزئیات بازدیدکننده</a>
+      </div>
+
+      <a href="#" class="nav-link"><i class="ico fa-solid fa-star"></i> دیدگاه‌ها</a>
+      <a href="#" class="nav-link"><i class="ico fa-solid fa-chart-line"></i> درآمد</a>
+
+      <div class="sidebar-section-title">سیستم</div>
+      <a href="#" class="nav-link"><i class="ico fa-solid fa-gear"></i> تنظیمات</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="battery-widget">
+        <div class="top"><span>وضعیت سرور</span><b>۷۸٪</b></div>
+        <div class="battery-track"><div class="battery-fill"></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn d-xl-none" id="sbToggle"><i class="fa-solid fa-bars"></i></button>
+
+      <div class="search-box">
+        <input type="text" placeholder="جستجوی محصول، سفارش، مشتری...">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 ms-auto">
+
+        <div class="theme-toggle">
+          <button id="themeLight" class="active" title="روشن"><i class="fa-solid fa-sun"></i></button>
+          <button id="themeDark" title="تیره"><i class="fa-solid fa-moon"></i></button>
+        </div>
+
+        <div class="dropdown-wrap">
+          <div class="icon-btn" id="notifBtn"><i class="fa-regular fa-bell"></i><span class="dot-badge"></span></div>
+          <div class="dropdown-panel" id="notifPanel">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="m-0 fw-bold" style="font-size:14px;">مرکز اعلان‌ها</h6>
+              <span class="link-more" style="cursor:pointer;">علامت‌گذاری همه</span>
+            </div>
+
+            <div class="notif-item">
+              <div class="notif-prio" style="background:var(--red);"></div>
+              <div class="notif-ico" style="background:rgba(239,68,68,.12);color:var(--red);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="notif-body"><p>هشدار موجودی انبار</p><span class="d">موجودی «اسکوتر فلش پرو» کمتر از ۵ واحد است</span><small>۲ دقیقه پیش</small></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-prio" style="background:var(--blue);"></div>
+              <div class="notif-ico" style="background:rgba(47,111,237,.12);color:var(--blue);"><i class="fa-solid fa-cart-shopping"></i></div>
+              <div class="notif-body"><p>سفارش جدید ثبت شد</p><span class="d">سفارش #۳۲۹۸ به ارزش ۲۸,۵۰۰,۰۰۰ تومان</span><small>۱۸ دقیقه پیش</small></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-prio" style="background:var(--orange);"></div>
+              <div class="notif-ico" style="background:rgba(245,158,11,.13);color:var(--orange);"><i class="fa-solid fa-star"></i></div>
+              <div class="notif-body"><p>دیدگاه جدید</p><span class="d">امتیاز ۴ ستاره برای «اسکوتر شهری اوربیت»</span><small>۱ ساعت پیش</small></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-prio" style="background:var(--green);"></div>
+              <div class="notif-ico" style="background:rgba(16,185,129,.13);color:var(--green);"><i class="fa-solid fa-truck"></i></div>
+              <div class="notif-body"><p>سفارش ارسال شد</p><span class="d">سفارش #۳۲۹۰ تحویل پیک شد</span><small>۳ ساعت پیش</small></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-prio" style="background:var(--cyan);"></div>
+              <div class="notif-ico" style="background:rgba(34,211,238,.14);color:#0E7490;"><i class="fa-solid fa-box"></i></div>
+              <div class="notif-body"><p>محصول جدید افزوده شد</p><span class="d">«اسکوتر آفرود ترندر X2» به فروشگاه اضافه شد</span><small>دیروز</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown-wrap">
+          <div class="profile-chip" id="profileBtn">
+            <img src="https://i.pravatar.cc/100?img=47" alt="">
+            <div class="who d-none d-sm-block"><b>الهام حسینی</b><span>مدیر فروشگاه</span></div>
+            <i class="fa-solid fa-chevron-down" style="font-size:10px;color:var(--text-muted);"></i>
+          </div>
+          <div class="dropdown-panel" id="profilePanel" style="width:220px;left:auto;right:0;padding:10px;">
+            <a href="#" class="d-flex align-items-center gap-2 p-2 rounded-3" style="color:var(--text);font-size:13.5px;"><i class="fa-regular fa-user fa-fw"></i> پروفایل من</a>
+            <a href="#" class="d-flex align-items-center gap-2 p-2 rounded-3" style="color:var(--text);font-size:13.5px;"><i class="fa-solid fa-gear fa-fw"></i> تنظیمات</a>
+            <a href="#" class="d-flex align-items-center gap-2 p-2 rounded-3" style="color:var(--text);font-size:13.5px;"><i class="fa-regular fa-circle-question fa-fw"></i> پشتیبانی</a>
+            <hr class="my-1" style="border-color:var(--border);">
+            <a href="#" class="d-flex align-items-center gap-2 p-2 rounded-3" style="color:var(--red);font-size:13.5px;"><i class="fa-solid fa-power-off fa-fw"></i> خروج از حساب</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="page-wrap">
+
+      <div class="page-head">
+        <div>
+          <h1>سلام، الهام 👋</h1>
+          <p>خلاصه عملکرد فروشگاه اسکوتر برقی شما — شنبه، ۳۰ خرداد ۱۴۰۵</p>
+        </div>
+        <button class="btn-current"><i class="fa-solid fa-plus"></i> افزودن محصول جدید</button>
+      </div>
+
+      <!-- ============ STAT CARDS ============ -->
+      <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:var(--grad-primary);"><i class="fa-solid fa-box-open"></i></div>
+              <div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۸.۲٪</div>
+            </div>
+            <div>
+              <div class="stat-value" data-count="486">۰</div>
+              <div class="stat-label">کل محصولات فعال</div>
+            </div>
+            <div id="sparkProducts" class="stat-spark"></div>
+          </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:var(--grad-orange);"><i class="fa-solid fa-cart-shopping"></i></div>
+              <div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۱۲.۴٪</div>
+            </div>
+            <div>
+              <div class="stat-value" data-count="93">۰</div>
+              <div class="stat-label">سفارش‌های امروز</div>
+            </div>
+            <div id="sparkOrders" class="stat-spark"></div>
+          </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:var(--grad-green);"><i class="fa-solid fa-users"></i></div>
+              <div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ۵.۱٪</div>
+            </div>
+            <div>
+              <div class="stat-value" data-count="12480">۰</div>
+              <div class="stat-label">کل مشتریان</div>
+            </div>
+            <div id="sparkCustomers" class="stat-spark"></div>
+          </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+          <div class="gcard stat-card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:var(--grad-purple);"><i class="fa-solid fa-sack-dollar"></i></div>
+              <div class="stat-trend trend-down"><i class="fa-solid fa-arrow-trend-down"></i> ۲.۳٪</div>
+            </div>
+            <div>
+              <div class="stat-value"><span class="num" data-count="2840" data-suffix="M">۰</span></div>
+              <div class="stat-label">درآمد ماهانه (تومان)</div>
+            </div>
+            <div id="sparkRevenue" class="stat-spark"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ CHARTS ROW 1 ============ -->
+      <div class="row g-4 mb-4">
+        <div class="col-xl-7">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>روند فروش ماهانه</h2><div class="sub">درآمد و تعداد سفارش‌ها در ۱۲ ماه گذشته</div></div>
+              <span class="link-more">گزارش کامل</span>
+            </div>
+            <div class="gcard-body">
+              <div id="chartSales"></div>
+              <div class="legend-row">
+                <span><i style="background:var(--blue);"></i> درآمد (میلیون تومان)</span>
+                <span><i style="background:var(--purple);"></i> تعداد سفارش</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-5">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>ترافیک و نرخ تبدیل</h2><div class="sub">بازدید روزانه فروشگاه آنلاین</div></div>
+            </div>
+            <div class="gcard-body">
+              <div id="chartTraffic" style="margin-top:-6px;"></div>
+              <div class="row g-3 mt-1 text-center">
+                <div class="col-6">
+                  <div id="chartConversion"></div>
+                  <div class="stat-label" style="margin-top:-10px;">نرخ تبدیل</div>
+                </div>
+                <div class="col-6 d-flex flex-column justify-content-center">
+                  <div class="stat-value" style="font-size:22px;">۴.۸٪</div>
+                  <div class="stat-trend trend-up mx-auto mt-1"><i class="fa-solid fa-arrow-trend-up"></i> ۰.۶٪ از هفته قبل</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ CHARTS ROW 2 ============ -->
+      <div class="row g-4 mb-4">
+        <div class="col-xl-6">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>پرفروش‌ترین اسکوترها</h2><div class="sub">بر اساس تعداد فروش این ماه</div></div>
+            </div>
+            <div class="gcard-body"><div id="chartTopSelling"></div></div>
+          </div>
+        </div>
+        <div class="col-xl-6">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>وضعیت موجودی انبار</h2><div class="sub">سطح موجودی به نسبت ظرفیت کل</div></div>
+            </div>
+            <div class="gcard-body"><div id="chartInventory"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ORDERS + ACTIVITY ============ -->
+      <div class="row g-4 mb-4">
+        <div class="col-xl-8">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>سفارش‌های اخیر</h2><div class="sub">۶ سفارش ثبت‌شده آخر</div></div>
+              <span class="link-more">مشاهده همه</span>
+            </div>
+            <div class="gcard-body" style="overflow-x:auto;">
+              <table class="table-modern">
+                <thead>
+                  <tr>
+                    <th>شماره سفارش</th><th>مشتری</th><th>محصول</th><th>مبلغ</th><th>وضعیت</th><th>تاریخ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="num">#۳۲۹۸</td>
+                    <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=12"><div><div class="nm">نیلوفر جلیلی</div><div class="id">CUS-1042</div></div></div></td>
+                    <td>اسکوتر برقی نوا X1</td>
+                    <td class="num">۲۸,۵۰۰,۰۰۰</td>
+                    <td><span class="badge-status st-pending">در انتظار</span></td>
+                    <td class="num">۱۴۰۵/۰۳/۳۰</td>
+                  </tr>
+                  <tr>
+                    <td class="num">#۳۲۹۷</td>
+                    <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=23"><div><div class="nm">میلاد احمدی</div><div class="id">CUS-1041</div></div></div></td>
+                    <td>اسکوتر شهری اوربیت</td>
+                    <td class="num">۱۹,۹۰۰,۰۰۰</td>
+                    <td><span class="badge-status st-processing">در حال پردازش</span></td>
+                    <td class="num">۱۴۰۵/۰۳/۲۹</td>
+                  </tr>
+                  <tr>
+                    <td class="num">#۳۲۹۶</td>
+                    <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=33"><div><div class="nm">علی مرادی</div><div class="id">CUS-0998</div></div></div></td>
+                    <td>اسکوتر فلش پرو</td>
+                    <td class="num">۳۴,۲۰۰,۰۰۰</td>
+                    <td><span class="badge-status st-shipped">ارسال شده</span></td>
+                    <td class="num">۱۴۰۵/۰۳/۲۸</td>
+                  </tr>
+                  <tr>
+                    <td class="num">#۳۲۹۵</td>
+                    <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=45"><div><div class="nm">سعید نوری</div><div class="id">CUS-0975</div></div></div></td>
+                    <td>اسکوتر آفرود ترندر</td>
+                    <td class="num">۴۱,۰۰۰,۰۰۰</td>
+                    <td><span class="badge-status st-delivered">تحویل شده</span></td>
+                    <td class="num">۱۴۰۵/۰۳/۲۷</td>
+                  </tr>
+                  <tr>
+                    <td class="num">#۳۲۹۴</td>
+                    <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=56"><div><div class="nm">پریسا کاظمی</div><div class="id">CUS-0954</div></div></div></td>
+                    <td>اسکوتر برقی نوا X1</td>
+                    <td class="num">۲۸,۵۰۰,۰۰۰</td>
+                    <td><span class="badge-status st-cancelled">لغو شده</span></td>
+                    <td class="num">۱۴۰۵/۰۳/۲۶</td>
+                  </tr>
+                  <tr>
+                    <td class="num">#۳۲۹۳</td>
+                    <td><div class="cust-cell"><img src="https://i.pravatar.cc/80?img=15"><div><div class="nm">رضا توکلی</div><div class="id">CUS-0932</div></div></div></td>
+                    <td>اسکوتر شهری اوربیت</td>
+                    <td class="num">۱۹,۹۰۰,۰۰۰</td>
+                    <td><span class="badge-status st-delivered">تحویل شده</span></td>
+                    <td class="num">۱۴۰۵/۰۳/۲۵</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-4">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>فعالیت‌های اخیر</h2></div>
+            </div>
+            <div class="gcard-body">
+              <div class="feed-item">
+                <div class="feed-ico" style="background:rgba(47,111,237,.12);color:var(--blue);"><i class="fa-solid fa-cart-shopping"></i></div>
+                <div class="feed-txt"><p>سفارش جدید دریافت شد</p><span>سفارش #۳۲۹۸ — ۲ دقیقه پیش</span></div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-ico" style="background:rgba(124,92,252,.12);color:var(--purple);"><i class="fa-solid fa-box"></i></div>
+                <div class="feed-txt"><p>محصول جدید اضافه شد</p><span>اسکوتر آفرود ترندر X2 — ۴۵ دقیقه پیش</span></div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-ico" style="background:rgba(245,158,11,.13);color:var(--orange);"><i class="fa-solid fa-star"></i></div>
+                <div class="feed-txt"><p>دیدگاه جدید ثبت شد</p><span>امتیاز ۵ ستاره — ۱ ساعت پیش</span></div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-ico" style="background:rgba(16,185,129,.13);color:var(--green);"><i class="fa-solid fa-truck"></i></div>
+                <div class="feed-txt"><p>وضعیت سفارش به‌روزرسانی شد</p><span>سفارش #۳۲۹۰ ارسال شد — ۳ ساعت پیش</span></div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-ico" style="background:rgba(239,68,68,.12);color:var(--red);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="feed-txt"><p>هشدار کاهش موجودی</p><span>اسکوتر فلش پرو — ۵ ساعت پیش</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ BEST SELLING + NOTIFICATIONS ============ -->
+      <div class="row g-4">
+        <div class="col-xl-8">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>پرفروش‌ترین اسکوترها</h2><div class="sub">عملکرد محصولات در ماه جاری</div></div>
+              <span class="link-more">مدیریت محصولات</span>
+            </div>
+            <div class="gcard-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="product-row">
+                    <div class="product-thumb" style="background:var(--grad-primary);"><i class="fa-solid fa-motorcycle"></i></div>
+                    <div class="product-info">
+                      <div class="pname">اسکوتر برقی نوا X1</div>
+                      <div class="pmeta"><span>۳۲۰ فروش</span><span>۲۸.۵M تومان</span></div>
+                      <div class="stock-bar"><div style="width:72%;background:var(--green);"></div></div>
+                    </div>
+                    <div class="qbtn"><i class="fa-solid fa-arrow-up-left-from-circle"></i></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="product-row">
+                    <div class="product-thumb" style="background:var(--grad-orange);"><i class="fa-solid fa-motorcycle"></i></div>
+                    <div class="product-info">
+                      <div class="pname">اسکوتر فلش پرو</div>
+                      <div class="pmeta"><span>۲۷۸ فروش</span><span>۳۴.۲M تومان</span></div>
+                      <div class="stock-bar"><div style="width:18%;background:var(--orange);"></div></div>
+                    </div>
+                    <div class="qbtn"><i class="fa-solid fa-arrow-up-left-from-circle"></i></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="product-row">
+                    <div class="product-thumb" style="background:var(--grad-green);"><i class="fa-solid fa-motorcycle"></i></div>
+                    <div class="product-info">
+                      <div class="pname">اسکوتر شهری اوربیت</div>
+                      <div class="pmeta"><span>۲۱۵ فروش</span><span>۱۹.۹M تومان</span></div>
+                      <div class="stock-bar"><div style="width:55%;background:var(--green);"></div></div>
+                    </div>
+                    <div class="qbtn"><i class="fa-solid fa-arrow-up-left-from-circle"></i></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="product-row">
+                    <div class="product-thumb" style="background:var(--grad-purple);"><i class="fa-solid fa-motorcycle"></i></div>
+                    <div class="product-info">
+                      <div class="pname">اسکوتر آفرود ترندر</div>
+                      <div class="pmeta"><span>۱۶۰ فروش</span><span>۴۱.۰M تومان</span></div>
+                      <div class="stock-bar"><div style="width:8%;background:var(--red);"></div></div>
+                    </div>
+                    <div class="qbtn"><i class="fa-solid fa-arrow-up-left-from-circle"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-4">
+          <div class="gcard h-100">
+            <div class="gcard-head">
+              <div><h2>مرکز اعلان‌ها</h2><div class="sub">به‌روزرسانی‌های مهم سیستم</div></div>
+            </div>
+            <div class="gcard-body" style="max-height:320px;overflow-y:auto;" class="scroll-thin">
+              <div class="notif-item">
+                <div class="notif-prio" style="background:var(--red);"></div>
+                <div class="notif-ico" style="background:rgba(239,68,68,.12);color:var(--red);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="notif-body"><p>هشدار موجودی انبار</p><span class="d">موجودی «اسکوتر فلش پرو» رو به اتمام است</span><small>۲ دقیقه پیش</small></div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-prio" style="background:var(--blue);"></div>
+                <div class="notif-ico" style="background:rgba(47,111,237,.12);color:var(--blue);"><i class="fa-solid fa-cart-shopping"></i></div>
+                <div class="notif-body"><p>سفارش جدید ثبت شد</p><span class="d">سفارش #۳۲۹۸ از نیلوفر جلیلی</span><small>۱۸ دقیقه پیش</small></div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-prio" style="background:var(--orange);"></div>
+                <div class="notif-ico" style="background:rgba(245,158,11,.13);color:var(--orange);"><i class="fa-solid fa-star"></i></div>
+                <div class="notif-body"><p>دیدگاه جدید دریافت شد</p><span class="d">امتیاز ۴ ستاره برای اسکوتر اوربیت</span><small>۱ ساعت پیش</small></div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-prio" style="background:var(--green);"></div>
+                <div class="notif-ico" style="background:rgba(16,185,129,.13);color:var(--green);"><i class="fa-solid fa-truck"></i></div>
+                <div class="notif-body"><p>سفارش ارسال شد</p><span class="d">سفارش #۳۲۹۰ تحویل پیک شد</span><small>۳ ساعت پیش</small></div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-prio" style="background:var(--cyan);"></div>
+                <div class="notif-ico" style="background:rgba(34,211,238,.14);color:#0E7490;"><i class="fa-solid fa-box"></i></div>
+                <div class="notif-body"><p>محصول جدید افزوده شد</p><span class="d">اسکوتر آفرود ترندر X2 اضافه شد</span><small>دیروز</small></div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-prio" style="background:var(--purple);"></div>
+                <div class="notif-ico" style="background:rgba(124,92,252,.12);color:var(--purple);"><i class="fa-solid fa-user-plus"></i></div>
+                <div class="notif-body"><p>مشتری جدید ثبت‌نام کرد</p><span class="d">رضا توکلی به فروشگاه پیوست</span><small>۲ روز پیش</small></div>
+              </div>
+            </div>
+            <div class="px-3 pb-3">
+              <button class="btn-current w-100 justify-content-center" style="background:var(--bg);color:var(--blue);box-shadow:none;border:1px solid var(--border);">مشاهده همه اعلان‌ها</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center py-4" style="color:var(--text-muted);font-size:12px;">
+        © ۱۴۰۵ اسکوتیکس — پنل مدیریت فروشگاه اسکوتر برقی
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   THEME ENGINE (in-memory, no storage APIs)
+   ============================================================ */
+const body = document.body;
+const btnLight = document.getElementById('themeLight');
+const btnDark = document.getElementById('themeDark');
+let charts = {};
+
+function applyChartTheme(isDark){
+  Object.values(charts).forEach(c=>{
+    if(!c) return;
+    c.updateOptions({
+      theme:{ mode: isDark ? 'dark' : 'light' },
+      chart:{ foreColor: isDark ? '#9099B3' : '#646E84' },
+      grid:{ borderColor: isDark ? 'rgba(255,255,255,.08)' : 'rgba(11,17,32,.08)' },
+      tooltip:{ theme: isDark ? 'dark' : 'light' }
+    }, false, true);
+  });
+}
+function setTheme(mode){
+  body.setAttribute('data-theme', mode);
+  btnLight.classList.toggle('active', mode==='light');
+  btnDark.classList.toggle('active', mode==='dark');
+  applyChartTheme(mode==='dark');
+}
+btnLight.addEventListener('click', ()=>setTheme('light'));
+btnDark.addEventListener('click', ()=>setTheme('dark'));
+if(window.matchMedia('(prefers-color-scheme: dark)').matches){ setTheme('dark'); }
+
+/* ============================================================
+   DROPDOWNS
+   ============================================================ */
+function wireDropdown(btnId, panelId){
+  const btn = document.getElementById(btnId);
+  const panel = document.getElementById(panelId);
+  btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    document.querySelectorAll('.dropdown-panel').forEach(p=>{ if(p!==panel) p.classList.remove('show'); });
+    panel.classList.toggle('show');
+  });
+}
+wireDropdown('notifBtn','notifPanel');
+wireDropdown('profileBtn','profilePanel');
+document.addEventListener('click', ()=> document.querySelectorAll('.dropdown-panel').forEach(p=>p.classList.remove('show')) );
+
+/* ============================================================
+   MOBILE SIDEBAR
+   ============================================================ */
+const sidebar = document.getElementById('sidebar');
+const sbBackdrop = document.getElementById('sbBackdrop');
+document.getElementById('sbToggle').addEventListener('click', ()=>{
+  sidebar.classList.add('show'); sbBackdrop.classList.add('show');
+});
+sbBackdrop.addEventListener('click', ()=>{
+  sidebar.classList.remove('show'); sbBackdrop.classList.remove('show');
+});
+
+/* ============================================================
+   ANIMATED COUNTERS
+   ============================================================ */
+function animateCounter(el){
+  const target = parseInt(el.getAttribute('data-count'),10);
+  const suffix = el.getAttribute('data-suffix') || '';
+  const duration = 1400;
+  const start = performance.now();
+  function toPersianDigits(n){
+    return n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+  }
+  function tick(now){
+    const p = Math.min(1, (now-start)/duration);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = Math.floor(eased*target);
+    el.textContent = toPersianDigits(val.toLocaleString('en-US')) + (suffix? ' '+suffix : '');
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+const counterObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ animateCounter(e.target); counterObserver.unobserve(e.target); }
+  });
+},{threshold:.4});
+document.querySelectorAll('[data-count]').forEach(el=>counterObserver.observe(el));
+
+/* ============================================================
+   APEXCHARTS — shared palette
+   ============================================================ */
+const palette = { blue:'#2F6FED', purple:'#7C5CFC', cyan:'#22D3EE', green:'#10B981', orange:'#F59E0B', red:'#EF4444' };
+const baseFont = "'Vazirmatn', sans-serif";
+
+// 1) Monthly sales: revenue (area) + orders (line)
+charts.sales = new ApexCharts(document.querySelector('#chartSales'), {
+  chart:{ type:'line', height:300, fontFamily:baseFont, toolbar:{show:false}, animations:{easing:'easeinout'} },
+  series:[
+    { name:'درآمد', type:'area', data:[120,135,128,150,162,158,170,182,176,195,205,214] },
+    { name:'سفارش‌ها', type:'line', data:[60,68,64,72,80,78,84,90,88,96,101,108] }
+  ],
+  stroke:{ width:[0,3], curve:'smooth' },
+  fill:{
+    type:['gradient','solid'],
+    gradient:{ shadeIntensity:1, opacityFrom:.45, opacityTo:0, stops:[0,90,100] }
+  },
+  colors:[palette.blue, palette.purple],
+  dataLabels:{ enabled:false },
+  xaxis:{ categories:['فرو','ارد','خرد','تیر','مرد','شهر','مهر','آبا','آذر','دی','بهم','اسف'], labels:{ style:{ fontSize:'11px' } }, axisBorder:{show:false}, axisTicks:{show:false} },
+  yaxis:{ opposite:true, labels:{ style:{ fontSize:'11px' } } },
+  grid:{ borderColor:'rgba(11,17,32,.08)', strokeDashArray:4 },
+  tooltip:{ shared:true },
+  legend:{ show:false }
+});
+charts.sales.render();
+
+// 2) Daily visits area
+charts.traffic = new ApexCharts(document.querySelector('#chartTraffic'), {
+  chart:{ type:'area', height:130, fontFamily:baseFont, sparkline:{enabled:true} },
+  series:[{ name:'بازدید', data:[210,260,240,300,280,340,400,380,420,460,440,500] }],
+  stroke:{ width:2.5, curve:'smooth' },
+  fill:{ type:'gradient', gradient:{ shadeIntensity:1, opacityFrom:.5, opacityTo:0 } },
+  colors:[palette.cyan],
+  tooltip:{ x:{show:false} }
+});
+charts.traffic.render();
+
+// 3) Conversion radial
+charts.conversion = new ApexCharts(document.querySelector('#chartConversion'), {
+  chart:{ type:'radialBar', height:130, fontFamily:baseFont },
+  series:[48],
+  plotOptions:{ radialBar:{ hollow:{size:'58%'}, dataLabels:{ value:{ fontSize:'15px', fontWeight:700, formatter:v=>v+'%' } } } },
+  colors:[palette.purple],
+  stroke:{ lineCap:'round' },
+  labels:['نرخ تبدیل']
+});
+charts.conversion.render();
+
+// 4) Top selling scooters bar
+charts.topSelling = new ApexCharts(document.querySelector('#chartTopSelling'), {
+  chart:{ type:'bar', height:300, fontFamily:baseFont, toolbar:{show:false} },
+  series:[{ name:'تعداد فروش', data:[320,278,215,160,134] }],
+  plotOptions:{ bar:{ borderRadius:8, horizontal:true, distributed:true, barHeight:'52%' } },
+  colors:[palette.blue, palette.purple, palette.cyan, palette.orange, palette.green],
+  dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:700 } },
+  xaxis:{ categories:['نوا X1','فلش پرو','اوربیت','ترندر','مینی کامپکت'], labels:{style:{fontSize:'11px'}} },
+  grid:{ borderColor:'rgba(11,17,32,.08)', strokeDashArray:4 },
+  legend:{ show:false }
+});
+charts.topSelling.render();
+
+// 5) Inventory status
+charts.inventory = new ApexCharts(document.querySelector('#chartInventory'), {
+  chart:{ type:'bar', height:300, fontFamily:baseFont, toolbar:{show:false} },
+  series:[{ name:'موجودی فعلی', data:[72,18,55,8,40] }],
+  plotOptions:{ bar:{ borderRadius:8, horizontal:true, barHeight:'52%',
+    colors:{ ranges:[
+      {from:0,to:15,color:palette.red},
+      {from:16,to:40,color:palette.orange},
+      {from:41,to:100,color:palette.green}
+    ]}
+  }},
+  dataLabels:{ enabled:true, formatter:v=>v+'%', style:{fontSize:'11px',fontWeight:700} },
+  xaxis:{ categories:['نوا X1','فلش پرو','اوربیت','ترندر','مینی کامپکت'], max:100, labels:{style:{fontSize:'11px'}} },
+  grid:{ borderColor:'rgba(11,17,32,.08)', strokeDashArray:4 },
+  legend:{ show:false }
+});
+charts.inventory.render();
+
+// 6) Mini sparklines on stat cards
+function spark(id, data, color){
+  charts[id] = new ApexCharts(document.querySelector('#'+id), {
+    chart:{ type:'area', height:34, sparkline:{enabled:true} },
+    series:[{ data }],
+    stroke:{ width:2, curve:'smooth' },
+    fill:{ type:'gradient', gradient:{ shadeIntensity:1, opacityFrom:.4, opacityTo:0 } },
+    colors:[color],
+    tooltip:{ enabled:false }
+  });
+  charts[id].render();
+}
+spark('sparkProducts', [30,34,32,40,38,44,48,46], palette.blue);
+spark('sparkOrders', [10,18,14,22,19,26,24,30], palette.orange);
+spark('sparkCustomers', [40,42,46,44,50,52,55,58], palette.green);
+spark('sparkRevenue', [60,58,55,50,48,44,40,38], palette.purple);
+</script>
+</body>
+</html>

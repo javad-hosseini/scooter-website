@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ارتباط با ما | اسکوتر برقی لوکس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0A0A0A;
+  --bg-secondary: #141414;
+  --bg-card: #1D1D1D;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --gold: #D4AF37;
+  --gold-hover: #E5C158;
+  --border: rgba(255,255,255,0.08);
+  --border-hover: rgba(212,175,55,0.3);
+  --font: 'Vazirmatn', sans-serif;
+}
+
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  direction: rtl;
+  text-align: right;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,175,55,0.08) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 20% 80%, rgba(212,175,55,0.04) 0%, transparent 60%),
+              #0A0A0A;
+}
+
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 80%);
+}
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,175,55,0.06) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem 1.5rem;
+  max-width: 760px;
+  animation: heroIn 1.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  padding: 0.45rem 1.25rem;
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 100px;
+  background: rgba(212,175,55,0.04);
+}
+
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  width: 20px; height: 1px;
+  background: var(--gold);
+  opacity: 0.5;
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #FFFFFF 0%, rgba(255,255,255,0.75) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--text-secondary);
+  font-weight: 400;
+  max-width: 520px;
+  margin: 0 auto 3rem;
+  line-height: 1.8;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.85rem 2.2rem;
+  background: var(--gold);
+  color: #0A0A0A;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  letter-spacing: 0.02em;
+}
+
+.btn-gold:hover {
+  background: var(--gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(212,175,55,0.25);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.85rem 2.2rem;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+
+.btn-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  animation: scrollBob 2s ease-in-out infinite;
+}
+
+@keyframes scrollBob {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.5; }
+  50% { transform: translateX(-50%) translateY(6px); opacity: 1; }
+}
+
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+}
+
+/* ─── SECTION COMMON ─── */
+.section { padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem); }
+
+.section-inner { max-width: 1280px; margin: 0 auto; }
+
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
+.section-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 560px;
+  line-height: 1.8;
+  margin-bottom: 3.5rem;
+}
+
+.divider {
+  width: 60px; height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  margin-bottom: 2rem;
+}
+
+/* ─── CONTACT METHODS ─── */
+.contact-methods { background: var(--bg-secondary); }
+
+.methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5px;
+  background: var(--border);
+  border: 1.5px solid var(--border);
+}
+
+.method-card {
+  background: var(--bg-card);
+  padding: 2.5rem 2rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+}
+
+.method-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(212,175,55,0.04), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.method-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+
+.method-card:hover::before { opacity: 1; }
+.method-card:hover::after { transform: scaleX(1); }
+
+.method-card:hover { background: #222; }
+.method-card:hover .method-icon { color: var(--gold); transform: scale(1.1); }
+.method-card:hover .method-title { color: var(--gold); }
+
+.method-icon {
+  font-size: 2rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  display: block;
+  transition: all 0.4s ease;
+  line-height: 1;
+}
+
+.method-icon svg {
+  width: 36px; height: 36px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.method-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s;
+}
+
+.method-value {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+  direction: ltr;
+  text-align: right;
+}
+
+.method-sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.method-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+}
+
+.method-action svg {
+  width: 14px; height: 14px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2;
+  transition: transform 0.3s ease;
+}
+
+.method-card:hover .method-action svg { transform: translateX(-4px); }
+
+/* ─── CONTACT FORM ─── */
+.contact-form-section { background: var(--bg-primary); }
+
+.form-container {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+.form-info { padding-top: 1rem; }
+
+.form-info .section-desc { margin-bottom: 2.5rem; }
+
+.contact-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.contact-detail:last-child { border-bottom: none; margin-bottom: 0; }
+
+.contact-detail-icon {
+  width: 42px; height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--gold);
+}
+
+.contact-detail-icon svg {
+  width: 18px; height: 18px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contact-detail-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+.contact-detail-val {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  direction: ltr;
+  text-align: right;
+}
+
+/* Glass Form */
+.glass-form {
+  background: rgba(29,29,29,0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-form::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-group { margin-bottom: 1.25rem; }
+.form-group:last-of-type { margin-bottom: 0; }
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.05em;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.85rem 1.1rem;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  outline: none;
+  direction: rtl;
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: rgba(161,161,170,0.5);
+  font-size: 0.9rem;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.03);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.07);
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.7;
+}
+
+.form-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.form-note {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.9rem 2.5rem;
+  background: var(--gold);
+  color: #0A0A0A;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  letter-spacing: 0.03em;
+}
+
+.btn-submit:hover {
+  background: var(--gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(212,175,55,0.3);
+}
+
+.btn-submit svg {
+  width: 18px; height: 18px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform 0.3s ease;
+}
+
+.btn-submit:hover svg { transform: translateX(-4px); }
+
+/* ─── MAP ─── */
+.map-section { background: var(--bg-secondary); padding: 0; }
+
+.map-header {
+  padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.map-wrapper {
+  position: relative;
+  height: clamp(400px, 55vw, 600px);
+  overflow: hidden;
+}
+
+.map-iframe {
+  width: 100%; height: 100%;
+  border: none;
+  filter: invert(0.92) hue-rotate(180deg) saturate(0.5) brightness(0.85);
+  display: block;
+}
+
+.map-card {
+  position: absolute;
+  top: 2.5rem;
+  right: clamp(1.5rem, 5vw, 4rem);
+  background: rgba(20,20,20,0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2rem 1.75rem;
+  max-width: 320px;
+  width: calc(100% - 3rem);
+  z-index: 10;
+}
+
+.map-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.map-card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.map-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.map-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+.map-item-icon {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--gold);
+}
+
+.map-item-icon svg {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.map-item-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+.map-item-val {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ─── BUSINESS ─── */
+.business-section {
+  background: var(--bg-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.business-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.business-visual {
+  position: relative;
+}
+
+.business-visual-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.business-visual-box::before {
+  content: '';
+  position: absolute;
+  top: -40%; right: -40%;
+  width: 80%; height: 80%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%);
+}
+
+.biz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.biz-stat:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+
+.biz-stat-num {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.biz-stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ─── FAQ ─── */
+.faq-section { background: var(--bg-secondary); }
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5px;
+  background: var(--border);
+  border: 1.5px solid var(--border);
+  margin-top: 1rem;
+}
+
+.faq-item {
+  background: var(--bg-card);
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+
+.faq-item:hover { background: #212121; }
+
+.faq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.75rem 2rem;
+  gap: 1rem;
+}
+
+.faq-q {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.faq-toggle {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.faq-toggle svg {
+  width: 14px; height: 14px;
+  stroke: var(--gold); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform 0.3s ease;
+}
+
+.faq-item.open .faq-toggle { border-color: var(--gold); background: rgba(212,175,55,0.08); }
+.faq-item.open .faq-toggle svg { transform: rotate(45deg); }
+.faq-item.open .faq-q { color: var(--gold); }
+
+.faq-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+
+.faq-body-inner {
+  padding: 0 2rem 1.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.85;
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+/* ─── SOCIAL ─── */
+.social-section { background: var(--bg-primary); }
+
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.social-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2.25rem 1.75rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.social-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(212,175,55,0.05), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.social-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.4);
+}
+
+.social-card:hover::after { opacity: 1; }
+
+.social-card:hover .social-icon { transform: scale(1.1); }
+
+.social-icon {
+  width: 52px; height: 52px;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.4s ease;
+}
+
+.social-icon svg {
+  width: 26px; height: 26px;
+  stroke: #fff; fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.social-icon.ig { background: linear-gradient(135deg, #405DE6, #833AB4, #C13584, #E1306C, #FD1D1D, #F77737); }
+.social-icon.tg { background: #229ED9; }
+.social-icon.wa { background: #25D366; }
+.social-icon.li { background: #0A66C2; }
+
+.social-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.social-handle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  direction: ltr;
+  text-align: right;
+}
+
+.social-cta {
+  margin-top: auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.social-cta svg {
+  width: 12px; height: 12px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* ─── FINAL CTA ─── */
+.final-cta {
+  background: var(--bg-secondary);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: clamp(5rem,10vw,10rem) clamp(1.5rem,5vw,4rem);
+}
+
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(212,175,55,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.final-cta-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+
+.final-cta-line {
+  width: 40px; height: 1px;
+  background: var(--gold);
+  margin: 0 auto 2rem;
+  opacity: 0.6;
+}
+
+.final-cta h2 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+  line-height: 1.2;
+}
+
+.final-cta p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+}
+
+/* ─── FOOTER ─── */
+.footer {
+  background: #0A0A0A;
+  border-top: 1px solid var(--border);
+  padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,4rem) 2rem;
+}
+
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 3rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.footer-brand {}
+
+.footer-logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.footer-brand-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 260px;
+  margin-bottom: 1.5rem;
+}
+
+.footer-social-links {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.footer-social-link {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.footer-social-link:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212,175,55,0.06);
+}
+
+.footer-social-link svg {
+  width: 15px; height: 15px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.footer-col-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.footer-links li a {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-links li a::before {
+  content: '';
+  width: 0; height: 1px;
+  background: var(--gold);
+  transition: width 0.3s ease;
+  flex-shrink: 0;
+}
+
+.footer-links li a:hover { color: var(--gold); }
+.footer-links li a:hover::before { width: 12px; }
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-copy {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  direction: rtl;
+}
+
+.footer-copy span { color: var(--gold); }
+
+.footer-legal {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.footer-legal li a {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-legal li a:hover { color: var(--gold); }
+
+/* ─── SCROLL ANIMATIONS ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .form-container { grid-template-columns: 1fr; gap: 3rem; }
+  .business-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+}
+
+@media (max-width: 768px) {
+  .faq-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .map-card { max-width: calc(100% - 3rem); top: 1.5rem; right: 1.5rem; }
+}
+
+@media (max-width: 640px) {
+  .hero-btns { flex-direction: column; align-items: center; }
+  .btn-gold, .btn-outline { width: 100%; max-width: 300px; justify-content: center; }
+  .methods-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .social-grid { grid-template-columns: 1fr 1fr; }
+  .form-submit { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .btn-submit { width: 100%; justify-content: center; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+  .map-card { position: relative; top: auto; right: auto; max-width: 100%;
+              margin: 1.5rem; width: calc(100% - 3rem); }
+  .map-wrapper { height: 280px; }
+}
+
+@media (max-width: 480px) {
+  .social-grid { grid-template-columns: 1fr; }
+  .glass-form { padding: 2rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">تماس با ما</span>
+    <h1>ارتباط با ما</h1>
+    <p class="hero-sub">ما همیشه آماده پاسخگویی، مشاوره و همراهی شما هستیم.</p>
+    <div class="hero-btns">
+      <a href="#contact-form" class="btn-gold">
+        تماس با کارشناسان
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.84 9.22 19.79 19.79 0 01.77 4.6 2 2 0 012.77 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      </a>
+      <a href="#contact-form" class="btn-outline">
+        ارسال پیام
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span style="font-size:0.68rem;letter-spacing:0.15em;">اسکرول کنید</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- CONTACT METHODS -->
+<section class="section contact-methods">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">روش‌های ارتباطی</div>
+      <h2 class="section-title">چگونه با ما ارتباط برقرار کنید</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="methods-grid">
+
+      <a href="tel:+982100000000" class="method-card reveal reveal-delay-1">
+        <span class="method-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.84 9.22 19.79 19.79 0 01.77 4.6 2 2 0 012.77 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        </span>
+        <div class="method-title">تماس تلفنی</div>
+        <div class="method-value" dir="ltr">+98 21 0000 0000</div>
+        <div class="method-sub">شنبه تا پنجشنبه<br>۸ صبح تا ۶ بعداز‌ظهر</div>
+        <div class="method-action">
+          تماس بگیرید
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+      <a href="mailto:info@luxescooter.ir" class="method-card reveal reveal-delay-2">
+        <span class="method-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </span>
+        <div class="method-title">ایمیل</div>
+        <div class="method-value" dir="ltr">info@luxescooter.ir</div>
+        <div class="method-sub">پاسخگویی در کمتر از ۲۴ ساعت</div>
+        <div class="method-action">
+          ارسال ایمیل
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+      <a href="https://wa.me/989100000000" class="method-card reveal reveal-delay-3">
+        <span class="method-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </span>
+        <div class="method-title">واتساپ</div>
+        <div class="method-value" dir="ltr">+98 910 000 0000</div>
+        <div class="method-sub">ارتباط مستقیم و پشتیبانی آنی</div>
+        <div class="method-action">
+          ارسال پیام
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+      <a href="#map" class="method-card reveal reveal-delay-4">
+        <span class="method-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </span>
+        <div class="method-title">آدرس دفتر</div>
+        <div class="method-value">تهران، خیابان ولیعصر</div>
+        <div class="method-sub">پاسداران، خیابان هویزه، پلاک ۱۲</div>
+        <div class="method-action">
+          نمایش روی نقشه
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT FORM -->
+<section class="section contact-form-section" id="contact-form">
+  <div class="section-inner">
+    <div class="form-container">
+      <div class="form-info reveal">
+        <div class="section-label">فرم تماس</div>
+        <h2 class="section-title">پیام خود را<br>برای ما بنویسید</h2>
+        <div class="divider"></div>
+        <p class="section-desc">تیم متخصص ما آماده پاسخگویی به تمامی سوالات، مشاوره و همراهی شما در انتخاب محصول مناسب است.</p>
+
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.84 9.22A19.79 19.79 0 01.77 4.6A2 2 0 012.77 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <div class="contact-detail-label">تلفن</div>
+            <div class="contact-detail-val" dir="ltr">+98 21 0000 0000</div>
+          </div>
+        </div>
+
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="contact-detail-label">ایمیل</div>
+            <div class="contact-detail-val" dir="ltr">info@luxescooter.ir</div>
+          </div>
+        </div>
+
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="contact-detail-label">ساعات کاری</div>
+            <div class="contact-detail-val">شنبه تا پنجشنبه — ۸ صبح تا ۶ عصر</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-form reveal reveal-delay-2">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">نام و نام خانوادگی</label>
+            <input type="text" class="form-input" placeholder="مثال: علی رضایی">
+          </div>
+          <div class="form-group">
+            <label class="form-label">شماره تماس</label>
+            <input type="tel" class="form-input" placeholder="۰۹۱۰ ۰۰۰ ۰۰۰۰" dir="ltr" style="text-align:right;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ایمیل</label>
+          <input type="email" class="form-input" placeholder="example@email.com" dir="ltr" style="text-align:right;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">موضوع</label>
+          <select class="form-select">
+            <option value="">— موضوع را انتخاب کنید —</option>
+            <option>خرید و سفارش</option>
+            <option>پشتیبانی فنی</option>
+            <option>همکاری تجاری</option>
+            <option>نمایندگی و فروش</option>
+            <option>سایر موارد</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">پیام</label>
+          <textarea class="form-textarea" placeholder="پیام خود را اینجا بنویسید..."></textarea>
+        </div>
+        <div class="form-submit">
+          <span class="form-note">اطلاعات شما محرمانه خواهد ماند</span>
+          <button class="btn-submit" type="button">
+            ارسال پیام
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-section" id="map">
+  <div class="map-header reveal">
+    <div class="section-label">موقعیت مکانی</div>
+    <h2 class="section-title">دفتر مرکزی ما</h2>
+    <div class="divider"></div>
+  </div>
+  <div class="map-wrapper">
+    <iframe class="map-iframe"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=51.3890%2C35.6870%2C51.4290%2C35.7270&amp;layer=mapnik&amp;marker=35.7070%2C51.4090"
+      loading="lazy" title="موقعیت دفتر">
+    </iframe>
+    <div class="map-card">
+      <div class="map-card-title">اطلاعات دفتر</div>
+      <div class="map-item">
+        <div class="map-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <div class="map-item-label">آدرس</div>
+          <div class="map-item-val">تهران، ولیعصر، خ. هویزه<br>پلاک ۱۲، واحد ۵</div>
+        </div>
+      </div>
+      <div class="map-item">
+        <div class="map-item-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <div class="map-item-label">ساعات کاری</div>
+          <div class="map-item-val">شنبه–پنجشنبه<br>۸:۰۰ صبح — ۱۸:۰۰ عصر</div>
+        </div>
+      </div>
+      <div class="map-item">
+        <div class="map-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.84 9.22A19.79 19.79 0 01.77 4.6A2 2 0 012.77 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <div>
+          <div class="map-item-label">تلفن</div>
+          <div class="map-item-val" dir="ltr" style="text-align:right;">+98 21 0000 0000</div>
+        </div>
+      </div>
+      <div class="map-item">
+        <div class="map-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <div class="map-item-label">ایمیل</div>
+          <div class="map-item-val" dir="ltr" style="text-align:right;">info@luxescooter.ir</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS SUPPORT -->
+<section class="section business-section">
+  <div class="section-inner business-inner">
+    <div class="reveal">
+      <div class="section-label">مشارکت</div>
+      <h2 class="section-title">همکاری تجاری</h2>
+      <div class="divider"></div>
+      <p class="section-desc">برای همکاری، نمایندگی و فروش عمده با ما در ارتباط باشید. تیم ما آماده بررسی پیشنهادات و راهنمایی شما است.</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:0.8rem;margin-bottom:2.5rem;">
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.9rem;color:var(--text-secondary);">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></span>
+          دریافت نمایندگی رسمی در سراسر کشور
+        </li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.9rem;color:var(--text-secondary);">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></span>
+          فروش عمده با شرایط اختصاصی
+        </li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.9rem;color:var(--text-secondary);">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></span>
+          همکاری با کسب‌وکارها و سازمان‌ها
+        </li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.9rem;color:var(--text-secondary);">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></span>
+          پشتیبانی اختصاصی برای شرکای تجاری
+        </li>
+      </ul>
+      <a href="mailto:business@luxescooter.ir" class="btn-gold">
+        درخواست همکاری
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="business-visual reveal reveal-delay-2">
+      <div class="business-visual-box">
+        <div class="biz-stat">
+          <div class="biz-stat-num">+۲۰۰</div>
+          <div class="biz-stat-label">نمایندگی فعال در کشور</div>
+        </div>
+        <div class="biz-stat">
+          <div class="biz-stat-num">+۱۵K</div>
+          <div class="biz-stat-label">مشتری راضی</div>
+        </div>
+        <div class="biz-stat">
+          <div class="biz-stat-num">۸</div>
+          <div class="biz-stat-label">سال تجربه در صنعت</div>
+        </div>
+        <div class="biz-stat">
+          <div class="biz-stat-num">۲۴/۷</div>
+          <div class="biz-stat-label">پشتیبانی شرکای تجاری</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section faq-section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">سوالات متداول</div>
+      <h2 class="section-title">پاسخ به سوالات شما</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="faq-grid reveal">
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-header">
+          <div class="faq-q">چگونه سفارش ثبت کنم؟</div>
+          <div class="faq-toggle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-body-inner">برای ثبت سفارش می‌توانید از طریق وب‌سایت اقدام کنید، محصول مورد نظر خود را انتخاب کرده و فرآیند پرداخت را تکمیل کنید. همچنین می‌توانید با تیم فروش ما تماس بگیرید تا راهنمایی لازم را دریافت کنید.</div>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-header">
+          <div class="faq-q">مدت زمان ارسال چقدر است؟</div>
+          <div class="faq-toggle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-body-inner">ارسال به تهران طی ۲ تا ۳ روز کاری و ارسال به سایر استان‌ها طی ۵ تا ۷ روز کاری انجام می‌شود. برای سفارش‌های خاص و مدل‌های سفارشی، مدت زمان بیشتری نیاز است.</div>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-header">
+          <div class="faq-q">آیا فروش عمده دارید؟</div>
+          <div class="faq-toggle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-body-inner">بله، برای خریدهای عمده بالای ۱۰ دستگاه شرایط و تخفیفات ویژه‌ای در نظر گرفته‌ایم. برای دریافت پیشنهاد قیمت عمده با بخش همکاری تجاری ما تماس بگیرید.</div>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-header">
+          <div class="faq-q">چگونه نمایندگی دریافت کنم؟</div>
+          <div class="faq-toggle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-body-inner">برای دریافت نمایندگی فرم درخواست همکاری تجاری را تکمیل کنید یا مستقیم با بخش توسعه شبکه فروش ما تماس بگیرید. مدارک لازم و شرایط اعطای نمایندگی در پاسخ برای شما ارسال خواهد شد.</div>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-header">
+          <div class="faq-q">گارانتی محصولات چند سال است؟</div>
+          <div class="faq-toggle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-body-inner">تمامی محصولات ما دارای گارانتی ۲ ساله رسمی هستند. باتری دارای گارانتی اختصاصی ۱ ساله است و خدمات پس از فروش در بیش از ۵۰ نمایندگی مجاز در سراسر کشور ارائه می‌شود.</div>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-header">
+          <div class="faq-q">آیا امکان بازگشت کالا وجود دارد؟</div>
+          <div class="faq-toggle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-body-inner">بله، در صورت وجود نقص فنی یا مغایرت با مشخصات تبلیغ‌شده، امکان مرجوعی کالا تا ۷ روز از تاریخ تحویل وجود دارد. برای این موارد با واحد پشتیبانی ما تماس بگیرید.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL MEDIA -->
+<section class="section social-section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">شبکه‌های اجتماعی</div>
+      <h2 class="section-title">ما را دنبال کنید</h2>
+      <div class="divider"></div>
+      <p class="section-desc">از آخرین محصولات، اخبار و محتوای اختصاصی ما در شبکه‌های اجتماعی باخبر شوید.</p>
+    </div>
+    <div class="social-grid">
+
+      <a href="#" class="social-card reveal reveal-delay-1">
+        <div class="social-icon ig">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </div>
+        <div class="social-name">اینستاگرام</div>
+        <div class="social-handle">@luxescooter.ir</div>
+        <div class="social-cta">
+          دنبال کنید
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+      <a href="#" class="social-card reveal reveal-delay-2">
+        <div class="social-icon tg">
+          <svg viewBox="0 0 24 24"><path d="M21.198 2.433a2.242 2.242 0 00-1.022.215l-8.609 3.33c-2.068.8-4.133 1.598-5.724 2.21a405.15 405.15 0 01-2.849 1.09c-.42.147-.99.332-1.473.901-.728.968.193 1.798.919 2.286 1.61.516 3.275 1.009 4.654 1.472.846 1.467 1.618 2.981 2.364 4.499a1.16 1.16 0 001.977.16l2.7-2.788c.84.616 1.723 1.255 2.55 1.868.916.64 1.774 1.273 2.575 1.904a1.225 1.225 0 001.955-.604c1.076-4.22 2.2-8.445 3.297-12.665.285-1.094-.08-2.078-.823-2.472z"/></svg>
+        </div>
+        <div class="social-name">تلگرام</div>
+        <div class="social-handle">@luxescooter</div>
+        <div class="social-cta">
+          عضو شوید
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+      <a href="#" class="social-card reveal reveal-delay-3">
+        <div class="social-icon wa">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </div>
+        <div class="social-name">واتساپ</div>
+        <div class="social-handle">+98 910 000 0000</div>
+        <div class="social-cta">
+          پیام بدهید
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+      <a href="#" class="social-card reveal reveal-delay-4">
+        <div class="social-icon li">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </div>
+        <div class="social-name">لینکدین</div>
+        <div class="social-handle">LuxeScooter</div>
+        <div class="social-cta">
+          دنبال کنید
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-cta-inner reveal">
+    <div class="final-cta-line"></div>
+    <h2>در کنار شما هستیم</h2>
+    <p>برای دریافت مشاوره و اطلاعات بیشتر با ما در ارتباط باشید.<br>تیم متخصص ما آماده پاسخگویی است.</p>
+    <a href="#contact-form" class="btn-gold">
+      تماس با ما
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.84 9.22A19.79 19.79 0 01.77 4.6A2 2 0 012.77 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="footer-logo">LUXE SCOOTER</span>
+        <p class="footer-brand-desc">پیشگام در طراحی و تولید اسکوتر برقی لوکس. آینده‌ی حرکت را با ما تجربه کنید.</p>
+        <div class="footer-social-links">
+          <a href="#" class="footer-social-link" aria-label="اینستاگرام">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="#" class="footer-social-link" aria-label="تلگرام">
+            <svg viewBox="0 0 24 24"><path d="M21.198 2.433a2.242 2.242 0 00-1.022.215l-8.609 3.33c-2.068.8-4.133 1.598-5.724 2.21a405.15 405.15 0 01-2.849 1.09c-.42.147-.99.332-1.473.901-.728.968.193 1.798.919 2.286 1.61.516 3.275 1.009 4.654 1.472.846 1.467 1.618 2.981 2.364 4.499a1.16 1.16 0 001.977.16l2.7-2.788c.84.616 1.723 1.255 2.55 1.868.916.64 1.774 1.273 2.575 1.904a1.225 1.225 0 001.955-.604c1.076-4.22 2.2-8.445 3.297-12.665.285-1.094-.08-2.078-.823-2.472z"/></svg>
+          </a>
+          <a href="#" class="footer-social-link" aria-label="واتساپ">
+            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+          </a>
+          <a href="#" class="footer-social-link" aria-label="لینکدین">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-title">محصولات</div>
+        <ul class="footer-links">
+          <li><a href="#">اسکوتر شهری</a></li>
+          <li><a href="#">اسکوتر اسپرت</a></li>
+          <li><a href="#">اسکوتر تجاری</a></li>
+          <li><a href="#">لوازم جانبی</a></li>
+          <li><a href="#">قطعات یدکی</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">شرکت</div>
+        <ul class="footer-links">
+          <li><a href="#">درباره ما</a></li>
+          <li><a href="#">اخبار و مقالات</a></li>
+          <li><a href="#">مشاغل</a></li>
+          <li><a href="#">نمایندگی‌ها</a></li>
+          <li><a href="#">تماس با ما</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">پشتیبانی</div>
+        <ul class="footer-links">
+          <li><a href="#">مرکز راهنما</a></li>
+          <li><a href="#">گارانتی</a></li>
+          <li><a href="#">سرویس و تعمیر</a></li>
+          <li><a href="#">سوالات متداول</a></li>
+          <li><a href="#">ثبت شکایت</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">
+        © ۱۴۰۴ <span>LUXE SCOOTER</span> — تمامی حقوق محفوظ است
+      </p>
+      <ul class="footer-legal">
+        <li><a href="#">حریم خصوصی</a></li>
+        <li><a href="#">شرایط استفاده</a></li>
+        <li><a href="#">کوکی</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleFaq(el) {
+  const body = el.querySelector('.faq-body');
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(item => {
+    item.classList.remove('open');
+    item.querySelector('.faq-body').style.maxHeight = '0';
+  });
+  if (!isOpen) {
+    el.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+const heroGlow = document.querySelector('.hero-glow');
+if (heroGlow) {
+  document.querySelector('.hero').addEventListener('mousemove', (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    heroGlow.style.left = x + '%';
+    heroGlow.style.top = y + '%';
+    heroGlow.style.transform = 'translate(-50%, -50%)';
+  });
+}
+</script>
+</body>
+</html>

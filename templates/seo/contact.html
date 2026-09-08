@@ -1,0 +1,50 @@
+{% extends "seo/_page_base.html" %}
+
+{% block content %}
+<h1>تماس با ولتکس</h1>
+<p class="lede">
+  برای مشاوره خرید اسکوتر برقی، پیگیری سفارش یا خدمات پس از فروش از راه‌های
+  زیر با ما در ارتباط باشید.
+</p>
+
+<h2>راه‌های ارتباطی</h2>
+{% comment %}
+NAP (Name / Address / Phone) is marked up with hCard-style microformat classes
+as well as the Store JSON-LD in <head>. Keeping the visible text and the
+structured data identical is what makes the local citation consistent.
+{% endcomment %}
+<dl class="contact">
+  {% if organization.telephone %}
+  <dt>تلفن</dt>
+  <dd><a href="tel:{{ organization.telephone }}" dir="ltr">{{ organization.telephone }}</a></dd>
+  {% endif %}
+  {% if organization.email %}
+  <dt>ایمیل</dt>
+  <dd><a href="mailto:{{ organization.email }}">{{ organization.email }}</a></dd>
+  {% endif %}
+  <dt>ساعات کاری</dt>
+  <dd>شنبه تا چهارشنبه ۱۰:۰۰ تا ۱۹:۰۰ — پنجشنبه ۱۰:۰۰ تا ۱۵:۰۰</dd>
+</dl>
+
+<h2>شوروم</h2>
+<address style="font-style: normal">
+  <p>
+    {% if store.street_address %}{{ store.street_address }}<br />{% endif %}
+    {{ store.locality }}{% if store.region and store.region != store.locality %}، {{ store.region }}{% endif %}
+    {% if store.postal_code %}<br />کد پستی: <span dir="ltr">{{ store.postal_code }}</span>{% endif %}
+  </p>
+</address>
+{% if not store.street_address %}
+<p style="color: var(--muted); font-size: 13px">
+  نشانی دقیق شوروم به‌زودی در همین صفحه اعلام می‌شود.
+</p>
+{% endif %}
+
+<h2>پیش از تماس</h2>
+<p>
+  بسیاری از پرسش‌های رایج درباره گارانتی، ارسال و عمر باتری در صفحه
+  <a href="{% url 'seo:about' %}">درباره ما</a> پاسخ داده شده‌اند. برای مقایسه
+  مشخصات فنی مدل‌ها هم می‌توانید مستقیم به
+  <a href="{% url 'shop:product_list' %}">فهرست محصولات</a> مراجعه کنید.
+</p>
+{% endblock %}
