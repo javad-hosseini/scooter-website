@@ -15,10 +15,29 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from .jazzmin import *
 from .jazzmin import JAZZMIN_SETTINGS
-from decouple import config, Csv
+from decouple import Config, Csv, RepositoryEnv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ══════════════════════════════════════════════════════════════════════
+#  ENVIRONMENT SWITCH — 1 of 2
+#
+#  Switch this together with the DATABASES block further down (marked
+#  "ENVIRONMENT SWITCH — 2 of 2"). Both must point at the same
+#  environment.
+# ══════════════════════════════════════════════════════════════════════
+
+# ---- DEVELOPMENT (active) ----
+ENV_FILE = BASE_DIR / '.env.dev'
+
+# ---- PRODUCTION (commented out) ----
+# ENV_FILE = BASE_DIR / '.env.prod'
+
+# Explicit file, rather than decouple's search for a file named ".env".
+# Real environment variables still win over the file, so a container or
+# systemd unit can override any single value without editing anything.
+config = Config(RepositoryEnv(ENV_FILE))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -198,23 +217,40 @@ TEMPLATES = [
 LOGOUT_REDIRECT_URL = "/"
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# ══════════════════════════════════════════════════════════════════════
+#  ENVIRONMENT SWITCH — 2 of 2  (Database)
+#  https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+#
+#  Exactly one of the two blocks below is active. Switch this together
+#  with ENV_FILE at the top of this file.
+# ══════════════════════════════════════════════════════════════════════
 
+# ---- DEVELOPMENT — SQLite (active) ----
+# Needs no server and no DB_* variables in .env.dev.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
-        # Reuse connections between requests — cuts a TCP+TLS handshake off
-        # every request's TTFB.
-        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
-        'CONN_HEALTH_CHECKS': True,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# ---- PRODUCTION — PostgreSQL (commented out) ----
+# Uncomment this block, comment out the SQLite block above, and set
+# ENV_FILE to .env.prod.
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME'),
+#         'USER': config('DB_USER'),
+#         'PASSWORD': config('DB_PASSWORD'),
+#         'HOST': config('DB_HOST'),
+#         'PORT': config('DB_PORT'),
+#         # Reuse connections between requests — cuts a TCP+TLS handshake
+#         # off every request's TTFB.
+#         'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
+#         'CONN_HEALTH_CHECKS': True,
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

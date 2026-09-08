@@ -111,9 +111,12 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'user_name', 'user_profile_image', 'content', 'created_at', 'is_approved', 'parent',
+        # NOTE: raw ``user`` PK and the ``is_approved`` moderation flag are
+        # deliberately not exposed on the public feed — the PK enables user
+        # enumeration and the flag leaks moderation state.
+        fields = ['id', 'user_name', 'user_profile_image', 'content', 'created_at', 'parent',
                   'replies']
-        read_only_fields = ['user', 'created_at', 'is_approved']
+        read_only_fields = ['created_at']
 
     def get_user_profile_image(self, obj):
         if obj.user and obj.user.profile_image:
