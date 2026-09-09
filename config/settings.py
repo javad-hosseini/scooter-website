@@ -73,6 +73,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
+    'django.contrib.sites',
+
+    # allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # local apps
     'apps.accounts.apps.AccountsConfig',
@@ -86,6 +93,8 @@ INSTALLED_APPS = [
     'ckeditor',
     'compressor',
 ]
+
+SITE_ID = 1
 
 CKEDITOR_CONFIGS = {
     'default': {
@@ -109,6 +118,7 @@ DEFAULT_THROTTLE_RATES = {
 AUTHENTICATION_BACKENDS = [
     'apps.accounts.backends.UsernameOrMobileBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # These are reversed by name, so they must include the URLconf namespace —
@@ -183,6 +193,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Canonicalises URL casing so /Shop/Product/X/ 301s to /shop/product/x/
@@ -439,3 +450,19 @@ SEO_STORE = {
         'Th 10:00-15:00',
     ],
 }
+
+# ============ django-allauth / Google OAuth ============
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID', default=''),
+            'secret': config('GOOGLE_CLIENT_SECRET', default=''),
+            'key': '',
+        },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+}
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True

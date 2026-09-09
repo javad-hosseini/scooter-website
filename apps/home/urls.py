@@ -1,30 +1,56 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path, re_path
 
 from . import views
+from .views import (
+    ArticleListAPIView,
+    ArticleDetailAPIView,
+    ArticleListPageView,
+    ArticleDetailPageView,
+    TagListAPIView,
+    CommentListCreateAPIView
+)
 
 app_name = 'home_app'
 
-# Article slugs allow unicode, so they cannot use <slug:...>. Restricting the
-# pattern to a single path segment stops one article resolving at an unbounded
-# number of nested URLs.
-SLUG = r'(?P<slug>[^/]+)'
-
 urlpatterns = [
+    # ===== صفحات HTML =====
+    path('articles/', ArticleListPageView.as_view(), name='articles'),
+    re_path(r'^articles/(?P<slug>.+)/$', ArticleDetailPageView.as_view(), name='article_detail'),
+    path('categories/', views.CategoryPageView.as_view(), name='categories'),
+    path('admin/dashboard/', views.AdminDashboardPageView.as_view(), name='admin_dashboard'),
+    path('about_us/', views.AboutUsPageView.as_view(), name='about_us'),
+    path('admin/comments/', views.CommentsModerationPageView.as_view(), name='admin_comments'),
+
     # ===== صفحه اصلی =====
     path('', views.IndexPageView.as_view(), name='index'),
+    path('api/index/', views.IndexPageAPIView.as_view(), name='api_index'),
 
-    # ===== صفحات HTML مقالات =====
+    # ===== صفحات مقالات (موجود) =====
     path('articles/', views.ArticleListPageView.as_view(), name='articles'),
-    re_path(rf'^articles/{SLUG}/$', views.ArticleDetailPageView.as_view(),
-            name='article_detail'),
+    re_path(r'^articles/(?P<slug>.+)/$', views.ArticleDetailPageView.as_view(), name='article_detail'),
 
     # ===== API =====
-    path('api/index/', views.IndexPageAPIView.as_view(), name='api_index'),
+    # ✅ IMPORTANT: URLهای با جزئیات بیشتر را اول قرار بده
+    re_path(r'^api/articles/(?P<slug>.+)/comments/$', CommentListCreateAPIView.as_view(), name='api_comments'),
+    re_path(r'^api/articles/(?P<slug>.+)/$', ArticleDetailAPIView.as_view(), name='api_article_detail'),
+    path('api/articles/', ArticleListAPIView.as_view(), name='api_articles'),
+    path('api/tags/', TagListAPIView.as_view(), name='api_tags'),
+    path('api/categories/', views.CategoryListAPIView.as_view(), name='api_categories'),
+    path('api/admin/comments/', views.AdminCommentListAPIView.as_view(), name='api_admin_comments'),
+    path('api/admin/comments/<int:pk>/moderate/', views.AdminCommentModerateAPIView.as_view(),
+         name='api_admin_comment_moderate'),
+
+    # ===== API مقالات (موجود) =====
     path('api/articles/', views.ArticleListAPIView.as_view(), name='api_articles'),
+    re_path(r'^api/articles/(?P<slug>.+)/$', views.ArticleDetailAPIView.as_view(), name='api_article_detail'),
     path('api/tags/', views.TagListAPIView.as_view(), name='api_tags'),
-    # ✅ More specific routes first.
-    re_path(rf'^api/articles/{SLUG}/comments/$', views.CommentListCreateAPIView.as_view(),
-            name='api_comments'),
-    re_path(rf'^api/articles/{SLUG}/$', views.ArticleDetailAPIView.as_view(),
-            name='api_article_detail'),
+    re_path(r'^api/articles/(?P<slug>.+)/comments/$', views.CommentListCreateAPIView.as_view(), name='api_comments'),
+    # ===== صفحه عدم دسترسی =====
+    path('access-denied/', views.AccessDeniedView.as_view(), name='access_denied'),
+    path('admin/finance/', views.FinancePageView.as_view(), name='admin_finance'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

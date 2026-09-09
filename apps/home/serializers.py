@@ -17,7 +17,6 @@ class ArticleListSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     cover_image_url = serializers.SerializerMethodField()
 
-
     class Meta:
         model = Article
         fields = [
@@ -96,11 +95,12 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
         return ArticleListSerializer(related, many=True, context=self.context).data
 
     def get_comments_count(self, obj):
-        return obj.comments.filter(is_approved=True).count()
+        return obj.comments.filter(status='approved').count()
 
     def get_recent_comments(self, obj):
-        """آخرین ۵ نظر تایید شده"""
-        comments = obj.comments.filter(is_approved=True, parent__isnull=True)[:5]
+        comments = obj.comments.filter(
+            status='approved', parent__isnull=True
+        ).select_related('user')[:5]
         return CommentSerializer(comments, many=True, context=self.context).data
 
 
@@ -111,11 +111,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        # NOTE: raw ``user`` PK and the ``is_approved`` moderation flag are
+        # NOTE: raw ``user`` PK and the ``status`` moderation flag are
         # deliberately not exposed on the public feed — the PK enables user
-        # enumeration and the flag leaks moderation state.
-        fields = ['id', 'user_name', 'user_profile_image', 'content', 'created_at', 'parent',
-                  'replies']
+        # enumeration and the status leaks moderation state.
+        fields = ['id', 'user_name', 'user_profile_image', 'content',
+                  'created_at', 'parent', 'replies']
         read_only_fields = ['created_at']
 
     def get_user_profile_image(self, obj):
@@ -124,8 +124,8 @@ class CommentSerializer(serializers.ModelSerializer):
         return None
 
     def get_replies(self, obj):
-        replies = obj.replies.filter(is_approved=True)
-        return CommentSerializer(replies, many=True).data
+        replies = obj.replies.filter(status='approved').select_related('user')
+        return CommentSerializer(replies, many=True, context=self.context).data
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
@@ -153,6 +153,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             raise serializers.ValidationError("برای ارسال نظر باید وارد حساب کاربری خود شوید.")
+
         return data
 
     def save(self, **kwargs):
@@ -161,17 +162,22 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
         self.validated_data['user'] = request.user
         self.validated_data['article_id'] = article_id
+        # status ست نمی‌کنیم، پیش‌فرض مدل خودش pending رو می‌ذاره
+        # حتی اگه کلاینت status بفرسته، چون تو fields نیست، DRF نادیده‌اش می‌گیره
 
         return super().save(**kwargs)
 
 
-# apps/home/serializers.py (افزودن به سریالایزرهای موجود)
+from .models import (
+    IndexPageSettings, ProductCard,
+    Testimonial, Promise, Article
+)
+
+# apps/home/serializers.py
 
 from rest_framework import serializers
-from .models import (
-    IndexPageSettings, CategoryFeature, ProductCard,
-    Testimonial, Promise, Article, Tag
-)
+from .models import CategoryFeature, CategoryImage, CategoryBadge
+from apps.shop.models import Category
 
 
 class CategoryFeatureSerializer(serializers.ModelSerializer):
@@ -179,18 +185,70 @@ class CategoryFeatureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CategoryFeature
-        fields = ['label', 'value', 'unit', 'color', 'color_hex']
+        fields = ['id', 'icon', 'value', 'label', 'color', 'color_hex', 'order']
 
     def get_color_hex(self, obj):
-        colors = dict(CategoryFeature.CATEGORY_COLORS)
-        colors = {
-            'neon': '#4fd8ff',
-            'orange': '#ff9a3c',
-            'green': '#a8e063',
-            'neon2': '#8b7bff',
-            'neon3': '#ff6cc4',
-        }
-        return colors.get(obj.color, '#4fd8ff')
+        return obj.get_color_hex()
+
+
+class CategoryImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CategoryImage
+        fields = ['id', 'image_url', 'alt_text', 'is_primary', 'order']
+
+    def get_image_url(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
+
+
+class CategoryBadgeSerializer(serializers.ModelSerializer):
+    color_hex = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CategoryBadge
+        fields = ['id', 'label', 'badge_text', 'color', 'color_hex', 'order']
+
+    def get_color_hex(self, obj):
+        return obj.get_color_hex()
+
+
+class CategoryListSerializer(serializers.ModelSerializer):
+    """سریالایزر برای نمایش دسته‌بندی‌ها در صفحه اصلی"""
+    features = CategoryFeatureSerializer(many=True, read_only=True)
+    images = CategoryImageSerializer(many=True, read_only=True)
+    badges = CategoryBadgeSerializer(many=True, read_only=True)
+    primary_image = serializers.SerializerMethodField()
+    primary_color = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = [
+            'id', 'name', 'slug', 'icon', 'description',
+            'features', 'images', 'badges', 'primary_image',
+            'primary_color', 'is_active', 'order'
+        ]
+
+    def get_primary_image(self, obj):
+        primary = obj.images.filter(is_primary=True).first()
+        if primary:
+            return CategoryImageSerializer(primary).data
+        first = obj.images.first()
+        if first:
+            return CategoryImageSerializer(first).data
+        return None
+
+    def get_primary_color(self, obj):
+        # گرفتن رنگ از اولین ویژگی یا اولین نشان
+        feature = obj.features.first()
+        if feature:
+            return feature.get_color_hex()
+        badge = obj.badges.first()
+        if badge:
+            return badge.get_color_hex()
+        return '#00f0ff'
 
 
 class ProductCardSerializer(serializers.ModelSerializer):
@@ -335,11 +393,11 @@ class IndexPageSerializer(serializers.ModelSerializer):
 
     def get_categories(self, obj):
         """گرفتن دسته‌بندی‌های فعال با ویژگی‌هایشان"""
-        from .models import Category
+        from apps.shop.models import Category
         categories = Category.objects.filter(is_active=True, parent__isnull=True).order_by('order')
         result = []
         for cat in categories:
-            features = cat.index_features.all()[:4]
+            features = cat.features.all()[:4]
             result.append({
                 'id': cat.id,
                 'name': cat.name,
@@ -354,7 +412,10 @@ class IndexPageSerializer(serializers.ModelSerializer):
         return result
 
     def _get_category_image(self, category):
-        """گرفتن تصویر برای دسته‌بندی (از اولین محصول یا پیش‌فرض)"""
+        """گرفتن تصویر برای دسته‌بندی (پایین‌ترین order، صرف‌نظر از is_primary؛ در نبود عکس، عکس محصول)"""
+        lowest_order_image = category.images.order_by('order').first()
+        if lowest_order_image:
+            return lowest_order_image.image.url
         product = category.products.filter(is_published=True).first()
         if product and product.cover_image:
             return product.cover_image.url
@@ -375,3 +436,23 @@ class IndexPageSerializer(serializers.ModelSerializer):
     def get_recent_articles(self, obj):
         articles = Article.objects.filter(is_published=True).order_by('-published_at', '-created_at')[:3]
         return ArticleCardSerializer(articles, many=True).data
+
+class AdminCommentSerializer(serializers.ModelSerializer):
+    """سریالایزر کامنت مقالات برای پنل ادمین (همه‌ی وضعیت‌ها)"""
+    user_name = serializers.CharField(source='user.fullname', read_only=True)
+    user_avatar = serializers.SerializerMethodField()
+    article_title = serializers.CharField(source='article.title', read_only=True)
+    article_slug = serializers.CharField(source='article.slug', read_only=True)
+    is_reply = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'user_name', 'user_avatar', 'article_title', 'article_slug',
+            'content', 'status', 'rejection_reason', 'parent', 'is_reply', 'created_at'
+        ]
+
+    def get_user_avatar(self, obj):
+        if obj.user and obj.user.profile_image:
+            return obj.user.profile_image.url
+        return None

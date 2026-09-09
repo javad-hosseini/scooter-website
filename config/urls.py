@@ -19,6 +19,7 @@ from drf_spectacular.views import (
 from apps.seo import views as seo_views
 from apps.seo.cache import versioned_cache_page
 from apps.seo.sitemaps import SITEMAPS
+from apps.shop import views as shop_views
 
 # Errors are rendered by our own templates so a missing page returns a real
 # 404 with usable navigation instead of a dead end (or, worse, a soft 404).
@@ -71,6 +72,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls', namespace='accounts_app')),
     path('shop/', include('apps.shop.urls', namespace='shop_app')),
+    path('api/shop/cart/', include([
+        path('', shop_views.CartAPIView.as_view()),
+        path('add/', shop_views.CartAPIView.as_view()),
+        path('clear/', shop_views.CartClearAPIView.as_view()),
+        path('apply-coupon/', shop_views.CartApplyCouponAPIView.as_view()),
+    ])),
+    path('social-auth/', include('allauth.urls')),
 ]
 
 # ===== 301 redirects for legacy / mistyped paths =====

@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.shortcuts import render
+from django.utils.html import format_html
 
+# from apps.shop.models import Category
 from .models import Article, Tag, Comment
+from .models import CategoryImage, CategoryBadge
 
 User = get_user_model()
 
@@ -22,7 +26,7 @@ class CommentInline(admin.TabularInline):
     """نمایش نظرات در صفحه مقاله"""
     model = Comment
     extra = 0
-    fields = ['user', 'content_preview', 'is_approved', 'created_at']
+    fields = ['user', 'content_preview', 'status', 'created_at']
     readonly_fields = ['user', 'content_preview', 'created_at']
     can_delete = True
     show_change_link = True
@@ -81,9 +85,8 @@ class ArticleAdmin(admin.ModelAdmin):
     tag_list.short_description = 'تگ‌ها'
 
     def comments_count(self, obj):
-        count = obj.comments.filter(is_approved=True).count()
+        count = obj.comments.filter(status=True).count()
         return format_html('<span style="color:var(--neon);">{}</span>', count)
-
     comments_count.short_description = 'نظرات'
 
     # ===== تصویر شاخص =====
@@ -148,78 +151,8 @@ class ArticleAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated} مقاله از حالت انتشار خارج شد')
 
 
-@admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    list_display = [
-        'user_display', 'article_title', 'content_preview',
-        'is_approved', 'is_reply', 'created_at'
-    ]
-    list_filter = ['is_approved', 'created_at', 'article']
-    search_fields = ['content', 'user__fullname', 'user__username', 'article__title']
-    readonly_fields = ['user', 'article', 'created_at', 'updated_at', 'parent']
-    list_per_page = 25
-    actions = ['approve_comments', 'unapprove_comments']
-
-    fieldsets = (
-        ('اطلاعات نظر', {
-            'fields': ('article', 'user', 'parent')
-        }),
-        ('متن نظر', {
-            'fields': ('content',)
-        }),
-        ('وضعیت', {
-            'fields': ('is_approved', 'created_at', 'updated_at')
-        }),
-    )
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('user', 'article', 'parent')
-
-    def user_display(self, obj):
-        if obj.user.profile_image:
-            return format_html(
-                '<img src="{}" style="height:24px;width:24px;border-radius:50%;object-fit:cover;margin-left:6px;" /> {}',
-                obj.user.profile_image.url,
-                obj.user.fullname or obj.user.username
-            )
-        return obj.user.fullname or obj.user.username
-
-    user_display.short_description = 'کاربر'
-
-    def article_title(self, obj):
-        return format_html(
-            '<a href="/admin/home/article/{}/change/" style="color:var(--neon);">{}</a>',
-            obj.article.id,
-            obj.article.title[:30] + '...' if len(obj.article.title) > 30 else obj.article.title
-        )
-
-    article_title.short_description = 'مقاله'
-
-    def content_preview(self, obj):
-        return obj.content[:60] + '...' if len(obj.content) > 60 else obj.content
-
-    content_preview.short_description = 'متن نظر'
-
-    def is_reply(self, obj):
-        return '✅' if obj.parent else '—'
-
-    is_reply.short_description = 'پاسخ'
-
-    @admin.action(description='تایید نظرات انتخاب‌شده')
-    def approve_comments(self, request, queryset):
-        updated = queryset.update(is_approved=True)
-        self.message_user(request, f'{updated} نظر تایید شد')
-
-    @admin.action(description='لغو تایید نظرات انتخاب‌شده')
-    def unapprove_comments(self, request, queryset):
-        updated = queryset.update(is_approved=False)
-        self.message_user(request, f'{updated} نظر از تایید خارج شد')
-
-
-# apps/home/admin.py (افزودن به ادمین موجود)
 
 from django.contrib import admin
-from django.utils.html import format_html
 from .models import (
     IndexPageSettings, CategoryFeature, ProductCard,
     Testimonial, Promise
@@ -271,9 +204,8 @@ class IndexPageSettingsAdmin(admin.ModelAdmin):
             )
         }),
         ('فوتر', {
-            'fields': ('footer_tagline', 'footer_copyright')
-        }),
-    )
+            'fields': ()
+        }))
 
     def has_add_permission(self, request):
         # فقط یک رکورد مجاز است
@@ -287,7 +219,7 @@ class IndexPageSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(CategoryFeature)
 class CategoryFeatureAdmin(admin.ModelAdmin):
-    list_display = ['category', 'label', 'value', 'unit', 'color', 'order']
+    list_display = ['category', 'label', 'value', 'color', 'order']
     list_filter = ['category', 'color']
     list_editable = ['order']
     ordering = ['category', 'order']
@@ -309,8 +241,8 @@ class ProductCardAdmin(admin.ModelAdmin):
 
 @admin.register(Testimonial)
 class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ['name', 'avatar_preview', 'rating', 'is_featured', 'order', 'is_active']
-    list_filter = ['rating', 'is_featured', 'is_active']
+    list_display = ['name', 'avatar_preview', 'rating', 'order', 'is_active']
+    list_filter = ['rating', 'is_active']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'quote']
     ordering = ['order']
@@ -326,9 +258,150 @@ class TestimonialAdmin(admin.ModelAdmin):
     avatar_preview.short_description = 'عکس'
 
 
-@admin.register(Promise)
-class PromiseAdmin(admin.ModelAdmin):
-    list_display = ['title', 'label', 'badge_value', 'color', 'order', 'is_active']
-    list_filter = ['color', 'is_active']
-    list_editable = ['order', 'is_active']
+# @admin.register(Promise)
+# class PromiseAdmin(admin.ModelAdmin):
+#     list_display = ['title', 'label', 'badge_value', 'color', 'order', 'is_active']
+#     list_filter = ['color', 'is_active']
+#     list_editable = ['order', 'is_active']
+#     ordering = ['order']
+#
+
+# apps/home/admin.py
+
+
+class CategoryFeatureInline(admin.TabularInline):
+    model = CategoryFeature
+    extra = 1
+    fields = ['icon', 'value', 'label', 'color', 'order']
     ordering = ['order']
+
+
+class CategoryImageInline(admin.TabularInline):
+    model = CategoryImage
+    extra = 1
+    fields = ['image', 'alt_text', 'is_primary', 'order']
+    ordering = ['order']
+
+
+class CategoryBadgeInline(admin.TabularInline):
+    model = CategoryBadge
+    extra = 1
+    fields = ['label', 'badge_text', 'color', 'order']
+    ordering = ['order']
+
+
+# apps/home/admin.py
+
+# این رو به انتهای فایل اضافه کن
+
+@admin.register(CategoryImage)
+class CategoryImageAdmin(admin.ModelAdmin):
+    list_display = ['category', 'image_preview', 'alt_text', 'is_primary', 'order']
+    list_filter = ['category', 'is_primary']
+    list_editable = ['order', 'is_primary']
+    search_fields = ['category__name', 'alt_text']
+    ordering = ['category', 'order']
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="height:50px;width:50px;object-fit:cover;border-radius:6px;" />',
+                obj.image.url
+            )
+        return '—'
+
+    image_preview.short_description = 'تصویر'
+
+
+# apps/home/admin.py
+
+@admin.register(CategoryBadge)
+class CategoryBadgeAdmin(admin.ModelAdmin):
+    list_display = ['category', 'label', 'badge_text', 'color', 'order']
+    list_filter = ['category', 'color']
+    list_editable = ['order']
+    search_fields = ['category__name', 'label']
+    ordering = ['category', 'order']
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = [
+        'user', 'article_title', 'short_content', 'is_reply_display',
+        'status_badge', 'created_at'
+    ]
+    list_filter = ['status', 'created_at']
+    search_fields = ['user__fullname', 'user__email', 'content', 'article__title']
+    list_per_page = 25
+    readonly_fields = ['created_at', 'updated_at', 'user', 'article', 'parent']
+    actions = ['approve_comments', 'reject_comments']
+
+    fieldsets = (
+        ('اطلاعات نظر', {
+            'fields': ('article', 'user', 'parent')
+        }),
+        ('محتوا', {
+            'fields': ('content',)
+        }),
+        ('وضعیت', {
+            'fields': ('status', 'rejection_reason')
+        }),
+        ('زمان‌ها', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'article', 'parent')
+
+    def article_title(self, obj):
+        return obj.article.title[:40]
+
+    article_title.short_description = 'مقاله'
+
+    def short_content(self, obj):
+        return obj.content[:50] + ('...' if len(obj.content) > 50 else '')
+
+    short_content.short_description = 'متن'
+
+    def is_reply_display(self, obj):
+        return '↳ ریپلای' if obj.is_reply else 'اصلی'
+
+    is_reply_display.short_description = 'نوع'
+
+    def status_badge(self, obj):
+        colors = {'pending': '#eab308', 'approved': '#22c55e', 'rejected': '#ef4444'}
+        labels = {'pending': 'در انتظار تایید', 'approved': 'تایید شده', 'rejected': 'رد شده'}
+        return format_html(
+            '<span style="color:{};font-weight:bold;">{}</span>',
+            colors[obj.status], labels[obj.status]
+        )
+
+    status_badge.short_description = 'وضعیت'
+
+    @admin.action(description='تایید نظرات انتخاب‌شده')
+    def approve_comments(self, request, queryset):
+        updated = queryset.update(status='approved')
+        self.message_user(request, f'{updated} نظر تایید شد')
+
+    @admin.action(description='رد کردن نظرات انتخاب‌شده')
+    def reject_comments(self, request, queryset):
+        if 'apply' in request.POST:
+            reason = request.POST.get('rejection_reason', '')
+            if not reason:
+                self.message_user(request, 'لطفاً دلیل رد کردن را وارد کنید.', level='ERROR')
+                return
+            updated = queryset.update(status='rejected', rejection_reason=reason)
+            self.message_user(request, f'{updated} نظر رد شد.')
+        else:
+            return render(request, 'admin/reject_reviews.html', {
+                'queryset': queryset,
+                'action': 'reject_comments'
+            })
+
+    reject_comments.short_description = 'رد کردن نظرات انتخاب‌شده'
+
+# CategoryAdmin رجیستر نمی‌شود اینجا — مدل Category متعلق به apps.shop است
+# و از قبل در apps/shop/admin.py رجیستر شده. اینلاین‌های بالا (Feature/Image/Badge)
+# از همانجا import و به CategoryAdmin شاپ اضافه می‌شوند.

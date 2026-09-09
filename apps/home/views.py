@@ -1,10 +1,13 @@
 # apps/home/views.py
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.db.models import F, Prefetch, Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, TemplateView
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
@@ -14,11 +17,17 @@ from apps.seo.cache import cached_page_class
 from apps.seo.seo import SEOMixin
 from apps.seo.utils import canonical_url, image_url, meta_description, meta_title
 
-from .models import Article, Tag, Comment
+from .models import Article, Tag, Comment, IndexPageSettings
 from .pagination import ArticlePagination
 from .serializers import (
-    ArticleListSerializer, ArticleDetailSerializer,
-    TagSerializer, CommentSerializer, CommentCreateSerializer
+    ArticleListSerializer,
+    ArticleDetailSerializer,
+    TagSerializer,
+    CommentSerializer,
+    CommentCreateSerializer,
+    CategoryListSerializer,
+    IndexPageSerializer,
+    AdminCommentSerializer,
 )
 
 
@@ -65,12 +74,12 @@ class ArticleDetailAPIView(generics.RetrieveAPIView):
             .select_related('author')
             .prefetch_related(
                 'tags',
-                Prefetch('comments', queryset=Comment.objects.filter(is_approved=True))
+                Prefetch('comments', queryset=Comment.objects.filter(status='approved'))
             )
         )
 
     def retrieve(self, request, *args, **kwargs):
-        # افزایش تعداد بازدید — atomic, so concurrent hits are not lost and
+        # افزایش بازدید — atomic, so concurrent hits are not lost and
         # updated_at is left alone (it feeds sitemap <lastmod>).
         instance = self.get_object()
         Article.objects.filter(pk=instance.pk).update(view_count=F('view_count') + 1)
@@ -97,15 +106,15 @@ class CommentListCreateAPIView(APIView):
     def get(self, request, slug):
         """گرفتن نظرات یک مقاله"""
         article = get_object_or_404(Article, slug=slug, is_published=True)
-        comments = article.comments.filter(is_approved=True, parent__isnull=True)
+        comments = article.comments.filter(status='approved', parent__isnull=True)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    def post(self, request, slug):  # این رو حتماً داشته باش
+    def post(self, request, slug):
         """ایجاد نظر جدید"""
         article = get_object_or_404(Article, slug=slug, is_published=True)
 
-        # اگه کاربر لاگین نیست
+        # اگر کاربر لاگین نیست
         if not request.user.is_authenticated:
             return Response(
                 {'detail': 'برای ارسال نظر باید وارد حساب کاربری خود شوید.'},
@@ -127,10 +136,10 @@ class CommentListCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ══════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════
 #  HTML pages — rendered server-side (see apps/shop/views.py for the
 #  rationale; these were the same empty JS-hydrated shells).
-# ══════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════
 
 ARTICLES_PER_PAGE = 12
 
@@ -213,7 +222,7 @@ class ArticleDetailPageView(SEOMixin, DetailView):
                 'tags',
                 Prefetch(
                     'comments',
-                    queryset=Comment.objects.filter(is_approved=True)
+                    queryset=Comment.objects.filter(status='approved')
                     .select_related('user')
                     .order_by('-created_at'),
                 ),
@@ -269,16 +278,6 @@ class ArticleDetailPageView(SEOMixin, DetailView):
         ]
 
 
-# apps/home/views.py (افزودن به ویوهای موجود)
-
-from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from django.views.generic import TemplateView
-from .models import IndexPageSettings
-from .serializers import IndexPageSerializer
-
-
 class IndexPageAPIView(generics.RetrieveAPIView):
     """API برای دریافت اطلاعات صفحه اصلی"""
     permission_classes = [AllowAny]
@@ -306,7 +305,7 @@ class IndexPageView(SEOMixin, TemplateView):
         context['index_settings'] = settings_obj
         context['categories'] = (
             Category.objects.filter(is_active=True, parent__isnull=True)
-            .prefetch_related('index_features')
+            .prefetch_related('features')
         )
         context['featured_products'] = (
             Product.objects.for_listing().filter(is_featured=True)[:8]
@@ -337,3 +336,133 @@ class IndexPageView(SEOMixin, TemplateView):
             schema.organization(self.request),
             schema.website(self.request),
         ]
+
+
+class CategoryListAPIView(generics.ListAPIView):
+    """API برای دریافت لیست دسته‌بندی‌ها"""
+    permission_classes = [AllowAny]
+    serializer_class = CategoryListSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        from apps.shop.models import Category
+        return Category.objects.filter(
+            is_active=True,
+            parent__isnull=True
+        ).order_by('order', 'name')
+
+
+@cached_page_class()
+class CategoryPageView(SEOMixin, TemplateView):
+    """صفحه نمایش دسته‌بندی‌ها"""
+    template_name = 'home/categories.html'
+
+    seo_title = 'دسته‌بندی اسکوترهای برقی'
+    seo_description = 'مشاهده تمام دسته‌بندی‌های اسکوتر برقی ولتکس'
+
+    def get_context_data(self, **kwargs):
+        from apps.shop.models import Category
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.filter(
+            is_active=True,
+            parent__isnull=True
+        ).prefetch_related('images', 'badges').order_by('order', 'name')
+        return context
+
+    def get_breadcrumbs(self, context):
+        return [('خانه', '/'), ('دسته‌بندی‌ها', reverse('home_app:categories'))]
+
+    def get_canonical_path(self):
+        return reverse('home_app:categories')
+
+    def get_json_ld(self, context, seo):
+        return [schema.breadcrumbs(seo.breadcrumbs, self.request)]
+
+
+def is_admin_group(user):
+    """چک کردن اینکه کاربر در گروه 'admin' هست"""
+    return user.is_authenticated and user.groups.filter(name='admin').exists()
+
+
+class AccessDeniedView(TemplateView):
+    """صفحه عدم دسترسی"""
+    template_name = 'home/access_denied.html'
+
+
+@method_decorator(login_required(login_url='/access-denied/'), name='dispatch')
+@method_decorator(staff_member_required(login_url='/access-denied/'), name='dispatch')
+class AdminDashboardPageView(TemplateView):
+    """صفحه داشبورد ادمین"""
+    template_name = 'accounts/admin_dashboard.html'
+
+
+class AboutUsPageView(TemplateView):
+    """صفحه درباره ما"""
+    template_name = 'home/about_us.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class AdminCommentListAPIView(generics.ListAPIView):
+    """لیست همه کامنت‌های مقالات برای ادمین، با فیلتر status"""
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminCommentSerializer
+
+    def get_queryset(self):
+        qs = Comment.objects.select_related('user', 'article').order_by('-created_at')
+        status_param = self.request.query_params.get('status', '').strip()
+        if status_param in dict(Comment.STATUS_CHOICES):
+            qs = qs.filter(status=status_param)
+        return qs
+
+
+class AdminCommentModerateAPIView(APIView):
+    """تایید یا رد کامنت مقاله"""
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        action = request.data.get('action')
+
+        if action not in ['approve', 'reject']:
+            return Response(
+                {'error': "مقدار action باید 'approve' یا 'reject' باشد"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if action == 'approve':
+            comment.status = 'approved'
+            comment.rejection_reason = ''
+        else:
+            reason = request.data.get('rejection_reason', '').strip()
+            if not reason:
+                return Response(
+                    {'error': 'برای رد کردن کامنت، وارد کردن دلیل الزامی است'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            comment.status = 'rejected'
+            comment.rejection_reason = reason
+
+        comment.save(update_fields=['status', 'rejection_reason', 'updated_at'])
+
+        return Response({
+            'status': 'success',
+            'message': 'وضعیت کامنت با موفقیت به‌روزرسانی شد',
+            'data': AdminCommentSerializer(comment).data
+        })
+
+
+@method_decorator(login_required(login_url='/access-denied/'), name='dispatch')
+@method_decorator(staff_member_required(login_url='/access-denied/'), name='dispatch')
+class CommentsModerationPageView(TemplateView):
+    """صفحه مدیریت کامنت‌ها"""
+    template_name = 'accounts/comments_moderation.html'
+
+
+@method_decorator(login_required(login_url='/access-denied/'), name='dispatch')
+@method_decorator(staff_member_required(login_url='/access-denied/'), name='dispatch')
+class FinancePageView(TemplateView):
+    """صفحه مالی ادمین"""
+    template_name = 'accounts/admin-earning.html'

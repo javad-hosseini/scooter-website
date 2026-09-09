@@ -16,3 +16,6 @@ staticfiles/
 front files
 .claude
 security-audit-report-*.md
+.venv
+public
+.claude

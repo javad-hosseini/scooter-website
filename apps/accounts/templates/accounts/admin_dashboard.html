@@ -1,0 +1,1968 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title id="page-title">اسکوتیکس | داشبورد مدیریت</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
+
+    <!-- ============================================================
+   STYLES — تمام استایل‌های فایل admin_dashboard.html رو اینجا کپی کن
+   (از <style> تا </style> فایل اصلی)
+   ============================================================ -->
+    <style>
+      /* ============================================================
+   DESIGN TOKENS — Electric Scooter Admin / "Current" system
+   ============================================================ */
+      :root {
+        --navy: #0b1120;
+        --navy-deep: #070b16;
+        --blue: #2f6fed;
+        --purple: #7c5cfc;
+        --cyan: #22d3ee;
+        --green: #10b981;
+        --orange: #f59e0b;
+        --red: #ef4444;
+
+        --bg: #f2f4fa;
+        --surface: #ffffff;
+        --surface-glass: rgba(255, 255, 255, 0.72);
+        --text: #0b1120;
+        --text-muted: #646e84;
+        --border: rgba(11, 17, 32, 0.08);
+        --shadow: 0 10px 30px -12px rgba(20, 30, 60, 0.16);
+        --shadow-lg: 0 24px 48px -16px rgba(20, 30, 60, 0.22);
+
+        --grad-primary: linear-gradient(
+          135deg,
+          var(--blue) 0%,
+          var(--purple) 100%
+        );
+        --grad-current: linear-gradient(
+          90deg,
+          var(--cyan) 0%,
+          var(--blue) 45%,
+          var(--purple) 100%
+        );
+        --grad-green: linear-gradient(135deg, #34d399 0%, #0ea5e9 100%);
+        --grad-orange: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+        --grad-purple: linear-gradient(135deg, #a78bfa 0%, #6366f1 100%);
+
+        --radius: 18px;
+        --radius-sm: 12px;
+        --font-display: "Vazirmatn", sans-serif;
+        --font-mono: "JetBrains Mono", "Vazirmatn", monospace;
+      }
+
+      [data-theme="dark"] {
+        --bg: #080b14;
+        --surface: #101728;
+        --surface-glass: rgba(16, 23, 40, 0.66);
+        --text: #e9ecf5;
+        --text-muted: #8b93ac;
+        --border: rgba(255, 255, 255, 0.08);
+        --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
+        --shadow-lg: 0 24px 48px -16px rgba(0, 0, 0, 0.6);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: var(--font-display);
+        background: var(--bg);
+        color: var(--text);
+        transition:
+          background 0.35s ease,
+          color 0.35s ease;
+        letter-spacing: -0.1px;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: var(--blue);
+        color: #fff;
+      }
+      a {
+        text-decoration: none;
+      }
+      .num {
+        font-family: var(--font-mono);
+      }
+
+      /* scrollbar */
+      .scroll-thin::-webkit-scrollbar {
+        width: 6px;
+      }
+      .scroll-thin::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+      }
+
+      /* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+      .app-shell {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar {
+        width: 272px;
+        flex-shrink: 0;
+        background: radial-gradient(
+          120% 140% at 0% 0%,
+          #131b36 0%,
+          var(--navy) 45%,
+          var(--navy-deep) 100%
+        );
+        color: #c9cedd;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        z-index: 40;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 26px 22px 22px;
+      }
+      .sidebar-brand .mark {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: var(--grad-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px -6px rgba(124, 92, 252, 0.6);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .sidebar-brand .mark i {
+        color: #fff;
+        font-size: 18px;
+      }
+      .sidebar-brand .name {
+        font-weight: 800;
+        font-size: 18px;
+        color: #fff;
+        line-height: 1.1;
+      }
+      .sidebar-brand .name span {
+        display: block;
+        font-size: 11px;
+        font-weight: 500;
+        color: #8c93ae;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+      }
+
+      .sidebar-section-title {
+        font-size: 11px;
+        font-weight: 700;
+        color: #5b6480;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 18px 22px 8px;
+      }
+      .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 10px;
+      }
+      .sidebar-nav .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #aeb4cb;
+        font-size: 14.5px;
+        font-weight: 500;
+        padding: 11px 22px;
+        margin: 2px 12px;
+        border-radius: 10px;
+        position: relative;
+        transition: 0.2s ease;
+      }
+      .sidebar-nav .nav-link i.ico {
+        width: 18px;
+        text-align: center;
+        font-size: 15px;
+        color: #7e86a3;
+        transition: 0.2s;
+      }
+      .sidebar-nav .nav-link:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+      .sidebar-nav .nav-link:hover i.ico {
+        color: var(--cyan);
+      }
+      .sidebar-nav .nav-link.active {
+        background: linear-gradient(
+          90deg,
+          rgba(47, 111, 237, 0.18),
+          rgba(124, 92, 252, 0.1)
+        );
+        color: #fff;
+      }
+      .sidebar-nav .nav-link.active i.ico {
+        color: var(--cyan);
+      }
+      .sidebar-nav .nav-link.active::before {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 3px;
+        border-radius: 3px;
+        background: var(--grad-current);
+        box-shadow: 0 0 10px 1px rgba(34, 211, 238, 0.7);
+      }
+      .sidebar-nav .nav-link .chev {
+        margin-right: auto;
+        font-size: 11px;
+        transition: 0.25s;
+        color: #5b6480;
+      }
+      .sidebar-nav .nav-link[aria-expanded="true"] .chev {
+        transform: rotate(-90deg);
+        color: var(--cyan);
+      }
+      .sidebar-sub {
+        padding-right: 18px;
+      }
+      .sidebar-sub .nav-link {
+        font-size: 13.5px;
+        padding: 9px 22px 9px 16px;
+        color: #8b92ab;
+      }
+      .sidebar-sub .nav-link::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #3a4262;
+        margin-left: 2px;
+      }
+      .sidebar-sub .nav-link:hover,
+      .sidebar-sub .nav-link.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .sidebar-sub .nav-link.active::before {
+        background: var(--cyan);
+        box-shadow: 0 0 6px var(--cyan);
+      }
+
+      .sidebar-footer {
+        padding: 16px 18px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .battery-widget {
+        background: linear-gradient(
+          135deg,
+          rgba(47, 111, 237, 0.16),
+          rgba(124, 92, 252, 0.1)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 14px;
+      }
+      .battery-widget .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .battery-widget .top span {
+        font-size: 12px;
+        color: #9aa1bd;
+        font-weight: 600;
+      }
+      .battery-widget .top b {
+        color: #fff;
+        font-size: 13px;
+      }
+      .battery-track {
+        height: 6px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+      .battery-fill {
+        height: 100%;
+        width: 78%;
+        border-radius: 6px;
+        background: var(--grad-current);
+        background-size: 200% 100%;
+        animation: currentFlow 3s linear infinite;
+      }
+
+      @keyframes currentFlow {
+        0% {
+          background-position: 0% 0;
+        }
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      /* ---------- Topbar ---------- */
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: var(--surface-glass);
+        backdrop-filter: blur(16px) saturate(160%);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .search-box {
+        flex: 1;
+        max-width: 380px;
+        position: relative;
+      }
+      .search-box input {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        border-radius: 12px;
+        padding: 10px 42px 10px 14px;
+        font-size: 13.5px;
+        color: var(--text);
+        transition: 0.2s;
+      }
+      .search-box input:focus {
+        outline: none;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.15);
+      }
+      .search-box i {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+
+      .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        position: relative;
+        transition: 0.2s;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .icon-btn:hover {
+        color: var(--blue);
+        border-color: var(--blue);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+      .dot-badge {
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--red);
+        border: 2px solid var(--surface);
+      }
+
+      .profile-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 5px 10px 5px 6px;
+        border-radius: 12px;
+        transition: 0.2s;
+      }
+      .profile-chip:hover {
+        background: var(--bg);
+      }
+      .profile-chip img {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        object-fit: cover;
+      }
+      .profile-chip .who {
+        line-height: 1.2;
+      }
+      .profile-chip .who b {
+        font-size: 13px;
+        display: block;
+        color: var(--text);
+      }
+      .profile-chip .who span {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .page-wrap {
+        padding: 28px;
+        max-width: 1480px;
+        margin: 0 auto;
+      }
+
+      /* ============================================================
+   COMPONENTS
+   ============================================================ */
+      .page-head {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 14px;
+        margin-bottom: 24px;
+      }
+      .page-head h1 {
+        font-size: 23px;
+        font-weight: 800;
+        margin: 0;
+      }
+      .page-head p {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin: 4px 0 0;
+      }
+      .btn-current {
+        background: var(--grad-primary);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 11px 20px;
+        font-size: 13.5px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 22px -8px rgba(124, 92, 252, 0.55);
+        transition: 0.2s;
+      }
+      .btn-current:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px -8px rgba(124, 92, 252, 0.65);
+        color: #fff;
+      }
+
+      /* card shell w/ signature current-line */
+      .gcard {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      .gcard::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--grad-current);
+        background-size: 200% 100%;
+        opacity: 0.85;
+      }
+      .gcard:hover {
+        box-shadow: var(--shadow-lg);
+      }
+      .gcard .gcard-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 22px 4px;
+      }
+      .gcard .gcard-head h2 {
+        font-size: 15.5px;
+        font-weight: 700;
+        margin: 0;
+      }
+      .gcard .gcard-head .sub {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+      .gcard .gcard-body {
+        padding: 14px 22px 22px;
+      }
+      .link-more {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--blue);
+      }
+
+      /* stat cards */
+      .stat-card {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        cursor: default;
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+      .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .stat-trend {
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 9px;
+        border-radius: 8px;
+      }
+      .trend-up {
+        color: var(--green);
+        background: rgba(16, 185, 129, 0.12);
+      }
+      .trend-down {
+        color: var(--red);
+        background: rgba(239, 68, 68, 0.12);
+      }
+      .stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        font-family: var(--font-mono);
+        letter-spacing: 0;
+      }
+      .stat-label {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .stat-spark {
+        height: 34px;
+        margin-top: -6px;
+      }
+
+      /* tables */
+      .table-modern {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      .table-modern thead th {
+        text-align: right;
+        font-size: 11.5px;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0 10px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .table-modern tbody td {
+        padding: 14px 10px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
+      .table-modern tbody tr {
+        transition: 0.2s;
+      }
+      .table-modern tbody tr:hover {
+        background: var(--bg);
+      }
+      .table-modern tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .cust-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .cust-cell img {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        object-fit: cover;
+      }
+      .cust-cell .nm {
+        font-weight: 600;
+        font-size: 13.5px;
+      }
+      .cust-cell .id {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+
+      .badge-status {
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 5px 11px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .badge-status::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .st-pending {
+        color: #b45309;
+        background: rgba(245, 158, 11, 0.13);
+      }
+      .st-pending::before {
+        background: var(--orange);
+      }
+      .st-processing {
+        color: #0e7490;
+        background: rgba(34, 211, 238, 0.14);
+      }
+      .st-processing::before {
+        background: var(--cyan);
+      }
+      .st-shipped {
+        color: #1d4ed8;
+        background: rgba(47, 111, 237, 0.13);
+      }
+      .st-shipped::before {
+        background: var(--blue);
+      }
+      .st-delivered {
+        color: #047857;
+        background: rgba(16, 185, 129, 0.13);
+      }
+      .st-delivered::before {
+        background: var(--green);
+      }
+      .st-cancelled {
+        color: #b91c1c;
+        background: rgba(239, 68, 68, 0.13);
+      }
+      .st-cancelled::before {
+        background: var(--red);
+      }
+
+      /* best selling product cards */
+      .product-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 13px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        transition: 0.2s;
+        margin-bottom: 10px;
+      }
+      .product-row:last-child {
+        margin-bottom: 0;
+      }
+      .product-row:hover {
+        border-color: transparent;
+        box-shadow: var(--shadow);
+        transform: translateY(-2px);
+      }
+      .product-thumb {
+        width: 54px;
+        height: 54px;
+        border-radius: 13px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 21px;
+        position: relative;
+        overflow: hidden;
+      }
+      .product-thumb::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 30% 20%,
+          rgba(255, 255, 255, 0.35),
+          transparent 60%
+        );
+      }
+      .product-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .product-info .pname {
+        font-weight: 700;
+        font-size: 13.8px;
+      }
+      .product-info .pmeta {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        margin-top: 2px;
+        display: flex;
+        gap: 10px;
+      }
+      .stock-bar {
+        height: 5px;
+        border-radius: 5px;
+        background: var(--bg);
+        width: 80px;
+        overflow: hidden;
+        margin-top: 6px;
+      }
+      .stock-bar > div {
+        height: 100%;
+        border-radius: 5px;
+      }
+      .qbtn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        transition: 0.2s;
+        flex-shrink: 0;
+      }
+      .qbtn:hover {
+        background: var(--grad-primary);
+        color: #fff;
+        border-color: transparent;
+      }
+
+      /* activity feed */
+      .feed-item {
+        display: flex;
+        gap: 13px;
+        padding: 13px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      .feed-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .feed-ico {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      .feed-txt p {
+        margin: 0;
+        font-size: 13.3px;
+        font-weight: 600;
+      }
+      .feed-txt span {
+        font-size: 11.5px;
+        color: var(--text-muted);
+      }
+
+      /* notifications */
+      .notif-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .notif-item:last-child {
+        border-bottom: none;
+      }
+      .notif-prio {
+        width: 7px;
+        border-radius: 6px;
+        flex-shrink: 0;
+        align-self: stretch;
+      }
+      .notif-ico {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .notif-body p {
+        margin: 0;
+        font-size: 13.2px;
+        font-weight: 600;
+      }
+      .notif-body span.d {
+        font-size: 12px;
+        color: var(--text-muted);
+        display: block;
+        margin-top: 1px;
+      }
+      .notif-body small {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .dropdown-panel {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
+        width: 360px;
+        max-height: 420px;
+        overflow: auto;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow-lg);
+        padding: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-8px) scale(0.98);
+        transition: 0.2s ease;
+        z-index: 50;
+      }
+      .dropdown-panel.show {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0) scale(1);
+      }
+      .dropdown-wrap {
+        position: relative;
+      }
+
+      /* theme toggle */
+      .theme-toggle {
+        display: flex;
+        align-items: center;
+        border-radius: 11px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        padding: 3px;
+        gap: 2px;
+      }
+      .theme-toggle button {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        border-radius: 9px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 13px;
+      }
+      .theme-toggle button.active {
+        background: var(--grad-primary);
+        color: #fff;
+      }
+
+      /* misc */
+      .legend-row {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        font-size: 12.5px;
+        color: var(--text-muted);
+        margin-top: 10px;
+      }
+      .legend-row span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .legend-row i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .sidebar-backdrop {
+        display: none;
+      }
+
+      @media (max-width: 1199.98px) {
+        .app-shell {
+          overflow-x: hidden;
+        }
+        .main {
+          width: 100%;
+          max-width: 100vw;
+          overflow-x: hidden;
+        }
+        .sidebar {
+          position: fixed;
+          top: 0;
+          right: 0;
+          height: 100vh;
+          transform: translateX(calc(100% + 24px));
+          transition: transform 0.3s ease;
+          pointer-events: none;
+          visibility: hidden;
+        }
+        .sidebar.show {
+          transform: translateX(0);
+          pointer-events: auto;
+          visibility: visible;
+        }
+        .sidebar-backdrop.show {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.45);
+          z-index: 39;
+        }
+        /* Fallback in case the Bootstrap CDN fails to load: guarantees the
+           hamburger button stays hidden on desktop and visible on mobile
+           without depending on the .d-xl-none utility class. */
+        #sbToggle {
+          display: flex;
+        }
+      }
+      @media (min-width: 1200px) {
+        #sbToggle {
+          display: none;
+        }
+      }
+      @media (max-width: 575.98px) {
+        .page-wrap {
+          padding: 18px;
+        }
+        .topbar {
+          padding: 12px 16px;
+        }
+        .search-box {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body data-theme="light">
+    <div class="sidebar-backdrop" id="sbBackdrop"></div>
+    <div class="app-shell">
+      <!-- ===================== SIDEBAR ===================== -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <div class="mark"><i class="fa-solid fa-bolt"></i></div>
+          <div class="name">اسکوتیکس<span>پنل مدیریت فروشگاه</span></div>
+        </div>
+
+        <nav class="sidebar-nav scroll-thin">
+          <div class="sidebar-section-title">اصلی</div>
+          <a href="/admin/dashboard/" class="nav-link active"
+            ><i class="ico fa-solid fa-grid-2"></i> داشبورد</a
+          >
+
+          <a href="/admin/comments/" class="nav-link"
+            ><i class="ico fa-solid fa-star"></i> دیدگاه‌ها</a
+          >
+          <a href="/admin/finance/" class="nav-link"
+            ><i class="ico fa-solid fa-chart-line"></i> درآمد</a
+          >
+        </nav>
+      </aside>
+
+      <!-- ===================== MAIN ===================== -->
+      <div class="main">
+        <!-- Topbar -->
+        <header class="topbar">
+          <button class="icon-btn d-xl-none" id="sbToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="d-flex align-items-center gap-2 ms-auto">
+            <div class="theme-toggle">
+              <button id="themeLight" class="active" title="روشن">
+                <i class="fa-solid fa-sun"></i>
+              </button>
+              <button id="themeDark" title="تیره">
+                <i class="fa-solid fa-moon"></i>
+              </button>
+            </div>
+
+            <div class="dropdown-wrap">
+              <div class="icon-btn" id="notifBtn">
+                <i class="fa-regular fa-bell"></i
+                ><span class="dot-badge"></span>
+              </div>
+              <div class="dropdown-panel" id="notifPanel">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-2"
+                >
+                  <h6 class="m-0 fw-bold" style="font-size: 14px">
+                    مرکز اعلان‌ها
+                  </h6>
+                  <span class="link-more" style="cursor: pointer"
+                    >علامت‌گذاری همه</span
+                  >
+                </div>
+                <div id="notifList"></div>
+              </div>
+            </div>
+
+            <div class="dropdown-wrap">
+              <div class="profile-chip" id="profileBtn">
+                <img id="profileAvatar" src="" alt="تصویر پروفایل" />
+                <div class="who d-none d-sm-block">
+                  <b id="profileName">کاربر</b
+                  ><span id="profileRole">مدیر فروشگاه</span>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-down"
+                  style="font-size: 10px; color: var(--text-muted)"
+                ></i>
+              </div>
+              <div
+                class="dropdown-panel"
+                id="profilePanel"
+                style="width: 220px; left: auto; right: 0; padding: 10px"
+              >
+                <a
+                  href="#"
+                  class="d-flex align-items-center gap-2 p-2 rounded-3"
+                  style="color: var(--text); font-size: 13.5px"
+                  ><i class="fa-regular fa-user fa-fw"></i> پروفایل من</a
+                >
+                <a
+                  href="#"
+                  class="d-flex align-items-center gap-2 p-2 rounded-3"
+                  style="color: var(--text); font-size: 13.5px"
+                  ><i class="fa-solid fa-gear fa-fw"></i> تنظیمات</a
+                >
+                <a
+                  href="#"
+                  class="d-flex align-items-center gap-2 p-2 rounded-3"
+                  style="color: var(--text); font-size: 13.5px"
+                  ><i class="fa-regular fa-circle-question fa-fw"></i>
+                  پشتیبانی</a
+                >
+                <hr class="my-1" style="border-color: var(--border)" />
+                <a
+                  href="#"
+                  class="d-flex align-items-center gap-2 p-2 rounded-3"
+                  style="color: var(--red); font-size: 13.5px"
+                  ><i class="fa-solid fa-power-off fa-fw"></i> خروج از حساب</a
+                >
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Page content -->
+        <div class="page-wrap">
+          <div class="page-head">
+            <div>
+              <h1 id="greetingText">سلام، کاربر 👋</h1>
+              <p id="todayDate">خلاصه عملکرد فروشگاه اسکوتر برقی شما — امروز</p>
+            </div>
+          </div>
+
+          <!-- ============ STAT CARDS ============ -->
+          <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+              <div class="gcard stat-card">
+                <div class="stat-top">
+                  <div
+                    class="stat-icon"
+                    style="background: var(--grad-primary)"
+                  >
+                    <i class="fa-solid fa-box-open"></i>
+                  </div>
+                  <div class="stat-trend trend-up" id="productsTrend">
+                    <i class="fa-solid fa-arrow-trend-up"></i> ۰٪
+                  </div>
+                </div>
+                <div>
+                  <div class="stat-value" id="totalProducts">۰</div>
+                  <div class="stat-label">کل محصولات فعال</div>
+                </div>
+                <div id="sparkProducts" class="stat-spark"></div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+              <div class="gcard stat-card">
+                <div class="stat-top">
+                  <div class="stat-icon" style="background: var(--grad-orange)">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                  </div>
+                  <div class="stat-trend trend-up" id="ordersTrend">
+                    <i class="fa-solid fa-arrow-trend-up"></i> ۰٪
+                  </div>
+                </div>
+                <div>
+                  <div class="stat-value" id="todayOrders">۰</div>
+                  <div class="stat-label">سفارش‌های امروز</div>
+                </div>
+                <div id="sparkOrders" class="stat-spark"></div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+              <div class="gcard stat-card">
+                <div class="stat-top">
+                  <div class="stat-icon" style="background: var(--grad-green)">
+                    <i class="fa-solid fa-users"></i>
+                  </div>
+                  <div class="stat-trend trend-up" id="customersTrend">
+                    <i class="fa-solid fa-arrow-trend-up"></i> ۰٪
+                  </div>
+                </div>
+                <div>
+                  <div class="stat-value" id="totalCustomers">۰</div>
+                  <div class="stat-label">کل مشتریان</div>
+                </div>
+                <div id="sparkCustomers" class="stat-spark"></div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+              <div class="gcard stat-card">
+                <div class="stat-top">
+                  <div class="stat-icon" style="background: var(--grad-purple)">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                  </div>
+                  <div class="stat-trend trend-down" id="revenueTrend">
+                    <i class="fa-solid fa-arrow-trend-down"></i> ۰٪
+                  </div>
+                </div>
+                <div>
+                  <div class="stat-value">
+                    <span class="num" id="monthlyRevenue">۰</span>
+                  </div>
+                  <div class="stat-label">درآمد ماهانه (میلیون تومان)</div>
+                </div>
+                <div id="sparkRevenue" class="stat-spark"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ CHARTS ROW 1 ============ -->
+          <div class="row g-4 mb-4">
+            <div class="col-xl-12">
+              <div class="gcard h-100">
+                <div class="gcard-head">
+                  <div>
+                    <h2>روند فروش ماهانه</h2>
+                    <div class="sub">درآمد در ۱۲ ماه گذشته</div>
+                  </div>
+                  <button
+                    class="link-more"
+                    id="downloadExcelBtn"
+                    style="border: none; background: none; cursor: pointer"
+                  ></button>
+                </div>
+                <div class="gcard-body">
+                  <div id="chartSales"></div>
+                  <div class="legend-row">
+                    <span
+                      ><i style="background: var(--blue)"></i> درآمد (میلیون
+                      تومان)</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ ORDERS + ACTIVITY ============ -->
+          <div class="row g-4 mb-4">
+            <div class="col-xl-8">
+              <div class="gcard h-100">
+                <div class="gcard-head">
+                  <div>
+                    <h2>سفارش‌های اخیر</h2>
+                    <div class="sub" id="recentOrdersCount">
+                      ۶ سفارش ثبت‌شده آخر
+                    </div>
+                  </div>
+                  <button
+                    class="link-more"
+                    id="downloadOrdersBtn"
+                    style="border: none; background: none; cursor: pointer"
+                  ></button>
+                </div>
+                <div class="gcard-body" style="overflow-x: auto">
+                  <table class="table-modern">
+                    <thead>
+                      <tr>
+                        <th>شماره سفارش</th>
+                        <th>مشتری</th>
+                        <th>محصول</th>
+                        <th>مبلغ</th>
+                        <th>وضعیت</th>
+                        <th>تاریخ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentOrdersTable">
+                      <tr>
+                        <td colspan="6" class="text-center text-muted">
+                          در حال بارگذاری...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-4">
+              <div class="gcard h-100">
+                <div class="gcard-head">
+                  <div><h2>فعالیت‌های اخیر</h2></div>
+                </div>
+                <div class="gcard-body" id="activitiesList">
+                  <div class="text-center text-muted py-3">
+                    در حال بارگذاری...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ BEST SELLING + NOTIFICATIONS ============ -->
+          <div class="row g-4">
+            <div class="col-xl-8">
+              <div class="gcard h-100">
+                <div class="gcard-head">
+                  <div>
+                    <h2>پرفروش‌ترین اسکوترها</h2>
+                    <div class="sub">عملکرد محصولات در ماه جاری</div>
+                  </div>
+                  <span class="link-more">مدیریت محصولات</span>
+                </div>
+                <div class="gcard-body" id="topProductsList">
+                  <div class="text-center text-muted py-3">
+                    در حال بارگذاری...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-4">
+              <div class="gcard h-100">
+                <div class="gcard-head">
+                  <div>
+                    <h2>مرکز اعلان‌ها</h2>
+                    <div class="sub">به‌روزرسانی‌های مهم سیستم</div>
+                  </div>
+                </div>
+                <div
+                  class="gcard-body"
+                  style="max-height: 320px; overflow-y: auto"
+                  class="scroll-thin"
+                  id="notificationList"
+                >
+                  <div class="text-center text-muted py-3">
+                    در حال بارگذاری...
+                  </div>
+                </div>
+                <div class="px-3 pb-3">
+                  <button
+                    class="btn-current w-100 justify-content-center"
+                    style="
+                      background: var(--bg);
+                      color: var(--blue);
+                      box-shadow: none;
+                      border: 1px solid var(--border);
+                    "
+                  >
+                    مشاهده همه اعلان‌ها
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="text-center py-4"
+            style="color: var(--text-muted); font-size: 12px"
+          >
+            © ۱۴۰۵ اسکوتیکس — پنل مدیریت فروشگاه اسکوتر برقی
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      /* ═══════════════════════════════════════
+   CONFIG & API
+═══════════════════════════════════════ */
+      const API_BASE = "/shop/api/";
+      const API_URL = API_BASE + "admin/dashboard/stats/";
+      let charts = {};
+      let dashboardData = null;
+
+      /* ═══════════════════════════════════════
+   UTILITY FUNCTIONS (اصلاح شده)
+═══════════════════════════════════════ */
+      function toPersianNum(n) {
+        if (n === undefined || n === null) return "۰";
+        const num = typeof n === "number" ? n : parseFloat(n);
+        if (isNaN(num)) return "۰";
+        return String(num).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
+      }
+
+      function formatPrice(price) {
+        if (price === undefined || price === null) return "۰";
+        const num = typeof price === "number" ? price : parseFloat(price);
+        if (isNaN(num)) return String(price);
+        return toPersianNum(Math.round(num).toLocaleString("en-US"));
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
+        try {
+          const d = new Date(dateStr);
+          return d
+            .toLocaleDateString("fa-IR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })
+            .replace(/\//g, "/");
+        } catch (e) {
+          return dateStr;
+        }
+      }
+
+      function getStatusBadge(status) {
+        const map = {
+          pending: "st-pending",
+          processing: "st-processing",
+          shipping: "st-shipped",
+          delivered: "st-delivered",
+          cancelled: "st-cancelled",
+        };
+        const labels = {
+          pending: "در انتظار",
+          processing: "در حال پردازش",
+          shipping: "ارسال شده",
+          delivered: "تحویل شده",
+          cancelled: "لغو شده",
+        };
+        return {
+          className: map[status] || "st-pending",
+          label: labels[status] || status,
+        };
+      }
+
+      function getColorHex(name) {
+        const map = {
+          red: "#EF4444",
+          blue: "#2F6FED",
+          orange: "#F59E0B",
+          green: "#10B981",
+          cyan: "#22D3EE",
+          purple: "#7C5CFC",
+        };
+        return map[name] || "#2F6FED";
+      }
+
+      function getColorRgb(name) {
+        const map = {
+          red: "239,68,68",
+          blue: "47,111,237",
+          orange: "245,158,11",
+          green: "16,185,129",
+          cyan: "34,211,238",
+          purple: "124,92,252",
+        };
+        return map[name] || "47,111,237";
+      }
+
+      /* ═══════════════════════════════════════
+   LOAD DASHBOARD DATA
+═══════════════════════════════════════ */
+      async function loadDashboard() {
+        try {
+          const response = await fetch(API_URL);
+          if (!response.ok) throw new Error("Failed to load dashboard data");
+          dashboardData = await response.json();
+          console.log("✅ Dashboard loaded:", dashboardData);
+          renderAll();
+        } catch (error) {
+          console.error("❌ Error loading dashboard:", error);
+          // نمایش خطا در UI
+          document
+            .querySelectorAll(".stat-value")
+            .forEach((el) => (el.textContent = "۰"));
+          document.getElementById("recentOrdersTable").innerHTML = `
+            <tr><td colspan="6" class="text-center text-danger">خطا در بارگذاری اطلاعات</td></tr>
+        `;
+          document.getElementById("topProductsList").innerHTML = `
+            <div class="text-center text-danger py-3">خطا در بارگذاری</div>
+        `;
+          document.getElementById("notificationList").innerHTML = `
+            <div class="text-center text-danger py-3">خطا در بارگذاری</div>
+        `;
+          document.getElementById("activitiesList").innerHTML = `
+            <div class="text-center text-danger py-3">خطا در بارگذاری</div>
+        `;
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER ALL (با چک کردن وجود دیتا)
+═══════════════════════════════════════ */
+      function renderAll() {
+        if (!dashboardData) return;
+        renderUserProfile();
+        renderStats();
+        renderMonthlySalesChart();
+        renderRecentOrders();
+        renderActivities();
+        renderTopProducts();
+        renderNotifications();
+        updateBadges();
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER USER PROFILE
+═══════════════════════════════════════ */
+      function renderUserProfile() {
+        const user = dashboardData.user || {};
+        const avatar = user.profile_image || "https://i.pravatar.cc/100?img=47";
+
+        document.getElementById("greetingText").textContent =
+          `سلام، ${user.fullname || "کاربر"} 👋`;
+        document.getElementById("todayDate").textContent =
+          dashboardData.today_date ||
+          "خلاصه عملکرد فروشگاه اسکوتر برقی شما — امروز";
+        document.getElementById("profileAvatar").src = avatar;
+        document.getElementById("profileName").textContent =
+          user.fullname || "کاربر";
+        document.getElementById("profileRole").textContent =
+          user.bio || "مدیر فروشگاه";
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER STATS (اصلاح شده)
+═══════════════════════════════════════ */
+      function renderStats() {
+        const stats = dashboardData.stats || {};
+        const trends = stats.trends || {};
+
+        document.getElementById("totalProducts").textContent = toPersianNum(
+          stats.total_products || 0,
+        );
+        document.getElementById("todayOrders").textContent = toPersianNum(
+          stats.today_orders || 0,
+        );
+        document.getElementById("totalCustomers").textContent = toPersianNum(
+          stats.total_customers || 0,
+        );
+        document.getElementById("monthlyRevenue").textContent = toPersianNum(
+          stats.monthly_revenue || 0,
+        );
+
+        // Trends
+        const trendMap = {
+          productsTrend: trends.products_trend || "+0%",
+          ordersTrend: trends.orders_trend || "+0%",
+          customersTrend: trends.customers_trend || "+0%",
+          revenueTrend: trends.revenue_trend || "+0%",
+        };
+
+        Object.entries(trendMap).forEach(([id, value]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const isUp = value.startsWith("+");
+          el.className = `stat-trend ${isUp ? "trend-up" : "trend-down"}`;
+          el.innerHTML = `<i class="fa-solid fa-arrow-trend-${isUp ? "up" : "down"}"></i> ${value}`;
+        });
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER MONTHLY SALES CHART (اصلاح شده)
+═══════════════════════════════════════ */
+      function renderMonthlySalesChart() {
+        const data = dashboardData.monthly_sales || [];
+
+        // ===== اگر دیتا خالی بود، دیتای نمونه بساز =====
+        let chartData = [];
+        let chartCategories = [];
+
+        if (data.length === 0 || data.every((d) => d.total === 0)) {
+          // دیتای نمونه
+          const sampleMonths = [
+            "فروردین",
+            "اردیبهشت",
+            "خرداد",
+            "تیر",
+            "مرداد",
+            "شهریور",
+            "مهر",
+            "آبان",
+            "آذر",
+            "دی",
+            "بهمن",
+            "اسفند",
+          ];
+          const sampleValues = [12, 18, 25, 30, 28, 35, 42, 38, 45, 50, 55, 60];
+          chartCategories = sampleMonths;
+          chartData = sampleValues;
+          console.log("📊 Using sample data for chart");
+        } else {
+          chartCategories = data.map((d) => d.month);
+          chartData = data.map((d) => d.total || 0);
+        }
+
+        const palette = {
+          blue: "#2F6FED",
+          purple: "#7C5CFC",
+          cyan: "#22D3EE",
+          green: "#10B981",
+          orange: "#F59E0B",
+          red: "#EF4444",
+        };
+        const baseFont = "'Vazirmatn', sans-serif";
+        const isDark = document.body.getAttribute("data-theme") === "dark";
+
+        if (charts.sales) {
+          charts.sales.destroy();
+        }
+
+        charts.sales = new ApexCharts(document.querySelector("#chartSales"), {
+          chart: {
+            type: "area",
+            height: 300,
+            fontFamily: baseFont,
+            toolbar: { show: false },
+            animations: { easing: "easeinout" },
+          },
+          series: [
+            {
+              name: "درآمد",
+              type: "area",
+              data: chartData,
+            },
+          ],
+          stroke: { width: [0], curve: "smooth" },
+          fill: {
+            type: ["gradient"],
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.45,
+              opacityTo: 0,
+              stops: [0, 90, 100],
+            },
+          },
+          colors: [palette.blue],
+          dataLabels: { enabled: false },
+          xaxis: {
+            categories: chartCategories,
+            labels: {
+              style: { fontSize: "11px" },
+              rotate: -45, // برای خوانایی بهتر
+            },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+          },
+          yaxis: {
+            opposite: true,
+            labels: {
+              style: { fontSize: "11px" },
+              formatter: (v) => Math.round(v) + "M",
+            },
+          },
+          grid: {
+            borderColor: isDark
+              ? "rgba(255,255,255,.08)"
+              : "rgba(11,17,32,.08)",
+            strokeDashArray: 4,
+          },
+          tooltip: {
+            shared: true,
+            y: { formatter: (v) => Math.round(v) + " میلیون تومان" },
+          },
+          legend: { show: false },
+        });
+        charts.sales.render();
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER RECENT ORDERS (اصلاح شده)
+═══════════════════════════════════════ */
+      function renderRecentOrders() {
+        const orders = dashboardData.recent_orders || [];
+        const tbody = document.getElementById("recentOrdersTable");
+
+        // به‌روزرسانی تعداد سفارش‌ها
+        document.getElementById("recentOrdersCount").textContent =
+          orders.length > 0
+            ? `${orders.length} سفارش ثبت‌شده آخر`
+            : "هیچ سفارشی یافت نشد";
+
+        if (orders.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">هیچ سفارشی یافت نشد</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = orders
+          .map((o) => {
+            const status = getStatusBadge(o.status);
+            const products = o.products || [];
+            const productNames = products.join(" - ");
+            const avatar =
+              o.customer_avatar || "https://i.pravatar.cc/80?img=12";
+
+            return `
+            <tr>
+                <td class="num">${o.order_number || "N/A"}</td>
+                <td>
+                    <div class="cust-cell">
+                        <img src="${avatar}" />
+                        <div>
+                            <div class="nm">${o.customer_name || "کاربر"}</div>
+                            <div class="id">@${o.customer_username || "user"}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>${productNames || "-"}</td>
+                <td class="num">${formatPrice(o.total)}</td>
+                <td>
+                    <span class="badge-status ${status.className}">${status.label}</span>
+                </td>
+                <td class="num">${formatDate(o.created_at)}</td>
+            </tr>
+        `;
+          })
+          .join("");
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER ACTIVITIES (اصلاح شده)
+═══════════════════════════════════════ */
+      function renderActivities() {
+        const activities = dashboardData.recent_activities || [];
+        const container = document.getElementById("activitiesList");
+
+        if (activities.length === 0) {
+          container.innerHTML = `<div class="text-center text-muted py-3">هیچ فعالیتی یافت نشد</div>`;
+          return;
+        }
+
+        const colorMap = {
+          blue: { bg: "rgba(47,111,237,0.12)", color: "#2F6FED" },
+          purple: { bg: "rgba(124,92,252,0.12)", color: "#7C5CFC" },
+          orange: { bg: "rgba(245,158,11,0.13)", color: "#F59E0B" },
+          green: { bg: "rgba(16,185,129,0.13)", color: "#10B981" },
+          red: { bg: "rgba(239,68,68,0.12)", color: "#EF4444" },
+          cyan: { bg: "rgba(34,211,238,0.14)", color: "#0E7490" },
+        };
+
+        container.innerHTML = activities
+          .map((a) => {
+            const colors = colorMap[a.color] || colorMap.blue;
+            return `
+            <div class="feed-item">
+                <div class="feed-ico" style="background: ${colors.bg}; color: ${colors.color};">
+                    <i class="fa-solid ${a.icon || "fa-bell"}"></i>
+                </div>
+                <div class="feed-txt">
+                    <p>${a.title || "فعالیت"}</p>
+                    <span>${a.description || ""} — ${a.time || ""}</span>
+                </div>
+            </div>
+        `;
+          })
+          .join("");
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER TOP PRODUCTS (اصلاح شده)
+═══════════════════════════════════════ */
+      function renderTopProducts() {
+        const products = dashboardData.top_products || [];
+        const container = document.getElementById("topProductsList");
+
+        if (products.length === 0) {
+          container.innerHTML = `<div class="text-center text-muted py-3">هیچ محصولی یافت نشد</div>`;
+          return;
+        }
+
+        const gradients = [
+          "var(--grad-primary)",
+          "var(--grad-orange)",
+          "var(--grad-green)",
+          "var(--grad-purple)",
+        ];
+
+        container.innerHTML =
+          `<div class="row g-3">` +
+          products
+            .map((p, i) => {
+              const color = gradients[i % gradients.length];
+              // ===== بررسی درست cover_image =====
+              let coverImage = p.cover_image || "";
+
+              // اگر cover_image با http شروع نمیشه و خالی نیست، مسیر کامل بساز
+              if (coverImage && !coverImage.startsWith("http")) {
+                // اگر با /media/ شروع میشه، خودش کامل است
+                if (!coverImage.startsWith("/media/")) {
+                  coverImage = "/media/" + coverImage;
+                }
+              }
+
+              // لاگ برای دیباگ
+              console.log(`Product ${i}:`, p.name, "cover_image:", coverImage);
+
+              return `
+                <div class="col-md-6">
+                    <div class="product-row">
+                        <div class="product-thumb" style="background: ${color};">
+                            ${
+                              coverImage
+                                ? `<img src="${coverImage}" 
+                                    style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" 
+                                    alt="${p.name || "محصول"}"
+                                    onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fa-solid fa-motorcycle\\'></i>'"
+                                />`
+                                : `<i class="fa-solid fa-motorcycle"></i>`
+                            }
+                        </div>
+                        <div class="product-info">
+                            <div class="pname">${p.name || "محصول"}</div>
+                            <div class="pmeta">
+                                <span>${toPersianNum(p.total_sold || 0)} فروش</span>
+                                <span>${formatPrice(p.total_revenue || 0)} تومان</span>
+                            </div>
+                        </div>
+                        <div class="qbtn">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            })
+            .join("") +
+          `</div>`;
+      }
+
+      /* ═══════════════════════════════════════
+   RENDER NOTIFICATIONS (اصلاح شده)
+═══════════════════════════════════════ */
+      function renderNotifications() {
+        const notifications = dashboardData.notifications || [];
+        const container = document.getElementById("notificationList");
+        const panelContainer = document.getElementById("notifList");
+
+        if (notifications.length === 0) {
+          const emptyMsg = `<div class="text-center text-muted py-3">هیچ اعلانی وجود ندارد</div>`;
+          container.innerHTML = emptyMsg;
+          panelContainer.innerHTML = emptyMsg;
+          return;
+        }
+
+        const renderItem = (n) => {
+          const iconColor = n.icon_color || "blue";
+          return `
+            <div class="notif-item">
+                <div class="notif-prio" style="background: ${n.priority_color || "#2F6FED"}"></div>
+                <div class="notif-ico" style="background: rgba(${getColorRgb(iconColor)},0.12); color: ${getColorHex(iconColor)};">
+                    <i class="fa-solid ${n.icon || "fa-bell"}"></i>
+                </div>
+                <div class="notif-body">
+                    <p>${n.title || "اعلان"}</p>
+                    <span class="d">${n.description || ""}</span>
+                    <small>${n.time || ""}</small>
+                </div>
+            </div>
+        `;
+        };
+
+        const html = notifications.map(renderItem).join("");
+        container.innerHTML = html;
+        panelContainer.innerHTML = html;
+      }
+
+      /* ═══════════════════════════════════════
+   UPDATE BADGES
+═══════════════════════════════════════ */
+      function updateBadges() {
+        const stats = dashboardData.stats || {};
+        const badge = document.getElementById("orderBadgeCount");
+        if (badge) {
+          badge.textContent = stats.today_orders || 0;
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   THEME ENGINE
+═══════════════════════════════════════ */
+      // ... بقیه کدهای theme و dropdown و sidebar به همین صورت باقی می‌مونه
+      /* ═══════════════════════════════════════
+   THEME ENGINE
+═══════════════════════════════════════ */
+      const body = document.body;
+      const btnLight = document.getElementById("themeLight");
+      const btnDark = document.getElementById("themeDark");
+
+      function applyChartTheme(isDark) {
+        Object.values(charts).forEach((c) => {
+          if (!c) return;
+          c.updateOptions(
+            {
+              theme: { mode: isDark ? "dark" : "light" },
+              chart: { foreColor: isDark ? "#9099B3" : "#646E84" },
+              grid: {
+                borderColor: isDark
+                  ? "rgba(255,255,255,.08)"
+                  : "rgba(11,17,32,.08)",
+              },
+              tooltip: { theme: isDark ? "dark" : "light" },
+            },
+            false,
+            true,
+          );
+        });
+      }
+
+      function setTheme(mode) {
+        body.setAttribute("data-theme", mode);
+        btnLight.classList.toggle("active", mode === "light");
+        btnDark.classList.toggle("active", mode === "dark");
+        applyChartTheme(mode === "dark");
+        // رفرش چارت
+        if (charts.sales) {
+          renderMonthlySalesChart();
+        }
+      }
+
+      btnLight.addEventListener("click", () => setTheme("light"));
+      btnDark.addEventListener("click", () => setTheme("dark"));
+
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        setTheme("dark");
+      }
+
+      /* ═══════════════════════════════════════
+   DROPDOWNS
+═══════════════════════════════════════ */
+      function wireDropdown(btnId, panelId) {
+        const btn = document.getElementById(btnId);
+        const panel = document.getElementById(panelId);
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          document.querySelectorAll(".dropdown-panel").forEach((p) => {
+            if (p !== panel) p.classList.remove("show");
+          });
+          panel.classList.toggle("show");
+        });
+      }
+      wireDropdown("notifBtn", "notifPanel");
+      wireDropdown("profileBtn", "profilePanel");
+      document.addEventListener("click", () =>
+        document
+          .querySelectorAll(".dropdown-panel")
+          .forEach((p) => p.classList.remove("show")),
+      );
+
+      /* ═══════════════════════════════════════
+   MOBILE SIDEBAR
+═══════════════════════════════════════ */
+      const sidebar = document.getElementById("sidebar");
+      const sbBackdrop = document.getElementById("sbBackdrop");
+      document.getElementById("sbToggle").addEventListener("click", () => {
+        sidebar.classList.add("show");
+        sbBackdrop.classList.add("show");
+      });
+      sbBackdrop.addEventListener("click", () => {
+        sidebar.classList.remove("show");
+        sbBackdrop.classList.remove("show");
+      });
+
+      /* ═══════════════════════════════════════
+   EXCEL DOWNLOAD HANDLERS (TODO)
+═══════════════════════════════════════ */
+      document
+        .getElementById("downloadExcelBtn")
+        .addEventListener("click", () => {
+          // TODO: پیاده‌سازی خروجی اکسل کامل با نمودارهای مختلف
+          alert("📊 TODO: خروجی اکسل کامل با نمودارهای درآمد ماهانه");
+        });
+
+      document
+        .getElementById("downloadOrdersBtn")
+        .addEventListener("click", () => {
+          // TODO: پیاده‌سازی خروجی اکسل ۲۰ سفارش آخر
+          alert("📊 TODO: خروجی اکسل ۲۰ سفارش آخر");
+        });
+
+      /* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+      loadDashboard();
+    </script>
+  </body>
+</html>

@@ -2,11 +2,13 @@
 
 from rest_framework import serializers
 
+from apps.accounts.models import Province, City
 from .models import (
-    Product, Category, ProductSpec, TrustBadge,
+    Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist, OrderItem, Order
+    ProductReview, Wishlist, CartItem, Transaction
 )
+from .models import Product, Order, OrderItem, Address
 from ..accounts.serializers import UserProfileSerializer, AddressSerializer
 
 
@@ -114,6 +116,8 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
 
     def get_cover_image_url(self, obj):
+        if obj.grid_image:
+            return obj.grid_image.url
         if obj.cover_image:
             return obj.cover_image.url
         return None
@@ -289,3 +293,217 @@ class DashboardSerializer(serializers.Serializer):
     wishlist = serializers.ListField()
     addresses = AddressSerializer(many=True)
     notifications = serializers.ListField()
+
+
+# apps/shop/serializers.py (افزودن)
+
+class AdminOrderSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='user.fullname')
+    customer_username = serializers.CharField(source='user.username')
+    customer_avatar = serializers.SerializerMethodField()
+    products = serializers.SerializerMethodField()
+    status_label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = [
+            'order_number', 'customer_name', 'customer_username',
+            'customer_avatar', 'products', 'total', 'status',
+            'status_label', 'created_at', 'payment_status'
+        ]
+
+    def get_customer_avatar(self, obj):
+        if obj.user and obj.user.profile_image:
+            return obj.user.profile_image.url
+        return None
+
+    def get_products(self, obj):
+        return [item.product.name for item in obj.items.all()]
+
+    def get_status_label(self, obj):
+        return dict(Order.STATUS_CHOICES).get(obj.status, obj.status)
+
+
+# apps/shop/serializers.py (افزودن به سریالایزرهای موجود)
+
+
+class ProvinceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Province
+        fields = ['id', 'name']
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['id', 'name', 'province']
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    province_name = serializers.CharField(source='province.name', read_only=True)
+    city_name = serializers.CharField(source='city.name', read_only=True)
+
+    class Meta:
+        model = Address
+        fields = [
+            'id', 'recipient_name', 'recipient_phone', 'province', 'province_name',
+            'city', 'city_name', 'address', 'postal_code', 'plaque',
+            'unit', 'floor', 'description', 'is_active'
+        ]
+        read_only_fields = ['user']
+
+
+# apps/shop/serializers.py
+
+# apps/shop/serializers.py
+
+# apps/shop/serializers.py
+
+class CartItemSerializer(serializers.ModelSerializer):
+    """سریالایزر برای آیتم‌های سبد خرید"""
+
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_slug = serializers.CharField(source='product.slug', read_only=True)
+    product_image = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
+    discount_price = serializers.SerializerMethodField()
+    final_price = serializers.SerializerMethodField()
+    total = serializers.SerializerMethodField()
+    selected_color = serializers.CharField(source='attributes.color', read_only=True, default='black')
+    available_colors = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CartItem
+        fields = [
+            'id', 'product', 'product_name', 'product_slug', 'product_image',
+            'quantity', 'price', 'discount_price', 'final_price', 'total',
+            'price_snapshot', 'selected_color', 'available_colors', 'created_at'
+        ]
+
+    def get_product_image(self, obj):
+        """دریافت تصویر محصول"""
+        # obj یک آبجکت CartItem است، نه دیکشنری
+        if hasattr(obj, 'product') and obj.product and obj.product.cover_image:
+            return obj.product.cover_image.url
+        return None
+
+    def get_price(self, obj):
+        return obj.product.price if hasattr(obj, 'product') else 0
+
+    def get_discount_price(self, obj):
+        return obj.product.discount_price if hasattr(obj, 'product') and obj.product.discount_price else None
+
+    def get_final_price(self, obj):
+        if hasattr(obj, 'product'):
+            return obj.product.final_price
+        return 0
+
+    def get_total(self, obj):
+        return obj.total if hasattr(obj, 'total') else 0
+
+    def get_available_colors(self, obj):
+        """دریافت رنگ‌های موجود برای محصول"""
+        if hasattr(obj, 'product') and obj.product:
+            colors = obj.product.images.values('color_slug', 'color_label', 'color_hex').distinct()
+            return [
+                {
+                    'slug': c['color_slug'],
+                    'name': c['color_label'],
+                    'hex': c['color_hex'],
+                }
+                for c in colors
+            ]
+        return []
+
+
+class CartSerializer(serializers.Serializer):
+    """سریالایزر اصلی سبد خرید"""
+    items = CartItemSerializer(many=True)
+    item_count = serializers.IntegerField()
+    subtotal = serializers.DecimalField(max_digits=15, decimal_places=0)
+    discount_total = serializers.DecimalField(max_digits=15, decimal_places=0)
+    shipping_cost = serializers.CharField()
+    applied_coupon = serializers.CharField(allow_blank=True, allow_null=True)
+    tax_amount = serializers.DecimalField(max_digits=15, decimal_places=0)
+    final_total = serializers.DecimalField(max_digits=15, decimal_places=0)
+
+
+class OrderCreateSerializer(serializers.Serializer):
+    """سریالایزر برای ایجاد سفارش جدید"""
+    # اطلاعات ارسال
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    phone = serializers.CharField(max_length=11)
+    province_id = serializers.IntegerField()
+    city_id = serializers.IntegerField()
+    postal_code = serializers.CharField(max_length=10)
+    address = serializers.CharField()
+    save_address = serializers.BooleanField(default=False)
+
+    # پرداخت
+    payment_method = serializers.ChoiceField(choices=['card', 'cod', 'installments'])
+    coupon_code = serializers.CharField(required=False, allow_blank=True)
+    gift_card_code = serializers.CharField(required=False, allow_blank=True)
+
+    # اقساط
+    installment_months = serializers.IntegerField(required=False, default=6)
+
+    def validate(self, data):
+        # اعتبارسنجی شماره موبایل
+        import re
+        if not re.match(r'^09\d{9}$', data['phone']):
+            raise serializers.ValidationError({'phone': 'شماره موبایل معتبر نیست'})
+
+        # اعتبارسنجی کد پستی
+        if len(data['postal_code']) != 10:
+            raise serializers.ValidationError({'postal_code': 'کد پستی باید ۱۰ رقم باشد'})
+
+        return data
+
+class AdminProductReviewSerializer(serializers.ModelSerializer):
+    """سریالایزر نظرات محصول برای پنل ادمین (همه‌ی وضعیت‌ها)"""
+    user_name = serializers.CharField(source='user.fullname', read_only=True)
+    user_avatar = serializers.SerializerMethodField()
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_slug = serializers.CharField(source='product.slug', read_only=True)
+
+    class Meta:
+        model = ProductReview
+        fields = [
+            'id', 'user_name', 'user_avatar', 'product_name', 'product_slug',
+            'rating', 'title', 'comment', 'status', 'rejection_reason',
+            'is_verified_purchase', 'created_at'
+        ]
+
+    def get_user_avatar(self, obj):
+        if obj.user and obj.user.profile_image:
+            return obj.user.profile_image.url
+        return None
+
+class AdminTransactionSerializer(serializers.ModelSerializer):
+    """سریالایزر تراکنش برای جدول پنل ادمین"""
+    customer_name = serializers.CharField(source='order.user.fullname', read_only=True)
+    customer_username = serializers.CharField(source='order.user.username', read_only=True)
+    customer_avatar = serializers.SerializerMethodField()
+    order_number = serializers.CharField(source='order.order_number', read_only=True)
+    product_names = serializers.SerializerMethodField()
+    gateway_label = serializers.CharField(source='get_gateway_display', read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = [
+            'id', 'transaction_id', 'order_number', 'customer_name', 'customer_username',
+            'customer_avatar', 'product_names', 'gateway', 'gateway_label', 'reference_id',
+            'amount', 'status', 'status_label', 'failure_reason',
+            'created_at', 'paid_at', 'settled_at'
+        ]
+
+    def get_customer_avatar(self, obj):
+        user = obj.order.user
+        if user and user.profile_image:
+            return user.profile_image.url
+        return None
+
+    def get_product_names(self, obj):
+        return [item.product.name for item in obj.order.items.select_related('product').all()]
