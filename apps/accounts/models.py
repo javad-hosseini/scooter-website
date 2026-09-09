@@ -1,6 +1,5 @@
 # accounts/models.py
 
-import hashlib
 import os
 import secrets
 
@@ -9,20 +8,44 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.text import slugify
+
+
+#: Mirrors ALLOWED_AVATAR_EXTENSIONS in apps/accounts/views.py. The stored
+#: extension decides the Content-Type the web server hands back, so it is
+#: pinned to this set rather than taken from the uploaded filename.
+ALLOWED_IMAGE_EXTENSIONS = ('jpg', 'jpeg', 'png', 'webp', 'gif')
 
 
 def user_profile_image_path(instance, filename):
     """مسیر ذخیره عکس پروفایل کاربر"""
-    ext = filename.split('.')[-1]
+    ext = os.path.splitext(filename or '')[1].lstrip('.').lower()
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        ext = 'jpg'
     # استفاده از username برای نام فایل
-    filename = f"{slugify(instance.username)}-{timezone.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+    stem = slugify(instance.username, allow_unicode=False) or 'user'
+    filename = f"{stem}-{timezone.now().strftime('%Y%m%d%H%M%S')}.{ext}"
     return os.path.join('users/profiles/', filename)
 
 
+#: Display names are echoed next to every comment and review. Escaping at the
+#: render sites is the real defence; this keeps markup characters out of the
+#: column in the first place so a future unescaped sink cannot be fed from here.
+#: Allows Persian/Arabic and Latin letters, digits, spaces and name punctuation.
+FULLNAME_VALIDATOR = RegexValidator(
+    r"^[\w\s؀-ۿ‌.'\-]+$",
+    'نام فقط می‌تواند شامل حروف، عدد، فاصله و نشانه‌های . - باشد',
+)
+
+
 class CustomUser(AbstractUser):
-    fullname = models.CharField(max_length=100, verbose_name="نام کامل")
-    mobile = models.CharField(max_length=11, unique=True, blank=True, null=True, verbose_name="شماره موبایل")
+    fullname = models.CharField(
+        max_length=100,
+        validators=[FULLNAME_VALIDATOR],
+        verbose_name="نام کامل",
+    )
+    mobile = models.CharField(max_length=11, unique=True, verbose_name="شماره موبایل")
     email = models.EmailField(unique=True, verbose_name="ایمیل")
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -102,6 +125,10 @@ class PasswordResetOTP(models.Model):
     attempts = models.PositiveSmallIntegerField(default=0)
     is_used = models.BooleanField(default=False)
     reset_token = models.CharField(max_length=64, null=True, blank=True, unique=True)  # بعد از verify موفق ست میشه
+    # The reset-token window runs from verification, not from OTP creation —
+    # measuring from created_at silently shortened it by however long the user
+    # took to enter the code.
+    verified_at = models.DateTimeField(null=True, blank=True)
 
     MAX_ATTEMPTS = 5
     OTP_LIFETIME_MINUTES = 5
@@ -109,7 +136,24 @@ class PasswordResetOTP(models.Model):
 
     @staticmethod
     def hash_code(code: str) -> str:
-        return hashlib.sha256(code.encode()).hexdigest()
+        """Salted HMAC of an OTP or reset token.
+
+        Keyed on SECRET_KEY so the stored digests are not a plain SHA-256 of a
+        six-digit number, which is trivially reversible by enumeration if the
+        table ever leaks.
+        """
+        # algorithm='sha256' explicitly: salted_hmac defaults to SHA-1, whose
+        # 40-char digest would also silently change the stored width.
+        return salted_hmac(
+            'accounts.PasswordResetOTP', code, algorithm='sha256'
+        ).hexdigest()
+
+    @staticmethod
+    def matches(stored: str, candidate: str) -> bool:
+        """Constant-time comparison of a stored digest against a candidate."""
+        if not stored:
+            return False
+        return constant_time_compare(stored, PasswordResetOTP.hash_code(candidate))
 
     @classmethod
     def generate_code(cls) -> str:

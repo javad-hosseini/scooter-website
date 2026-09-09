@@ -2,58 +2,42 @@
 
 from django.urls import path, re_path
 
-from apps.accounts.views import CityListAPIView, ProvinceListAPIView
 from . import views
-from .views import CartAPIView
 
 app_name = 'shop'
 
-urlpatterns = [
-    # ============================================================
-    # API
-    # ============================================================
+# Slugs may contain Persian characters (SlugField(allow_unicode=True)), which
+# Django's built-in <slug:...> converter rejects, so they are matched with an
+# explicit "one path segment" pattern. The old r'.+' patterns matched slashes
+# too, which let a single product be reached at unlimited nested URLs.
+SLUG = r'(?P<slug>[^/]+)'
 
-    # ===== لیست و دسته‌بندی =====
+urlpatterns = [
+    # ===== API =====
     path('api/products/', views.ProductListAPIView.as_view(), name='api_product_list'),
     path('api/categories/', views.CategoryListAPIView.as_view(), name='api_categories'),
-    re_path(r'^api/category/(?P<slug>.+)/$', views.CategoryDetailAPIView.as_view(), name='api_category_detail'),
-    path('api/admin/reviews/', views.AdminProductReviewListAPIView.as_view(), name='api_admin_reviews'),
-    path('api/admin/reviews/<int:pk>/moderate/', views.AdminProductReviewModerateAPIView.as_view(),
-         name='api_admin_review_moderate'),
-    path('api/admin/finance/stats/', views.AdminFinanceStatsAPIView.as_view(), name='api_admin_finance_stats'),
-    path('api/admin/transactions/', views.AdminTransactionListAPIView.as_view(), name='api_admin_transactions'),
-
-    # ===== محصولات (با جزئیات بیشتر اول) =====
-    re_path(r'^api/products/(?P<slug>.+)/reviews/$', views.ProductReviewListCreateAPIView.as_view(),
-            name='api_reviews'),
-    re_path(r'^api/products/(?P<slug>.+)/wishlist/$', views.WishlistToggleAPIView.as_view(),
-            name='api_wishlist_toggle_slug'),
-    re_path(r'^api/products/(?P<slug>.+)/$', views.ProductDetailAPIView.as_view(), name='api_product_detail'),
-
-    # ===== سبد خرید و پرداخت =====
-    path('api/cart/add/', CartAPIView.as_view(), name='cart_add'),
-    path('api/cart/', views.CartAPIView.as_view(), name='api_cart'),
-    path('api/wishlist/toggle/', views.WishlistToggleAPIView.as_view(), name='api_wishlist_toggle'),
     path('api/wishlist/', views.WishlistListAPIView.as_view(), name='api_wishlist_list'),
+    path('api/wishlist/toggle/', views.WishlistToggleAPIView.as_view(), name='api_wishlist_toggle'),
+    re_path(rf'^api/category/{SLUG}/$', views.CategoryDetailAPIView.as_view(),
+            name='api_category_detail'),
 
-    # ===== ادمین =====
-    path('api/admin/dashboard/stats/', views.AdminDashboardStatsAPIView.as_view(), name='api_admin_dashboard_stats'),
+    # ⚠️ More specific routes first.
+    re_path(rf'^api/products/{SLUG}/reviews/$', views.ProductReviewListCreateAPIView.as_view(),
+            name='api_reviews'),
+    re_path(rf'^api/products/{SLUG}/wishlist/$', views.WishlistToggleAPIView.as_view(),
+            name='api_product_wishlist_toggle'),
+    re_path(rf'^api/products/{SLUG}/$', views.ProductDetailAPIView.as_view(),
+            name='api_product_detail'),
 
-    # ===== استان و شهر =====
-    path('api/provinces/', ProvinceListAPIView.as_view(), name='api_provinces'),
-    path('api/cities/', CityListAPIView.as_view(), name='api_cities'),
-
-    # ============================================================
-    # صفحات HTML
-    # ============================================================
-
-    # ===== سبد خرید و پرداخت =====
-    path('cart/', views.CheckoutPageView.as_view(), name='cart'),
-    path('checkout/submit/', views.CheckoutSubmitAPIView.as_view(), name='checkout_submit'),
-    path('payment/gateway/<int:order_id>/', views.PaymentGatewayView.as_view(), name='payment_gateway'),
-
-    # ===== محصولات =====
+    # ===== صفحات HTML =====
+    re_path(rf'^category/{SLUG}/$', views.CategoryPageView.as_view(), name='category_products'),
+    re_path(rf'^product/{SLUG}/$', views.ProductDetailPageView.as_view(), name='product_detail'),
     path('', views.ProductListPageView.as_view(), name='product_list'),
-    re_path(r'^category/(?P<slug>.+)/$', views.CategoryPageView.as_view(), name='category_products'),
-    re_path(r'^product/(?P<slug>.+)/$', views.ProductPageView.as_view(), name='product_detail'),
+
+    # Legacy shape: /shop/<slug>/ used to resolve to a product detail page via
+    # a catch-all. Kept as a permanent redirect so any existing links and
+    # already-indexed URLs consolidate onto /shop/product/<slug>/ instead of
+    # serving the same product on two addresses.
+    re_path(rf'^{SLUG}/$', views.LegacyProductRedirectView.as_view(),
+            name='legacy_product_detail'),
 ]

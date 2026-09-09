@@ -4,7 +4,6 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Sum
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -34,6 +33,21 @@ class Category(models.Model):
     )
     order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
     is_active = models.BooleanField(default=True, verbose_name="فعال")
+
+    # ===== SEO =====
+    meta_title = models.CharField(
+        max_length=60,
+        blank=True,
+        verbose_name="عنوان متا",
+        help_text="حداکثر ۶۰ کاراکتر. اگر خالی باشد از نام دسته‌بندی ساخته می‌شود."
+    )
+    meta_description = models.CharField(
+        max_length=160,
+        blank=True,
+        verbose_name="توضیحات متا",
+        help_text="حداکثر ۱۶۰ کاراکتر. اگر خالی باشد از توضیحات دسته‌بندی ساخته می‌شود."
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -49,6 +63,10 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('shop:category_products', kwargs={'slug': self.slug})
 
 
 class ProductSpec(models.Model):
@@ -169,8 +187,15 @@ class ProductImage(models.Model):
     )
     image = models.ImageField(
         upload_to='products/gallery/',
-        verbose_name="تصویر"
+        verbose_name="تصویر",
+        width_field='image_width',
+        height_field='image_height',
     )
+    # Cached intrinsic dimensions. Without them the template cannot emit
+    # width/height attributes without opening every file with Pillow on each
+    # render, and missing attributes are the main source of layout shift.
+    image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     color_slug = models.SlugField(
         max_length=50,
         verbose_name="اسلاگ رنگ",
@@ -251,7 +276,7 @@ class ProductReview(models.Model):
     class Meta:
         verbose_name = "نظر محصول"
         verbose_name_plural = "نظرات محصولات"
-        ordering = ['-created_at']
+        ordering  = ['-created_at']
 
     def __str__(self):
         return f"{self.user.fullname} - {self.product.name} ({self.rating}★)"
@@ -280,8 +305,53 @@ class Wishlist(models.Model):
         return f"{self.user.fullname} - {self.product.name}"
 
 
+class ProductQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(is_published=True)
+
+    def with_ratings(self):
+        """Annotate approved-review count/average in one pass.
+
+        Product cards show a star rating, so without this every card on a
+        listing page triggers its own COUNT and AVG — the single biggest
+        contributor to slow TTFB on category pages.
+        """
+        approved = models.Q(reviews__status='approved')
+        return self.annotate(
+            approved_review_count=models.Count(
+                'reviews', filter=approved, distinct=True
+            ),
+            approved_review_average=models.Avg('reviews__rating', filter=approved),
+        )
+
+    def for_listing(self):
+        """Everything a product card renders, with no N+1 left behind."""
+        return (
+            self.published()
+            .filter(is_discontinued=False)
+            .select_related('category')
+            .with_ratings()
+            # Explicit and total. annotate() drops the model's default
+            # ordering, and an unordered queryset makes pagination
+            # non-deterministic — the same product can appear on page 1 and
+            # page 2, or on neither, across two crawls of the same listing.
+            .order_by('-is_featured', '-created_at', 'pk')
+        )
+
+    def for_detail(self):
+        return (
+            self.published()
+            .select_related('category', 'category__parent')
+            .prefetch_related('specs', 'trust_badges', 'marketing_features',
+                              'stat_features', 'images')
+            .with_ratings()
+        )
+
+
 class Product(models.Model):
     """مدل اصلی محصول"""
+    objects = ProductQuerySet.as_manager()
+
     # اطلاعات پایه
     name = models.CharField(max_length=255, verbose_name="نام محصول")
     slug = models.SlugField(max_length=280, unique=True, allow_unicode=True, verbose_name="اسلاگ")
@@ -301,25 +371,21 @@ class Product(models.Model):
     )
     description = models.TextField(verbose_name="توضیحات")
 
-    # تصویر اصلی (کاور) — برای صفحه‌ی جزئیات محصول
+    # تصویر اصلی (کاور)
     cover_image = models.ImageField(
         upload_to='products/covers/',
         verbose_name="تصویر کاور",
-        help_text="تصویر اصلی محصول که در صفحه‌ی جزئیات نمایش داده می‌شود"
+        help_text="تصویر اصلی محصول که در هدر نمایش داده می‌شود",
+        width_field='cover_image_width',
+        height_field='cover_image_height',
     )
+    cover_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    cover_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     cover_alt_text = models.CharField(
         max_length=200,
         blank=True,
-        verbose_name="متن جایگزین تصویر کاور"
-    )
-
-    # تصویر گرید — برای کارت محصول در صفحه‌ی دسته‌بندی
-    grid_image = models.ImageField(
-        upload_to='products/grid/',
-        null=True,
-        blank=True,
-        verbose_name="تصویر گرید",
-        help_text="تصویری که در کارت محصول داخل صفحه‌ی دسته‌بندی نمایش داده می‌شود. اگر خالی بماند، از تصویر کاور استفاده می‌شود."
+        verbose_name="متن جایگزین تصویر کاور",
+        help_text="برای سئوی تصویر و دسترسی‌پذیری. اگر خالی باشد از نام محصول ساخته می‌شود."
     )
 
     # قیمت
@@ -327,13 +393,6 @@ class Product(models.Model):
         max_digits=15,
         decimal_places=0,
         verbose_name="قیمت (تومان)"
-    )
-    cost_price = models.DecimalField(
-        max_digits=15,
-        decimal_places=0,
-        default=0,
-        verbose_name="قیمت تمام‌شده",
-        help_text="هزینه‌ی خرید/تولید محصول — برای محاسبه‌ی سود خالص استفاده می‌شود و به مشتری نمایش داده نمی‌شود"
     )
     discount_price = models.DecimalField(
         max_digits=15,
@@ -346,21 +405,65 @@ class Product(models.Model):
     # موجودی
     stock = models.PositiveIntegerField(default=0, verbose_name="موجودی")
     is_available = models.BooleanField(default=True, verbose_name="موجود")
+    restock_expected = models.BooleanField(
+        default=True,
+        verbose_name="به‌زودی شارژ می‌شود",
+        help_text="اگر تیک بخورد، صفحه‌ی محصول ناموجود زنده و ایندکس‌شده می‌ماند."
+    )
+    is_discontinued = models.BooleanField(
+        default=False,
+        verbose_name="تولید متوقف شده",
+        help_text=(
+            "محصولی که دیگر تولید/فروخته نمی‌شود. صفحه با ریدایرکت ۳۰۱ به محصول "
+            "جایگزین یا به دسته‌بندی والد منتقل می‌شود تا ارزش لینک‌ها از بین نرود."
+        )
+    )
+    replacement_product = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='replaces',
+        verbose_name="محصول جایگزین",
+        help_text="مقصد ریدایرکت ۳۰۱ برای محصول متوقف‌شده. اگر خالی باشد به دسته‌بندی می‌رود."
+    )
 
     # وضعیت
     is_published = models.BooleanField(default=True, verbose_name="منتشر شده")
     is_featured = models.BooleanField(default=False, verbose_name="ویژه")
 
+    # شناسه‌های کالا (برای Product schema و گوگل شاپینگ)
+    sku = models.CharField(
+        max_length=64,
+        blank=True,
+        db_index=True,
+        verbose_name="کد کالا (SKU)",
+        help_text="اگر خالی باشد به‌صورت خودکار ساخته می‌شود."
+    )
+    brand = models.CharField(
+        max_length=100,
+        blank=True,
+        default='VOLTEX',
+        verbose_name="برند"
+    )
+    mpn = models.CharField(
+        max_length=64,
+        blank=True,
+        verbose_name="شماره قطعه سازنده (MPN)"
+    )
+
     # متادیتا
     meta_title = models.CharField(
         max_length=60,
         blank=True,
-        verbose_name="عنوان متا"
+        verbose_name="عنوان متا",
+        help_text="حداکثر ۶۰ کاراکتر. اگر خالی باشد از نام محصول ساخته می‌شود."
     )
     meta_description = models.CharField(
         max_length=160,
         blank=True,
-        verbose_name="توضیحات متا"
+        verbose_name="توضیحات متا",
+        help_text="حداکثر ۱۶۰ کاراکتر. اگر خالی باشد از توضیحات محصول ساخته می‌شود."
     )
 
     # آمار
@@ -369,19 +472,6 @@ class Product(models.Model):
     # زمان
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    stock_out_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="تاریخ اتمام موجودی"
-    )
-
-    # ===== سیگنال برای اطلاع‌رسانی اتمام موجودی =====
-    def send_stock_alert(self):
-        """ارسال هشدار اتمام موجودی به ادمین"""
-        if self.stock <= 5 and self.is_available:
-            # TODO: ارسال ایمیل یا نوتیفیکیشن به ادمین
-            pass
 
     class Meta:
         verbose_name = "محصول"
@@ -394,15 +484,26 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
+        if not self.cover_alt_text:
+            # Never ship an empty alt on the product's primary image.
+            self.cover_alt_text = f'{self.name} — اسکوتر برقی {self.brand or "ولتکس"}'
         super().save(*args, **kwargs)
+        if not self.sku:
+            # Needs the PK, so it has to happen after the first insert.
+            type(self).objects.filter(pk=self.pk).update(sku=f'VLX-{self.pk:05d}')
+            self.sku = f'VLX-{self.pk:05d}'
 
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('shop:product_detail', kwargs={'slug': self.slug})
 
     @property
-    def reviews_count(self):
-        return self.reviews.filter(status='approved').count()
+    def seo_title(self):
+        return self.meta_title or self.name
+
+    @property
+    def is_in_stock(self):
+        return self.is_available and self.stock > 0 and not self.is_discontinued
 
     @property
     def final_price(self):
@@ -410,21 +511,27 @@ class Product(models.Model):
         return self.discount_price if self.discount_price else self.price
 
     @property
-    def profit_margin(self):
-        """سود هر واحد از فروش این محصول (با احتساب تخفیف)"""
-        return self.final_price - self.cost_price
-
-    @property
     def average_rating(self):
-        """میانگین امتیازات تایید شده"""
-        approved = self.reviews.filter(status='approved')
-        if approved.exists():
-            return round(approved.aggregate(models.Avg('rating'))['rating__avg'], 1)
-        return 0
+        """میانگین امتیازات تایید شده
+
+        Uses the ``approved_review_average`` annotation added by
+        ``Product.objects.with_ratings()`` when it is present. Without it a
+        listing page would fire two extra queries per product.
+        """
+        annotated = getattr(self, 'approved_review_average', None)
+        if annotated is not None:
+            return round(annotated, 1) if annotated else 0
+        result = self.reviews.filter(status='approved').aggregate(
+            avg=models.Avg('rating')
+        )['avg']
+        return round(result, 1) if result else 0
 
     @property
     def reviews_count(self):
         """تعداد نظرات تایید شده"""
+        annotated = getattr(self, 'approved_review_count', None)
+        if annotated is not None:
+            return annotated
         return self.reviews.filter(status='approved').count()
 
     @property
@@ -479,11 +586,6 @@ class Order(models.Model):
         ('paid', 'پرداخت شده'),
         ('failed', 'ناموفق'),
         ('refunded', 'بازگشت وجه'),
-    ]
-
-    SHIPPING_METHOD_CHOICES = [
-        ('standard', 'ارسال معمولی'),
-        ('express', 'ارسال فوری'),
     ]
 
     # اطلاعات اصلی
@@ -545,18 +647,6 @@ class Order(models.Model):
         decimal_places=0,
         default=0,
         verbose_name="هزینه ارسال"
-    )
-    shipping_method = models.CharField(
-        max_length=20,
-        choices=SHIPPING_METHOD_CHOICES,
-        default='standard',
-        verbose_name="روش ارسال"
-    )
-    tax_amount = models.DecimalField(
-        max_digits=15,
-        decimal_places=0,
-        default=0,
-        verbose_name="مالیات"
     )
     total = models.DecimalField(
         max_digits=15,
@@ -628,286 +718,3 @@ class OrderItem(models.Model):
     @property
     def total(self):
         return (self.price - self.discount) * self.quantity
-
-
-# apps/shop/models.py
-
-class Cart(models.Model):
-    """سبد خرید کاربر (اعم از مهمان یا لاگین‌شده)"""
-
-    # ===== شناسه =====
-    user = models.ForeignKey(
-        CustomUser,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='cart',
-        verbose_name="کاربر"
-    )
-    session_key = models.CharField(
-        max_length=40,
-        null=True,
-        blank=True,
-        db_index=True,
-        verbose_name="کلید نشست"
-    )
-
-    # ===== وضعیت =====
-    is_active = models.BooleanField(default=True, verbose_name="فعال")
-
-    # ===== کوپن/تخفیف =====
-    coupon_code = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        verbose_name="کد تخفیف"
-    )
-    coupon_discount = models.DecimalField(
-        max_digits=10,
-        decimal_places=0,
-        default=0,
-        verbose_name="تخفیف کوپن"
-    )
-
-    # ===== زمان =====
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "سبد خرید"
-        verbose_name_plural = "سبدهای خرید"
-        ordering = ['-updated_at']
-        indexes = [
-            models.Index(fields=['user', 'is_active']),
-            models.Index(fields=['session_key', 'is_active']),
-        ]
-
-    def __str__(self):
-        if self.user:
-            return f"سبد {self.user.fullname}"
-        return f"سبد مهمان ({self.session_key})"
-
-    @property
-    def item_count(self):
-        """تعداد کل آیتم‌های سبد خرید"""
-        return self.items.aggregate(Sum('quantity'))['quantity__sum'] or 0
-
-    @property
-    def total_items(self):
-        """تعداد کل آیتم‌ها"""
-        return self.items.aggregate(
-            total=models.Sum('quantity')
-        )['total'] or 0
-
-    @property
-    def subtotal(self):
-        """جمع کل بدون تخفیف"""
-        total = 0
-        for item in self.items.all():
-            total += item.product.price * item.quantity
-        return total
-
-    @property
-    def total(self):
-        """مبلغ نهایی با تخفیف"""
-        return self.subtotal - self.coupon_discount
-
-    @property
-    def has_items(self):
-        return self.items.exists()
-
-
-class CartItem(models.Model):
-    """آیتم‌های سبد خرید"""
-
-    cart = models.ForeignKey(
-        Cart,
-        on_delete=models.CASCADE,
-        related_name='items',
-        verbose_name="سبد خرید"
-    )
-    product = models.ForeignKey(
-        'Product',
-        on_delete=models.PROTECT,
-        related_name='cart_items',
-        verbose_name="محصول"
-    )
-    quantity = models.PositiveIntegerField(
-        default=1,
-        validators=[MinValueValidator(1)],
-        verbose_name="تعداد"
-    )
-
-    color_slug = models.CharField(
-        max_length=50,
-        blank=True,
-        default='',
-        verbose_name="رنگ"
-    )
-
-    # ===== اطلاعات محصول در زمان اضافه شدن (برای ثبات قیمت) =====
-    price_snapshot = models.DecimalField(
-        max_digits=15,
-        decimal_places=0,
-        verbose_name="قیمت لحظه اضافه شدن"
-    )
-
-    # ===== اضافه کردن این فیلد =====
-    selected_color = models.CharField(
-        max_length=50,
-        default='black',
-        verbose_name="رنگ انتخاب‌شده"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "آیتم سبد خرید"
-        verbose_name_plural = "آیتم‌های سبد خرید"
-        unique_together = ['cart', 'product']  # هر محصول فقط یک بار در سبد
-
-    def __str__(self):
-        return f"{self.product.name} x{self.quantity}"
-
-    @property
-    def total(self):
-        return self.price_snapshot * self.quantity
-
-    def save(self, *args, **kwargs):
-        """ذخیره قیمت لحظه‌ای در اولین بار ایجاد"""
-        if not self.pk and not self.price_snapshot:
-            self.price_snapshot = self.product.final_price  # قیمت با تخفیف
-        super().save(*args, **kwargs)
-
-
-class Transaction(models.Model):
-    """تراکنش‌های پرداخت مرتبط با یک سفارش (هر تلاش پرداخت یک رکورد)"""
-
-    GATEWAY_CHOICES = [
-        ('zarinpal', 'زرین‌پال'),
-        ('idpay', 'آی‌دی‌پی'),
-        ('nextpay', 'نکست‌پی'),
-        ('bank', 'بانکی'),
-    ]
-
-    STATUS_CHOICES = [
-        ('pending', 'در انتظار'),
-        ('success', 'موفق'),
-        ('failed', 'ناموفق'),
-    ]
-
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name='transactions',
-        verbose_name="سفارش"
-    )
-    transaction_id = models.CharField(
-        max_length=30,
-        unique=True,
-        editable=False,
-        verbose_name="شناسه تراکنش"
-    )
-    gateway = models.CharField(
-        max_length=20,
-        choices=GATEWAY_CHOICES,
-        verbose_name="درگاه پرداخت"
-    )
-    reference_id = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name="کد رهگیری درگاه",
-        help_text="Authority/RefID که خودِ درگاه برمی‌گرداند"
-    )
-    amount = models.DecimalField(
-        max_digits=15,
-        decimal_places=0,
-        verbose_name="مبلغ"
-    )
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending',
-        verbose_name="وضعیت"
-    )
-    failure_reason = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name="دلیل ناموفق بودن"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد")
-    paid_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان پرداخت")
-    settled_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان تسویه")
-
-    class Meta:
-        verbose_name = "تراکنش"
-        verbose_name_plural = "تراکنش‌ها"
-        ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['order', 'status']),
-            models.Index(fields=['gateway', 'status']),
-        ]
-
-    def __str__(self):
-        return f"{self.transaction_id} - {self.get_gateway_display()} ({self.get_status_display()})"
-
-    def save(self, *args, **kwargs):
-        if not self.transaction_id:
-            self.transaction_id = f"TRX-{uuid.uuid4().hex[:8].upper()}"
-        super().save(*args, **kwargs)
-
-
-class RefundRequest(models.Model):
-    """درخواست بازگشت وجه برای یک سفارش"""
-
-    STATUS_CHOICES = [
-        ('pending', 'در انتظار بررسی'),
-        ('approved', 'تایید شده'),
-        ('rejected', 'رد شده'),
-        ('completed', 'بازگشت انجام شد'),
-    ]
-
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name='refund_requests',
-        verbose_name="سفارش"
-    )
-    transaction = models.ForeignKey(
-        Transaction,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='refund_requests',
-        verbose_name="تراکنش مرتبط"
-    )
-    amount = models.DecimalField(
-        max_digits=15,
-        decimal_places=0,
-        verbose_name="مبلغ درخواستی"
-    )
-    reason = models.TextField(verbose_name="دلیل درخواست کاربر")
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending',
-        verbose_name="وضعیت"
-    )
-    admin_note = models.TextField(
-        blank=True,
-        verbose_name="یادداشت ادمین",
-        help_text="در صورت رد شدن، دلیل رد شدن اینجا ثبت می‌شود"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان درخواست")
-    resolved_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان تصمیم‌گیری")
-
-    class Meta:
-        verbose_name = "درخواست بازگشت وجه"
-        verbose_name_plural = "درخواست‌های بازگشت وجه"
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"بازگشت وجه سفارش {self.order.order_number} - {self.get_status_display()}"

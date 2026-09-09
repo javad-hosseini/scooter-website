@@ -1,17 +1,17 @@
 import logging
+import os
 import secrets
 from datetime import timedelta
 
+import filetype
+from PIL import Image
+
 from django.contrib.auth import login as django_login
-from django.contrib.auth import logout as django_logout
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.decorators import method_decorator
-from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
@@ -34,6 +34,8 @@ logger = logging.getLogger(__name__)
 class UserRegistrationAPIView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserRegistrationSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'register'
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -92,22 +94,6 @@ class UserLoginAPIView(generics.GenericAPIView):
             }
         }, status=status.HTTP_200_OK)
 
-
-# class LoginPageView(TemplateView):
-#     template_name = 'accounts/login.html'
-#
-#     def post(self, request, *args, **kwargs):
-#         form = AuthenticationForm(request, data=request.POST)
-#         if form.is_valid():
-#             user = form.get_user()
-#             login(request, user)
-#
-#
-#             if user.is_staff:
-#                 return redirect('home_app:admin_dashboard')
-#             return redirect('home_app:index')
-#
-#         return self.render_to_response({'form': form})
 
 class LoginPageView(TemplateView):
     template_name = 'accounts/login.html'
@@ -183,7 +169,7 @@ class PasswordResetVerifyAPIView(generics.GenericAPIView):
         if not otp or otp.is_expired() or otp.is_locked():
             return generic_error
 
-        if otp.code_hash != PasswordResetOTP.hash_code(code):
+        if not PasswordResetOTP.matches(otp.code_hash, code):
             otp.attempts = models.F('attempts') + 1
             otp.save(update_fields=['attempts'])
             return generic_error
@@ -192,7 +178,8 @@ class PasswordResetVerifyAPIView(generics.GenericAPIView):
         raw_token = secrets.token_urlsafe(32)
         otp.reset_token = PasswordResetOTP.hash_code(raw_token)  # هش شده ذخیره میشه
         otp.is_used = True
-        otp.save(update_fields=['reset_token', 'is_used'])
+        otp.verified_at = timezone.now()
+        otp.save(update_fields=['reset_token', 'is_used', 'verified_at'])
 
         return Response({
             'success': True,
@@ -228,7 +215,10 @@ class PasswordResetConfirmAPIView(generics.GenericAPIView):
         if not otp:
             return generic_error
 
-        token_expiry = otp.created_at + timedelta(minutes=PasswordResetOTP.RESET_TOKEN_LIFETIME_MINUTES)
+        # From verified_at, not created_at: the latter charged the user for
+        # however long they took to type the code.
+        issued_at = otp.verified_at or otp.created_at
+        token_expiry = issued_at + timedelta(minutes=PasswordResetOTP.RESET_TOKEN_LIFETIME_MINUTES)
         if timezone.now() > token_expiry:
             return generic_error
 
@@ -292,36 +282,40 @@ class DashboardDataAPIView(APIView):
     def get(self, request):
         user = request.user
 
+        # ===== دریافت سفارشات =====
         orders_qs = user.orders.all()
 
+        # ===== آمار =====
         total_orders = orders_qs.count()
         delivered_orders = orders_qs.filter(status='delivered').count()
         pending_orders = orders_qs.filter(status__in=['pending', 'processing']).count()
 
-        # نظرات محصولات
+        # نظرات محصولات (QuerySet)
         product_comments_qs = ProductReview.objects.filter(user=user)
         approved_product_comments = product_comments_qs.filter(status='approved').count()
         pending_product_comments = product_comments_qs.filter(status='pending').count()
 
-        # نظرات مقالات - همه‌ی وضعیت‌ها (approved/pending/rejected)، نه فقط approved
-        article_comments_qs = Comment.objects.filter(user=user)
-        approved_article_comments = article_comments_qs.filter(status='approved').count()
-        pending_article_comments = article_comments_qs.filter(status='pending').count()
+        # نظرات مقالات (QuerySet) - اینجا نباید count() بزنی
+        article_comments_qs = Comment.objects.filter(user=user, is_approved=True)  # ← بدون count()
+        article_comments_count = article_comments_qs.count()  # ← تعداد رو اینجا بگیر
 
         stats = {
             'total_orders': total_orders,
             'delivered_orders': delivered_orders,
             'pending_orders': pending_orders,
-            'approved_comments': approved_product_comments + approved_article_comments,
-            'pending_comments': pending_product_comments + pending_article_comments,
+            'approved_comments': approved_product_comments + article_comments_count,  # ← از عدد استفاده کن
+            'pending_comments': pending_product_comments,
             'wishlist_count': user.wishlist.count(),
         }
 
+        # ===== آخرین سفارشات =====
         recent_orders = orders_qs.select_related('address').prefetch_related('items__product')[:5]
         recent_orders_data = OrderListSerializer(recent_orders, many=True).data
 
+        # ===== نظرات کاربر (برای نمایش در بخش نظرات) =====
         comments_data = []
 
+        # نظرات محصولات
         for comment in product_comments_qs.select_related('product').order_by('-created_at'):
             comments_data.append({
                 'type': 'product',
@@ -336,7 +330,8 @@ class DashboardDataAPIView(APIView):
                 'title': comment.title,
             })
 
-        for comment in article_comments_qs.select_related('article').order_by('-created_at'):
+        # نظرات مقالات - از QuerySet استفاده کن
+        for comment in article_comments_qs.select_related('article').order_by('-created_at'):  # ← حالا درسته
             comments_data.append({
                 'type': 'article',
                 'article_title': comment.article.title,
@@ -345,13 +340,15 @@ class DashboardDataAPIView(APIView):
                 'date': comment.created_at,
                 'rating': None,
                 'text': comment.content,
-                'status': comment.status,
-                'reject_reason': comment.rejection_reason if comment.status == 'rejected' else None,
+                'status': 'approved' if comment.is_approved else 'pending',
+                'reject_reason': None,
                 'title': None,
             })
 
+        # مرتب‌سازی نظرات بر اساس تاریخ
         comments_data.sort(key=lambda x: x['date'], reverse=True)
 
+        # ===== علاقه‌مندی‌ها =====
         wishlist_data = []
         for item in user.wishlist.select_related('product').all():
             product = item.product
@@ -367,14 +364,17 @@ class DashboardDataAPIView(APIView):
                 'in_stock': product.is_available and product.stock > 0,
             })
 
+        # ===== آدرس‌ها =====
         addresses = user.addresses.filter(is_active=True).select_related('province', 'city')
         addresses_data = AddressSerializer(addresses, many=True).data
 
+        # ===== اعلان‌ها =====
         notifications = [
             {'icon': 'truck', 'title': 'سفارش شما ارسال شد',
              'desc': 'سفارش شما تحویل پست شد', 'time': '۲ ساعت پیش', 'unread': True},
         ]
 
+        # ===== کاربر =====
         user_data = UserProfileSerializer(user).data
 
         data = {
@@ -392,16 +392,68 @@ class DashboardDataAPIView(APIView):
 
 # apps/accounts/views.py
 
+#: Avatars are served back from our own origin and embedded in comment and
+#: review markup, so an .svg or .html "image" is a stored-XSS delivery vector.
+#: Extension, declared type and sniffed magic bytes all have to agree.
+ALLOWED_AVATAR_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp', 'gif'}
+ALLOWED_AVATAR_MIME_TYPES = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
+MAX_AVATAR_BYTES = 3 * 1024 * 1024  # 3 MB
+
+
+def validate_avatar(uploaded):
+    """Return an error message for a rejected avatar, or None if it passes."""
+    if uploaded.size > MAX_AVATAR_BYTES:
+        return 'حجم عکس نباید بیشتر از ۳ مگابایت باشد'
+
+    ext = os.path.splitext(uploaded.name or '')[1].lstrip('.').lower()
+    if ext not in ALLOWED_AVATAR_EXTENSIONS:
+        return 'فرمت عکس مجاز نیست (فقط JPG، PNG، WebP یا GIF)'
+
+    # content_type is client-supplied; checked so an obvious mismatch is
+    # rejected early, but the magic-byte check below is what actually decides.
+    if uploaded.content_type and uploaded.content_type not in ALLOWED_AVATAR_MIME_TYPES:
+        return 'فرمت عکس مجاز نیست (فقط JPG، PNG، WebP یا GIF)'
+
+    head = uploaded.read(261)
+    uploaded.seek(0)
+    kind = filetype.guess(head)
+    if kind is None or kind.mime not in ALLOWED_AVATAR_MIME_TYPES:
+        return 'فایل ارسالی یک تصویر معتبر نیست'
+
+    # Last gate: Pillow has to be able to parse it as an actual image. This is
+    # the check Model.save() skips.
+    try:
+        image = Image.open(uploaded)
+        image.verify()
+    except Exception:
+        return 'فایل ارسالی یک تصویر معتبر نیست'
+    finally:
+        uploaded.seek(0)
+
+    return None
+
+
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'profile_update'
 
     def put(self, request):
         user = request.user
 
-        # ===== ۱. اول عکس رو ذخیره کن =====
-        if 'avatar' in request.FILES:
-            user.profile_image = request.FILES['avatar']
-            user.save(update_fields=['profile_image'])
+        # ===== ۱. اعتبارسنجی عکس =====
+        # Assigning request.FILES straight onto the model field skipped every
+        # check: Model.save() does not run full_clean(), so ImageField's
+        # Pillow verification never fired, the extension came from the client
+        # verbatim, and there was no size ceiling. Validate first, and only
+        # persist once the rest of the payload has validated too.
+        avatar = request.FILES.get('avatar')
+        if avatar is not None:
+            error = validate_avatar(avatar)
+            if error:
+                return Response(
+                    {'avatar': [error]}, status=status.HTTP_400_BAD_REQUEST
+                )
 
         # ===== ۲. بعد بقیه فیلدها رو با serializer بروزرسانی کن =====
         # اما profile_image رو نادیده بگیر
@@ -413,6 +465,8 @@ class UserProfileUpdateAPIView(APIView):
         )
 
         if serializer.is_valid():
+            if avatar is not None:
+                user.profile_image = avatar
             # فقط فیلدهایی که میخوای رو جداگانه ست کن
             allowed_fields = ['fullname', 'username', 'email', 'mobile',
                               'national_code', 'birth_date', 'gender', 'bio']
@@ -477,17 +531,6 @@ class CityListAPIView(generics.ListAPIView):
         return City.objects.none()
 
 
-@require_POST  # فقط POST — امن در برابر CSRF logout
-@login_required
-def logout_view(request):
-    django_logout(request)
-    return redirect('home_app:index')
-
-
-@method_decorator(login_required(login_url='/accounts/login/'), name='dispatch')
 class DashboardPageView(TemplateView):
     """صفحه داشبورد کاربر"""
     template_name = 'accounts/user_dashboard.html'
-
-class RulesView(TemplateView):
-    template_name = 'accounts/rules.html'

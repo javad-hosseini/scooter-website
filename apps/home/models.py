@@ -96,8 +96,14 @@ class Article(models.Model):
         verbose_name="تصویر کاور",
         blank=True,
         null=True,
-        help_text="تصویر اصلی مقاله که در هدر و کارت‌ها نمایش داده می‌شود.\n📐 ابعاد: 1200 × 630 پیکسل (نسبت 1.91:1)\n📁 فرمت: WebP (بهترین) یا JPEG\n📦 حجم: حداکثر 200 کیلوبایت\n🖥️ رزولوشن: 72 DPI (مناسب برای وب)"
+        help_text="تصویر اصلی مقاله که در هدر و کارت‌ها نمایش داده می‌شود.\n📐 ابعاد: 1200 × 630 پیکسل (نسبت 1.91:1)\n📁 فرمت: WebP (بهترین) یا JPEG\n📦 حجم: حداکثر 200 کیلوبایت\n🖥️ رزولوشن: 72 DPI (مناسب برای وب)",
+        width_field='cover_image_width',
+        height_field='cover_image_height',
     )
+    # Cached intrinsic size so templates can emit width/height without a
+    # Pillow read per render (CLS).
+    cover_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    cover_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     cover_alt_text = models.CharField(
         max_length=200,
         verbose_name="متن جایگزین تصویر",
@@ -194,6 +200,10 @@ class Article(models.Model):
         if not self.meta_description and self.excerpt:
             self.meta_description = self.excerpt[:155]
 
+        # ===== متن جایگزین تصویر (alt) =====
+        if self.cover_image and not self.cover_alt_text:
+            self.cover_alt_text = self.title[:200]
+
         # ===== محاسبه زمان مطالعه =====
         if not self.time_to_read and self.description:
             from django.utils.html import strip_tags
@@ -206,7 +216,9 @@ class Article(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('home:article_detail', kwargs={'slug': self.slug})
+        # The URLconf namespace is 'home_app'; 'home' raised NoReverseMatch,
+        # which meant every sitemap/canonical built from this method failed.
+        return reverse('home_app:article_detail', kwargs={'slug': self.slug})
 
     @property
     def attachment_type(self):
@@ -236,13 +248,6 @@ class Article(models.Model):
 
 class Comment(models.Model):
     """نظرات مقالات"""
-
-    STATUS_CHOICES = (
-        ('pending', 'در انتظار تایید'),
-        ('approved', 'تایید شده'),
-        ('rejected', 'رد شده'),
-    )
-
     article = models.ForeignKey(
         Article,
         on_delete=models.CASCADE,
@@ -264,21 +269,10 @@ class Comment(models.Model):
         verbose_name="پاسخ به"
     )
     content = models.TextField(verbose_name="متن نظر")
-
-    # ===== جایگزین is_approved =====
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending',
-        db_index=True,
-        verbose_name="وضعیت"
-    )
-    rejection_reason = models.TextField(
-        blank=True,
-        verbose_name="دلیل رد شدن",
-        help_text="در صورت رد شدن نظر، دلیل آن را وارد کنید"
-    )
-
+    # Comments are user-supplied HTML-bearing text rendered into the article
+    # page. Publishing them unreviewed made every article a stored-XSS sink,
+    # so new comments wait for a moderator.
+    is_approved = models.BooleanField(default=False, verbose_name="تایید شده")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="آخرین بروزرسانی")
 
@@ -286,9 +280,6 @@ class Comment(models.Model):
         verbose_name = "نظر"
         verbose_name_plural = "نظرات"
         ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['article', 'status', 'parent']),
-        ]
 
     def __str__(self):
         return f"نظر {self.user.fullname} - {self.article.title[:30]}"
@@ -359,15 +350,25 @@ class IndexPageSettings(models.Model):
         verbose_name="تصویر هیرو",
         blank=True,
         null=True,
-        help_text="تصویر اصلی هیرو (Desktop)\n📐 ابعاد: 1200 × 800 پیکسل\n📁 فرمت: WebP یا JPEG"
+        help_text="تصویر اصلی هیرو (Desktop)\n📐 ابعاد: 1200 × 800 پیکسل\n📁 فرمت: WebP یا JPEG",
+        width_field='hero_image_width',
+        height_field='hero_image_height',
     )
+    # The hero image is the LCP element on the home page: its dimensions must
+    # be in the HTML so the box is reserved before the bytes arrive.
+    hero_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    hero_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     hero_mobile_image = models.ImageField(
         upload_to='home/index/hero/',
         verbose_name="تصویر هیرو موبایل",
         blank=True,
         null=True,
-        help_text="تصویر هیرو برای موبایل\n📐 ابعاد: 600 × 400 پیکسل"
+        help_text="تصویر هیرو برای موبایل\n📐 ابعاد: 600 × 400 پیکسل",
+        width_field='hero_mobile_image_width',
+        height_field='hero_mobile_image_height',
     )
+    hero_mobile_image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    hero_mobile_image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     hero_image_alt = models.CharField(
         max_length=200,
         blank=True,
@@ -376,7 +377,7 @@ class IndexPageSettings(models.Model):
 
     # ===== Hero Stats (4 عدد) =====
     hero_stat_1_value = models.CharField(max_length=50, default='85', verbose_name="مقدار آمار ۱")
-    hero_stat_1_unit = models.CharField(max_length=20, default='km/h',null=True , blank=True, verbose_name="واحد آمار ۱")
+    hero_stat_1_unit = models.CharField(max_length=20, default='km/h', blank=True, verbose_name="واحد آمار ۱")
     hero_stat_1_label = models.CharField(max_length=50, default='حداکثر سرعت', verbose_name="برچسب آمار ۱")
 
     hero_stat_2_value = models.CharField(max_length=50, default='160', verbose_name="مقدار آمار ۲")
@@ -446,12 +447,12 @@ class IndexPageSettings(models.Model):
     # ===== Final Section (Promise) =====
     promise_label = models.CharField(
         max_length=100,
-        default='چرا Nex Go',
+        default='چرا VOLTEX',
         verbose_name="برچسب بخش تعهدات"
     )
     promise_title = models.CharField(
         max_length=200,
-        default='تعهد Nex Go',
+        default='تعهد VOLTEX',
         verbose_name="عنوان بخش تعهدات"
     )
 
@@ -472,7 +473,7 @@ class IndexPageSettings(models.Model):
         verbose_name="کلمه برجسته در بیانیه پایانی"
     )
     statement_description = models.TextField(
-        default='به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Nex Go را انتخاب کرده‌اند. اسکوترهای پریمیوم، تحویل در ۲۴ ساعت، با ۳ سال گارانتی.',
+        default='به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند. اسکوترهای پریمیوم، تحویل در ۲۴ ساعت، با ۳ سال گارانتی.',
         verbose_name="توضیحات بیانیه پایانی"
     )
     statement_btn_text = models.CharField(
@@ -484,6 +485,18 @@ class IndexPageSettings(models.Model):
         max_length=100,
         default='کاوش مجموعه‌ها',
         verbose_name="متن دکمه ثانویه بیانیه پایانی"
+    )
+
+    # ===== Footer =====
+    footer_tagline = models.CharField(
+        max_length=200,
+        default='اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.',
+        verbose_name="شعار فوتر"
+    )
+    footer_copyright = models.CharField(
+        max_length=200,
+        default='© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است.',
+        verbose_name="متن کپی‌رایت"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -504,37 +517,35 @@ class IndexPageSettings(models.Model):
 
 
 class CategoryFeature(models.Model):
-    """ویژگی‌های دسته‌بندی (spec-chip)"""
+    """ویژگی‌های دسته‌بندی برای نمایش در صفحه اصلی (4 ویژگی)"""
     CATEGORY_COLORS = [
-        ('cyan', '#00f0ff'),
-        ('orange', '#f97316'),
-        ('red', '#ef4444'),
-        ('yellow', '#fbbf24'),
-        ('purple', '#a855f7'),
-        ('green', '#22c55e'),
+        ('neon', '#4fd8ff'),
+        ('orange', '#ff9a3c'),
+        ('green', '#a8e063'),
+        ('neon2', '#8b7bff'),
+        ('neon3', '#ff6cc4'),
     ]
 
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
-        related_name='features'
+        related_name='index_features'
     )
-    icon = models.CharField(
-        max_length=50,
-        blank=True,
-        verbose_name="آیکون",
-        help_text="آیکون فونت‌آ‌وسم یا ایموجی"
-    )
-    value = models.CharField(max_length=100, verbose_name="مقدار")
-    unit = models.CharField(max_length=50, null=True, blank=True)
-    label = models.CharField(max_length=100, verbose_name="برچسب")
+    label = models.CharField(max_length=100, verbose_name="برچسب ویژگی")
+    value = models.CharField(max_length=50, verbose_name="مقدار ویژگی")
+    unit = models.CharField(max_length=20, blank=True, verbose_name="واحد")
     color = models.CharField(
         max_length=20,
         choices=CATEGORY_COLORS,
-        default='cyan',
+        default='neon',
         verbose_name="رنگ"
     )
-    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
+    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب")
+
+    def get_color_hex(self):
+        """دریافت کد هگز رنگ"""
+        colors = dict(self.CATEGORY_COLORS)
+        return colors.get(self.color, '#4fd8ff')
 
     class Meta:
         verbose_name = "ویژگی دسته‌بندی"
@@ -543,84 +554,6 @@ class CategoryFeature(models.Model):
 
     def __str__(self):
         return f"{self.category.name} - {self.label}"
-
-    def get_color_hex(self):
-        colors = dict(self.CATEGORY_COLORS)
-        return colors.get(self.color, '#00f0ff')
-
-
-class CategoryImage(models.Model):
-    """تصویر دسته‌بندی"""
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name='images'
-    )
-    image = models.ImageField(
-        upload_to='categories/',
-        verbose_name="تصویر"
-    )
-    alt_text = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name="متن جایگزین"
-    )
-    is_primary = models.BooleanField(
-        default=True,
-        verbose_name="تصویر اصلی"
-    )
-    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب")
-
-    class Meta:
-        verbose_name = "تصویر دسته‌بندی"
-        verbose_name_plural = "تصاویر دسته‌بندی"
-        ordering = ['order']
-
-    def __str__(self):
-        return f"{self.category.name} - {self.order}"
-
-
-class CategoryBadge(models.Model):
-    """نشان دسته‌بندی (cat-pill)"""
-    CATEGORY_COLORS = [
-        ('cyan', '#00f0ff'),
-        ('orange', '#f97316'),
-        ('red', '#ef4444'),
-        ('yellow', '#fbbf24'),
-        ('purple', '#a855f7'),
-        ('green', '#22c55e'),
-    ]
-
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name='badges'
-    )
-    label = models.CharField(max_length=100, verbose_name="برچسب")
-    badge_text = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name="متن نشان"
-    )
-    color = models.CharField(
-        max_length=20,
-        choices=CATEGORY_COLORS,
-        default='cyan',
-        verbose_name="رنگ"
-    )
-    order = models.PositiveIntegerField(default=0, verbose_name="ترتیب")
-
-    class Meta:
-        verbose_name = "نشان دسته‌بندی"
-        verbose_name_plural = "نشان‌های دسته‌بندی"
-        ordering = ['order']
-
-    def __str__(self):
-        return f"{self.category.name} - {self.label}"
-
-    def get_color_hex(self):
-        colors = dict(self.CATEGORY_COLORS)
-        return colors.get(self.color, '#00f0ff')
 
 
 class ProductCard(models.Model):
@@ -726,7 +659,7 @@ class Testimonial(models.Model):
 
 
 class Promise(models.Model):
-    """تعهدات Nex Go در بخش پایانی"""
+    """تعهدات VOLTEX در بخش پایانی"""
     PROMISE_COLORS = [
         ('neon', '#4fd8ff'),
         ('orange', '#ff9a3c'),

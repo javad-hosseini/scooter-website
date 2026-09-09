@@ -55,6 +55,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             },
         }
 
+    def validate_agree_terms(self, value):
+        # ``required=True`` only forces the key to be present — ``False`` is
+        # still a valid boolean, so an explicit check is needed to refuse it.
+        if not value:
+            raise serializers.ValidationError('برای ادامه باید قوانین و مقررات را بپذیرید')
+        return value
+
     def validate_mobile(self, value):
         if not re.match(r'^09\d{9}$', value):
             raise serializers.ValidationError('شماره موبایل باید با ۰۹ شروع شده و ۱۱ رقم باشد')
@@ -252,17 +259,37 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(source='fullname', required=False)
     profile_image = serializers.ImageField(required=False)
+    current_password = serializers.CharField(write_only=True, required=False)
+
+    #: Changing any of these is an identity change: on its own a stolen session
+    #: could be converted straight into account takeover (e.g. via a password
+    #: reset to the attacker's address), so re-authentication is required.
+    IDENTITY_FIELDS = ('email', 'username', 'mobile')
 
     class Meta:
         model = User
         fields = ['full_name', 'username', 'email', 'mobile', 'national_code',
-                  'birth_date', 'gender', 'bio', 'profile_image']
+                  'birth_date', 'gender', 'bio', 'profile_image', 'current_password']
 
     def validate_mobile(self, value):
         import re
         if not re.match(r'^09\d{9}$', value):
             raise serializers.ValidationError('شماره موبایل معتبر نیست')
         return value
+
+    def validate(self, attrs):
+        user = self.instance
+        changing_identity = user is not None and any(
+            field in attrs and attrs[field] != getattr(user, field)
+            for field in self.IDENTITY_FIELDS
+        )
+        if changing_identity:
+            current = attrs.get('current_password')
+            if not current or not user.check_password(current):
+                raise serializers.ValidationError({
+                    'current_password': 'برای تغییر ایمیل، نام کاربری یا شماره موبایل باید رمز عبور فعلی را وارد کنید'
+                })
+        return attrs
 
 
 class ProvinceSerializer(serializers.ModelSerializer):
