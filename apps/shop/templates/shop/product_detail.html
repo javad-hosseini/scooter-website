@@ -28,18 +28,14 @@
     <!-- JSON-LD: Product -->
     <script id="json-ld-product" type="application/ld+json"></script>
 
-    <!-- Preconnect / Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link
-            href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-            rel="stylesheet"
-    />
+    <!-- Self-hosted Fonts -->
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
 
-    <!-- Font Awesome for wishlist icon -->
+    <!-- Font Awesome for wishlist icon (Self-hosted) -->
     <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            href="{% static 'vendor/font-awesome/css/all.min.css' %}"
     />
 
     <style>

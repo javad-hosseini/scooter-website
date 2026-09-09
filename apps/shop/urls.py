@@ -52,6 +52,7 @@ urlpatterns = [
     # ===== صفحات HTML =====
     path('cart/', views.CheckoutPageView.as_view(), name='cart'),
     path('payment/gateway/<int:order_id>/', views.PaymentGatewayView.as_view(), name='payment_gateway'),
+    path('payment/callback/<str:gateway>/<int:order_id>/', views.PaymentCallbackView.as_view(), name='payment_callback'),
     re_path(rf'^category/{SLUG}/$', views.CategoryPageView.as_view(), name='category_products'),
     re_path(rf'^product/{SLUG}/$', views.ProductDetailPageView.as_view(), name='product_detail'),
     path('', views.ProductListPageView.as_view(), name='product_list'),

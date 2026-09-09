@@ -37,9 +37,11 @@ from .serializers import (
     OrderCreateSerializer, CartItemSerializer, OrderListSerializer,
     AdminProductReviewSerializer, CartSerializer
 )
+from django.views import View
 from .utils.inventory_utils import InventoryManager
 from .utils.shipping_utils import ShippingCalculator
 from .utils.tax_utils import TaxCalculator
+from .services.payment import PaymentGatewayFactory
 
 
 # ============================================
@@ -1259,16 +1261,30 @@ class CheckoutSubmitAPIView(APIView):
                 discount=item_data['discount']
             )
 
-        # ===== 9. کاهش موجودی با استفاده از InventoryManager =====
-        InventoryManager.deduct_stock(cart.items.all())
+        # ===== 9. ایجاد تراکنش و اتصال به درگاه پرداخت =====
+        gateway_name = data.get('payment_method') or data.get('gateway') or 'sandbox'
+        gateway = PaymentGatewayFactory.get_gateway(gateway_name)
 
-        # ===== 10. غیرفعال کردن سبد خرید =====
-        cart.is_active = False
-        cart.save()
+        trx = Transaction.objects.create(
+            order=order,
+            gateway=gateway.get_gateway_name(),
+            amount=order.total,
+            status='pending'
+        )
 
-        # ===== 11. اتصال به درگاه پرداخت =====
-        # TODO: اتصال به زرین‌پال یا دیگر درگاه‌ها
-        payment_url = self._generate_payment_url(order)
+        callback_url = request.build_absolute_uri(
+            reverse('shop_app:payment_callback', kwargs={'gateway': gateway.get_gateway_name(), 'order_id': order.id})
+        )
+        payment_result = gateway.request_payment(order, callback_url=callback_url)
+
+        if payment_result.success:
+            trx.reference_id = payment_result.authority
+            trx.save(update_fields=['reference_id'])
+            payment_url = payment_result.redirect_url
+        else:
+            fallback_gateway = PaymentGatewayFactory.get_gateway('sandbox')
+            fallback_result = fallback_gateway.request_payment(order, callback_url=callback_url)
+            payment_url = fallback_result.redirect_url
 
         return Response({
             'status': 'success',
@@ -1283,14 +1299,6 @@ class CheckoutSubmitAPIView(APIView):
                 'status': order.status,
             }
         }, status=status.HTTP_201_CREATED)
-
-    def _generate_payment_url(self, order):
-        """تولید لینک درگاه پرداخت"""
-        # TODO: پیاده‌سازی واقعی
-        # مثلاً برای زرین‌پال:
-        # from .services.zarinpal import ZarinpalService
-        # return ZarinpalService.get_payment_url(order)
-        return f'/payment/gateway/{order.id}/'
 
 
 # ============================================
@@ -1347,14 +1355,67 @@ class OrderCancelAPIView(APIView):
 
 
 class PaymentGatewayView(TemplateView):
-    """صفحه درگاه پرداخت (موقت)"""
+    """صفحه درگاه پرداخت تستی (Sandbox)"""
     template_name = 'shop/payment_gateway.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order_id = self.kwargs.get('order_id')
-        context['order'] = get_object_or_404(Order, id=order_id)
+        if self.request.user.is_authenticated:
+            context['order'] = get_object_or_404(Order, id=order_id, user=self.request.user)
+        else:
+            context['order'] = get_object_or_404(Order, id=order_id)
         return context
+
+
+class PaymentCallbackView(View):
+    """
+    رسیدگی به بازگشت کاربر از درگاه‌های پرداخت (زرین‌پال، اسنپ‌پی، دیجی‌پی، تستی)
+    """
+
+    def get(self, request, gateway, order_id):
+        return self._handle_callback(request, gateway, order_id)
+
+    def post(self, request, gateway, order_id):
+        return self._handle_callback(request, gateway, order_id)
+
+    @transaction.atomic
+    def _handle_callback(self, request, gateway_name, order_id):
+        order = get_object_or_404(Order, id=order_id)
+        trx = Transaction.objects.filter(order=order).order_by('-created_at').first()
+
+        gateway = PaymentGatewayFactory.get_gateway(gateway_name)
+        request_params = {**request.GET.dict(), **request.POST.dict()}
+
+        verification = gateway.verify_payment(order, request_params)
+
+        if verification.success:
+            order.status = 'processing'
+            order.payment_status = 'paid'
+            order.paid_at = timezone.now()
+            order.save(update_fields=['status', 'payment_status', 'paid_at', 'updated_at'])
+
+            if trx:
+                trx.status = 'success'
+                trx.reference_id = verification.reference_id or trx.reference_id
+                trx.paid_at = timezone.now()
+                trx.save(update_fields=['status', 'reference_id', 'paid_at'])
+
+            # کسر قطعی موجودی انبار پس از پرداخت موفقیت‌آمیز
+            InventoryManager.deduct_stock(order.items.all())
+
+            # غیرفعال‌سازی سبد خرید فعلی
+            Cart.objects.filter(user=order.user, is_active=True).update(is_active=False)
+
+            return redirect(f"{reverse('accounts_app:dashboard')}?payment=success&order={order.order_number}")
+        else:
+            if trx:
+                trx.status = 'failed'
+                trx.failure_reason = verification.error_message
+                trx.save(update_fields=['status', 'failure_reason'])
+
+            return redirect(f"{reverse('accounts_app:dashboard')}?payment=failed&order={order.order_number}")
+
 
 class AdminProductReviewListAPIView(generics.ListAPIView):
     """لیست همه‌ی نظرات محصولات برای ادمین، با فیلتر status"""

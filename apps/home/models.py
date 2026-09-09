@@ -3,7 +3,7 @@
 import time
 import uuid
 
-from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
@@ -80,7 +80,7 @@ class Article(models.Model):
     tags = models.ManyToManyField(Tag, related_name='articles', blank=True, verbose_name="برچسب‌ها")
 
     # ========== محتوا ==========
-    description = RichTextField(verbose_name="محتوا")
+    description = CKEditor5Field(verbose_name="محتوا", config_name='extends')
 
     # ========== خلاصه مقاله (برای meta description) ==========
     excerpt = models.TextField(

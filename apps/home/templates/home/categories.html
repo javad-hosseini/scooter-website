@@ -1,4 +1,4 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -14,30 +14,30 @@
       name="keywords"
       content="اسکوتر برقی, Nex Go, خرید اسکوتر, اسکوتر شهری, اسکوتر آفرود, اسکوتر تاشو, اسکوتر پریمیوم"
     />
+    <meta name="author" content="Nex Go" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#050505" />
     <link rel="canonical" id="meta-canonical" href="" />
 
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Nex Go" />
     <meta property="og:title" id="og-title" content="" />
     <meta property="og:description" id="og-description" content="" />
+    <meta property="og:image" id="og-image" content="{% static 'images/fallback-category.jpg' %}" />
     <meta property="og:url" id="og-url" content="" />
-    <meta property="og:image" id="og-image" content="" />
+    <meta property="og:site_name" content="Nex Go" />
     <meta property="og:locale" content="fa_IR" />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@voltexir" />
     <meta name="twitter:title" id="twitter-title" content="" />
     <meta name="twitter:description" id="twitter-description" content="" />
-    <meta name="twitter:image" id="twitter-image" content="" />
+    <meta name="twitter:image" id="twitter-image" content="{% static 'images/fallback-category.jpg' %}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Vazirmatn:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Self-hosted Fonts -->
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
 
     <!-- ============================================================
    STYLES — تمام استایل‌های فایل categories.html رو اینجا کپی کن
@@ -2137,7 +2137,7 @@
             };
             const imageUrl =
               imageData.image_url ||
-              "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=85&auto=format&fit=crop";
+              "{% static 'images/default-category.jpg' %}";
             const imageAlt = imageData.alt_text || cat.name || "";
 
             // ویژگی‌ها (specs)

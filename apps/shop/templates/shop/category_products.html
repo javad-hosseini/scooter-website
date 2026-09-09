@@ -1,4 +1,4 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -34,12 +34,9 @@
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2306070a'/><text y='23' x='5' font-size='20' font-family='Arial' font-weight='900' fill='%235bffb5'>V</text></svg>"
     />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Vazirmatn:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Self-hosted Fonts -->
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
 
     <style>
       /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

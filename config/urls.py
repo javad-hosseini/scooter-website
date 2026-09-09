@@ -79,6 +79,7 @@ urlpatterns = [
         path('apply-coupon/', shop_views.CartApplyCouponAPIView.as_view()),
     ])),
     path('social-auth/', include('allauth.urls')),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
 ]
 
 # ===== 301 redirects for legacy / mistyped paths =====

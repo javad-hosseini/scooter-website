@@ -14,8 +14,19 @@ db.sqlite3
 media/
 staticfiles/
 front files
-.claude
+public/
+.venv/
 security-audit-report-*.md
-.venv
-public
-.claude
+
+# AI Agent Skills & IDE configs
+.agent/
+.agents/
+.claude/
+
+# SEO Skill generated reports
+seo-report-*.html
+SEO-REPORT*.html
+FULL-AUDIT-REPORT.md
+ACTION-PLAN.md
+GITHUB-SEO-REPORT.md
+GITHUB-ACTION-PLAN.md

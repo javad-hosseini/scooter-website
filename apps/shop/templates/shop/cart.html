@@ -1,4 +1,4 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -11,35 +11,12 @@
     />
     <link rel="canonical" id="meta-canonical" href="" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              base: "#0B0B0B",
-              card: "#161616",
-              card2: "#1C1C1C",
-              line: "#282828",
-              gold: "#D4AF37",
-              goldlight: "#E8C766",
-              cyan: "#22D3C8",
-              mute: "#8A8A8A",
-            },
-            fontFamily: {
-              display: ['"Space Grotesk"', "sans-serif"],
-              body: ['"Vazirmatn"', "Inter", "sans-serif"],
-              mono: ['"JetBrains Mono"', "monospace"],
-            },
-          },
-        },
-      };
-    </script>
+    <!-- Self-hosted Fonts -->
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+
+    <!-- Compiled Local Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}" />
     <style>
       html {
         scroll-behavior: smooth;

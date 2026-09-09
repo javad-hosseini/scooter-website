@@ -924,8 +924,11 @@ class Transaction(models.Model):
 
     GATEWAY_CHOICES = [
         ('zarinpal', 'زرین‌پال'),
+        ('snappay', 'اسنپ‌پی (اقساطی BNPL)'),
+        ('digipay', 'دیجی‌پی'),
         ('idpay', 'آی‌دی‌پی'),
         ('nextpay', 'نکست‌پی'),
+        ('sandbox', 'درگاه تستی (Sandbox)'),
         ('bank', 'بانکی'),
     ]
 

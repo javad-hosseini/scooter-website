@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>درگاه پرداخت تستی | Nex Go</title>
+  <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
+  <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #070B14;
+      color: #FFFFFF;
+      font-family: 'Vazirmatn', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .payment-card {
+      background: rgba(14, 20, 35, 0.95);
+      border: 1px solid rgba(79, 216, 255, 0.2);
+      border-radius: 20px;
+      padding: 36px 30px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(79, 216, 255, 0.08);
+      text-align: center;
+      position: relative;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(79, 216, 255, 0.12);
+      color: #4fd8ff;
+      border: 1px solid rgba(79, 216, 255, 0.3);
+      padding: 4px 14px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #00f0ff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.desc {
+      font-size: 0.86rem;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .order-details {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+      text-align: right;
+      font-size: 0.88rem;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+      padding-top: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #4fd8ff;
+    }
+    .detail-label { color: rgba(255, 255, 255, 0.5); }
+    .actions { display: flex; flex-direction: column; gap: 12px; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      border: none;
+    }
+    .btn-pay {
+      background: linear-gradient(135deg, #00f0ff, #8b7bff);
+      color: #050507;
+      box-shadow: 0 8px 24px rgba(79, 216, 255, 0.25);
+    }
+    .btn-pay:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(79, 216, 255, 0.38);
+    }
+    .btn-cancel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .btn-cancel:hover {
+      background: rgba(255, 108, 108, 0.1);
+      border-color: rgba(255, 108, 108, 0.3);
+      color: #ff8a8a;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-card">
+    <span class="badge">محیط شبیه‌ساز پرداخت لوکال</span>
+    <h1>درگاه پرداخت شاپرک / Nex Go</h1>
+    <p class="desc">این یک درگاه تستی است تا فرآیند پرداخت و تغییر وضعیت سفارش را بدون اتصال به درگاه‌های واقعی تست کنید.</p>
+
+    <div class="order-details">
+      <div class="detail-row">
+        <span class="detail-label">شماره سفارش:</span>
+        <span class="detail-value" style="direction: ltr;">{{ order.order_number }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">خریدار:</span>
+        <span class="detail-value">{{ order.address.recipient_name|default:order.user.fullname }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">کد رهگیری سیستم:</span>
+        <span class="detail-value" style="direction: ltr;">{{ order.tracking_code }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">مبلغ قابل پرداخت:</span>
+        <span class="detail-value">{{ order.total|floatformat:0 }} تومان</span>
+      </div>
+    </div>
+
+    <form method="POST" action="{% url 'shop_app:payment_callback' gateway='sandbox' order_id=order.id %}">
+      {% csrf_token %}
+      <div class="actions">
+        <button type="submit" name="status" value="success" class="btn btn-pay">
+          ✓ پرداخت موفقیت‌آمیز (تکمیل خرید)
+        </button>
+        <button type="submit" name="status" value="failed" class="btn btn-cancel">
+          ✕ انصراف از پرداخت (لغو)
+        </button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

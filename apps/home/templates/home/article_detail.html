@@ -31,41 +31,12 @@
     <!-- JSON-LD: BreadcrumbList (توسط JavaScript پر می‌شود) -->
     <script id="json-ld-breadcrumb" type="application/ld+json"></script>
 
-    <!-- Preconnect / Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Self-hosted Fonts -->
+    <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              black: "#050507",
-              deep: "#08080d",
-              surface: "#0c0c13",
-              card: "#101018",
-              cardhover: "#14141e",
-              white: "#f6f6f8",
-              neon: "#4fd8ff",
-              neon2: "#8b7bff",
-              neon3: "#ff6cc4",
-              gold: "#e9c97f",
-            },
-            fontFamily: {
-              display: ["Vazirmatn", "Space Grotesk", "sans-serif"],
-              body: ["Vazirmatn", "Inter", "sans-serif"],
-              mono: ["JetBrains Mono", "Vazirmatn", "monospace"],
-            },
-          },
-        },
-      };
-    </script>
+    <!-- Compiled Local Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'css/article.css' %}" />
 
     <style>
       /* ===== تمام استایل‌های قبلی را اینجا قرار دهید ===== */
