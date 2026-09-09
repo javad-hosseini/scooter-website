@@ -2,14 +2,9 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     {% include "seo/_head.html" %}
     <meta name="enamad" content="Nex Go | اسکوتر های پرمیوم شهری " />
-    
-    
 
     <!-- ============================================================
      MOBILE SCROLL-MODE DETECTION (runs before CSS paints)
@@ -40,30 +35,6 @@
       })();
     </script>
 
-    <!-- ============================================================
-     SEO META TAGS — توسط JavaScript پر می‌شوند
-     ============================================================ -->
-    <meta name="description" id="meta-description" content="" />
-    <meta name="enamad" content="Nex Go | اسکوتر های پرمیوم شهری " />
-    <link rel="canonical" id="meta-canonical" href="" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" id="og-title" content="" />
-    <meta property="og:description" id="og-description" content="" />
-    <meta property="og:image" id="og-image" content="" />
-    <meta property="og:url" id="og-url" content="" />
-    <meta property="og:site_name" content="Nex Go" />
-    <meta property="og:locale" content="fa_IR" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" id="twitter-title" content="" />
-    <meta name="twitter:description" id="twitter-description" content="" />
-    <meta name="twitter:image" id="twitter-image" content="" />
-
-    <!-- JSON-LD: WebSite -->
-    <script id="json-ld-website" type="application/ld+json"></script>
 
     <!-- ============================================================
      FONTS — فونت‌های محلی (Self-hosted)
@@ -5251,204 +5222,6 @@ DESKTOP (1024px+)
 
     <div id="scroll-progress"></div>
 
-    <!-- ============================================================
-     NAV — استاتیک (با Django Template Tags قابل شخصی‌سازی)
-     ============================================================ -->
-    <nav id="nav">
-      <div class="nav-logo">Nex Go</div>
-      <ul class="nav-links">
-        <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(1);
-              return false;
-            "
-            >مدل‌ها</a
-          >
-        </li>
-        <li>
-          <a
-            href="{% url 'home_app:categories' %}"
-            >فروشگاه</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(3);
-              return false;
-            "
-            >نظرات</a
-          >
-        </li>
-        <li>
-          <a
-            href="{% url 'home_app:articles' %}"
-
-            >مقالات</a
-          >
-        </li>
-        <li>
-          <a
-            href="{% url 'home_app:about_us' %}"
-            >درباره ما</a
-          >
-        </li>
-      </ul>
-
-      <div class="nav-right-cluster">
-        <div class="nav-auth" id="navAuth">
-          {% if user.is_authenticated %}
-          <div class="auth-user" id="authUser">
-            <button
-              class="auth-user-btn"
-              id="authUserBtn"
-              onclick="toggleUserMenu(event)"
-            >
-              {% if user.profile_image %}
-              <img
-                class="auth-user-avatar"
-                src="{{ user.profile_image.url }}"
-                alt="{{ user.username }}"
-              />
-              {% else %}
-              <span class="auth-user-avatar">👤</span>
-              {% endif %}
-              <span class="auth-user-name">{{ user.fullname|default:user.username }}</span>
-            </button>
-            <div class="auth-user-menu" id="authUserMenu" role="menu">
-              <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
-              <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
-              <a href="{% url 'accounts_app:dashboard' %}#wishlist" role="menuitem">علاقه‌مندی‌ها</a>
-              <a href="{% url 'accounts_app:dashboard' %}#settings" role="menuitem">تنظیمات حساب</a>
-              <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form" role="none">
-                {% csrf_token %}
-                <button type="submit" class="auth-logout" role="menuitem">خروج</button>
-              </form>
-            </div>
-          </div>
-          {% else %}
-          <div class="auth-guest" id="authGuest">
-            <a href="{% url 'accounts_app:login' %}" class="auth-link-login">ورود</a>
-            <button
-              class="nav-cta"
-              onclick="window.location.href='{% url 'accounts_app:register' %}'"
-            >
-              ثبت‌نام
-            </button>
-          </div>
-          {% endif %}
-        </div>
-
-        <a
-          class="nav-cart-btn"
-          id="navCartBtn"
-          href="{% url 'shop:cart' %}"
-          aria-label="سبد خرید"
-        >
-          <svg class="nav-cart-icon" viewBox="0 0 24 24">
-            <path
-              d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"
-            />
-            <circle cx="10" cy="20.5" r="1.4" />
-            <circle cx="17" cy="20.5" r="1.4" />
-          </svg>
-          <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
-        </a>
-
-        <button
-          class="nav-menu-btn"
-          id="menuBtn"
-          onclick="toggleMenu()"
-          aria-label="منو"
-        >
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </nav>
-
-    <!-- ============================================================
-     MOBILE DRAWER
-     ============================================================ -->
-    <div class="mobile-drawer" id="mobileDrawer">
-      <a
-        href="#"
-        onclick="
-          closeMenu();
-          goToSlide(0);
-          return false;
-        "
-        >خانه</a
-      >
-      <a
-        href="#"
-        onclick="
-          closeMenu();
-          goToSlide(1);
-          return false;
-        "
-        >مدل‌ها</a
-      >
-      <a
-        href="#"
-        onclick="
-          closeMenu();
-          goToSlide(2);
-          return false;
-        "
-        >فروشگاه</a
-      >
-      <a
-        href="#"
-        onclick="
-          closeMenu();
-          goToSlide(3);
-          return false;
-        "
-        >نظرات</a
-      >
-      <a
-        href="#"
-        onclick="
-          closeMenu();
-          goToSlide(4);
-          return false;
-        "
-        >راهنما</a
-      >
-      <a
-        href="#"
-        onclick="
-          closeMenu();
-          goToSlide(5);
-          return false;
-        "
-        >درباره ما</a
-      >
-      <button
-        class="mobile-drawer-cta"
-        onclick="
-          closeMenu();
-          goToSlide(2);
-        "
-      >
-        خرید کنید
-      </button>
-      <div class="drawer-auth" id="drawerAuthGuest">
-        <a href="#" class="drawer-auth-link">ورود</a>
-        <button class="drawer-auth-register">ثبت‌نام</button>
-      </div>
-      <div class="drawer-auth-user" id="drawerAuthUser" style="display: none">
-        <div class="drawer-user-info">👤 <span>کاربر</span></div>
-        <a href="#">پروفایل</a>
-        <a href="#">سفارش‌های من</a>
-        <a href="#">علاقه‌مندی‌ها</a>
-        <a href="#">تنظیمات حساب</a>
-        <a href="#" class="auth-logout">خروج</a>
-      </div>
-    </div>
 
     <!-- ============================================================
      NAV DOTS
@@ -6583,6 +6356,7 @@ DESKTOP (1024px+)
          UPDATE SEO
          ════════════════════════════════════ */
       function updateSEO(data) {
+        if (!data) return;
         const title = data.meta_title || "Nex Go | اسکوتر های پرمیوم شهری ";
         const desc =
           data.meta_description ||
@@ -6590,35 +6364,42 @@ DESKTOP (1024px+)
         const url = window.location.href;
         const image = data.hero_image || "/images/1.png";
 
-        document.title = title;
-        document.getElementById("page-title").textContent = title;
-        document.getElementById("meta-description").content = desc;
-        document.getElementById("meta-canonical").href = url;
+        if (title) document.title = title;
+        const setAttr = (id, attr, val) => {
+          const el = document.getElementById(id);
+          if (el && val) el[attr] = val;
+        };
 
-        document.getElementById("og-title").content = title;
-        document.getElementById("og-description").content = desc;
-        document.getElementById("og-image").content = image;
-        document.getElementById("og-url").content = url;
+        setAttr("page-title", "textContent", title);
+        setAttr("meta-description", "content", desc);
+        setAttr("meta-canonical", "href", url);
 
-        document.getElementById("twitter-title").content = title;
-        document.getElementById("twitter-description").content = desc;
-        document.getElementById("twitter-image").content = image;
+        setAttr("og-title", "content", title);
+        setAttr("og-description", "content", desc);
+        setAttr("og-image", "content", image);
+        setAttr("og-url", "content", url);
+
+        setAttr("twitter-title", "content", title);
+        setAttr("twitter-description", "content", desc);
+        setAttr("twitter-image", "content", image);
 
         // JSON-LD
-        const jsonLd = {
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "Nex Go",
-          description: desc,
-          url: url,
-          potentialAction: {
-            "@type": "SearchAction",
-            target: url + "?s={search_term_string}",
-            "query-input": "required name=search_term_string",
-          },
-        };
-        document.getElementById("json-ld-website").textContent =
-          JSON.stringify(jsonLd);
+        const jsonEl = document.getElementById("json-ld-website");
+        if (jsonEl) {
+          const jsonLd = {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Nex Go",
+            description: desc,
+            url: url,
+            potentialAction: {
+              "@type": "SearchAction",
+              target: url + "?s={search_term_string}",
+              "query-input": "required name=search_term_string",
+            },
+          };
+          jsonEl.textContent = JSON.stringify(jsonLd);
+        }
       }
 
       /* ════════════════════════════════════
@@ -6807,17 +6588,20 @@ DESKTOP (1024px+)
       function toggleMenu() {
         const btn = document.getElementById("menuBtn");
         const drawer = document.getElementById("mobileDrawer");
+        if (!btn || !drawer) return;
         const isOpen = drawer.classList.toggle("open");
         btn.classList.toggle("open", isOpen);
         btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
       }
 
       function closeMenu() {
-        document.getElementById("menuBtn").classList.remove("open");
-        document.getElementById("mobileDrawer").classList.remove("open");
-        document
-          .getElementById("menuBtn")
-          .setAttribute("aria-expanded", "false");
+        const btn = document.getElementById("menuBtn");
+        const drawer = document.getElementById("mobileDrawer");
+        if (btn) {
+          btn.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+        }
+        if (drawer) drawer.classList.remove("open");
       }
 
       // User menu toggle

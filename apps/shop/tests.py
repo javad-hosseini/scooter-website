@@ -3,7 +3,8 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from apps.shop.models import Order, Transaction
+from apps.shop.models import Order, Transaction, Product, Category, OrderItem
+from apps.shop.utils.tax_utils import TaxCalculator
 from apps.shop.services.payment import (
     PaymentGatewayFactory,
     BasePaymentGateway,
@@ -190,6 +191,81 @@ class PaymentGatewayArchitectureTests(TestCase):
         trx.refresh_from_db()
         self.assertEqual(trx.status, 'failed')
         self.assertIsNotNone(trx.failure_reason)
+
+    def test_payment_callback_gateway_tampering_rejected(self):
+        """Callback with mismatched gateway is rejected with HTTP 403."""
+        self.client.login(username='testshopper', password='testpassword123')
+        # Order initialized with zarinpal
+        trx = Transaction.objects.create(
+            order=self.order,
+            gateway='zarinpal',
+            amount=self.order.total,
+            status='pending',
+            reference_id='ZARIN-123'
+        )
+        # Attacker tries to use sandbox callback on a zarinpal transaction
+        url = reverse('shop_app:payment_callback', kwargs={'gateway': 'sandbox', 'order_id': self.order.id})
+        response = self.client.post(url, data={'status': 'success', 'authority': 'ZARIN-123'})
+        self.assertEqual(response.status_code, 403)
+
+    def test_payment_callback_idempotency(self):
+        """Already paid order callback does not duplicate processing and redirects safely."""
+        self.client.login(username='testshopper', password='testpassword123')
+        self.order.payment_status = 'paid'
+        self.order.status = 'processing'
+        self.order.save()
+
+        url = reverse('shop_app:payment_callback', kwargs={'gateway': 'sandbox', 'order_id': self.order.id})
+        response = self.client.post(url, data={'status': 'success'})
+        self.assertEqual(response.status_code, 302)
+
+    def test_order_cancel_unpaid_does_not_inflate_stock(self):
+        """Canceling an unpaid pending order does not inflate product stock."""
+        category = Category.objects.create(name='اسکوتر', slug='scooters')
+        product = Product.objects.create(
+            name='اسکوتر تستی',
+            slug='scooter-test',
+            category=category,
+            price=Decimal('1000000'),
+            stock=5,
+            is_available=True,
+            is_published=True
+        )
+        OrderItem.objects.create(
+            order=self.order,
+            product=product,
+            quantity=3,
+            price=Decimal('1000000'),
+            discount=0
+        )
+        initial_stock = product.stock
+
+        self.client.login(username='testshopper', password='testpassword123')
+        cancel_url = reverse('shop_app:order_cancel', kwargs={'order_number': self.order.order_number})
+        response = self.client.post(cancel_url)
+        self.assertEqual(response.status_code, 200)
+
+        product.refresh_from_db()
+        # Stock should NOT have been increased
+        self.assertEqual(product.stock, initial_stock)
+
+    def test_tax_calculator_never_negative(self):
+        """TaxCalculator.calculate_total returns at least 0 even with large discount."""
+        total = TaxCalculator.calculate_total(
+            subtotal=Decimal('10000'),
+            discount=Decimal('50000'),
+            shipping_cost=Decimal('5000')
+        )
+        self.assertGreaterEqual(total, Decimal('0'))
+
+    def test_provinces_and_cities_allow_guest(self):
+        """Guests can view provinces and cities list without 403."""
+        self.client.logout()
+        res_prov = self.client.get(reverse('shop_app:api_provinces'))
+        self.assertEqual(res_prov.status_code, 200)
+
+        res_city = self.client.get(f"{reverse('shop_app:api_cities')}?province={self.province.id}")
+        self.assertEqual(res_city.status_code, 200)
 
 
 class CKEditor5IntegrationTests(TestCase):

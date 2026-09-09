@@ -2050,16 +2050,51 @@
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
       }
 
+      /* ━━ BREADCRUMB & HEADING SPACING ━━ */
+      .breadcrumb-wrap {
+        padding-top: calc(var(--nav-h, 64px) + 24px);
+        margin-bottom: 12px;
+      }
+      .breadcrumb ol {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        list-style: none;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .breadcrumb ol li + li::before {
+        content: "‹";
+        margin-left: 8px;
+        color: var(--muted2);
+      }
+      .breadcrumb a {
+        color: var(--text);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .breadcrumb a:hover {
+        color: var(--accent);
+      }
+      .page-heading {
+        margin-bottom: 24px;
+      }
+      .page-h1 {
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      .page-intro {
+        color: var(--muted);
+        font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+        max-width: 800px;
+        line-height: 1.7;
+      }
     </style>
   </head>
   <body>
     <a href="#main" class="skip">رفتن به محتوا</a>
-
-    <!-- ━━ HEADER (Nex Go) — استخراج شده از _header.html ━━ -->
-    <div id="loader">
-      <div class="loader-logo">Nex go</div>
-      <div class="loader-bar"><div class="loader-fill"></div></div>
-    </div>
 
     <div id="header-scroll-progress"></div>
 
@@ -2171,6 +2206,7 @@
           role="list"
           aria-label="محصولات"
           data-server-rendered="1"
+          data-category-slug="{{ category_slug }}"
         >
           {% for product in products %}
           <article class="card" data-id="{{ product.id }}" role="listitem" tabindex="0"
@@ -2252,22 +2288,12 @@
       const SLIDE_DURATION = 5000;
 
       /* ═══════════════════════════════════════
-   GET SLUG FROM URL
+   GET SLUG FROM DJANGO TEMPLATE (not URL)
 ═══════════════════════════════════════ */
-      function getSlugFromUrl() {
-        let path = window.location.pathname;
-        if (path.endsWith("/")) path = path.slice(0, -1);
-        const parts = path.split("/");
-        const slug = parts[parts.length - 1];
-        try {
-          return decodeURIComponent(slug);
-        } catch (e) {
-          return slug;
-        }
-      }
-
-      const categorySlug = getSlugFromUrl();
-      console.log("🔍 Category Slug:", categorySlug);
+      // اسلاگ را از data-attribute تزریق‌شده توسط جنگو می‌خوانیم، نه از URL
+      const categorySlug = document.getElementById("productGrid")
+        ?.dataset.categorySlug || "";
+      console.log("🔍 Category Slug:", categorySlug || "(all products - SSR)");
 
       /* ═══════════════════════════════════════
    LOAD CATEGORY DATA
@@ -2715,77 +2741,90 @@
       }
 
       let searchDebounce;
-      searchInput.addEventListener("input", () => {
-        clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(applyFilters, 280);
-      });
-      sortSelect.addEventListener("change", applyFilters);
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
+          clearTimeout(searchDebounce);
+          searchDebounce = setTimeout(applyFilters, 280);
+        });
+      }
+      if (sortSelect) {
+        sortSelect.addEventListener("change", applyFilters);
+      }
 
       /* ═══════════════════════════════════════
    HERO KEYBOARD/TOUCH
 ═══════════════════════════════════════ */
-      if (heroProducts.length > 1) {
+      if (heroProducts && heroProducts.length > 1) {
         const heroEl = document.getElementById("heroSlider");
-        heroEl.addEventListener("mouseenter", () => clearInterval(slideTimer));
-        heroEl.addEventListener("mouseleave", resetSlideTimer);
+        if (heroEl) {
+          heroEl.addEventListener("mouseenter", () => clearInterval(slideTimer));
+          heroEl.addEventListener("mouseleave", resetSlideTimer);
 
-        heroEl.addEventListener("keydown", (e) => {
-          if (e.key === "ArrowLeft")
-            goToSlide((currentSlide + 1) % heroProducts.length);
-          if (e.key === "ArrowRight")
-            goToSlide(
-              (currentSlide - 1 + heroProducts.length) % heroProducts.length,
-            );
-        });
-
-        let touchX = 0;
-        heroEl.addEventListener(
-          "touchstart",
-          (e) => {
-            touchX = e.touches[0].clientX;
-          },
-          { passive: true },
-        );
-        heroEl.addEventListener(
-          "touchend",
-          (e) => {
-            const dx = e.changedTouches[0].clientX - touchX;
-            if (Math.abs(dx) > 40)
+          heroEl.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft")
+              goToSlide((currentSlide + 1) % heroProducts.length);
+            if (e.key === "ArrowRight")
               goToSlide(
-                dx > 0
-                  ? (currentSlide + 1) % heroProducts.length
-                  : (currentSlide - 1 + heroProducts.length) %
-                      heroProducts.length,
+                (currentSlide - 1 + heroProducts.length) % heroProducts.length,
               );
-          },
-          { passive: true },
-        );
+          });
+
+          let touchX = 0;
+          heroEl.addEventListener(
+            "touchstart",
+            (e) => {
+              touchX = e.touches[0].clientX;
+            },
+            { passive: true },
+          );
+          heroEl.addEventListener(
+            "touchend",
+            (e) => {
+              const dx = e.changedTouches[0].clientX - touchX;
+              if (Math.abs(dx) > 40)
+                goToSlide(
+                  dx > 0
+                    ? (currentSlide + 1) % heroProducts.length
+                    : (currentSlide - 1 + heroProducts.length) %
+                        heroProducts.length,
+                );
+            },
+            { passive: true },
+          );
+        }
       }
 
       /* ═══════════════════════════════════════
    START
 ═══════════════════════════════════════ */
-      loadCategoryData();
+      // فقط برای صفحات کتگوری API فراخوانی می‌شود — صفحه /shop/ از SSR استفاده می‌کند
+      if (categorySlug) {
+        loadCategoryData();
+      }
       /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         NEWSLETTER SUBMIT
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-      document.getElementById("nlBtn").addEventListener("click", function () {
-        const input = document.getElementById("nl-email");
-        const email = input.value.trim();
+      const nlBtn = document.getElementById("nlBtn");
+      if (nlBtn) {
+        nlBtn.addEventListener("click", function () {
+          const input = document.getElementById("nl-email");
+          if (!input) return;
+          const email = input.value.trim();
 
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          input.style.borderColor = "rgba(248,113,113,.6)";
-          input.focus();
-          setTimeout(() => (input.style.borderColor = ""), 1800);
-          return;
-        }
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            input.style.borderColor = "rgba(248,113,113,.6)";
+            input.focus();
+            setTimeout(() => (input.style.borderColor = ""), 1800);
+            return;
+          }
 
-        this.textContent = "✓ ثبت شد";
-        this.style.background = "#00c97a";
-        this.disabled = true;
-        input.value = "";
-        input.disabled = true;
-      });
+          this.textContent = "✓ ثبت شد";
+          this.style.background = "#00c97a";
+          this.disabled = true;
+          input.value = "";
+          input.disabled = true;
+        });
+      }
     </script>
 
     {% include 'includes/header-scripts.html' %}

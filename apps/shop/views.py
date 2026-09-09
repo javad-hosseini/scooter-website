@@ -7,12 +7,16 @@ import jdatetime
 from django.db import transaction
 from django.db.models import F, Q, Count, Avg, Sum
 from django.db.models.functions import Coalesce, TruncMonth
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect, HttpResponseForbidden
+import logging
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.views.generic import DetailView, ListView, RedirectView, TemplateView
+
+logger = logging.getLogger(__name__)
+
 from rest_framework import generics, serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -38,7 +42,7 @@ from .serializers import (
     AdminProductReviewSerializer, CartSerializer
 )
 from django.views import View
-from .utils.inventory_utils import InventoryManager
+from .utils.inventory_utils import InventoryManager, InsufficientStockError
 from .utils.shipping_utils import ShippingCalculator
 from .utils.tax_utils import TaxCalculator
 from .services.payment import PaymentGatewayFactory
@@ -406,6 +410,12 @@ class ProductListPageView(BaseProductListView):
         'با گارانتی ۳ ساله و ارسال سریع به سراسر ایران.'
     )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # رشته خالی به JS می‌گوید این صفحه، لیست کل محصولات است نه یک کتگوری
+        context['category_slug'] = ''
+        return context
+
     def get_breadcrumbs(self, context):
         return [('خانه', '/'), ('محصولات', reverse('shop:product_list'))]
 
@@ -445,6 +455,7 @@ class CategoryPageView(BaseProductListView):
         context = super().get_context_data(**kwargs)
         context['category'] = self.category
         context['slug'] = self.category.slug
+        context['category_slug'] = self.category.slug
         context['hero_products'] = [
             hp.product
             for hp in self.category.hero_products.select_related('product').all()[:5]
@@ -540,17 +551,27 @@ class AdminDashboardStatsAPIView(APIView):
         months = []
         for i in range(11, -1, -1):
             month_date = today - timedelta(days=30 * i)
-            month_num = month_date.month
+            try:
+                j_date = jdatetime.date.fromgregorian(date=month_date)
+                month_num = j_date.month
+                year_val = j_date.year
+            except Exception:
+                month_num = month_date.month
+                year_val = month_date.year
             month_name = month_names_fa.get(month_num, str(month_num))
             months.append({
                 'month': month_name,
-                'year': month_date.year,
+                'year': year_val,
                 'total': 0
             })
 
         for data in sales_data:
             if data['month']:
-                month_num = data['month'].month
+                try:
+                    d_val = data['month'].date() if hasattr(data['month'], 'date') else data['month']
+                    month_num = jdatetime.date.fromgregorian(date=d_val).month
+                except Exception:
+                    month_num = data['month'].month
                 month_name = month_names_fa.get(month_num, str(month_num))
                 for m in months:
                     if m['month'] == month_name:
@@ -727,7 +748,7 @@ class AdminDashboardStatsAPIView(APIView):
 
 
 class CartAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_cart(self, request):
         """دریافت یا ایجاد سبد خرید فعال کاربر"""
@@ -742,6 +763,10 @@ class CartAPIView(APIView):
 
     def get(self, request):
         """نمایش سبد خرید"""
+        # کاربران مهمان سبد خرید ندارند — پاسخ ایمن بازمی‌گردد
+        if not request.user.is_authenticated:
+            return self._empty_cart_response()
+
         cart = self.get_cart(request)
 
         if not cart.items.exists():
@@ -1209,7 +1234,7 @@ class CheckoutSubmitAPIView(APIView):
                 'product': product,
                 'quantity': quantity,
                 'price': product.price,
-                'discount': product.discount_price or 0,
+                'discount': unit_discount,
             })
 
         # محاسبه مالیات و هزینه ارسال با utils
@@ -1333,15 +1358,16 @@ class OrderCancelAPIView(APIView):
     def post(self, request, order_number):
         order = get_object_or_404(Order, order_number=order_number, user=request.user)
 
-        # فقط سفارش های در انتظار پرداخت قابل لغو هستند
+        # فقط سفارش های در انتظار پرداخت و در حال پردازش قابل لغو هستند
         if order.status not in ['pending', 'processing']:
             return Response(
                 {'error': 'این سفارش قابل لغو نیست'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # بازگرداندن موجودی
-        InventoryManager.restore_stock(order.items.all())
+        # بازگرداندن موجودی فقط در صورتی که سفارش قبلاً پرداخت شده و موجودی کسر شده باشد
+        if order.payment_status == 'paid':
+            InventoryManager.restore_stock(order.items.all())
 
         # لغو سفارش
         order.status = 'cancelled'
@@ -1384,6 +1410,17 @@ class PaymentCallbackView(View):
         order = get_object_or_404(Order, id=order_id)
         trx = Transaction.objects.filter(order=order).order_by('-created_at').first()
 
+        # بررسی Idempotency: اگر سفارش از قبل پرداخت شده، فرآیند را تکرار نکن
+        if order.payment_status == 'paid':
+            return redirect(f"{reverse('accounts_app:dashboard')}?payment=success&order={order.order_number}")
+
+        # بررسی تطابق درگاه کال‌بک با درگاه تراکنش ثبت‌شده (جلوگیری از درگاه تستی جعلی)
+        if trx and trx.gateway != gateway_name:
+            logger.warning(
+                f"Gateway tampering attempt for order {order_id}: expected {trx.gateway}, got {gateway_name}"
+            )
+            return HttpResponseForbidden("عدم تطابق درگاه پرداخت با تراکنش ثبت‌شده.")
+
         gateway = PaymentGatewayFactory.get_gateway(gateway_name)
         request_params = {**request.GET.dict(), **request.POST.dict()}
 
@@ -1402,7 +1439,18 @@ class PaymentCallbackView(View):
                 trx.save(update_fields=['status', 'reference_id', 'paid_at'])
 
             # کسر قطعی موجودی انبار پس از پرداخت موفقیت‌آمیز
-            InventoryManager.deduct_stock(order.items.all())
+            # select_for_update در inventory_utils از race-condition جلوگیری می‌کند
+            try:
+                InventoryManager.deduct_stock(order.items.all())
+            except InsufficientStockError as exc:
+                # موجودی در فاصله checkout تا callback تمام شده (edge-case)
+                # سفارش را به حالت تعلیق در می‌آوریم تا ادمین بررسی کند
+                order.status = 'on_hold'
+                order.notes = (order.notes or '') + f' | موجودی ناکافی: {exc}'
+                order.save(update_fields=['status', 'notes', 'updated_at'])
+                return redirect(
+                    f"{reverse('accounts_app:dashboard')}?payment=stock_error&order={order.order_number}"
+                )
 
             # غیرفعال‌سازی سبد خرید فعلی
             Cart.objects.filter(user=order.user, is_active=True).update(is_active=False)
@@ -1565,10 +1613,19 @@ class AdminFinanceStatsAPIView(APIView):
         months = []
         for i in range(11, -1, -1):
             month_date = today - timedelta(days=30 * i)
-            months.append({'month': month_names_fa.get(month_date.month, ''), 'total': 0})
+            try:
+                j_m = jdatetime.date.fromgregorian(date=month_date).month
+            except Exception:
+                j_m = month_date.month
+            months.append({'month': month_names_fa.get(j_m, ''), 'total': 0})
         for d in monthly_data:
             if d['month']:
-                name = month_names_fa.get(d['month'].month, '')
+                try:
+                    d_date = d['month'].date() if hasattr(d['month'], 'date') else d['month']
+                    j_m = jdatetime.date.fromgregorian(date=d_date).month
+                except Exception:
+                    j_m = d['month'].month
+                name = month_names_fa.get(j_m, '')
                 for m in months:
                     if m['month'] == name:
                         m['total'] = float(d['total']) / 1_000_000
@@ -1612,11 +1669,20 @@ class AdminFinanceStatsAPIView(APIView):
         month_keys = []
         for i in range(5, -1, -1):
             m = today - timedelta(days=30 * i)
-            month_keys.append((m.year, m.month))
+            try:
+                jm = jdatetime.date.fromgregorian(date=m)
+                month_keys.append((jm.year, jm.month))
+            except Exception:
+                month_keys.append((m.year, m.month))
 
         gw_lookup = {}
         for row in gw_monthly:
-            key = (row['month'].year, row['month'].month, row['gateway'])
+            d_date = row['month'].date() if hasattr(row['month'], 'date') else row['month']
+            try:
+                jm = jdatetime.date.fromgregorian(date=d_date)
+                key = (jm.year, jm.month, row['gateway'])
+            except Exception:
+                key = (row['month'].year, row['month'].month, row['gateway'])
             gw_lookup[key] = float(row['total']) / 1_000_000
 
         for code, _ in Transaction.GATEWAY_CHOICES:
@@ -1624,28 +1690,28 @@ class AdminFinanceStatsAPIView(APIView):
                 gw_lookup.get((y, m, code), 0) for (y, m) in month_keys
             ]
 
-            # ===== ۷. تفکیک به ازای هر درگاه (کل تاریخچه) =====
-            gateway_totals = Transaction.objects.values('gateway').annotate(
-                total_count=Count('id'),
-                success_count=Count('id', filter=Q(status='success')),
-                revenue=Sum('amount', filter=Q(status='success')),
-            )
-            gateway_breakdown = []
-            for row in gateway_totals:
-                total = row['total_count'] or 0
-                success = row['success_count'] or 0
-                gateway_breakdown.append({
-                    'code': row['gateway'],
-                    'label': gateway_labels.get(row['gateway'], row['gateway']),
-                    'total_count': total,
-                    'success_count': success,
-                    'revenue': float(row['revenue'] or 0),
-                    'success_rate': round((success / total * 100), 1) if total else 0,
-                })
+        # ===== ۷. تفکیک به ازای هر درگاه (کل تاریخچه) =====
+        gateway_totals = Transaction.objects.values('gateway').annotate(
+            total_count=Count('id'),
+            success_count=Count('id', filter=Q(status='success')),
+            revenue=Sum('amount', filter=Q(status='success')),
+        )
+        gateway_breakdown = []
+        for row in gateway_totals:
+            total = row['total_count'] or 0
+            success = row['success_count'] or 0
+            gateway_breakdown.append({
+                'code': row['gateway'],
+                'label': gateway_labels.get(row['gateway'], row['gateway']),
+                'total_count': total,
+                'success_count': success,
+                'revenue': float(row['revenue'] or 0),
+                'success_rate': round((success / total * 100), 1) if total else 0,
+            })
 
-            # ===== ۸. میانگین ارزش سفارش =====
-            avg_order_value = Order.objects.filter(payment_status='paid').aggregate(
-                avg=Avg('total'))['avg'] or 0
+        # ===== ۸. میانگین ارزش سفارش =====
+        avg_order_value = Order.objects.filter(payment_status='paid').aggregate(
+            avg=Avg('total'))['avg'] or 0
 
         return Response({
             'stats': {
@@ -1658,6 +1724,7 @@ class AdminFinanceStatsAPIView(APIView):
                 'refund_requests_count': refund_count,
                 'net_profit': float(net_profit),
                 'profit_margin': profit_margin,
+                'avg_order_value': float(avg_order_value),
             },
             'monthly_revenue': months,
             'revenue_sources': revenue_sources,

@@ -1,7 +1,18 @@
 # apps/shop/utils/inventory_utils.py
-from datetime import timezone
-
 from django.db import transaction
+
+from apps.shop.models import Product
+
+
+class InsufficientStockError(Exception):
+    """موجودی انبار برای ثبت سفارش کافی نیست."""
+
+    def __init__(self, product_name, available):
+        self.product_name = product_name
+        self.available = available
+        super().__init__(
+            f"موجودی کافی نیست — {product_name}: {available} عدد موجود"
+        )
 
 
 class InventoryManager:
@@ -32,19 +43,31 @@ class InventoryManager:
     @classmethod
     @transaction.atomic
     def deduct_stock(cls, items):
-        """کاهش موجودی آیتم‌ها"""
+        """
+        کاهش قطعی موجودی آیتم‌ها با قفل ردیف (select_for_update).
+
+        باید درون یک تراکنش اتمیک فراخوانده شود (PaymentCallbackView
+        از @transaction.atomic استفاده می‌کند).
+
+        Raises:
+            InsufficientStockError: اگر موجودی واقعی (پس از قفل) کافی نباشد.
+        """
         for item in items:
-            product = item.product
+            # قفل ردیف محصول در سطح DB تا از race-condition جلوگیری شود
+            product = Product.objects.select_for_update().get(pk=item.product_id)
+
+            if product.stock < item.quantity:
+                raise InsufficientStockError(product.name, product.stock)
+
             product.stock -= item.quantity
 
             if product.stock <= 0:
                 product.is_available = False
-                product.stock_out_at = timezone.now()
 
-            product.save()
+            product.save(update_fields=['stock', 'is_available', 'updated_at'])
 
             # ارسال هشدار اگر موجودی کم است
-            if product.stock <= 5:
+            if hasattr(product, 'send_stock_alert') and product.stock <= 5:
                 product.send_stock_alert()
 
     @classmethod
@@ -52,11 +75,10 @@ class InventoryManager:
     def restore_stock(cls, items):
         """بازگرداندن موجودی (در صورت لغو سفارش)"""
         for item in items:
-            product = item.product
+            product = Product.objects.select_for_update().get(pk=item.product_id)
             product.stock += item.quantity
 
             if not product.is_available and product.stock > 0:
                 product.is_available = True
-                product.stock_out_at = None
 
-            product.save()
+            product.save(update_fields=['stock', 'is_available', 'updated_at'])

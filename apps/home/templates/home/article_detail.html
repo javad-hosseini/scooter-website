@@ -2244,7 +2244,22 @@
           .join("");
       }
 
+      function escapeHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/[&<>"']/g, function (m) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[m];
+        });
+      }
+
       function renderComment(comment) {
+        const safeName = escapeHtml(comment.user_name || "کاربر ناشناس");
+        const safeContent = escapeHtml(comment.content || "");
         const initials = comment.user_name
           ? comment.user_name
               .split(" ")
@@ -2252,7 +2267,8 @@
               .join("")
               .toUpperCase()
           : "??";
-        const avatarUrl = comment.user_profile_image || null;
+        const safeInitials = escapeHtml(initials);
+        const avatarUrl = comment.user_profile_image ? encodeURI(comment.user_profile_image) : null;
 
         let repliesHtml = "";
         if (comment.replies && comment.replies.length > 0) {
@@ -2265,16 +2281,16 @@
         <div class="comment-card">
             <div class="flex items-start gap-3">
                 <div class="comment-avatar" style="background:linear-gradient(135deg,var(--neon),var(--neon2))">
-                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${comment.user_name}" class="w-full h-full rounded-full object-cover">` : initials}
+                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${safeName}" class="w-full h-full rounded-full object-cover">` : safeInitials}
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="text-sm font-semibold text-white">${comment.user_name || "کاربر ناشناس"}</span>
+                        <span class="text-sm font-semibold text-white">${safeName}</span>
                         <time datetime="${comment.created_at}" class="text-xs numeric" style="color:var(--muted)">${formatDate(new Date(comment.created_at))}</time>
                     </div>
-                    <p class="text-sm mb-2" style="color:var(--dim);line-height:1.8">${comment.content}</p>
-                    <button class="reply-btn" onclick="toggleReply('${comment.id}')">پاسخ</button>
-                    <form id="reply-form-${comment.id}" class="hidden mt-3" onsubmit="submitReply(event, '${comment.id}')">
+                    <p class="text-sm mb-2" style="color:var(--dim);line-height:1.8">${safeContent}</p>
+                    <button class="reply-btn" onclick="toggleReply('${encodeURIComponent(comment.id)}')">پاسخ</button>
+                    <form id="reply-form-${encodeURIComponent(comment.id)}" class="hidden mt-3" onsubmit="submitReply(event, '${encodeURIComponent(comment.id)}')">
                         <textarea rows="2" placeholder="پاسخ شما..." class="w-full px-4 py-2.5 rounded-[10px] text-sm outline-none resize-none mb-2" style="background:var(--card);border:1px solid var(--border);color:var(--white)"></textarea>
                         <button type="submit" class="px-5 py-2 rounded-full text-xs font-semibold" style="background:var(--neon);color:var(--black)">ارسال پاسخ</button>
                     </form>

@@ -35,4 +35,5 @@ class TaxCalculator:
             shipping_cost: هزینه ارسال (اختیاری)
         """
         tax = TaxCalculator.calculate_tax(subtotal)
-        return subtotal - discount + shipping_cost + tax
+        total = subtotal - discount + shipping_cost + tax
+        return max(Decimal('0'), total)

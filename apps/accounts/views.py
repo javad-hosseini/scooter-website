@@ -515,14 +515,14 @@ class AddressDeleteAPIView(APIView):
 
 class ProvinceListAPIView(generics.ListAPIView):
     """API برای لیست استان‌ها"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = ProvinceSerializer
     queryset = Province.objects.all()
 
 
 class CityListAPIView(generics.ListAPIView):
     """API برای لیست شهرهای یک استان"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = CitySerializer
 
     def get_queryset(self):

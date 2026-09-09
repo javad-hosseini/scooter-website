@@ -36,6 +36,9 @@ urlpatterns = [
     path('api/cart/clear/', views.CartClearAPIView.as_view(), name='api_cart_clear'),
     path('api/cart/apply-coupon/', views.CartApplyCouponAPIView.as_view(), name='api_cart_apply_coupon'),
     path('checkout/submit/', views.CheckoutSubmitAPIView.as_view(), name='checkout_submit'),
+    path('api/orders/', views.OrderListAPIView.as_view(), name='order_list'),
+    path('api/orders/<str:order_number>/cancel/', views.OrderCancelAPIView.as_view(), name='order_cancel'),
+    path('api/orders/<str:order_number>/', views.OrderDetailAPIView.as_view(), name='order_detail'),
 
     # Location APIs
     path('api/provinces/', ProvinceListAPIView.as_view(), name='api_provinces'),
