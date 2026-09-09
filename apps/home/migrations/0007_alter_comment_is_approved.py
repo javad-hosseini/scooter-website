@@ -10,9 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='comment',
-            name='is_approved',
-            field=models.BooleanField(default=False, verbose_name='تایید شده'),
-        ),
     ]

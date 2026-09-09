@@ -295,16 +295,17 @@ class DashboardDataAPIView(APIView):
         approved_product_comments = product_comments_qs.filter(status='approved').count()
         pending_product_comments = product_comments_qs.filter(status='pending').count()
 
-        # نظرات مقالات (QuerySet) - اینجا نباید count() بزنی
-        article_comments_qs = Comment.objects.filter(user=user, is_approved=True)  # ← بدون count()
-        article_comments_count = article_comments_qs.count()  # ← تعداد رو اینجا بگیر
+        # نظرات مقالات - همه‌ی وضعیت‌ها (approved/pending/rejected)
+        article_comments_qs = Comment.objects.filter(user=user)
+        approved_article_comments = article_comments_qs.filter(status='approved').count()
+        pending_article_comments = article_comments_qs.filter(status='pending').count()
 
         stats = {
             'total_orders': total_orders,
             'delivered_orders': delivered_orders,
             'pending_orders': pending_orders,
-            'approved_comments': approved_product_comments + article_comments_count,  # ← از عدد استفاده کن
-            'pending_comments': pending_product_comments,
+            'approved_comments': approved_product_comments + approved_article_comments,
+            'pending_comments': pending_product_comments + pending_article_comments,
             'wishlist_count': user.wishlist.count(),
         }
 
@@ -330,8 +331,8 @@ class DashboardDataAPIView(APIView):
                 'title': comment.title,
             })
 
-        # نظرات مقالات - از QuerySet استفاده کن
-        for comment in article_comments_qs.select_related('article').order_by('-created_at'):  # ← حالا درسته
+        # نظرات مقالات
+        for comment in article_comments_qs.select_related('article').order_by('-created_at'):
             comments_data.append({
                 'type': 'article',
                 'article_title': comment.article.title,
@@ -340,8 +341,8 @@ class DashboardDataAPIView(APIView):
                 'date': comment.created_at,
                 'rating': None,
                 'text': comment.content,
-                'status': 'approved' if comment.is_approved else 'pending',
-                'reject_reason': None,
+                'status': comment.status,
+                'reject_reason': comment.rejection_reason if comment.status == 'rejected' else None,
                 'title': None,
             })
 
@@ -534,3 +535,8 @@ class CityListAPIView(generics.ListAPIView):
 class DashboardPageView(TemplateView):
     """صفحه داشبورد کاربر"""
     template_name = 'accounts/user_dashboard.html'
+
+
+class RulesView(TemplateView):
+    """صفحه قوانین و مقررات"""
+    template_name = 'accounts/rules.html'

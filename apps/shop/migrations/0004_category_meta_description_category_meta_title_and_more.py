@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0003_order_orderitem'),
+        ('shop', '0008_product_grid_image_alter_product_cover_image'),
     ]
 
     operations = [

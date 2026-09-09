@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0005_testimonial_avatar_image_and_more'),
+        ('home', '0005_categoryfeature_unit'),
     ]
 
     operations = [

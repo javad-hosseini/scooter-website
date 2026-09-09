@@ -4,6 +4,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -387,6 +388,13 @@ class Product(models.Model):
         verbose_name="متن جایگزین تصویر کاور",
         help_text="برای سئوی تصویر و دسترسی‌پذیری. اگر خالی باشد از نام محصول ساخته می‌شود."
     )
+    grid_image = models.ImageField(
+        upload_to='products/grid/',
+        blank=True,
+        null=True,
+        verbose_name="تصویر گرید",
+        help_text="تصویری که در کارت محصول داخل صفحه‌ی دسته‌بندی نمایش داده می‌شود. اگر خالی بماند، از تصویر کاور استفاده می‌شود."
+    )
 
     # قیمت
     price = models.DecimalField(
@@ -401,9 +409,21 @@ class Product(models.Model):
         null=True,
         verbose_name="قیمت با تخفیف"
     )
+    cost_price = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="قیمت تمام‌شده",
+        help_text="هزینه‌ی خرید/تولید محصول — برای محاسبه‌ی سود خالص استفاده می‌شود و به مشتری نمایش داده نمی‌شود"
+    )
 
     # موجودی
     stock = models.PositiveIntegerField(default=0, verbose_name="موجودی")
+    stock_out_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="تاریخ اتمام موجودی"
+    )
     is_available = models.BooleanField(default=True, verbose_name="موجود")
     restock_expected = models.BooleanField(
         default=True,
@@ -544,6 +564,17 @@ class Product(models.Model):
                 distribution[rating] = approved.filter(rating=rating).count()
         return distribution
 
+    def profit_margin(self):
+        """حاشیه سود = (قیمت فروش - قیمت خرید) / قیمت فروش"""
+        if self.price and self.cost_price:
+            return round(((self.price - self.cost_price) / self.price) * 100, 1)
+        return 0
+
+    def send_stock_alert(self):
+        """ارسال هشدار به ادمین وقتی موجودی کمه"""
+        if self.stock <= 2:
+            print(f"هشدار: موجودی {self.name} کم است ({self.stock} عدد)")
+
 
 # apps/shop/models.py
 
@@ -586,6 +617,11 @@ class Order(models.Model):
         ('paid', 'پرداخت شده'),
         ('failed', 'ناموفق'),
         ('refunded', 'بازگشت وجه'),
+    ]
+
+    SHIPPING_METHOD_CHOICES = [
+        ('standard', 'ارسال معمولی'),
+        ('express', 'ارسال فوری'),
     ]
 
     # اطلاعات اصلی
@@ -647,6 +683,18 @@ class Order(models.Model):
         decimal_places=0,
         default=0,
         verbose_name="هزینه ارسال"
+    )
+    shipping_method = models.CharField(
+        max_length=20,
+        choices=SHIPPING_METHOD_CHOICES,
+        default='standard',
+        verbose_name="روش ارسال"
+    )
+    tax_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="مالیات"
     )
     total = models.DecimalField(
         max_digits=15,
@@ -718,3 +766,286 @@ class OrderItem(models.Model):
     @property
     def total(self):
         return (self.price - self.discount) * self.quantity
+
+
+# apps/shop/models.py
+
+class Cart(models.Model):
+    """سبد خرید کاربر (اعم از مهمان یا لاگین‌شده)"""
+
+    # ===== شناسه =====
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='cart',
+        verbose_name="کاربر"
+    )
+    session_key = models.CharField(
+        max_length=40,
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name="کلید نشست"
+    )
+
+    # ===== وضعیت =====
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
+
+    # ===== کوپن/تخفیف =====
+    coupon_code = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name="کد تخفیف"
+    )
+    coupon_discount = models.DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        default=0,
+        verbose_name="تخفیف کوپن"
+    )
+
+    # ===== زمان =====
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "سبد خرید"
+        verbose_name_plural = "سبدهای خرید"
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['session_key', 'is_active']),
+        ]
+
+    def __str__(self):
+        if self.user:
+            return f"سبد {self.user.fullname}"
+        return f"سبد مهمان ({self.session_key})"
+
+    @property
+    def item_count(self):
+        """تعداد کل آیتم‌های سبد خرید"""
+        return self.items.aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+    @property
+    def total_items(self):
+        """تعداد کل آیتم‌ها"""
+        return self.items.aggregate(
+            total=models.Sum('quantity')
+        )['total'] or 0
+
+    @property
+    def subtotal(self):
+        """جمع کل بدون تخفیف"""
+        total = 0
+        for item in self.items.all():
+            total += item.product.price * item.quantity
+        return total
+
+    @property
+    def total(self):
+        """مبلغ نهایی با تخفیف"""
+        return self.subtotal - self.coupon_discount
+
+    @property
+    def has_items(self):
+        return self.items.exists()
+
+
+class CartItem(models.Model):
+    """آیتم‌های سبد خرید"""
+
+    cart = models.ForeignKey(
+        Cart,
+        on_delete=models.CASCADE,
+        related_name='items',
+        verbose_name="سبد خرید"
+    )
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.PROTECT,
+        related_name='cart_items',
+        verbose_name="محصول"
+    )
+    quantity = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1)],
+        verbose_name="تعداد"
+    )
+
+    color_slug = models.CharField(
+        max_length=50,
+        blank=True,
+        default='',
+        verbose_name="رنگ"
+    )
+
+    # ===== اطلاعات محصول در زمان اضافه شدن (برای ثبات قیمت) =====
+    price_snapshot = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="قیمت لحظه اضافه شدن"
+    )
+
+    # ===== اضافه کردن این فیلد =====
+    selected_color = models.CharField(
+        max_length=50,
+        default='black',
+        verbose_name="رنگ انتخاب‌شده"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "آیتم سبد خرید"
+        verbose_name_plural = "آیتم‌های سبد خرید"
+        unique_together = ['cart', 'product']  # هر محصول فقط یک بار در سبد
+
+    def __str__(self):
+        return f"{self.product.name} x{self.quantity}"
+
+    @property
+    def total(self):
+        return self.price_snapshot * self.quantity
+
+    def save(self, *args, **kwargs):
+        """ذخیره قیمت لحظه‌ای در اولین بار ایجاد"""
+        if not self.pk and not self.price_snapshot:
+            self.price_snapshot = self.product.final_price  # قیمت با تخفیف
+        super().save(*args, **kwargs)
+
+
+class Transaction(models.Model):
+    """تراکنش‌های پرداخت مرتبط با یک سفارش (هر تلاش پرداخت یک رکورد)"""
+
+    GATEWAY_CHOICES = [
+        ('zarinpal', 'زرین‌پال'),
+        ('idpay', 'آی‌دی‌پی'),
+        ('nextpay', 'نکست‌پی'),
+        ('bank', 'بانکی'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار'),
+        ('success', 'موفق'),
+        ('failed', 'ناموفق'),
+    ]
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='transactions',
+        verbose_name="سفارش"
+    )
+    transaction_id = models.CharField(
+        max_length=30,
+        unique=True,
+        editable=False,
+        verbose_name="شناسه تراکنش"
+    )
+    gateway = models.CharField(
+        max_length=20,
+        choices=GATEWAY_CHOICES,
+        verbose_name="درگاه پرداخت"
+    )
+    reference_id = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="کد رهگیری درگاه",
+        help_text="Authority/RefID که خودِ درگاه برمی‌گرداند"
+    )
+    amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="مبلغ"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="وضعیت"
+    )
+    failure_reason = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="دلیل ناموفق بودن"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد")
+    paid_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان پرداخت")
+    settled_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان تسویه")
+
+    class Meta:
+        verbose_name = "تراکنش"
+        verbose_name_plural = "تراکنش‌ها"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['order', 'status']),
+            models.Index(fields=['gateway', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.transaction_id} - {self.get_gateway_display()} ({self.get_status_display()})"
+
+    def save(self, *args, **kwargs):
+        if not self.transaction_id:
+            self.transaction_id = f"TRX-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
+
+
+class RefundRequest(models.Model):
+    """درخواست بازگشت وجه برای یک سفارش"""
+
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار بررسی'),
+        ('approved', 'تایید شده'),
+        ('rejected', 'رد شده'),
+        ('completed', 'بازگشت انجام شد'),
+    ]
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='refund_requests',
+        verbose_name="سفارش"
+    )
+    transaction = models.ForeignKey(
+        Transaction,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='refund_requests',
+        verbose_name="تراکنش مرتبط"
+    )
+    amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        verbose_name="مبلغ درخواستی"
+    )
+    reason = models.TextField(verbose_name="دلیل درخواست کاربر")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="وضعیت"
+    )
+    admin_note = models.TextField(
+        blank=True,
+        verbose_name="یادداشت ادمین",
+        help_text="در صورت رد شدن، دلیل رد شدن اینجا ثبت می‌شود"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان درخواست")
+    resolved_at = models.DateTimeField(null=True, blank=True, verbose_name="زمان تصمیم‌گیری")
+
+    class Meta:
+        verbose_name = "درخواست بازگشت وجه"
+        verbose_name_plural = "درخواست‌های بازگشت وجه"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"بازگشت وجه سفارش {self.order.order_number} - {self.get_status_display()}"

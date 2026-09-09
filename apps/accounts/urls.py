@@ -30,6 +30,7 @@ urlpatterns = [
 
     path('api/addresses/', views.AddressListCreateAPIView.as_view(), name='api_addresses'),
     path('api/addresses/<int:pk>/delete/', views.AddressDeleteAPIView.as_view(), name='api_address_delete'),
+    path('rules/', views.RulesView.as_view(), name='rules'),
 
     path('api/provinces/', views.ProvinceListAPIView.as_view(), name='api_provinces'),
     path('api/cities/', views.CityListAPIView.as_view(), name='api_cities'),

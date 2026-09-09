@@ -61,12 +61,15 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductReview
+        # NOTE: raw ``user`` PK and the ``status`` moderation state are
+        # deliberately not exposed on the public feed — the PK enables user
+        # enumeration and the status leaks moderation state.
         fields = [
-            'id', 'user', 'user_name', 'user_avatar', 'rating', 'title',
-            'comment', 'status', 'helpful_count', 'is_verified_purchase',
+            'id', 'user_name', 'user_avatar', 'rating', 'title',
+            'comment', 'helpful_count', 'is_verified_purchase',
             'created_at'
         ]
-        read_only_fields = ['user', 'status', 'helpful_count', 'created_at']
+        read_only_fields = ['helpful_count', 'created_at']
 
     def get_user_avatar(self, obj):
         if obj.user and obj.user.profile_image:
@@ -141,7 +144,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'category', 'tagline', 'description',
             'cover_image_url', 'cover_alt_text', 'price', 'discount_price',
-            'final_price', 'stock', 'is_available', 'is_published',
+            'final_price', 'is_available', 'is_published',
             'is_featured', 'specs', 'trust_badges', 'marketing_features',
             'stat_features', 'images', 'average_rating', 'reviews_count',
             'rating_distribution', 'view_count', 'is_in_wishlist',
