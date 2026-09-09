@@ -1,84 +1,32 @@
 <!doctype html>
+{% load static seo_tags compress %}
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title id="page-title">Nex Go | اسکوتر های پرمیوم شهری و برقی</title>
-    <meta name="enamad" content="Nex Go | اسکوتر های پرمیوم شهری " />
-    
-    
+    {# maximum-scale=1 / user-scalable=no blocked pinch-zoom entirely, which #}
+    {# fails WCAG 1.4.4 and is flagged by Lighthouse accessibility. #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ============================================================
-     MOBILE SCROLL-MODE DETECTION (runs before CSS paints)
-     Sets html.is-mobile-scroll for true handheld phones only —
-     portrait phones (by width) and landscape phones (short height +
-     coarse pointer). Tablets (portrait or landscape) and laptops/
-     desktop are intentionally NOT matched here, so they keep the
-     existing animated slide-paging system. This is viewport/media-
-     feature based (no User-Agent sniffing) and is the single source
-     of truth that both the CSS and the slide-navigation JS read from,
-     so the two can never disagree with each other.
-     ============================================================ -->
-    <script>
-      (function () {
-        var mobileQuery =
-          "(max-width: 767.98px), (max-height: 500px) and (max-width: 1023.98px) and (orientation: landscape) and (pointer: coarse)";
-        var mq = window.matchMedia(mobileQuery);
-        function applyMobileScrollClass(e) {
-          document.documentElement.classList.toggle("is-mobile-scroll", e.matches);
-        }
-        applyMobileScrollClass(mq);
-        if (mq.addEventListener) {
-          mq.addEventListener("change", applyMobileScrollClass);
-        } else if (mq.addListener) {
-          // Safari < 14 fallback
-          mq.addListener(applyMobileScrollClass);
-        }
-      })();
-    </script>
+    {% include "seo/_head.html" %}
 
-    <!-- ============================================================
-     SEO META TAGS — توسط JavaScript پر می‌شوند
-     ============================================================ -->
-    <meta name="description" id="meta-description" content="" />
-    <meta name="enamad" content="Nex Go | اسکوتر های پرمیوم شهری " />
-    <link rel="canonical" id="meta-canonical" href="" />
+    {% if index_settings.hero_image %}
+    <link rel="preload" as="image" fetchpriority="high"
+          href="{{ index_settings.hero_image.url }}"
+          media="(min-width: 900px)" />
+    {% endif %}
+    {% if index_settings.hero_mobile_image %}
+    <link rel="preload" as="image" fetchpriority="high"
+          href="{{ index_settings.hero_mobile_image.url }}"
+          media="(max-width: 899px)" />
+    {% endif %}
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" id="og-title" content="" />
-    <meta property="og:description" id="og-description" content="" />
-    <meta property="og:image" id="og-image" content="" />
-    <meta property="og:url" id="og-url" content="" />
-    <meta property="og:site_name" content="Nex Go" />
-    <meta property="og:locale" content="fa_IR" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" id="twitter-title" content="" />
-    <meta name="twitter:description" id="twitter-description" content="" />
-    <meta name="twitter:image" id="twitter-image" content="" />
-
-    <!-- JSON-LD: WebSite -->
-    <script id="json-ld-website" type="application/ld+json"></script>
-
-    <!-- ============================================================
-     FONTS — لینک‌های فونت
-     ============================================================ -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    {% include "seo/_fonts.html" %}
 
     <!-- ============================================================
      STYLES — تمام استایل‌های فایل index.html رو اینجا کپی کن
      (از <style> تا </style> فایل اصلی)
      ============================================================ -->
+{% compress css %}
     <style>
       /* ══════════════════════════════════════════
    DESIGN TOKENS — refined dark "instrument cluster" system
@@ -397,7 +345,6 @@
         font-size: 0.82rem;
         flex-shrink: 0;
         line-height: 1;
-        object-fit: cover;
       }
       .auth-user-menu {
         position: absolute;
@@ -426,8 +373,7 @@
         visibility: visible;
         transform: translateY(0);
       }
-      .auth-user-menu a,
-      .auth-user-menu button.auth-logout {
+      .auth-user-menu a {
         font-family: var(--font-ui);
         font-size: 0.78rem;
         color: var(--dim);
@@ -439,31 +385,18 @@
           color 0.2s var(--ease-smooth);
       }
       .auth-user-menu a:hover,
-      .auth-user-menu a:focus-visible,
-      .auth-user-menu button.auth-logout:hover,
-      .auth-user-menu button.auth-logout:focus-visible {
+      .auth-user-menu a:focus-visible {
         background: rgba(255, 255, 255, 0.05);
         color: var(--white);
       }
-      .auth-user-menu a.auth-logout,
-      .auth-user-menu button.auth-logout {
+      .auth-user-menu a.auth-logout {
         color: #ff8a8a;
         border-top: 1px solid var(--border);
         margin-top: 4px;
         padding-top: 11px;
-        background: none;
-        border-inline: none;
-        border-bottom: none;
-        width: 100%;
-        text-align: right;
-        cursor: pointer;
       }
-      .auth-user-menu a.auth-logout:hover,
-      .auth-user-menu button.auth-logout:hover {
+      .auth-user-menu a.auth-logout:hover {
         background: rgba(255, 108, 108, 0.08);
-      }
-      .auth-logout-form {
-        margin: 0;
       }
 
       @media (min-width: 768px) {
@@ -643,55 +576,23 @@
         transform: translateY(0);
       }
       .mobile-drawer a {
-        position: relative;
         font-family: var(--font-display);
-        font-weight: 600;
-        font-size: 1.15rem;
-        letter-spacing: 0.01em;
+        font-weight: 500;
+        font-size: 1.9rem;
+        letter-spacing: 0.02em;
         color: var(--dim);
         text-decoration: none;
-        padding: 14px 0;
-        width: min(240px, 70vw);
-        border-radius: var(--r-sm);
-        border-bottom: 1px solid var(--border);
+        padding: 12px 0;
         transition:
           color 0.35s var(--ease-smooth),
-          transform 0.35s var(--ease-smooth),
-          border-color 0.35s var(--ease-smooth),
-          background 0.35s var(--ease-smooth),
-          box-shadow 0.35s var(--ease-smooth);
+          transform 0.35s var(--ease-smooth);
         display: block;
         text-align: center;
       }
-      .mobile-drawer a:last-of-type {
-        border-bottom: none;
-      }
-      /* Premium hover — restricted to true hover-capable pointers so touch
-         phones (no real hover) never get a stuck/sticky hover state */
-      @media (hover: hover) and (pointer: fine) {
-        .mobile-drawer a:hover {
-          color: var(--neon);
-          border-color: var(--border-lit);
-          background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
-          box-shadow: inset 0 0 0 1px rgba(79, 216, 255, 0.08);
-          transform: translateX(-6px);
-        }
-      }
+      .mobile-drawer a:hover,
       .mobile-drawer a:active {
         color: var(--neon);
-        border-color: var(--border-lit);
-        background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
-        transform: translateX(-4px);
-      }
-      /* Keyboard focus gets the same polished treatment as hover */
-      .mobile-drawer a:focus-visible {
-        color: var(--neon);
-        border-color: var(--border-lit);
-        background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
-        box-shadow:
-          0 0 0 1px var(--border-lit),
-          0 0 20px -8px var(--neon);
-        outline: none;
+        transform: translateX(-6px);
       }
       .mobile-drawer-cta {
         margin-top: 26px;
@@ -706,62 +607,90 @@
         border-radius: 100px;
       }
 
-      /* ══════════════════════════════════════════
-         MOBILE HAMBURGER MENU — refinement (<= 767.98px only)
-         The trigger button (.nav-menu-btn) is only ever visible below
-         768px (hidden by the tablet/desktop nav rules further down),
-         so this drawer is already mobile-only in practice. It's still
-         wrapped in an explicit max-width query here so the smaller,
-         cleaner typography below can never affect Tablet/Desktop even
-         if that visibility rule ever changes. Only type scale, weight,
-         spacing and padding are touched — layout mechanics, colors,
-         functionality and the hamburger button itself are untouched.
-         ══════════════════════════════════════════ */
-      @media (max-width: 767.98px) {
-        .mobile-drawer {
-          gap: 2px;
-          padding-top: 74px;
-          width: 100vw;
-          height: 100vh; /* fallback for browsers without dvh support */
-          height: 100dvh;
-          max-height: 100vh;
-          max-height: 100dvh;
-          overflow-x: hidden;
+      /* ── SECTIONS WRAPPER ── */
+      /* ===== Crawlable site footer (inside the final slide) ===== */
+      .site-footer {
+        position: absolute;
+        inset-inline: 0;
+        bottom: 0;
+        z-index: 4;
+        padding: 18px clamp(16px, 4vw, 48px) 14px;
+        background: linear-gradient(
+          to top,
+          rgba(5, 5, 7, 0.96),
+          rgba(5, 5, 7, 0)
+        );
+        font-size: 12px;
+        pointer-events: auto;
+      }
+      .site-footer-inner {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .site-footer h2 {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin: 0 0 6px;
+        text-transform: none;
+      }
+      .site-footer ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .site-footer a {
+        color: var(--dim);
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
+      .site-footer a:hover,
+      .site-footer a:focus-visible {
+        color: var(--neon);
+      }
+      .site-footer-copy {
+        text-align: center;
+        color: var(--muted);
+        margin: 12px 0 0;
+        font-size: 11px;
+      }
+      @media (max-height: 760px), (max-width: 640px) {
+        /* Compact on small screens rather than hidden. Google crawls
+           mobile-first, so hiding the footer below 640px would take these
+           links away from exactly the rendering that matters most. */
+        .site-footer {
+          padding: 10px 12px 8px;
+          max-height: 34vh;
+          overflow-y: auto;
           overscroll-behavior: contain;
-          -webkit-overflow-scrolling: touch;
         }
-        .mobile-drawer a {
-          font-family: var(--font-ui);
-          font-weight: 500;
-          font-size: 0.92rem;
-          letter-spacing: 0.01em;
-          padding: 11px 0;
-          width: min(210px, 72vw);
+        .site-footer-inner {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 6px 14px;
         }
-        .mobile-drawer-cta {
-          margin-top: 20px;
-          padding: 13px 40px;
+        .site-footer h2 {
+          font-size: 10px;
+          margin-bottom: 3px;
         }
-        .drawer-auth {
-          margin-top: 16px;
-          gap: 10px;
+        .site-footer ul {
+          gap: 2px;
         }
-        .drawer-auth-link {
-          font-size: 0.82rem;
-          padding: 10px 26px;
-        }
-        .drawer-auth-register {
-          padding: 13px 38px;
-        }
-        .drawer-auth-user {
-          margin-top: 16px;
-        }
-        .drawer-user-info {
-          font-size: 0.88rem;
+        .site-footer a,
+        .site-footer-copy {
+          font-size: 10px;
         }
       }
 
-      /* ── SECTIONS WRAPPER ── */
       #sections-wrapper {
         position: fixed;
         top: 0;
@@ -787,24 +716,6 @@
         margin: 0 auto;
         padding: 0 20px;
         width: 100%;
-      }
-      /* Short-viewport / unusual aspect-ratio safety net (low-height
-         monitors, landscape phones, small laptop windows). Slides keep
-         their fixed 100dvh paging offsets, but become internally
-         scrollable instead of clipping/overlapping content when it
-         doesn't fit the available height. This never engages on normal
-         viewports, so default layout/design is unaffected. */
-      @media (max-height: 680px) {
-        .slide {
-          overflow-y: auto;
-          align-items: flex-start;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        .slide::-webkit-scrollbar {
-          display: none;
-        }
       }
       .section-label {
         font-family: var(--font-mono);
@@ -1933,37 +1844,26 @@ SLIDE 5: FINAL — MOBILE (FIXED FOR SCROLLING & OVERFLOW)
         background: var(--black);
         height: 100dvh !important;
         min-height: 100dvh;
-        overflow: hidden !important;
+        overflow: visible !important;
         align-items: flex-start !important;
         display: block !important;
       }
-      /* Single scroll container for slide 6: holds the promise section
-         (mobile OR desktop variant, toggled via media queries) followed
-         by the footer, and scrolls internally if content is taller than
-         the viewport — without affecting slide-to-slide navigation. */
-      .final-scroll {
+      .final-mobile-wrap {
         width: 100%;
-        height: 100%;
+        height: 100dvh;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        padding-top: var(--nav-h);
+        padding-bottom: calc(24px + env(safe-area-inset-bottom));
         overflow-y: auto;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
-        position: relative;
-        z-index: 1;
-        padding-bottom: env(safe-area-inset-bottom);
       }
-      .final-scroll::-webkit-scrollbar {
+      .final-mobile-wrap::-webkit-scrollbar {
         display: none;
-      }
-      .final-mobile-wrap {
-        width: 100%;
-        height: auto;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        padding-top: var(--nav-h);
       }
       .final-ambient {
         position: fixed;
@@ -2349,71 +2249,6 @@ SLIDE 5: FINAL — MOBILE (FIXED FOR SCROLLING & OVERFLOW)
       .slide.active .fs-anim {
         opacity: 1;
         transform: none;
-      }
-
-      /* ══════════════════════════════════════════
-         SLIDE SYSTEM: TRUE MOBILE ONLY
-         On real handheld phones (html.is-mobile-scroll, set in <head>
-         based on viewport/pointer media features — portrait phones by
-         width, landscape phones by short height + coarse pointer) the
-         whole full-screen slide/paging mechanism is disabled and the
-         page becomes a normal, naturally stacked, vertically scrolling
-         document. Tablets (portrait or landscape) and laptop/desktop
-         are NOT matched by this class, so they keep the existing
-         animated slide-paging system untouched. Nothing here touches
-         colors, fonts, component styling, or animation keyframes —
-         only the layout mechanics of #sections-wrapper/.slide.
-         ══════════════════════════════════════════ */
-      html.is-mobile-scroll {
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        height: auto !important;
-      }
-      html.is-mobile-scroll body {
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        height: auto !important;
-        width: 100% !important;
-        max-width: 100%;
-        min-height: 100dvh;
-        overscroll-behavior: auto;
-      }
-      html.is-mobile-scroll #sections-wrapper {
-        position: static !important;
-        top: auto !important;
-        left: auto !important;
-        width: 100% !important;
-        height: auto !important;
-        transform: none !important;
-        transition: none !important;
-        will-change: auto;
-      }
-      html.is-mobile-scroll .slide {
-        position: static !important;
-        top: auto !important;
-        left: auto !important;
-        width: 100% !important;
-        height: auto !important;
-        min-height: 0;
-        overflow: visible !important;
-      }
-      /* Content should be visible immediately without waiting
-         for the desktop "active slide" JS toggle — an
-         IntersectionObserver re-adds .active per-slide on
-         scroll (see script), but this guarantees nothing is
-         stuck invisible if JS is slow/disabled. */
-      html.is-mobile-scroll .slide .fs-anim,
-      html.is-mobile-scroll .slide .slide-anim,
-      html.is-mobile-scroll .slide .slide-anim-left,
-      html.is-mobile-scroll .slide .slide-anim-right,
-      html.is-mobile-scroll .slide .slide-anim-scale,
-      html.is-mobile-scroll .slide .word-reveal .word span {
-        opacity: 1 !important;
-        transform: none !important;
-      }
-      html.is-mobile-scroll #nav-dots,
-      html.is-mobile-scroll #scroll-progress {
-        display: none !important;
       }
 
       /* ══════════════════════════════════════════
@@ -3288,11 +3123,11 @@ TABLET BREAKPOINT (768px–1023px)
         }
         .final-desktop-wrap {
           width: 100%;
-          height: auto;
+          height: 100dvh;
           display: flex;
           flex-direction: column;
           padding-top: var(--nav-h);
-          overflow: visible;
+          overflow: hidden;
         }
         .promise-section-d {
           padding: 22px 36px 18px;
@@ -3395,6 +3230,139 @@ TABLET BREAKPOINT (768px–1023px)
           font-size: 0.73rem;
           color: var(--muted);
           line-height: 1.55;
+        }
+        .stmt-desktop {
+          flex: 1;
+          padding: 0 36px;
+          text-align: center;
+          border-bottom: 1px solid var(--border);
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .stmt-ring {
+          position: absolute;
+          border-radius: 50%;
+          border: 1px solid rgba(79, 216, 255, 0.035);
+          top: 50%;
+          left: 50%;
+          animation: ringExpand 9s linear infinite;
+          pointer-events: none;
+        }
+        .stmt-ring:nth-child(1) {
+          width: 260px;
+          height: 260px;
+          animation-delay: 0s;
+        }
+        .stmt-ring:nth-child(2) {
+          width: 440px;
+          height: 440px;
+          animation-delay: 3s;
+        }
+        @keyframes ringExpand {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.7);
+          }
+          30% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.3);
+          }
+        }
+        .stmt-inner-d {
+          position: relative;
+          z-index: 2;
+        }
+        .stmt-eyebrow-d {
+          font-family: var(--font-mono);
+          font-size: 0.66rem;
+          letter-spacing: 0;
+          text-transform: none;
+          color: var(--neon);
+          margin-bottom: 10px;
+          display: block;
+        }
+        .stmt-desktop-title {
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: clamp(2.5rem, 4.6vw, 4.6rem);
+          line-height: 1.15;
+          color: var(--white);
+          margin-bottom: 10px;
+          letter-spacing: 0;
+        }
+        .stmt-desktop-title em {
+          font-style: normal;
+          background: linear-gradient(
+            90deg,
+            var(--neon),
+            var(--neon2),
+            var(--neon3)
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .stmt-desktop-desc {
+          font-family: var(--font-body);
+          font-size: 0.86rem;
+          font-weight: 300;
+          color: var(--dim);
+          line-height: 1.75;
+          margin-bottom: 16px;
+          max-width: 420px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .stmt-desktop-btns {
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+        }
+        .stmt-btn-p-d {
+          font-family: var(--font-ui);
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0;
+          text-transform: none;
+          background: var(--white);
+          color: var(--black);
+          padding: 14px 38px;
+          border: none;
+          cursor: pointer;
+          border-radius: 100px;
+          transition: all 0.45s var(--ease-luxury);
+          position: relative;
+          overflow: hidden;
+        }
+        .stmt-btn-p-d:hover {
+          background: var(--neon);
+          transform: translateY(-2px);
+          box-shadow: 0 14px 36px -10px rgba(79, 216, 255, 0.4);
+        }
+        .stmt-btn-s-d {
+          font-family: var(--font-ui);
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0;
+          text-transform: none;
+          background: transparent;
+          color: var(--white);
+          padding: 13px 30px;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          cursor: pointer;
+          border-radius: 100px;
+          transition: all 0.35s var(--ease-smooth);
+        }
+        .stmt-btn-s-d:hover {
+          border-color: var(--neon);
+          color: var(--neon);
+          transform: translateY(-2px);
         }
         .footer-desktop {
           padding: 18px 36px 16px;
@@ -4152,7 +4120,6 @@ DESKTOP (1024px+)
           overflow: hidden;
           position: relative;
           width: 100%;
-          direction: ltr;
         }
         .testimonials-track {
           display: flex;
@@ -4160,7 +4127,6 @@ DESKTOP (1024px+)
           padding: 10px 44px 22px;
           animation: testimonialScroll 38s linear infinite;
           width: max-content;
-          direction: ltr;
         }
         .testimonials-track:hover {
           animation-play-state: paused;
@@ -4424,11 +4390,11 @@ DESKTOP (1024px+)
         }
         .final-desktop-wrap {
           width: 100%;
-          height: auto;
+          height: 100dvh;
           display: flex;
           flex-direction: column;
           padding-top: var(--nav-h);
-          overflow: visible;
+          overflow: hidden;
         }
         .promise-section-d {
           padding: 26px 64px 22px;
@@ -4559,6 +4525,127 @@ DESKTOP (1024px+)
           font-size: 0.78rem;
           color: var(--muted);
           line-height: 1.65;
+        }
+        .stmt-desktop {
+          flex: 1;
+          min-height: 0;
+          padding: 0 64px;
+          text-align: center;
+          border-bottom: 1px solid var(--border);
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .stmt-ring {
+          position: absolute;
+          border-radius: 50%;
+          border: 1px solid rgba(79, 216, 255, 0.035);
+          top: 50%;
+          left: 50%;
+          animation: ringExpand 9s linear infinite;
+          pointer-events: none;
+        }
+        .stmt-ring:nth-child(1) {
+          width: 300px;
+          height: 300px;
+          animation-delay: 0s;
+        }
+        .stmt-ring:nth-child(2) {
+          width: 500px;
+          height: 500px;
+          animation-delay: 3s;
+        }
+        .stmt-inner-d {
+          position: relative;
+          z-index: 2;
+        }
+        .stmt-eyebrow-d {
+          font-family: var(--font-mono);
+          font-size: 0.66rem;
+          letter-spacing: 0;
+          text-transform: none;
+          color: var(--neon);
+          margin-bottom: 12px;
+          display: block;
+        }
+        .stmt-desktop-title {
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: clamp(2.8rem, 5vw, 5.6rem);
+          line-height: 1.15;
+          color: var(--white);
+          margin-bottom: 12px;
+          letter-spacing: 0;
+        }
+        .stmt-desktop-title em {
+          font-style: normal;
+          background: linear-gradient(
+            90deg,
+            var(--neon),
+            var(--neon2),
+            var(--neon3)
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .stmt-desktop-desc {
+          font-family: var(--font-body);
+          font-size: 0.9rem;
+          font-weight: 300;
+          color: var(--dim);
+          line-height: 1.85;
+          margin-bottom: 18px;
+          max-width: 480px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .stmt-desktop-btns {
+          display: flex;
+          gap: 14px;
+          justify-content: center;
+        }
+        .stmt-btn-p-d {
+          font-family: var(--font-ui);
+          font-size: 0.8rem;
+          font-weight: 600;
+          letter-spacing: 0;
+          text-transform: none;
+          background: var(--white);
+          color: var(--black);
+          padding: 15px 44px;
+          border: none;
+          cursor: pointer;
+          border-radius: 100px;
+          transition: all 0.45s var(--ease-luxury);
+          position: relative;
+          overflow: hidden;
+        }
+        .stmt-btn-p-d:hover {
+          background: var(--neon);
+          transform: translateY(-2px);
+          box-shadow: 0 16px 44px -12px rgba(79, 216, 255, 0.42);
+        }
+        .stmt-btn-s-d:hover {
+          border-color: var(--neon);
+          color: var(--neon);
+          transform: translateY(-2px);
+        }
+        .stmt-btn-s-d {
+          font-family: var(--font-ui);
+          font-size: 0.8rem;
+          font-weight: 600;
+          letter-spacing: 0;
+          text-transform: none;
+          background: transparent;
+          color: var(--white);
+          padding: 14px 38px;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          cursor: pointer;
+          border-radius: 100px;
+          transition: all 0.35s var(--ease-smooth);
         }
         .footer-desktop {
           padding: 22px 64px 18px;
@@ -4749,6 +4836,9 @@ DESKTOP (1024px+)
         .promise-section-d {
           padding: 28px 84px 22px;
         }
+        .stmt-desktop {
+          padding: 0 84px;
+        }
         .footer-desktop {
           padding: 24px 84px 20px;
         }
@@ -4797,459 +4887,15 @@ DESKTOP (1024px+)
           display: none !important;
         }
       }
-
-      /* ══════════════════════════════════════════
-         MOBILE RESPONSIVE FIXES — no horizontal
-         swiping/carousels on real phones.
-         Desktop/tablet (≥768px, which already hides
-         everything below via display:none above) is
-         completely untouched by this block.
-         ══════════════════════════════════════════ */
-      @media (max-width: 767px) {
-        /* Best sellers + testimonials: these rendered as
-           horizontally swipeable card carousels
-           (overflow-x: auto + scroll-snap). Convert to a
-           normal vertical stack so the page only scrolls
-           up/down, matching every other mobile section. */
-        .bs-mobile-wrap,
-        .testi-mobile-wrap {
-          height: auto;
-          overflow: visible;
-        }
-        .bs-carousel,
-        .testi-carousel-m {
-          flex-direction: column;
-          overflow-x: hidden;
-          overflow-y: visible;
-          scroll-snap-type: none;
-        }
-        .pc-card-m,
-        .testi-card-m {
-          flex: 0 0 auto;
-          width: 100%;
-        }
-        /* Position dots only made sense for horizontal paging */
-        .bs-scroll-indicator {
-          display: none;
-        }
-
-        /* Hamburger touch target: 40px → ~44px minimum per
-           mobile a11y guidance. Hidden on ≥768px already, so
-           this never affects tablet/desktop. */
-        .nav-menu-btn {
-          width: 44px;
-          height: 44px;
-        }
-      }
-
-      /* ══════════════════════════════════════════
-      FOOTER LAYOUT FIXES (Desktop & Mobile)
-      ══════════════════════════════════════════ */
-
-      /* Keep footer inside the final slide layout on every device that
-         still uses the animated slide-paging system: tablets (portrait
-         AND landscape), laptops, and desktop. Scoped by the same
-         html.is-mobile-scroll flag used for the paging system itself
-         (see <head>), instead of a width breakpoint, so a portrait
-         10.9" tablet — which is narrower than 1024px but must keep the
-         slide animation — gets this treatment too. */
-      html:not(.is-mobile-scroll) .final-scroll {
-        /* #final already has display:block and 100dvh height */
-        /* .final-scroll must fill the slide and contain both promise + footer */
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        height: 100%;
-        width: 100%;
-        overflow-y: auto;
-      }
-
-      /* desktop/tablet wrapper sits inside final-scroll, stacked naturally */
-      html:not(.is-mobile-scroll) .final-desktop-wrap {
-        flex-shrink: 0;
-        width: 100%;
-        padding-top: var(--nav-h);
-      }
-
-      /* desktop/tablet footer sits inside final-scroll after the promise section */
-      html:not(.is-mobile-scroll) .footer-desktop {
-        flex-shrink: 0;
-        width: 100%;
-        margin-top: auto; /* pushes footer to bottom if content is short */
-        padding: 22px 64px 18px;
-        background: var(--deep);
-        border-top: 1px solid var(--border);
-      }
-
-      /* Ensure footer doesn't cause overflow inside final-scroll */
-      html:not(.is-mobile-scroll) .footer-desktop .ft-top,
-      html:not(.is-mobile-scroll) .footer-desktop .ft-bot {
-        max-width: 1400px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      /* Keep the footer content fully visible */
-      html:not(.is-mobile-scroll) .footer-desktop .ft-top {
-        padding-bottom: clamp(32px, 5vw, 60px);
-      }
-      html:not(.is-mobile-scroll) .footer-desktop .ft-bot {
-        padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
-      }
-
-      /* The actual footer element (the .footer-desktop rules above target
-         a class that isn't present in the markup) — give it the same
-         flex behavior so it fills down and sits at the bottom of the
-         slide instead of leaving empty space underneath it. This is the
-         key fix for the final/footer slide clipping on large tablets,
-         landscape tablets, and laptops: previously this rule (and the
-         .final-scroll flex rules above) only activated at min-width:
-         1024px, so any tablet wider than 767px but narrower than 1024px
-         — a 10.9" tablet in portrait, for example — fell through with
-         no flex/scroll layout for its footer while still running the
-         fixed-height 100dvh slide-paging system, which is exactly what
-         clipped/overlapped the footer. */
-      html:not(.is-mobile-scroll) .final-scroll footer {
-        flex-shrink: 0;
-        width: 100%;
-        margin-top: auto;
-      }
-
-      /* True mobile only: footer and final section stack naturally in
-         normal document flow (no fixed-height slide, no internal
-         scroll container). */
-      html.is-mobile-scroll #final {
-        height: auto !important;
-        min-height: 0 !important;
-        overflow: visible !important;
-        display: block !important;
-      }
-
-      html.is-mobile-scroll .final-scroll {
-        height: auto !important;
-        overflow: visible !important;
-        padding-bottom: 0;
-      }
-
-      html.is-mobile-scroll .final-mobile-wrap {
-        height: auto !important;
-        padding-top: var(--nav-h);
-      }
-
-      /* Footer inside the scroll flow on mobile */
-      html.is-mobile-scroll footer {
-        position: relative;
-        width: 100%;
-        max-width: 100vw;
-        overflow-x: hidden;
-        padding: clamp(40px, 6vw, 72px) clamp(16px, 4vw, 36px) 0;
-        margin-top: 0;
-      }
-
-      /* Ensure footer content doesn't overflow */
-      html.is-mobile-scroll .ft-top {
-        grid-template-columns: 1fr;
-        gap: 28px;
-        max-width: 100%;
-        padding-bottom: 32px;
-      }
-
-      html.is-mobile-scroll .ft-brand {
-        grid-column: 1 / -1;
-      }
-
-      html.is-mobile-scroll .ft-tag {
-        max-width: 100%;
-      }
-
-      html.is-mobile-scroll .ft-bot {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 16px 0 24px;
-      }
-
-      html.is-mobile-scroll .ft-legal {
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-
-      html.is-mobile-scroll .ft-col {
-        width: 100%;
-      }
-
-      html.is-mobile-scroll .ft-col ul {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px 12px;
-      }
-
-      html.is-mobile-scroll .ft-col li {
-        margin-bottom: 4px;
-      }
-
-      html.is-mobile-scroll .ft-col a {
-        min-height: 28px;
-        line-height: 28px;
-        font-size: 0.82rem;
-      }
-
-      /* Tablet-specific footer refinements */
-      @media (min-width: 768px) and (max-width: 1023px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-          gap: 24px 32px;
-        }
-
-        .ft-brand {
-          grid-column: 1 / -1;
-        }
-
-        .ft-col ul {
-          grid-template-columns: 1fr;
-        }
-
-        .footer-desktop {
-          padding: 18px 36px 16px;
-        }
-      }
-
-      /* Small mobile footer refinements */
-      @media (max-width: 480px) {
-        .ft-col ul {
-          grid-template-columns: 1fr;
-        }
-
-        .ft-top {
-          gap: 20px;
-        }
-
-        .ft-bot {
-          gap: 8px;
-        }
-
-        .ft-legal {
-          gap: 8px;
-        }
-
-        .ft-legal a {
-          font-size: 0.6rem;
-          min-height: 24px;
-        }
-      }
-
-      @media (max-width: 360px) {
-        .ft-top {
-          gap: 16px;
-        }
-
-        .ft-col a {
-          font-size: 0.75rem;
-          min-height: 24px;
-          line-height: 24px;
-        }
-      }
-
-      /* ============================================================
-   FOOTER BASE STYLES (applies to both desktop & mobile)
-   ============================================================ */
-      footer {
-        position: relative;
-        z-index: 1;
-        background: rgba(255, 255, 255, 0.012);
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-        padding: clamp(40px, 6vw, 72px) clamp(22px, 5vw, 84px) 0;
-      }
-      footer::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          #00f0ff,
-          #a855f7,
-          transparent
-        );
-        opacity: 0.35;
-        pointer-events: none;
-      }
-
-      /* 4-col grid → 2-col → 1-col */
-      .ft-top {
-        display: grid;
-        grid-template-columns: 1.6fr repeat(3, 1fr);
-        gap: clamp(24px, 3vw, 48px);
-        max-width: 1400px;
-        margin: 0 auto;
-        padding-bottom: clamp(32px, 5vw, 60px);
-      }
-
-      .ft-logo {
-        font-family: var(--font-mono);
-        font-weight: 700;
-        font-size: clamp(1rem, 1.8vw, 1.28rem);
-        background: linear-gradient(135deg, #00f0ff, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: 0.14em;
-        margin-bottom: 12px;
-        display: block;
-      }
-      .ft-tag {
-        font-size: clamp(0.78rem, 1vw, 0.85rem);
-        color: rgba(255, 255, 255, 0.32);
-        line-height: 1.85;
-        max-width: 280px;
-        margin-bottom: 22px;
-      }
-      .social-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      .soc {
-        width: 38px;
-        height: 38px;
-        border-radius: 9px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.35s;
-        color: rgba(255, 255, 255, 0.45);
-        text-decoration: none;
-        flex-shrink: 0;
-      }
-      @media (hover: hover) {
-        .soc:hover {
-          background: rgba(0, 240, 255, 0.08);
-          border-color: rgba(0, 240, 255, 0.28);
-          color: #00f0ff;
-          transform: translateY(-2px);
-        }
-      }
-      .soc svg {
-        width: 15px;
-        height: 15px;
-        fill: currentColor;
-      }
-
-      .ft-col h3 {
-        font-family: var(--font-ui);
-        font-size: clamp(0.68rem, 0.85vw, 0.75rem);
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.3);
-        margin-bottom: clamp(12px, 1.5vw, 18px);
-      }
-      .ft-col ul {
-        list-style: none;
-      }
-      .ft-col li {
-        margin-bottom: clamp(7px, 1vw, 11px);
-      }
-      .ft-col a {
-        font-size: clamp(0.78rem, 0.95vw, 0.86rem);
-        color: rgba(255, 255, 255, 0.42);
-        text-decoration: none;
-        transition: color 0.3s;
-        display: block;
-        min-height: 32px;
-        line-height: 32px;
-      }
-      @media (hover: hover) {
-        .ft-col a:hover {
-          color: #fff;
-        }
-      }
-
-      .ft-bot {
-        max-width: 1400px;
-        margin: 0 auto;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      .ft-copy {
-        font-family: var(--font-mono);
-        font-size: clamp(0.5rem, 0.65vw, 0.6rem);
-        color: rgba(255, 255, 255, 0.18);
-        letter-spacing: 0.06em;
-      }
-      .ft-legal {
-        display: flex;
-        flex-wrap: wrap;
-        gap: clamp(10px, 1.5vw, 20px);
-      }
-      .ft-legal a {
-        font-size: clamp(0.62rem, 0.75vw, 0.7rem);
-        color: rgba(255, 255, 255, 0.22);
-        text-decoration: none;
-        transition: color 0.3s;
-        min-height: 32px;
-        display: inline-flex;
-        align-items: center;
-      }
-      @media (hover: hover) {
-        .ft-legal a:hover {
-          color: rgba(255, 255, 255, 0.55);
-        }
-      }
-
-      /* ── Footer responsive breakpoints ── */
-      @media (max-width: 1024px) {
-        .ft-top {
-          grid-template-columns: 1.4fr 1fr 1fr 1fr;
-          gap: clamp(20px, 2.5vw, 36px);
-        }
-      }
-      @media (max-width: 820px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-          gap: 28px;
-        }
-        .ft-brand {
-          grid-column: 1 / -1;
-        }
-        .ft-tag {
-          max-width: 100%;
-        }
-      }
-      @media (max-width: 480px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-        }
-        .ft-bot {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-      }
-      @media (max-width: 360px) {
-        .ft-top {
-          grid-template-columns: 1fr;
-        }
-        .ft-legal {
-          gap: 8px;
-        }
-      }
     </style>
+{% endcompress %}
   </head>
   <body>
     <!-- ============================================================
      LOADER
      ============================================================ -->
     <div id="loader">
-      <div class="loader-logo">Nex go</div>
+      <div class="loader-logo">VOLTEX</div>
       <div class="loader-bar"><div class="loader-fill"></div></div>
     </div>
 
@@ -5259,99 +4905,44 @@ DESKTOP (1024px+)
      NAV — استاتیک (با Django Template Tags قابل شخصی‌سازی)
      ============================================================ -->
     <nav id="nav">
-      <div class="nav-logo">Nex Go</div>
+      <div class="nav-logo">VOLTEX</div>
       <ul class="nav-links">
+        <li><a href="{% url 'shop:product_list' %}">مدل‌ها</a></li>
+        <li><a href="{% url 'shop:product_list' %}">فروشگاه</a></li>
         <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(1);
-              return false;
-            "
-            >مدل‌ها</a
-          >
+          <a href="#testimonials" onclick="goToSlide(3); return false;">نظرات</a>
         </li>
-        <li>
-          <a
-            href="{% url 'home_app:categories' %}"
-            >فروشگاه</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              goToSlide(3);
-              return false;
-            "
-            >نظرات</a
-          >
-        </li>
-        <li>
-          <a
-            href="{% url 'home_app:articles' %}"
-
-            >مقالات</a
-          >
-        </li>
-        <li>
-          <a
-            href="{% url 'home_app:about_us' %}"
-            >درباره ما</a
-          >
-        </li>
+        <li><a href="{% url 'home_app:articles' %}">راهنما</a></li>
+        <li><a href="{% url 'seo:about' %}">درباره ما</a></li>
+        <li><a href="{% url 'seo:contact' %}">تماس</a></li>
       </ul>
 
       <div class="nav-right-cluster">
         <div class="nav-auth" id="navAuth">
-          {% if user.is_authenticated %}
-          <div class="auth-user" id="authUser">
+          <div class="auth-guest" id="authGuest">
+            <a href="#" class="auth-link-login">ورود</a>
+            <button class="nav-cta">ثبت‌نام</button>
+          </div>
+          <div class="auth-user" id="authUser" style="display: none">
             <button
               class="auth-user-btn"
               id="authUserBtn"
               onclick="toggleUserMenu(event)"
             >
-              {% if user.profile_image %}
-              <img
-                class="auth-user-avatar"
-                src="{{ user.profile_image.url }}"
-                alt="{{ user.username }}"
-              />
-              {% else %}
               <span class="auth-user-avatar">👤</span>
-              {% endif %}
-              <span class="auth-user-name">{{ user.fullname|default:user.username }}</span>
+              <span class="auth-user-name">کاربر</span>
             </button>
             <div class="auth-user-menu" id="authUserMenu" role="menu">
-              <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
-              <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
-              <a href="{% url 'accounts_app:dashboard' %}#wishlist" role="menuitem">علاقه‌مندی‌ها</a>
-              <a href="{% url 'accounts_app:dashboard' %}#settings" role="menuitem">تنظیمات حساب</a>
-              <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form" role="none">
-                {% csrf_token %}
-                <button type="submit" class="auth-logout" role="menuitem">خروج</button>
-              </form>
+              <a href="#" role="menuitem">پروفایل</a>
+              <a href="#" role="menuitem">سفارش‌های من</a>
+              <a href="#" role="menuitem">علاقه‌مندی‌ها</a>
+              <a href="#" role="menuitem">تنظیمات حساب</a>
+              <a href="#" class="auth-logout" role="menuitem">خروج</a>
             </div>
           </div>
-          {% else %}
-          <div class="auth-guest" id="authGuest">
-            <a href="{% url 'accounts_app:login' %}" class="auth-link-login">ورود</a>
-            <button
-              class="nav-cta"
-              onclick="window.location.href='{% url 'accounts_app:register' %}'"
-            >
-              ثبت‌نام
-            </button>
-          </div>
-          {% endif %}
         </div>
 
-        <a
-          class="nav-cart-btn"
-          id="navCartBtn"
-          href="{% url 'shop:cart' %}"
-          aria-label="سبد خرید"
-        >
+        <button class="nav-cart-btn" id="navCartBtn" aria-label="سبد خرید">
           <svg class="nav-cart-icon" viewBox="0 0 24 24">
             <path
               d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"
@@ -5359,8 +4950,8 @@ DESKTOP (1024px+)
             <circle cx="10" cy="20.5" r="1.4" />
             <circle cx="17" cy="20.5" r="1.4" />
           </svg>
-          <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
-        </a>
+          <span class="nav-cart-badge" id="navCartCount">0</span>
+        </button>
 
         <button
           class="nav-menu-btn"
@@ -5467,8 +5058,60 @@ DESKTOP (1024px+)
       <div class="slide" id="hero" style="top: 0">
         <div class="hero-ambient"></div>
         <div class="hero-grid"></div>
-        <div class="hero-inner" id="hero-inner">
-          <!-- توسط JavaScript پر می‌شود -->
+        <!-- Rendered server-side. This was an empty div: the home page
+             shipped with no top-level heading at all and no text for a crawler
+             to read.
+             renderHero() below leaves this markup alone. -->
+        <div class="hero-inner" id="hero-inner" data-server-rendered="1">
+          <div style="flex: 1; min-width: 0">
+            <div class="hero-tag slide-anim d-1">{{ index_settings.hero_tag|default:"آینده جابه‌جایی شهری" }}</div>
+            <div class="hero-mobile-img-wrap slide-anim d-2">
+              {% if index_settings.hero_mobile_image %}
+              <img class="hero-mobile-img"
+                   src="{{ index_settings.hero_mobile_image.url }}"
+                   alt="{{ index_settings.hero_image_alt|default:'اسکوتر برقی ولتکس' }}"
+                   {% img_dimensions index_settings.hero_mobile_image 600 400 %}
+                   fetchpriority="high" loading="eager" decoding="async" />
+              {% endif %}
+            </div>
+            <h1 class="hero-title">
+              <div class="word-reveal"><span class="word"><span style="transition-delay:0.15s">{{ index_settings.hero_title_part1|default:"متفاوت" }}</span></span></div>
+              <div class="word-reveal"><span class="word"><span class="line-grad" style="transition-delay:0.28s">{{ index_settings.hero_title_part2|default:"برقی" }}</span></span></div>
+              <div class="word-reveal"><span class="word"><span style="transition-delay:0.41s">{{ index_settings.hero_title_part3|default:"برانید" }}</span></span></div>
+            </h1>
+            <div class="hero-mini-stats slide-anim d-4">
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_1_value|default:"85" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_1_unit|default:"km/h" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_1_label|default:"حداکثر سرعت" }}</div>
+              </div>
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_2_value|default:"160" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_2_unit|default:"km" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_2_label|default:"برد" }}</div>
+              </div>
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_3_value|default:"2" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_3_unit|default:"hr" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_3_label|default:"زمان شارژ" }}</div>
+              </div>
+              <div class="hero-mini-stat">
+                <div class="hero-mini-stat-val">{{ index_settings.hero_stat_4_value|default:"40k" }}<span class="hero-mini-stat-unit">{{ index_settings.hero_stat_4_unit|default:"+" }}</span></div>
+                <div class="hero-mini-stat-label">{{ index_settings.hero_stat_4_label|default:"کاربران" }}</div>
+              </div>
+            </div>
+            <p class="hero-desc slide-anim d-5">{{ index_settings.hero_description|default:"اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند." }}</p>
+            <div class="hero-btns slide-anim d-6">
+              <button class="btn-primary" type="button" onclick="goToSlide(2)">{{ index_settings.hero_btn_text|default:"مشاهده مجموعه" }}</button>
+              <button class="btn-secondary" type="button" onclick="goToSlide(1)">{{ index_settings.hero_btn_secondary_text|default:"کاوش مدل‌ها" }}</button>
+            </div>
+          </div>
+          <div class="hero-right-desktop">
+            {% if index_settings.hero_image %}
+            <img class="hero-desktop-img"
+                 src="{{ index_settings.hero_image.url }}"
+                 alt="{{ index_settings.hero_image_alt|default:'اسکوتر برقی ولتکس' }}"
+                 {% img_dimensions index_settings.hero_image 1200 800 %}
+                 fetchpriority="high" loading="eager" decoding="async" />
+            {% endif %}
+          </div>
         </div>
         <div class="scroll-hint">
           <span>اسکرول</span>
@@ -5477,7 +5120,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 1: CATEGORIES (داینامیک) -->
-      <div class="slide" id="categories" style="top: 100dvh">
+      <div class="slide" id="categories" style="top: 100vh">
         <div class="cat-mobile-wrap" id="cat-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5487,7 +5130,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 2: BEST SELLERS (داینامیک) -->
-      <div class="slide" id="bestsellers" style="top: 200dvh">
+      <div class="slide" id="bestsellers" style="top: 200vh">
         <div class="bs-mobile-wrap" id="bs-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5497,7 +5140,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 3: TESTIMONIALS (داینامیک) -->
-      <div class="slide" id="testimonials" style="top: 300dvh">
+      <div class="slide" id="testimonials" style="top: 300vh">
         <div class="testi-mobile-wrap" id="testi-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5507,7 +5150,7 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 4: GUIDE (داینامیک) -->
-      <div class="slide" id="guide" style="top: 400dvh">
+      <div class="slide" id="guide" style="top: 400vh">
         <div class="guide-mobile-wrap" id="guide-mobile-wrap">
           <!-- توسط JavaScript پر می‌شود -->
         </div>
@@ -5517,96 +5160,75 @@ DESKTOP (1024px+)
       </div>
 
       <!-- SLIDE 5: FINAL (داینامیک) -->
-      <div class="slide" id="final" style="top: 500dvh">
+      <div class="slide" id="final" style="top: 500vh">
         <div class="final-ambient"></div>
-        <div class="final-scroll" id="final-scroll">
-          <div class="final-mobile-wrap" id="final-mobile-wrap">
-            <!-- توسط JavaScript پر می‌شود -->
-          </div>
-          <div class="final-desktop-wrap" id="final-desktop-wrap">
-            <!-- توسط JavaScript پر می‌شود -->
-          </div>
+        <div class="final-mobile-wrap" id="final-mobile-wrap">
+          <!-- توسط JavaScript پر می‌شود -->
+        </div>
+        <div class="final-desktop-wrap" id="final-desktop-wrap">
+          <!-- توسط JavaScript پر می‌شود -->
+        </div>
+    <!-- ============================================================
+     SITE FOOTER — ناوبری قابل خزش
 
-    <!-- FOOTER -->
-    <footer role="contentinfo">
-      <div class="ft-top">
-        <div class="ft-brand">
-          <span class="ft-logo">Nex Go</span>
-          <p class="ft-tag">
-            تعریف دوباره تحرک الکتریکی برای نسلی که متفاوت حرکت می‌کند. جسورانه.
-            دقیق. پایدار.
-          </p>
-          <div class="social-row" role="list" aria-label="شبکه‌های اجتماعی">
-            <a href="#" class="soc" aria-label="Nex Go در توییتر/X" role="listitem">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </a>
-            <a href="#" class="soc" aria-label="Nex Go در اینستاگرام" role="listitem">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-              </svg>
-            </a>
-            <a href="#" class="soc" aria-label="Nex Go در یوتیوب" role="listitem">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-              </svg>
-            </a>
-            <a href="#" class="soc" aria-label="Nex Go در لینکدین" role="listitem">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-            </a>
-          </div>
-        </div>
-        <div class="ft-col">
-          <h3>محصولات</h3>
+     The nav at the top of this page is entirely href="#" + goToSlide(),
+     so before this footer existed the home page linked to nothing: no
+     crawler could reach a category, a product or an article from the most
+     authoritative page on the site. These are real anchors, rendered
+     server-side, and they are what distributes link equity into the rest
+     of the site.
+     ============================================================ -->
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <nav aria-labelledby="footer-shop-heading">
+          <h2 id="footer-shop-heading">دسته‌بندی‌ها</h2>
           <ul>
-            <li><a href="#">سری شهری</a></li>
-            <li><a href="#">آفرود</a></li>
-            <li><a href="#">اسپرت</a></li>
-            <li><a href="#">تاشو</a></li>
-            <li><a href="#">برد بلند</a></li>
-            <li><a href="#">پریمیوم</a></li>
+            <li><a href="{% url 'shop:product_list' %}">همه اسکوترهای برقی</a></li>
+            {% for category in categories %}
+            <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+            {% endfor %}
           </ul>
-        </div>
-        <div class="ft-col">
-          <h3>شرکت</h3>
-          <ul>
-            <li><a href="#">درباره Nex Go</a></li>
-            <li><a href="#">فناوری</a></li>
-            <li><a href="#">پایداری</a></li>
-            <li><a href="#">فرصت‌های شغلی</a></li>
-            <li><a href="#">اخبار</a></li>
-            <li><a href="#">سرمایه‌گذاران</a></li>
-          </ul>
-        </div>
-        <div class="ft-col">
-          <h3>پشتیبانی</h3>
-          <ul>
-            <li><a href="#">مرکز راهنمایی</a></li>
-            <li><a href="#">یافتن نمایندگی</a></li>
-            <li><a href="#">مرکز خدمات</a></li>
-            <li><a href="#">گارانتی</a></li>
-            <li><a href="#">تماس با ما</a></li>
-            <li><a href="#">جامعه کاربری</a></li>
-          </ul>
-        </div>
-      </div>
+        </nav>
 
-      <div class="ft-bot">
-        <div class="ft-copy">© ۱۴۰۴ Nex Go الکتریک. تمام حقوق محفوظ است.</div>
-        <nav class="ft-legal" aria-label="لینک‌های قانونی">
-          <a href="#">حریم خصوصی</a>
-          <a href="#">شرایط استفاده</a>
-          <a href="#">تنظیمات کوکی</a>
-          <a href="#">نقشه سایت</a>
-          <a href="https://AS-tech.company" target="_blank" rel="noopener noreferrer" style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Designed &amp; Developed by AS Tech</a>
+        {% if featured_products %}
+        <nav aria-labelledby="footer-products-heading">
+          <h2 id="footer-products-heading">مدل‌های پرفروش</h2>
+          <ul>
+            {% for product in featured_products %}
+            <li><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        {% if latest_articles %}
+        <nav aria-labelledby="footer-magazine-heading">
+          <h2 id="footer-magazine-heading">تازه‌های مجله</h2>
+          <ul>
+            {% for article in latest_articles %}
+            <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
+            {% endfor %}
+            <li><a href="{% url 'home_app:articles' %}">همه مقالات</a></li>
+          </ul>
+        </nav>
+        {% endif %}
+
+        <nav aria-labelledby="footer-company-heading">
+          <h2 id="footer-company-heading">ولتکس</h2>
+          <ul>
+            <li><a href="{% url 'seo:about' %}">درباره ما</a></li>
+            <li><a href="{% url 'seo:contact' %}">تماس با ما</a></li>
+            <li><a href="{% url 'home_app:articles' %}">مجله</a></li>
+          </ul>
         </nav>
       </div>
+      <p class="site-footer-copy">
+        {{ index_settings.footer_copyright|default:"© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است." }}
+      </p>
     </footer>
-        </div>
       </div>
+    </div>
+
 
     <!-- ============================================================
      JAVASCRIPT — همه دیتاها از API میاد
@@ -5690,6 +5312,14 @@ DESKTOP (1024px+)
         const container = document.getElementById("hero-inner");
         if (!container) return;
 
+        // The hero is already in the HTML. Rebuilding it here would append a
+        // second top-level heading to the page and re-request the LCP image
+        // for nothing.
+        if (container.dataset.serverRendered === "1") {
+          container.dataset.serverRendered = "0";
+          return;
+        }
+
         const h = data;
 
         // هدر
@@ -5708,7 +5338,7 @@ DESKTOP (1024px+)
         const mobileImg = document.createElement("img");
         mobileImg.className = "hero-mobile-img";
         mobileImg.src = h.hero_mobile_image || "/images/1.png";
-        mobileImg.alt = h.hero_image_alt || "اسکوتر برقی Nex Go";
+        mobileImg.alt = h.hero_image_alt || "اسکوتر برقی Voltex";
         mobileImgWrap.appendChild(mobileImg);
 
         // عنوان
@@ -5783,7 +5413,7 @@ DESKTOP (1024px+)
         const desktopImg = document.createElement("img");
         desktopImg.className = "hero-desktop-img";
         desktopImg.src = h.hero_image || "/images/1.png";
-        desktopImg.alt = h.hero_image_alt || "اسکوتر برقی Nex Go";
+        desktopImg.alt = h.hero_image_alt || "اسکوتر برقی Voltex";
         desktopRight.appendChild(desktopImg);
 
         container.appendChild(header);
@@ -5902,14 +5532,13 @@ DESKTOP (1024px+)
           mobileWrap.appendChild(imgArea);
 
           // محتوا
-          // ===== داخل renderCategories (موبایل) =====
           const content = document.createElement("div");
           content.className = "cat-content-m";
           content.innerHTML = `
             <div class="cat-name-m" id="catNameM">${firstCat?.name || "دسته‌بندی"}</div>
             <div class="cat-sub-m" id="catSubM">${firstCat?.description || ""}</div>
             <div class="cat-btns-m">
-              <button class="cat-btn-m primary" id="catBtnM" onclick="window.location.href='/shop/category/${firstCat?.slug || ""}/'" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
+              <button class="cat-btn-m primary" onclick="goToSlide(2)" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
             </div>
             <div class="cat-dots-m" id="catDotsM">
               ${categories.map((_, idx) => `<div class="cat-dot-m${idx === 0 ? " active" : ""}" onclick="switchCat(${idx})" style="${idx === 0 ? "background:" + (firstCat?.color_hex || "var(--neon)") : ""}"></div>`).join("")}
@@ -5935,7 +5564,7 @@ DESKTOP (1024px+)
           visualPanel.innerHTML = `
             <div class="cat-d-grid"></div>
             <div class="cat-d-scooter">
-              <img id="catScooterImgD" src="${firstCat?.image || "/static/images/default-category.jpg"}" alt="تصویر دسته‌بندی اسکوتر" class="visible">
+              <img id="catScooterImgD" src="${firstCat?.image || "/static/images/default-category.jpg"}" alt="تصویر دسته‌بندی اسکوتر" class="visible" width="800" height="600" loading="lazy" decoding="async">
             </div>
           `;
           desktopWrap.appendChild(visualPanel);
@@ -5971,7 +5600,6 @@ DESKTOP (1024px+)
           ];
           const displayFeatures = features.length ? features : defaultFeatures;
 
-          // ===== داخل renderCategories (دسکتاپ) =====
           const contentHTML = `
             <span class="section-label" id="catLabelD" style="color:${firstCat?.color_hex || "var(--neon)"}">${firstCat?.name || "دسته‌بندی"}</span>
             <div class="cat-heading-d" id="catHeadingD">${firstCat?.name || ""}</div>
@@ -5989,7 +5617,7 @@ DESKTOP (1024px+)
                 .join("")}
             </div>
             <div class="cat-btns-d">
-              <button class="cat-btn-primary-d" id="catBtnD" onclick="window.location.href='/shop/category/${firstCat?.slug || ""}/'" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
+              <button class="cat-btn-primary-d" id="catBtnD" onclick="goToSlide(2)" style="background:${firstCat?.color_hex || "var(--neon)"}">مشاهده مجموعه</button>
             </div>
           `;
           contentPanel.insertAdjacentHTML("beforeend", contentHTML);
@@ -6052,11 +5680,10 @@ DESKTOP (1024px+)
         // بروزرسانی تصاویر
         ["catScooterImgM", "catScooterImgD"].forEach((id) => {
           const img = document.getElementById(id);
-          const newSrc = cat.image || "/static/images/default-category.jpg";
-          if (img) {
+          if (img && cat.image) {
             img.classList.remove("visible");
             setTimeout(() => {
-              img.src = newSrc;
+              img.src = cat.image;
               img.classList.add("visible");
             }, 200);
           }
@@ -6067,15 +5694,8 @@ DESKTOP (1024px+)
         if (nameM) nameM.textContent = cat.name || "";
         const subM = document.getElementById("catSubM");
         if (subM) subM.textContent = cat.description || "";
-
-        // ✅ دکمه موبایل
         const btnM = document.getElementById("catBtnM");
-        if (btnM) {
-          btnM.style.background = cat.color_hex || "var(--neon)";
-          btnM.onclick = function () {
-            window.location.href = "/shop/category/" + (cat.slug || "") + "/";
-          };
-        }
+        if (btnM) btnM.style.background = cat.color_hex || "var(--neon)";
 
         // بروزرسانی محتوای دسکتاپ
         const labelD = document.getElementById("catLabelD");
@@ -6087,15 +5707,8 @@ DESKTOP (1024px+)
         if (headingD) headingD.textContent = cat.name || "";
         const subD = document.getElementById("catSubD");
         if (subD) subD.textContent = cat.description || "";
-
-        // ✅ دکمه دسکتاپ (یک بار تعریف شده)
         const btnD = document.getElementById("catBtnD");
-        if (btnD) {
-          btnD.style.background = cat.color_hex || "var(--neon)";
-          btnD.onclick = function () {
-            window.location.href = "/shop/category/" + (cat.slug || "") + "/";
-          };
-        }
+        if (btnD) btnD.style.background = cat.color_hex || "var(--neon)";
 
         // بروزرسانی ویژگی‌ها
         const features = cat.features || [];
@@ -6112,10 +5725,10 @@ DESKTOP (1024px+)
           specRowD.innerHTML = displayFeatures
             .map(
               (f) => `
-                <div class="cat-spec-d">
-                    <div class="cat-spec-val-d">${f.value || "0"}<span class="cat-spec-unit-d" style="color:${cat.color_hex || "var(--neon)"}"> ${f.unit || ""}</span></div>
-                    <div class="cat-spec-label-d">${f.label || ""}</div>
-                </div>
+              <div class="cat-spec-d">
+                <div class="cat-spec-val-d">${f.value || "0"}<span class="cat-spec-unit-d" style="color:${cat.color_hex || "var(--neon)"}"> ${f.unit || ""}</span></div>
+                <div class="cat-spec-label-d">${f.label || ""}</div>
+              </div>
             `,
             )
             .join("");
@@ -6126,10 +5739,10 @@ DESKTOP (1024px+)
           metricsM.innerHTML = displayFeatures
             .map(
               (f) => `
-                <div class="cat-img-metric">
-                    <div class="cat-img-metric-val">${f.value || "0"}<span class="cat-img-metric-unit"> ${f.unit || ""}</span></div>
-                    <div class="cat-img-metric-label">${f.label || ""}</div>
-                </div>
+              <div class="cat-img-metric">
+                <div class="cat-img-metric-val">${f.value || "0"}<span class="cat-img-metric-unit"> ${f.unit || ""}</span></div>
+                <div class="cat-img-metric-label">${f.label || ""}</div>
+              </div>
             `,
             )
             .join("");
@@ -6173,11 +5786,11 @@ DESKTOP (1024px+)
                     <div class="pc-accent-bar-m"></div>
                     <div class="pc-img-m">
                       <div class="pc-img-m-bg" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
-                      ${card.product_cover ? `<img class="pc-scooter-img-m" src="${card.product_cover}" alt="${card.product_name}">` : ""}
+                      ${card.product_cover ? `<img class="pc-scooter-img-m" src="${card.product_cover}" alt="${card.product_name}" width="600" height="750" loading="lazy" decoding="async">` : ""}
                       ${card.badge_text ? `<div class="pc-badge-m">${card.badge_text}</div>` : ""}
                     </div>
                     <div class="pc-body-m">
-                      <div class="pc-brand-m" style="color:${color}">Nex Go</div>
+                      <div class="pc-brand-m" style="color:${color}">Voltex</div>
                       <div class="pc-name-m">${card.product_name || "محصول"}</div>
                       <div class="pc-desc-m">${card.product_description || ""}</div>
                       <div class="pc-specs-m">
@@ -6198,7 +5811,7 @@ DESKTOP (1024px+)
                             ${formatPrice(card.product_price)} 
                             <small>شروع قیمت از</small>
                         </div>
-                        <button class="pc-cta-m" style="background:${color}" onclick="location.href='/shop/product/${card.product_slug}/'">خرید کنید</button>
+                        <button class="pc-cta-m" style="background:${color}" onclick="location.href='/shop/${card.product_slug}/'">خرید کنید</button>
                       </div>
                     </div>
                   </div>
@@ -6252,15 +5865,15 @@ DESKTOP (1024px+)
                   const color = colors[card.color] || "#4fd8ff";
                   const specs = card.product_specs || [];
                   return `
-                  <div class="pc-large-d visible" style="--pc-color:${color};--pc-glow:rgba(79,216,255,0.1);cursor:pointer" onclick="location.href='/shop/product/${card.product_slug}/'">
+                  <div class="pc-large-d visible" style="--pc-color:${color};--pc-glow:rgba(79,216,255,0.1)">
                     <div class="pc-accent-bar-d" style="background:${color}"></div>
                     <div class="pc-img-d">
                       <div class="pc-img-bg-d" style="background:linear-gradient(135deg,#040e18,#081c30)"></div>
-                      ${card.product_cover ? `<img class="pc-scooter-img-d" src="${card.product_cover}" alt="${card.product_name}">` : ""}
+                      ${card.product_cover ? `<img class="pc-scooter-img-d" src="${card.product_cover}" alt="${card.product_name}" width="600" height="750" loading="lazy" decoding="async">` : ""}
                       ${card.badge_text ? `<div class="pc-badge-d" style="background:${color}">${card.badge_text}</div>` : ""}
                     </div>
                     <div class="pc-body-d">
-                      <div class="pc-brand-d" style="color:${color}">Nex Go</div>
+                      <div class="pc-brand-d" style="color:${color}">Voltex</div>
                       <div class="pc-name-d">${card.product_name || "محصول"}</div>
                       <div class="pc-desc-d">${card.product_description || ""}</div>
                       <div class="pc-specs-d">
@@ -6390,7 +6003,7 @@ DESKTOP (1024px+)
       ${
         t.avatar_url
           ? `<div class="testi-avatar-d" style="background:transparent;padding:0;overflow:hidden;border:2px solid var(--gold);">
-          <img src="${t.avatar_url}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          <img src="${t.avatar_url}" alt="${t.name}" width="96" height="96" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
          </div>`
           : `<div class="testi-avatar-d" style="background:linear-gradient(135deg,${t.color_start_hex || "var(--neon)"},${t.color_end_hex || "var(--neon2)"})">${t.initials || "??"}</div>`
       }                <div><div class="testi-name-d">${t.name}</div></div>
@@ -6434,7 +6047,7 @@ DESKTOP (1024px+)
                   return `
                   <a href="/articles/${article.slug}/" class="guide-card-m">
                     <div class="guide-img-m ${article.cover_url ? "" : "placeholder"}">
-                      ${article.cover_url ? `<img src="${article.cover_url}" alt="${article.title}">` : `<div class="guide-placeholder-icon">📄</div>`}
+                      ${article.cover_url ? `<img src="${article.cover_url}" alt="${article.title}" width="1200" height="630" loading="lazy" decoding="async">` : `<div class="guide-placeholder-icon">📄</div>`}
                     </div>
                     <div class="guide-content-m">
                       <div class="guide-cat-m">${tag}</div>
@@ -6471,7 +6084,7 @@ DESKTOP (1024px+)
                       <div class="guide-img-inner-d" style="background:linear-gradient(135deg,#040d18,#081828)">
                         ${
                           article.cover_url
-                            ? `<img src="${article.cover_url}" alt="${article.title}" style="width:100%;height:100%;object-fit:cover;">`
+                            ? `<img src="${article.cover_url}" alt="${article.title}" width="1200" height="630" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;">`
                             : `
                           <div class="guide-img-placeholder">
                             <div class="guide-placeholder-emoji">${emojis[i] || "📄"}</div>
@@ -6501,153 +6114,140 @@ DESKTOP (1024px+)
       /* ════════════════════════════════════
          RENDER FINAL (PROMISES + STATEMENT + FOOTER)
          ════════════════════════════════════ */
-      /* ════════════════════════════════════
-   RENDER FINAL (PROMISES + STATEMENT + FOOTER)
-   ════════════════════════════════════ */
-    function renderFinal(data) {
-      // ===== MOBILE =====
-      const mobileWrap = document.getElementById("final-mobile-wrap");
-      if (mobileWrap) {
-        mobileWrap.innerHTML = `
-          <div class="promise-header-m">
-            <span class="section-label">چرا Nex Go</span>
-            <h3>تعهد Nex Go</h3>
-          </div>
-          <div class="promise-list-m">
-            <div class="promise-strip-m" style="--pc:var(--neon);--pc-rgb:79,216,255">
-              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(79,216,255,0.16) 0%,rgba(79,216,255,0.03) 70%);border-color:rgba(79,216,255,0.22)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--neon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>
-              </div>
-              <div class="ps-content-m">
-                <div class="ps-label-m">ارسال</div>
-                <div class="ps-title-m">ارسال سریع</div>
-                <div class="ps-desc-m">ارسال رایگان یک‌روزه در سراسر اروپا</div>
-              </div>
-              <div class="ps-badge-m" style="color:var(--neon)">24<span class="ps-badge-unit-m" style="color:var(--neon)">h</span></div>
-            </div>
-            <div class="promise-strip-m" style="--pc:#a8e063;--pc-rgb:168,224,99">
-              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(168,224,99,0.16) 0%,rgba(168,224,99,0.03) 70%);border-color:rgba(168,224,99,0.22)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#a8e063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <div class="ps-content-m">
-                <div class="ps-label-m">گارانتی</div>
-                <div class="ps-title-m">گارانتی رسمی</div>
-                <div class="ps-desc-m">گارانتی کامل کارخانه + شبکه خدمات اروپا</div>
-              </div>
-              <div class="ps-badge-m" style="color:#a8e063">3<span class="ps-badge-unit-m" style="color:#a8e063">yr</span></div>
-            </div>
-            <div class="promise-strip-m" style="--pc:var(--neon2);--pc-rgb:139,123,255">
-              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(139,123,255,0.16) 0%,rgba(139,123,255,0.03) 70%);border-color:rgba(139,123,255,0.22)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--neon2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              </div>
-              <div class="ps-content-m">
-                <div class="ps-label-m">پرداخت</div>
-                <div class="ps-title-m">پرداخت امن</div>
-                <div class="ps-desc-m">رمزنگاری بانکی، پشتیبانی از ۱۲ روش پرداخت</div>
-              </div>
-              <div class="ps-badge-m" style="color:var(--neon2)">256<span class="ps-badge-unit-m" style="color:var(--neon2)">bit</span></div>
-            </div>
-            <div class="promise-strip-m" style="--pc:var(--neon3);--pc-rgb:255,108,196">
-              <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(255,108,196,0.16) 0%,rgba(255,108,196,0.03) 70%);border-color:rgba(255,108,196,0.22)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--neon3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              </div>
-              <div class="ps-content-m">
-                <div class="ps-label-m">پشتیبانی</div>
-                <div class="ps-title-m">پشتیبانی متخصص</div>
-                <div class="ps-desc-m">انسان واقعی، بدون ربات، هر روز هفته</div>
-              </div>
-              <div class="ps-badge-m" style="color:var(--neon3)">7<span class="ps-badge-unit-m" style="color:var(--neon3)">×24</span></div>
-            </div>
-          </div>
-        `;
-      }
+      function renderFinal(data) {
+        const promises = data.promises || [];
+        const colors = {
+          neon: { hex: "#4fd8ff", rgb: "79,216,255" },
+          orange: { hex: "#ff9a3c", rgb: "255,154,60" },
+          green: { hex: "#a8e063", rgb: "168,224,99" },
+          neon2: { hex: "#8b7bff", rgb: "139,123,255" },
+          neon3: { hex: "#ff6cc4", rgb: "255,108,196" },
+        };
 
-      // ===== DESKTOP =====
-      const desktopWrap = document.getElementById("final-desktop-wrap");
-      if (desktopWrap) {
-        desktopWrap.innerHTML = `
-          <div class="promise-section-d fs-anim d-1">
-            <div class="section-label">چرا Nex Go</div>
-            <h2 class="fs-anim d-2">تعهد Nex Go</h2>
-            <div class="promise-grid-d">
-              <div class="promise-card-d fs-anim d-3" style="--pc:var(--neon);--pc-glow:rgba(79,216,255,0.12)">
-                <div class="promise-icon-d"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg></div>
-                <div class="promise-card-text">
-                  <div class="promise-big-d">24<span class="promise-big-unit-d" style="color:var(--neon)">h</span></div>
-                  <div class="promise-title-d">ارسال سریع</div>
-                  <div class="promise-desc-d">ارسال رایگان یک‌روزه در سراسر اروپا</div>
+        // ===== MOBILE =====
+        const mobileWrap = document.getElementById("final-mobile-wrap");
+        if (mobileWrap) {
+          mobileWrap.innerHTML = `
+            <div class="promise-header-m">
+              <span class="section-label">${data.promise_label || "چرا VOLTEX"}</span>
+              <h3>${data.promise_title || "تعهد VOLTEX"}</h3>
+            </div>
+            <div class="promise-list-m">
+              ${promises
+                .map((p) => {
+                  const c = colors[p.color] || colors["neon"];
+                  return `
+                  <div class="promise-strip-m" style="--pc:${c.hex};--pc-rgb:${c.rgb}">
+                    <div class="ps-icon-m" style="background:radial-gradient(circle,rgba(${c.rgb},0.16) 0%,rgba(${c.rgb},0.03) 70%);border-color:rgba(${c.rgb},0.22)">
+                      ${p.icon_svg || `<svg viewBox="0 0 24 24" fill="none" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}
+                    </div>
+                    <div class="ps-content-m">
+                      <div class="ps-label-m">${p.label || ""}</div>
+                      <div class="ps-title-m">${p.title || ""}</div>
+                      <div class="ps-desc-m">${p.description || ""}</div>
+                    </div>
+                    <div class="ps-badge-m" style="color:${c.hex}">${p.badge_value || ""}<span class="ps-badge-unit-m" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
+                  </div>
+                `;
+                })
+                .join("")}
+            </div>
+            <div class="footer-m">
+              <div class="footer-brand-row-m">
+                <div class="footer-brand-m">
+                  <span class="footer-logo-m">VOLTEX</span>
+                  <p class="footer-tagline-m">${data.footer_tagline || "اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند."}</p>
+                  <div class="footer-social-m">
+                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
+                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                    <a href="#" class="footer-social-link-m"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
+                  </div>
                 </div>
               </div>
-              <div class="promise-card-d fs-anim d-4" style="--pc:#a8e063;--pc-glow:rgba(168,224,99,0.1)">
-                <div class="promise-icon-d" style="border-color:rgba(168,224,99,0.3)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="#a8e063"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                <div class="promise-card-text">
-                  <div class="promise-big-d">3<span class="promise-big-unit-d" style="color:#a8e063">yr</span></div>
-                  <div class="promise-title-d">گارانتی رسمی</div>
-                  <div class="promise-desc-d">گارانتی کامل کارخانه + شبکه خدمات اروپا</div>
+              <div class="footer-nav-m">
+                <div>
+                  <span class="footer-nav-title-m">محصولات</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">اسکوترهای شهری</a></li><li><a href="#">آفرود</a></li><li><a href="#">تاشو</a></li><li><a href="#">پرفورمنس</a></li></ul>
+                  <span class="footer-nav-title-m">شرکت</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">درباره Voltex</a></li><li><a href="#">فرصت‌های شغلی</a></li><li><a href="#">رسانه</a></li></ul>
+                </div>
+                <div>
+                  <span class="footer-nav-title-m">پشتیبانی</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">مرکز راهنمایی</a></li><li><a href="#">پیگیری سفارش</a></li><li><a href="#">بازگشت کالا</a></li><li><a href="#">گارانتی</a></li></ul>
+                  <span class="footer-nav-title-m">قوانین</span>
+                  <ul class="footer-nav-links-m"><li><a href="#">حریم خصوصی</a></li><li><a href="#">شرایط استفاده</a></li><li><a href="#">کوکی‌ها</a></li></ul>
                 </div>
               </div>
-              <div class="promise-card-d fs-anim d-5" style="--pc:var(--neon2);--pc-glow:rgba(139,123,255,0.1)">
-                <div class="promise-icon-d" style="border-color:rgba(139,123,255,0.3)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="var(--neon2)"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-                <div class="promise-card-text">
-                  <div class="promise-big-d">256<span class="promise-big-unit-d" style="color:var(--neon2);font-size:0.9rem">bit</span></div>
-                  <div class="promise-title-d">پرداخت امن</div>
-                  <div class="promise-desc-d">رمزنگاری بانکی، پشتیبانی از ۱۲ روش پرداخت</div>
+              <div class="newsletter-wrap-m">
+                <span class="newsletter-label-m">خبرنامه</span>
+                <div class="newsletter-row-m">
+                  <input class="newsletter-input-m" type="email" placeholder="ایمیل شما">
+                  <button class="newsletter-btn-m"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
                 </div>
+                <div class="footer-copy-m">${data.footer_copyright || "© ۲۰۲۶ Voltex GmbH. تمامی حقوق محفوظ است."}</div>
               </div>
-              <div class="promise-card-d fs-anim d-6" style="--pc:var(--neon3);--pc-glow:rgba(255,108,196,0.1)">
-                <div class="promise-icon-d" style="border-color:rgba(255,108,196,0.3)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="var(--neon3)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-                <div class="promise-card-text">
-                  <div class="promise-big-d">7<span class="promise-big-unit-d" style="color:var(--neon3)">×24</span></div>
-                  <div class="promise-title-d">پشتیبانی متخصص</div>
-                  <div class="promise-desc-d">انسان واقعی، بدون ربات، هر روز هفته</div>
+            </div>
+          `;
+        }
+
+        // ===== DESKTOP =====
+        const desktopWrap = document.getElementById("final-desktop-wrap");
+        if (desktopWrap) {
+          desktopWrap.innerHTML = `
+            <div class="promise-section-d fs-anim d-1">
+              <div class="section-label">${data.promise_label || "چرا VOLTEX"}</div>
+              <h2 class="fs-anim d-2">${data.promise_title || "تعهد VOLTEX"}</h2>
+              <div class="promise-grid-d">
+                ${promises
+                  .map((p, i) => {
+                    const c = colors[p.color] || colors["neon"];
+                    return `
+                    <div class="promise-card-d fs-anim d-${i + 3}" style="--pc:${c.hex};--pc-glow:rgba(${c.rgb},0.12)">
+                      <div class="promise-icon-d" style="border-color:rgba(${c.rgb},0.3)">${p.icon_svg || `<svg viewBox="0 0 24 24" stroke="${c.hex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 2l10 10-10 10"/></svg>`}</div>
+                      <div class="promise-card-text">
+                        <div class="promise-big-d">${p.badge_value || ""}<span class="promise-big-unit-d" style="color:${c.hex}">${p.badge_unit || ""}</span></div>
+                        <div class="promise-title-d">${p.title || ""}</div>
+                        <div class="promise-desc-d">${p.description || ""}</div>
+                      </div>
+                    </div>
+                  `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+            <div class="stmt-desktop fs-anim d-2">
+              <div class="stmt-ring"></div>
+              <div class="stmt-ring"></div>
+              <div class="stmt-inner-d">
+                <span class="stmt-eyebrow-d fs-anim d-2">${data.statement_eyebrow || "سفر شما از اینجا آغاز می‌شود"}</span>
+                <div class="stmt-desktop-title fs-anim d-3">${data.statement_title || "امروز"} <em>${data.statement_title_highlight || "جلوتر"}</em> برو</div>
+                <p class="stmt-desktop-desc fs-anim d-4">${data.statement_description || "به بیش از ۴۰,۰۰۰ راکب در سراسر اروپا بپیوندید که Voltex را انتخاب کرده‌اند."}</p>
+                <div class="stmt-desktop-btns fs-anim d-5">
+                  <button class="stmt-btn-p-d" onclick="goToSlide(2)">${data.statement_btn_text || "مشاهده همه مدل‌ها"}</button>
+                  <button class="stmt-btn-s-d" onclick="goToSlide(1)">${data.statement_btn_secondary_text || "کاوش مجموعه‌ها"}</button>
                 </div>
               </div>
             </div>
-          </div>
-        `;
+          
+          `;
+        }
       }
-    }
 
       /* ════════════════════════════════════
          UPDATE SEO
          ════════════════════════════════════ */
       function updateSEO(data) {
-        const title = data.meta_title || "Nex Go | اسکوتر های پرمیوم شهری ";
-        const desc =
-          data.meta_description ||
-          "اسکوترهای برقی پریمیوم، طراحی‌شده برای کسانی که بیشتر می‌خواهند.";
-        const url = window.location.href;
-        const image = data.hero_image || "/images/1.png";
-
-        document.title = title;
-        document.getElementById("page-title").textContent = title;
-        document.getElementById("meta-description").content = desc;
-        document.getElementById("meta-canonical").href = url;
-
-        document.getElementById("og-title").content = title;
-        document.getElementById("og-description").content = desc;
-        document.getElementById("og-image").content = image;
-        document.getElementById("og-url").content = url;
-
-        document.getElementById("twitter-title").content = title;
-        document.getElementById("twitter-description").content = desc;
-        document.getElementById("twitter-image").content = image;
-
-        // JSON-LD
-        const jsonLd = {
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "Nex Go",
-          description: desc,
-          url: url,
-          potentialAction: {
-            "@type": "SearchAction",
-            target: url + "?s={search_term_string}",
-            "query-input": "required name=search_term_string",
-          },
-        };
-        document.getElementById("json-ld-website").textContent =
-          JSON.stringify(jsonLd);
+        // ===============================================================
+        //  No-op. Title, description, canonical, Open Graph, Twitter cards
+        //  and the Organization + WebSite JSON-LD are rendered by Django
+        //  into the initial HTML (templates/seo/_head.html).
+        //
+        //  The old implementation set the canonical to window.location.href,
+        //  so every visit carrying ?utm_source=... declared itself canonical
+        //  and split the home page across as many URLs as there were
+        //  campaigns. It also declared a SearchAction pointing at "?s=",
+        //  a search parameter this site does not implement.
+        // ===============================================================
       }
 
       /* ════════════════════════════════════
@@ -6659,32 +6259,8 @@ DESKTOP (1024px+)
       let currentSlide = 0;
       let isAnimating = false;
 
-      // Slide paging runs on tablets, laptops, and desktop. It is
-      // switched off only on true handheld phones (html.is-mobile-scroll,
-      // set in <head> from the same viewport/pointer media query used by
-      // the CSS above), where the page is a normal scrolling document
-      // instead. Reading the class here — rather than re-declaring a
-      // second, possibly-divergent media query — guarantees the JS and
-      // CSS always agree on which devices get which behavior.
-      const mobileScrollMQ = window.matchMedia(
-        "(max-width: 767.98px), (max-height: 500px) and (max-width: 1023.98px) and (orientation: landscape) and (pointer: coarse)",
-      );
-      const isPagingMode = () => !document.documentElement.classList.contains("is-mobile-scroll");
-
       function goToSlide(index) {
         if (index < 0 || index >= totalSlides) return;
-
-        if (!isPagingMode()) {
-          // True mobile only: just scroll the target section into view
-          // like a normal anchor link, no fixed-viewport paging.
-          slides[index].scrollIntoView({ behavior: "smooth", block: "start" });
-          currentSlide = index;
-          document.querySelectorAll(".nav-dot").forEach((dot, i) => {
-            dot.classList.toggle("active", i === currentSlide);
-          });
-          return;
-        }
-
         if (isAnimating) return;
         isAnimating = true;
         slides[currentSlide].classList.remove("active");
@@ -6704,25 +6280,6 @@ DESKTOP (1024px+)
         }, 60);
       }
 
-      // True mobile only: reveal each section's entrance animations as it
-      // scrolls into view (normal scroll-reveal pattern), instead of the
-      // paging-mode "one active slide at a time" state. The CSS rule
-      // above already forces everything visible as a fallback, so this
-      // is purely a progressive-enhancement animation trigger.
-      if (!isPagingMode() && "IntersectionObserver" in window) {
-        const revealObserver = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add("active");
-              }
-            });
-          },
-          { threshold: 0.2 },
-        );
-        slides.forEach((slide) => revealObserver.observe(slide));
-      }
-
       // Nav dots
       const navDots = document.getElementById("nav-dots");
       slides.forEach((_, i) => {
@@ -6735,40 +6292,9 @@ DESKTOP (1024px+)
       // Wheel navigation
       let wheelAccum = 0,
         wheelTimer = null;
-
-      // Finds the nearest ancestor that is actually scrollable right now —
-      // either slide 6's dedicated .final-scroll container, or (on short
-      // viewports / unusual aspect ratios) a .slide itself when its content
-      // doesn't fit the available height. Returns null otherwise.
-      function findScrollableAncestor(el) {
-        const finalScroll = el.closest(".final-scroll");
-        if (finalScroll) return finalScroll;
-        const slide = el.closest(".slide");
-        if (slide && slide.scrollHeight > slide.clientHeight) return slide;
-        return null;
-      }
-
       window.addEventListener(
         "wheel",
         (e) => {
-          // Paging mode only (tablet/laptop/desktop). On true mobile the
-          // page scrolls natively, so just let the browser handle the wheel event.
-          if (!isPagingMode()) return;
-
-          // Let internally-scrollable content (slide 6's promise + footer
-          // stack, or any slide that overflows on a short viewport) scroll
-          // natively unless it's already at its top/bottom edge — only
-          // then hand off to slide navigation.
-          const scrollable = findScrollableAncestor(e.target);
-          if (scrollable) {
-            const atTop = scrollable.scrollTop <= 0;
-            const atBottom =
-              scrollable.scrollTop + scrollable.clientHeight >=
-              scrollable.scrollHeight - 1;
-            if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
-              return; // allow native scroll inside the slide
-            }
-          }
           e.preventDefault();
           wheelAccum += e.deltaY;
           clearTimeout(wheelTimer);
@@ -6783,9 +6309,8 @@ DESKTOP (1024px+)
         { passive: false },
       );
 
-      // Keyboard navigation (paging mode only: tablet/laptop/desktop)
+      // Keyboard navigation
       document.addEventListener("keydown", (e) => {
-        if (!isPagingMode()) return;
         if (e.key === "ArrowDown" || e.key === "PageDown") {
           e.preventDefault();
           goToSlide(currentSlide + 1);
@@ -6811,15 +6336,12 @@ DESKTOP (1024px+)
       document.addEventListener(
         "touchend",
         (e) => {
-          // Paging-mode swipe (tablet/laptop/desktop). On true mobile,
-          // native touch scrolling handles the page.
-          if (!isPagingMode()) return;
           const target = e.target;
           if (
             target.closest(".bs-carousel") ||
             target.closest(".cat-tabs-strip") ||
             target.closest(".guide-list") ||
-            findScrollableAncestor(target)
+            target.closest(".final-mobile-wrap")
           )
             return;
           const diff = touchStartY - e.changedTouches[0].clientY;
@@ -6879,24 +6401,6 @@ DESKTOP (1024px+)
               btn.focus();
             }
           }
-        }
-      });
-
-
-      // Keep things sane if the viewport crosses the mobile/paging
-      // boundary at runtime (window resize, orientation change, devtools
-      // device toggle) instead of only on page load. e.matches === true
-      // means we just entered true-mobile (native scroll) mode.
-      mobileScrollMQ.addEventListener("change", (e) => {
-        if (!e.matches) {
-          // Entering paging mode (tablet/laptop/desktop): re-apply the
-          // paging transform for whatever slide is considered current.
-          wrapper.style.transform = `translateY(-${currentSlide * 100}dvh)`;
-          slides.forEach((s, i) => s.classList.toggle("active", i === currentSlide));
-        } else {
-          // Entering true-mobile mode: drop the paging transform so the
-          // wrapper/slides fall back to normal static document flow.
-          wrapper.style.transform = "";
         }
       });
 

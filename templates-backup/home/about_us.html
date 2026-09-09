@@ -1,0 +1,2875 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>درباره ما | Nex Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:       #070B14;
+  --bg2:      #0E1423;
+  --surface:  rgba(255,255,255,.03);
+  --text:     #FFFFFF;
+  --muted:    rgba(255,255,255,.65);
+  --primary:     #4F46E5;
+  --primary-h:   #6366F1;
+  --secondary: #06B6D4;
+  --accent:   #22C55E;
+  --border:   rgba(255,255,255,.08);
+  --glow:     rgba(79,70,229,.35);
+  --font:     'Vazirmatn', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  direction: rtl;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* every element is contained */
+* { max-width: 100%; }
+
+img, svg, video { display: block; max-width: 100%; height: auto; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════
+   NAV  — ported from home/index.html header
+═══════════════════════════════════════════ */
+/* header-specific design tokens (scoped additions, no collisions) */
+:root {
+  --nav-h: 64px;
+  --nav-black: #050507;
+  --nav-white: #f6f6f8;
+  --nav-dim: rgba(246, 246, 248, 0.58);
+  --nav-neon: #4fd8ff;
+  --nav-border: rgba(255, 255, 255, 0.06);
+  --nav-border-lit: rgba(125, 211, 252, 0.22);
+  --nav-card: #101018;
+  --nav-glow: rgba(79, 216, 255, 0.14);
+  --nav-font-ui: "Vazirmatn", "Inter", sans-serif;
+  --nav-font-mono: "JetBrains Mono", "Vazirmatn", monospace;
+  --nav-font-display: "Vazirmatn", "Space Grotesk", sans-serif;
+  --nav-ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+  --nav-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --nav-r-sm: 10px;
+  --nav-r-md: 14px;
+  --nav-shadow-lift:
+    0 30px 70px -24px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--nav-h);
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(5, 5, 7, 0.78);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border-bottom: 1px solid var(--nav-border);
+}
+.nav-logo {
+  font-family: "Space Grotesk", "Vazirmatn", sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.22em;
+  color: var(--nav-white);
+  flex-shrink: 0;
+  direction: ltr;
+}
+.nav-links {
+  display: none;
+}
+.nav-menu-btn {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid var(--nav-border);
+  border-radius: var(--nav-r-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    border-color 0.35s var(--nav-ease-smooth),
+    background 0.35s var(--nav-ease-smooth);
+  flex-shrink: 0;
+}
+.nav-menu-btn:hover {
+  border-color: var(--nav-border-lit);
+  background: rgba(255, 255, 255, 0.02);
+}
+.nav-menu-btn span {
+  display: block;
+  width: 16px;
+  height: 1.5px;
+  background: var(--nav-dim);
+  transition: all 0.35s var(--nav-ease-luxury);
+}
+.nav-menu-btn.open span:nth-child(1) {
+  transform: rotate(45deg) translate(4px, 4px);
+}
+.nav-menu-btn.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-menu-btn.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(4px, -4px);
+}
+.nav-cta {
+  font-family: var(--nav-font-ui);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  background: var(--nav-white);
+  color: var(--nav-black);
+  padding: 9px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 100px;
+  transition:
+    transform 0.35s var(--nav-ease-luxury),
+    background 0.35s var(--nav-ease-smooth);
+  flex-shrink: 0;
+}
+.nav-cta:hover {
+  background: var(--nav-neon);
+}
+.nav-cta:active {
+  transform: scale(0.95);
+}
+
+/* ── AUTH SECTION (header) ── */
+.nav-auth {
+  display: none;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.auth-guest {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.auth-link-login {
+  font-family: var(--nav-font-ui);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--nav-dim);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s var(--nav-ease-smooth);
+}
+.auth-link-login::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--nav-neon);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--nav-ease-luxury);
+}
+.auth-link-login:hover {
+  color: var(--nav-white);
+}
+.auth-link-login:hover::after {
+  transform: scaleX(1);
+}
+
+.auth-user {
+  position: relative;
+}
+.auth-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--nav-border);
+  border-radius: 100px;
+  padding: 6px 16px 6px 8px;
+  font-family: var(--nav-font-ui);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--nav-white);
+  cursor: pointer;
+  transition:
+    border-color 0.3s var(--nav-ease-smooth),
+    background 0.3s var(--nav-ease-smooth);
+}
+.auth-user-btn:hover {
+  border-color: var(--nav-border-lit);
+  background: rgba(255, 255, 255, 0.02);
+}
+.auth-user-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(79, 216, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  line-height: 1;
+  object-fit: cover;
+}
+.auth-user-name {
+  white-space: nowrap;
+}
+.auth-user-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 190px;
+  background: var(--nav-card);
+  border: 1px solid var(--nav-border);
+  border-radius: var(--nav-r-md);
+  box-shadow: var(--nav-shadow-lift);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.25s var(--nav-ease-smooth),
+    transform 0.25s var(--nav-ease-smooth),
+    visibility 0.25s;
+  z-index: 1001;
+}
+.auth-user-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.auth-user-menu a,
+.auth-user-menu button.auth-logout {
+  font-family: var(--nav-font-ui);
+  font-size: 0.78rem;
+  color: var(--nav-dim);
+  text-decoration: none;
+  padding: 9px 12px;
+  border-radius: var(--nav-r-sm);
+  transition:
+    background 0.2s var(--nav-ease-smooth),
+    color 0.2s var(--nav-ease-smooth);
+}
+.auth-user-menu a:hover,
+.auth-user-menu a:focus-visible,
+.auth-user-menu button.auth-logout:hover,
+.auth-user-menu button.auth-logout:focus-visible {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--nav-white);
+}
+.auth-user-menu a.auth-logout,
+.auth-user-menu button.auth-logout {
+  color: #ff8a8a;
+  border-top: 1px solid var(--nav-border);
+  margin-top: 4px;
+  padding-top: 11px;
+  background: none;
+  border-inline: none;
+  border-bottom: none;
+  width: 100%;
+  text-align: right;
+  cursor: pointer;
+}
+.auth-user-menu a.auth-logout:hover,
+.auth-user-menu button.auth-logout:hover {
+  background: rgba(255, 108, 108, 0.08);
+}
+.auth-logout-form {
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .nav-auth {
+    display: flex;
+  }
+}
+
+/* ── CART BUTTON (header) ── */
+.nav-right-cluster {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.nav-cart-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid var(--nav-border);
+  border-radius: var(--nav-r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    border-color 0.35s var(--nav-ease-smooth),
+    background 0.35s var(--nav-ease-smooth);
+  flex-shrink: 0;
+}
+.nav-cart-btn:hover {
+  border-color: var(--nav-border-lit);
+  background: rgba(255, 255, 255, 0.02);
+}
+.nav-cart-btn:active {
+  transform: scale(0.95);
+}
+.nav-cart-icon {
+  width: 18px;
+  height: 18px;
+  stroke: var(--nav-dim);
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s var(--nav-ease-smooth);
+}
+.nav-cart-btn:hover .nav-cart-icon {
+  stroke: var(--nav-white);
+}
+.nav-cart-badge {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--nav-neon);
+  color: var(--nav-black);
+  font-family: var(--nav-font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  direction: ltr;
+  box-shadow: 0 0 0 2px var(--nav-black);
+}
+.nav-cart-badge[hidden] {
+  display: none;
+}
+
+/* Mobile-only auth block, lives inside the drawer */
+.drawer-auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+.drawer-auth-link {
+  font-family: var(--nav-font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--nav-dim);
+  text-decoration: none;
+  padding: 12px 30px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 100px;
+  transition: all 0.35s var(--nav-ease-smooth);
+}
+.drawer-auth-link:hover {
+  border-color: var(--nav-neon);
+  color: var(--nav-neon);
+}
+.drawer-auth-register {
+  font-family: var(--nav-font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--nav-white);
+  color: var(--nav-black);
+  padding: 15px 46px;
+  border: none;
+  cursor: pointer;
+  border-radius: 100px;
+}
+.drawer-auth-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 22px;
+}
+.drawer-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--nav-white);
+  font-family: var(--nav-font-ui);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+.drawer-auth-user a {
+  font-family: var(--nav-font-ui);
+  font-size: 0.85rem;
+  color: var(--nav-dim);
+  text-decoration: none;
+  padding: 9px 0;
+  transition: color 0.3s var(--nav-ease-smooth);
+}
+.drawer-auth-user a:hover {
+  color: var(--nav-neon);
+}
+.drawer-auth-user a.auth-logout {
+  color: #ff8a8a;
+}
+.drawer-auth-user .auth-logout-form {
+  margin: 0;
+}
+.drawer-auth-user .auth-logout-form button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--nav-font-ui);
+  font-size: 0.85rem;
+  color: #ff8a8a;
+  padding: 9px 0;
+}
+
+/* Mobile drawer */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 5, 8, 0.98);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transform: translateY(-100%);
+  transition: transform 0.6s var(--nav-ease-luxury);
+  padding-top: 80px;
+  overflow-y: auto;
+}
+.mobile-drawer.open {
+  transform: translateY(0);
+}
+.mobile-drawer a {
+  position: relative;
+  font-family: var(--nav-font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+  color: var(--nav-dim);
+  text-decoration: none;
+  padding: 14px 0;
+  width: min(240px, 70vw);
+  border-radius: var(--nav-r-sm);
+  border-bottom: 1px solid var(--nav-border);
+  transition:
+    color 0.35s var(--nav-ease-smooth),
+    transform 0.35s var(--nav-ease-smooth),
+    border-color 0.35s var(--nav-ease-smooth),
+    background 0.35s var(--nav-ease-smooth),
+    box-shadow 0.35s var(--nav-ease-smooth);
+  display: block;
+  text-align: center;
+}
+.mobile-drawer a:last-of-type {
+  border-bottom: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .mobile-drawer a:hover {
+    color: var(--nav-neon);
+    border-color: var(--nav-border-lit);
+    background: linear-gradient(90deg, transparent, var(--nav-glow) 45%, transparent);
+    box-shadow: inset 0 0 0 1px rgba(79, 216, 255, 0.08);
+    transform: translateX(-6px);
+  }
+}
+.mobile-drawer a:active {
+  color: var(--nav-neon);
+  border-color: var(--nav-border-lit);
+  background: linear-gradient(90deg, transparent, var(--nav-glow) 45%, transparent);
+  transform: translateX(-4px);
+}
+.mobile-drawer a:focus-visible {
+  color: var(--nav-neon);
+  border-color: var(--nav-border-lit);
+  background: linear-gradient(90deg, transparent, var(--nav-glow) 45%, transparent);
+  box-shadow:
+    0 0 0 1px var(--nav-border-lit),
+    0 0 20px -8px var(--nav-neon);
+  outline: none;
+}
+.mobile-drawer-cta {
+  margin-top: 26px;
+  font-family: var(--nav-font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--nav-white);
+  color: var(--nav-black);
+  padding: 15px 46px;
+  border: none;
+  cursor: pointer;
+  border-radius: 100px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+@media (max-width: 767.98px) {
+  .mobile-drawer {
+    gap: 2px;
+    padding-top: 74px;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-drawer a {
+    font-family: var(--nav-font-ui);
+    font-weight: 500;
+    font-size: 0.92rem;
+    letter-spacing: 0.01em;
+    padding: 11px 0;
+    width: min(210px, 72vw);
+  }
+  .mobile-drawer-cta {
+    margin-top: 20px;
+    padding: 13px 40px;
+  }
+  .drawer-auth {
+    margin-top: 16px;
+    gap: 10px;
+  }
+  .drawer-auth-link {
+    font-size: 0.82rem;
+    padding: 10px 26px;
+  }
+  .drawer-auth-register {
+    padding: 13px 38px;
+  }
+  .drawer-auth-user {
+    margin-top: 16px;
+  }
+  .drawer-user-info {
+    font-size: 0.88rem;
+  }
+}
+
+/* Tablet nav (768–1023) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --nav-h: 68px;
+  }
+  nav {
+    padding: 0 36px;
+  }
+  .nav-menu-btn {
+    display: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--nav-font-ui);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--nav-dim);
+    text-decoration: none;
+    transition: color 0.3s var(--nav-ease-smooth);
+    position: relative;
+    white-space: nowrap;
+  }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: var(--nav-neon);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--nav-ease-luxury);
+  }
+  .nav-links a:hover {
+    color: var(--nav-white);
+  }
+  .nav-links a:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Desktop nav (>=1024) */
+@media (min-width: 1024px) {
+  :root {
+    --nav-h: 76px;
+  }
+  nav {
+    padding: 0 64px;
+  }
+  .nav-menu-btn {
+    display: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--nav-font-ui);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--nav-dim);
+    text-decoration: none;
+    transition: color 0.3s var(--nav-ease-smooth);
+    position: relative;
+    white-space: nowrap;
+  }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: var(--nav-neon);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--nav-ease-luxury);
+  }
+  .nav-links a:hover {
+    color: var(--nav-white);
+  }
+  .nav-links a:hover::after {
+    transform: scaleX(1);
+  }
+  .nav-cta {
+    font-size: 0.78rem;
+    padding: 11px 26px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SHARED LAYOUT
+═══════════════════════════════════════════ */
+section { padding: 6rem 0; width: 100%; }
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--primary);
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  margin-bottom: 1.4rem;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity .85s ease, transform .85s ease;
+  will-change: opacity, transform;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity .85s ease, transform .85s ease;
+  will-change: opacity, transform;
+}
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity .85s ease, transform .85s ease;
+  will-change: opacity, transform;
+}
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  display: inline-block;
+  padding: .9rem 2.6rem;
+  background: var(--primary);
+  color: #fff;
+  font-family: var(--font);
+  font-size: .93rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: .04em;
+  transition: all .35s;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+  transform: translateX(110%);
+  transition: transform .55s;
+}
+.btn-primary:hover::after { transform: translateX(-110%); }
+.btn-primary:hover {
+  background: var(--primary-h);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(79,70,229,.28);
+}
+
+.btn-outline {
+  display: inline-block;
+  padding: .9rem 2.6rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.22);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .93rem;
+  font-weight: 400;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: .04em;
+  transition: all .35s;
+  white-space: nowrap;
+}
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#hero {
+  position: relative;
+  min-height: 100svh;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 70%, rgba(79,70,229,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 20% 30%, rgba(79,70,229,.04) 0%, transparent 60%),
+    linear-gradient(180deg, #0A0A0A 0%, #080808 100%);
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 80px 80px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  opacity: .4;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 1.5rem;
+  width: 100%;
+  max-width: 860px;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  color: var(--primary);
+  font-size: .76rem;
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp .8s .3s forwards;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 1px;
+  background: var(--primary);
+  opacity: .5;
+  flex-shrink: 0;
+}
+.hero-h1 {
+  font-size: clamp(2.4rem, 7vw, 6.2rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.4rem;
+  opacity: 0;
+  animation: fadeUp .9s .5s forwards;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.hero-h1 .gold { color: var(--primary); }
+.hero-sub {
+  font-size: clamp(.95rem, 2.2vw, 1.3rem);
+  color: var(--muted);
+  font-weight: 300;
+  line-height: 1.75;
+  max-width: 520px;
+  margin: 0 auto 2.8rem;
+  opacity: 0;
+  animation: fadeUp .9s .7s forwards;
+}
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp .9s .9s forwards;
+}
+.hero-scroll {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  color: var(--muted);
+  font-size: .68rem;
+  letter-spacing: .15em;
+  opacity: 0;
+  animation: fadeUp .8s 1.2s forwards;
+  white-space: nowrap;
+}
+.hero-scroll-line {
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(to bottom, var(--primary), transparent);
+  animation: scrollPulse 2s infinite;
+}
+@keyframes scrollPulse {
+  0%,100% { opacity:.3; transform:scaleY(1); }
+  50%      { opacity:1;  transform:scaleY(1.1); }
+}
+
+/* ═══════════════════════════════════════════
+   PHILOSOPHY
+═══════════════════════════════════════════ */
+#philosophy { background: var(--bg); }
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.philosophy-left .big-quote {
+  font-size: clamp(1.9rem, 4vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.8rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.philosophy-left .big-quote .gold { color: var(--primary); }
+.philosophy-left p {
+  color: var(--muted);
+  line-height: 2;
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 1.4rem;
+}
+.philosophy-pillars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--border);
+  margin-top: 1rem;
+}
+.pillar-item {
+  padding: 1.4rem;
+  border: 1px solid var(--border);
+  transition: background .3s;
+}
+.pillar-item:hover { background: rgba(79,70,229,.05); }
+.pillar-num { font-size: .68rem; color: var(--primary); letter-spacing: .2em; margin-bottom: .4rem; }
+.pillar-title { font-size: .95rem; font-weight: 600; margin-bottom: .35rem; }
+.pillar-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+
+.philosophy-visual {
+  position: relative;
+  aspect-ratio: 4/5;
+  background: var(--surface);
+  overflow: hidden;
+  width: 100%;
+}
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-placeholder svg { opacity: .14; }
+.philosophy-visual::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(79,70,229,.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.gold-frame {
+  position: absolute;
+  top: 1.4rem; right: 1.4rem; bottom: 1.4rem; left: 1.4rem;
+  border: 1px solid rgba(79,70,229,.2);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════
+   TIMELINE
+═══════════════════════════════════════════ */
+#journey { background: var(--bg); }
+.timeline-header { text-align: center; margin-bottom: 4.5rem; }
+.timeline-header h2 {
+  font-size: clamp(1.9rem, 4vw, 3.3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.timeline-wrap { position: relative; width: 100%; }
+.timeline-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 50%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--primary) 10%, var(--primary) 90%, transparent);
+  opacity: .3;
+}
+.timeline-items { display: flex; flex-direction: column; }
+
+.tl-item {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  align-items: start;
+  gap: 0;
+}
+.tl-left { padding: 2.2rem 2.5rem 2.2rem 0; text-align: left; }
+.tl-right { padding: 2.2rem 0 2.2rem 2.5rem; text-align: right; }
+
+.tl-item:nth-child(even) .tl-left { order: 3; text-align: right; padding: 2.2rem 0 2.2rem 2.5rem; }
+.tl-item:nth-child(even) .tl-right { order: 1; text-align: left; padding: 2.2rem 2.5rem 2.2rem 0; }
+
+.tl-dot {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  order: 2;
+  padding-top: 2.5rem;
+}
+.tl-dot-ring {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: var(--bg);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  transition: all .4s;
+}
+.tl-item:hover .tl-dot-ring { background: var(--primary); box-shadow: 0 0 18px rgba(79,70,229,.5); }
+.tl-year { font-size: .68rem; color: var(--primary); font-weight: 600; letter-spacing: .1em; }
+.tl-content h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: .45rem; }
+.tl-content p { color: var(--muted); font-size: .85rem; line-height: 1.75; font-weight: 300; }
+
+/* ═══════════════════════════════════════════
+   DIFFERENTIATORS
+═══════════════════════════════════════════ */
+#different { background: var(--bg2); }
+.diff-header { text-align: center; margin-bottom: 3.5rem; }
+.diff-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
+.diff-header p { color: var(--muted); margin-top: .9rem; font-size: 1rem; font-weight: 300; }
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  width: 100%;
+}
+.diff-card {
+  background: var(--bg2);
+  padding: 2.5rem 2.2rem;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: background .4s;
+}
+.diff-card::before {
+  content: '';
+  position: absolute; top: 0; right: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  transform: scaleX(0);
+  transition: transform .5s;
+}
+.diff-card:hover::before { transform: scaleX(1); }
+.diff-card:hover { background: rgba(79,70,229,.04); }
+.diff-icon {
+  width: 48px; height: 48px;
+  border: 1px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.6rem;
+  transition: background .4s;
+  flex-shrink: 0;
+}
+.diff-card:hover .diff-icon { background: rgba(79,70,229,.1); }
+.diff-icon svg { color: var(--primary); flex-shrink: 0; }
+.diff-card h3 { font-size: 1.08rem; font-weight: 700; margin-bottom: .7rem; }
+.diff-card p { color: var(--muted); font-size: .85rem; line-height: 1.8; font-weight: 300; }
+.diff-number {
+  position: absolute; bottom: 1.4rem; left: 1.4rem;
+  font-size: .62rem; color: rgba(79,70,229,.3); letter-spacing: .15em;
+}
+
+/* ═══════════════════════════════════════════
+   METRICS
+═══════════════════════════════════════════ */
+#metrics { background: var(--bg); position: relative; overflow: hidden; }
+.metrics-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(79,70,229,.04) 0%, transparent 70%);
+}
+.metrics-wrap { position: relative; z-index: 1; text-align: center; }
+.metrics-wrap h2 {
+  font-size: clamp(1.7rem, 3.5vw, 2.9rem);
+  font-weight: 800; margin-bottom: .9rem; letter-spacing: -0.02em;
+}
+.metrics-wrap .sub { color: var(--muted); font-size: 1rem; margin-bottom: 4rem; font-weight: 300; }
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  width: 100%;
+}
+.metric-box {
+  background: var(--bg);
+  padding: 3rem 1.5rem;
+  border-bottom: 2px solid transparent;
+  transition: border-color .4s, background .4s;
+}
+.metric-box:hover { border-color: var(--primary); background: rgba(79,70,229,.03); }
+.metric-num {
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: .45rem;
+}
+.metric-label { font-size: .9rem; color: var(--muted); font-weight: 300; letter-spacing: .05em; }
+
+/* ═══════════════════════════════════════════
+   VALUES
+═══════════════════════════════════════════ */
+#values { background: var(--bg); }
+.values-header { text-align: center; margin-bottom: 3.5rem; }
+.values-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.2rem;
+  width: 100%;
+}
+.value-card {
+  position: relative;
+  padding: 2.2rem 1.5rem;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  transition: all .4s;
+  cursor: default;
+  overflow: hidden;
+}
+.value-card::before {
+  content: '';
+  position: absolute; inset: -1px;
+  background: linear-gradient(135deg, rgba(79,70,229,.18), transparent, rgba(79,70,229,.09));
+  opacity: 0;
+  transition: opacity .4s;
+}
+.value-card:hover::before { opacity: 1; }
+.value-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(79,70,229,.28);
+  box-shadow: 0 18px 52px rgba(0,0,0,.38);
+}
+.value-icon {
+  width: 52px; height: 52px;
+  margin: 0 auto 1.3rem;
+  background: rgba(79,70,229,.08);
+  border: 1px solid rgba(79,70,229,.2);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.value-icon svg { color: var(--primary); flex-shrink: 0; }
+.value-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .45rem; }
+.value-card p { font-size: .78rem; color: var(--muted); line-height: 1.7; }
+
+/* ═══════════════════════════════════════════
+   OUR STORY
+═══════════════════════════════════════════ */
+#story { background: var(--bg2); overflow: hidden; }
+.story-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  margin-bottom: 5.5rem;
+}
+.story-intro-left { position: relative; padding-right: 2.2rem; }
+.story-glow-line {
+  position: absolute;
+  top: .2rem; bottom: .2rem; right: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--primary) 15%, var(--secondary) 50%, var(--primary) 85%, transparent);
+  box-shadow: 0 0 16px var(--glow), 0 0 28px var(--glow);
+  animation: storyLinePulse 3.5s ease-in-out infinite;
+}
+@keyframes storyLinePulse {
+  0%, 100% { opacity: .55; }
+  50%      { opacity: 1; }
+}
+.story-subtitle {
+  color: var(--secondary);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  margin-bottom: 1rem;
+}
+.story-title {
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  margin-bottom: 1.6rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.story-title .accent-grad {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.story-lead {
+  color: var(--muted);
+  line-height: 2;
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 2.2rem;
+  max-width: 480px;
+}
+.story-stats {
+  display: flex;
+  gap: 2.4rem;
+  flex-wrap: wrap;
+}
+.story-stat { position: relative; padding-right: 1.2rem; }
+.story-stat::before {
+  content: '';
+  position: absolute;
+  top: .15em; right: 0; bottom: .15em;
+  width: 1px;
+  background: var(--border);
+}
+.story-stat:first-child { padding-right: 0; }
+.story-stat:first-child::before { display: none; }
+.story-stat-num {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+  margin-bottom: .35rem;
+}
+.story-stat-label { font-size: .76rem; color: var(--muted); font-weight: 300; }
+
+.story-visual {
+  position: relative;
+  aspect-ratio: 4/5;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.story-glow-orb {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 65%; height: 65%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+  filter: blur(30px);
+  transform: translate(-50%, -50%);
+  transition: transform .3s ease-out;
+}
+.story-gradient-shape {
+  position: absolute;
+  border-radius: 42% 58% 60% 40% / 45% 40% 60% 55%;
+  filter: blur(2px);
+  opacity: .55;
+  animation: storyMorph 12s ease-in-out infinite;
+}
+.story-shape-1 {
+  width: 62%; height: 62%;
+  top: 6%; right: 4%;
+  background: linear-gradient(135deg, rgba(79,70,229,.4), rgba(6,182,212,.18));
+}
+.story-shape-2 {
+  width: 42%; height: 42%;
+  bottom: 4%; left: 2%;
+  background: linear-gradient(135deg, rgba(6,182,212,.3), rgba(34,197,94,.14));
+  animation-delay: -6s;
+}
+@keyframes storyMorph {
+  0%, 100% { border-radius: 42% 58% 60% 40% / 45% 40% 60% 55%; transform: rotate(0deg) scale(1); }
+  50%      { border-radius: 58% 42% 40% 60% / 55% 60% 40% 45%; transform: rotate(8deg) scale(1.06); }
+}
+.story-float-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  backdrop-filter: blur(6px);
+  animation: storyFloat 7s ease-in-out infinite;
+}
+.story-fc-1 { width: 84px; height: 84px; top: 10%; left: 8%; animation-duration: 8s; }
+.story-fc-2 { width: 46px; height: 46px; bottom: 22%; right: 10%; animation-duration: 6.5s; animation-delay: -2s; }
+.story-fc-3 { width: 30px; height: 30px; top: 46%; left: -2%; animation-duration: 5.5s; animation-delay: -4s; }
+@keyframes storyFloat {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50%      { transform: translateY(-18px) translateX(6px); }
+}
+.story-glass-card {
+  position: absolute;
+  width: 60%;
+  padding: 1.3rem 1.4rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 60px rgba(0,0,0,.4);
+  transition: transform .5s ease, box-shadow .5s ease;
+}
+.story-glass-card:hover { transform: translateY(-6px); box-shadow: 0 30px 70px rgba(0,0,0,.5), 0 0 32px var(--glow); }
+.story-card-main { top: 6%; right: 6%; z-index: 3; }
+.story-card-sub { bottom: 26%; left: 2%; z-index: 2; width: 48%; }
+.story-card-mini {
+  bottom: 6%; right: 14%; z-index: 4;
+  width: auto; padding: .7rem 1rem;
+  display: flex; align-items: center; gap: .6rem;
+}
+.story-card-mini .gc-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: #fff;
+}
+.story-glass-card .gc-label { font-size: .66rem; color: var(--secondary); letter-spacing: .12em; margin-bottom: .5rem; }
+.story-glass-card .gc-num { font-size: 1.9rem; font-weight: 800; margin-bottom: .2rem; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.story-glass-card .gc-text { font-size: .78rem; color: var(--muted); }
+.story-glass-card .gc-bar { height: 3px; border-radius: 2px; background: var(--border); margin-top: .8rem; overflow: hidden; }
+.story-glass-card .gc-bar::after { content: ''; display: block; height: 100%; width: 72%; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+
+/* ── Detailed story roadmap ── */
+.story-roadmap { position: relative; }
+.story-roadmap-track {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.4rem;
+  position: relative;
+}
+.story-roadmap-track::before {
+  content: '';
+  position: absolute;
+  top: 27px; right: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--secondary), var(--primary));
+  opacity: .35;
+}
+.story-stage {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.6rem 1.3rem 1.5rem;
+  transition: transform .4s ease, border-color .4s ease, box-shadow .4s ease;
+}
+.story-stage:nth-child(even) { transform: translateY(1.8rem); }
+.story-stage:hover { transform: translateY(-6px); border-color: rgba(79,70,229,.32); box-shadow: 0 20px 48px rgba(0,0,0,.4); }
+.story-stage:nth-child(even):hover { transform: translateY(1.8rem) translateY(-6px); }
+.story-stage-icon {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary);
+  margin-bottom: 1.1rem;
+  transition: all .4s;
+  position: relative;
+  z-index: 1;
+}
+.story-stage:hover .story-stage-icon { background: var(--primary); color: #fff; box-shadow: 0 0 18px var(--glow); }
+.story-stage-num {
+  position: absolute;
+  top: 1.2rem; left: 1.2rem;
+  font-size: .66rem;
+  color: var(--muted);
+  letter-spacing: .12em;
+  opacity: .6;
+}
+.story-stage h4 { font-size: .98rem; font-weight: 700; margin-bottom: .55rem; }
+.story-stage p { font-size: .78rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+/* ═══════════════════════════════════════════
+   OUR TEAM
+═══════════════════════════════════════════ */
+#team { background: var(--bg); position: relative; }
+.team-header { text-align: center; margin-bottom: 3.5rem; }
+.team-header h2 { font-size: clamp(1.9rem, 4vw, 3.3rem); font-weight: 800; letter-spacing: -0.02em; }
+.team-header p { color: var(--muted); margin-top: .9rem; font-size: 1rem; font-weight: 300; }
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.6rem;
+  width: 100%;
+}
+.team-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  transition: transform .45s ease, border-color .45s ease, box-shadow .45s ease;
+}
+.team-card::before {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--primary), transparent 40%, var(--secondary));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .45s ease;
+  pointer-events: none;
+}
+.team-card::after {
+  content: '';
+  position: absolute;
+  width: 160px; height: 160px;
+  top: -60px; left: -60px;
+  background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+  filter: blur(20px);
+  opacity: 0;
+  transition: opacity .45s ease;
+  pointer-events: none;
+}
+.team-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(79,70,229,.3);
+  box-shadow: 0 26px 60px rgba(0,0,0,.45);
+}
+.team-card:hover::before,
+.team-card:hover::after { opacity: 1; }
+
+.team-img-wrap {
+  position: relative;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d0f1a, #141a2a, #0d0f1a);
+}
+.team-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .6s ease, filter .6s ease;
+  filter: grayscale(.2);
+}
+.team-card:hover .team-img-wrap img { transform: scale(1.08); filter: grayscale(0); }
+.team-img-wrap::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(7,11,20,.85) 0%, transparent 55%);
+}
+
+.team-body { position: relative; z-index: 1; padding: 1.5rem 1.4rem 1.7rem; }
+.team-name { font-size: 1.05rem; font-weight: 700; margin-bottom: .3rem; }
+.team-underline {
+  width: 26px; height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  margin-bottom: .7rem;
+  transition: width .4s ease;
+}
+.team-card:hover .team-underline { width: 48px; }
+.team-role { font-size: .78rem; color: var(--secondary); font-weight: 500; letter-spacing: .04em; margin-bottom: .8rem; }
+.team-desc { font-size: .82rem; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 1.2rem; }
+.team-socials { display: flex; gap: .6rem; }
+.team-socials a {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  transition: all .3s;
+  flex-shrink: 0;
+}
+.team-socials a:hover { border-color: var(--primary); color: var(--text); background: rgba(79,70,229,.12); }
+
+/* ═══════════════════════════════════════════
+   VISION
+═══════════════════════════════════════════ */
+#vision { background: var(--bg2); position: relative; overflow: hidden; }
+.vision-bg-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 80% 30%, rgba(6,182,212,.08) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 60% at 10% 80%, rgba(79,70,229,.08) 0%, transparent 60%);
+}
+.vision-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.vision-left h2 {
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  margin-bottom: 1.4rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.vision-left p {
+  color: var(--muted);
+  line-height: 2;
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 2.2rem;
+  max-width: 480px;
+}
+.vision-roadmap { position: relative; padding-right: 2.6rem; }
+.vision-roadmap-line {
+  position: absolute;
+  top: 6px; bottom: 6px; right: 17px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary), var(--accent));
+  box-shadow: 0 0 14px var(--glow);
+}
+.vision-milestone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.15rem 0;
+}
+.vision-ms-icon {
+  position: absolute;
+  right: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+  transition: all .4s;
+  z-index: 1;
+}
+.vision-milestone:hover .vision-ms-icon {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 18px var(--glow);
+}
+.vision-ms-content { padding-right: 3.2rem; }
+.vision-ms-year { font-size: .7rem; color: var(--secondary); letter-spacing: .12em; font-weight: 600; margin-bottom: .25rem; }
+.vision-ms-title { font-size: .98rem; font-weight: 700; margin-bottom: .2rem; }
+.vision-ms-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+/* ═══════════════════════════════════════════
+   FINAL CTA
+═══════════════════════════════════════════ */
+#final-cta {
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  padding: 9rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.cta-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 80% at 50% 60%, rgba(79,70,229,.08) 0%, transparent 65%);
+}
+.cta-grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 80px 80px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  opacity: .3;
+}
+.cta-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 1.5rem;
+  width: 100%;
+  max-width: 800px;
+}
+.cta-line {
+  width: 56px; height: 1px;
+  background: var(--primary);
+  margin: 0 auto 2.2rem;
+  opacity: .6;
+}
+.cta-content h2 {
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  margin-bottom: 1.3rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.cta-content h2 .gold { color: var(--primary); }
+.cta-content p { color: var(--muted); font-size: 1.1rem; margin-bottom: 2.8rem; font-weight: 300; }
+.cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════
+   FOOTER  — full multi-column luxury layout
+═══════════════════════════════════════════ */
+/* ── normalized to match home/index.html ── */
+footer {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.012);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: clamp(40px, 6vw, 72px) clamp(22px, 5vw, 84px) 0;
+  width: 100%;
+}
+footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #00f0ff, #a855f7, transparent);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.ft-top {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: clamp(24px, 3vw, 48px);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-bottom: clamp(32px, 5vw, 60px);
+}
+.ft-logo {
+  font-family: "JetBrains Mono", "Vazirmatn", monospace;
+  font-weight: 700;
+  font-size: clamp(1rem, 1.8vw, 1.28rem);
+  background: linear-gradient(135deg, #00f0ff, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.14em;
+  margin-bottom: 12px;
+  display: block;
+}
+.ft-tag {
+  font-size: clamp(0.78rem, 1vw, 0.85rem);
+  color: rgba(255, 255, 255, 0.32);
+  line-height: 1.85;
+  max-width: 280px;
+  margin-bottom: 22px;
+}
+.social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.soc {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.35s;
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+@media (hover: hover) {
+  .soc:hover {
+    background: rgba(0, 240, 255, 0.08);
+    border-color: rgba(0, 240, 255, 0.28);
+    color: #00f0ff;
+    transform: translateY(-2px);
+  }
+}
+.soc svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+.ft-col h3 {
+  font-family: "Vazirmatn", "Inter", sans-serif;
+  font-size: clamp(0.68rem, 0.85vw, 0.75rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: clamp(12px, 1.5vw, 18px);
+}
+.ft-col ul {
+  list-style: none;
+}
+.ft-col li {
+  margin-bottom: clamp(7px, 1vw, 11px);
+}
+.ft-col a {
+  font-size: clamp(0.78rem, 0.95vw, 0.86rem);
+  color: rgba(255, 255, 255, 0.42);
+  text-decoration: none;
+  transition: color 0.3s;
+  display: block;
+  min-height: 32px;
+  line-height: 32px;
+}
+@media (hover: hover) {
+  .ft-col a:hover {
+    color: #fff;
+  }
+}
+.ft-bot {
+  max-width: 1400px;
+  margin: 0 auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ft-copy {
+  font-family: "JetBrains Mono", "Vazirmatn", monospace;
+  font-size: clamp(0.5rem, 0.65vw, 0.6rem);
+  color: rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.06em;
+}
+.ft-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(10px, 1.5vw, 20px);
+}
+.ft-legal a {
+  font-size: clamp(0.62rem, 0.75vw, 0.7rem);
+  color: rgba(255, 255, 255, 0.22);
+  text-decoration: none;
+  transition: color 0.3s;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+@media (hover: hover) {
+  .ft-legal a:hover {
+    color: rgba(255, 255, 255, 0.55);
+  }
+}
+@media (max-width: 1024px) {
+  .ft-top {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: clamp(20px, 2.5vw, 36px);
+  }
+}
+@media (max-width: 820px) {
+  .ft-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  .ft-brand {
+    grid-column: 1 / -1;
+  }
+  .ft-tag {
+    max-width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .ft-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ft-bot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 360px) {
+  .ft-top {
+    grid-template-columns: 1fr;
+  }
+  .ft-legal {
+    gap: 8px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 1280px
+═══════════════════════════════════════════ */
+@media (max-width: 1280px) {
+  .container { padding: 0 2.5rem; }
+  .values-grid { grid-template-columns: repeat(3, 1fr); }
+  .footer-top-inner { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2.5rem; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 1024px
+═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .container { padding: 0 2rem; }
+
+  /* Philosophy */
+  .philosophy-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .philosophy-visual { aspect-ratio: 16/9; max-height: 360px; }
+  .philosophy-left .big-quote { font-size: clamp(1.8rem, 4.5vw, 3rem); }
+
+  /* Story / Vision */
+  .story-intro { grid-template-columns: 1fr; gap: 3rem; margin-bottom: 4rem; }
+  .story-visual { max-height: 420px; }
+  .story-roadmap-track { grid-template-columns: repeat(3, 1fr); gap: 1.2rem 1rem; }
+  .story-stage:nth-child(even) { transform: none; }
+  .story-stage:nth-child(even):hover { transform: translateY(-6px); }
+  .story-roadmap-track::before { display: none; }
+  .vision-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .vision-roadmap { padding-top: .5rem; }
+
+  /* Timeline — single-side */
+  .timeline-line { right: 28px; left: auto; }
+  .tl-item { grid-template-columns: 60px 1fr; }
+  .tl-left,
+  .tl-item:nth-child(even) .tl-left { display: none; }
+  .tl-dot { order: 1; padding-top: 2.2rem; width: 60px; }
+  .tl-item:nth-child(even) .tl-dot { order: 1; }
+  .tl-right,
+  .tl-item:nth-child(even) .tl-right {
+    order: 2;
+    text-align: right;
+    padding: 2rem 1.5rem 2rem 0;
+  }
+
+  /* Grids */
+  .diff-grid { grid-template-columns: repeat(2, 1fr); }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
+  .values-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Footer */
+  .footer-top-inner { grid-template-columns: 1fr 1fr; gap: 3rem; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-brand p { max-width: 100%; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 820px
+═══════════════════════════════════════════ */
+@media (max-width: 820px) {
+  section { padding: 4.5rem 0; }
+  .container { padding: 0 1.5rem; }
+
+  .diff-grid { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .values-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .footer-top-inner { grid-template-columns: 1fr 1fr; }
+  .footer-brand { grid-column: 1 / -1; }
+
+  .footer-newsletter-inner { flex-direction: column; align-items: flex-start; }
+  .footer-newsletter-form { width: 100%; }
+  .footer-newsletter-form input { flex: 1; width: auto; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 768px (tablets / mobile)
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  section { padding: 4rem 0; }
+  .container { padding: 0 1.2rem; }
+
+  /* Hero */
+  .hero-content { padding: 0 1.2rem; }
+  .hero-btns { flex-direction: column; align-items: center; }
+  .hero-btns .btn-primary,
+  .hero-btns .btn-outline { width: 100%; max-width: 300px; text-align: center; }
+
+  /* Philosophy */
+  .philosophy-pillars { grid-template-columns: 1fr; }
+  .pillar-item { padding: 1.2rem; }
+
+  /* Timeline */
+  .timeline-line { right: 20px; }
+  .tl-item { grid-template-columns: 44px 1fr; }
+  .tl-dot { width: 44px; }
+  .tl-dot-ring { width: 11px; height: 11px; }
+
+  /* Grids */
+  .diff-grid { grid-template-columns: 1fr; }
+  .diff-card { padding: 2rem 1.5rem; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .metric-box { padding: 2.2rem 1rem; }
+  .values-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .team-grid { grid-template-columns: 1fr; }
+
+  /* Story */
+  .story-intro-left { padding-right: 1.6rem; }
+  .story-visual { aspect-ratio: 1/1; max-height: 340px; }
+  .story-glass-card { width: 74%; padding: 1.1rem 1.2rem; }
+  .story-card-sub { width: 60%; }
+  .story-card-mini { display: none; }
+  .story-stats { gap: 1.6rem; }
+  .story-roadmap-track { grid-template-columns: repeat(2, 1fr); }
+
+  /* Vision */
+  .vision-roadmap { padding-right: 2.2rem; }
+
+  /* CTA */
+  .cta-btns { flex-direction: column; align-items: center; }
+  .cta-btns .btn-primary,
+  .cta-btns .btn-outline { width: 100%; max-width: 300px; text-align: center; }
+  #final-cta { padding: 6rem 0; }
+
+  /* Footer */
+  .footer-top { padding: 3.5rem 0 3rem; }
+  .footer-top-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .footer-brand { grid-column: auto; }
+  .footer-brand p { max-width: 100%; }
+  .footer-newsletter-form { flex-direction: column; gap: .6rem; width: 100%; }
+  .footer-newsletter-form input {
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    width: 100%; max-width: 100%;
+  }
+  .footer-newsletter-form button { width: 100%; }
+  .footer-bottom-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .footer-bottom-links { gap: 1.2rem; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 480px
+═══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  section { padding: 3.5rem 0; }
+  .container { padding: 0 1rem; }
+
+  .hero-h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
+  .hero-sub { font-size: .9rem; }
+  .hero-scroll { display: none; }
+
+  .philosophy-left .big-quote { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+
+  .values-grid { grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .value-card { padding: 1.6rem 1rem; }
+
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .metric-box { padding: 1.8rem .8rem; }
+  .metric-num { font-size: clamp(1.8rem, 8vw, 2.8rem); }
+  .metric-label { font-size: .78rem; }
+
+  .diff-card { padding: 1.8rem 1.2rem; }
+
+  .story-title { font-size: clamp(1.7rem, 7vw, 2.3rem); }
+  .story-visual { max-height: 280px; }
+  .story-glass-card { padding: .9rem 1rem; }
+  .story-glass-card .gc-num { font-size: 1.5rem; }
+  .story-roadmap-track { grid-template-columns: 1fr; }
+  .story-stats { gap: 1.2rem; }
+  .team-body { padding: 1.2rem 1.1rem 1.4rem; }
+  .vision-left h2 { font-size: clamp(1.7rem, 7vw, 2.3rem); }
+
+  .footer-top-inner { gap: 2rem; }
+  .footer-col ul { gap: .7rem; }
+
+  .cta-content h2 { font-size: clamp(1.9rem, 8vw, 2.8rem); }
+  #final-cta { padding: 5rem 0; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — 360px
+═══════════════════════════════════════════ */
+@media (max-width: 360px) {
+  .container { padding: 0 .9rem; }
+  .values-grid { grid-template-columns: 1fr; }
+  .hero-btns .btn-primary,
+  .hero-btns .btn-outline { padding: .85rem 1.5rem; font-size: .87rem; }
+  .btn-primary, .btn-outline { padding: .85rem 1.8rem; }
+  .footer-social a { width: 34px; height: 34px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV — ported from home/index.html
+     ============================================================ -->
+<nav id="nav">
+  <div class="nav-logo">Nex Go</div>
+  <ul class="nav-links">
+    <li><a href="{% url 'home_app:index' %}">مدل‌ها</a></li>
+    <li><a href="{% url 'home_app:categories' %}">فروشگاه</a></li>
+    <li><a href="{% url 'home_app:index' %}">نظرات</a></li>
+    <li><a href="{% url 'home_app:articles' %}">مقالات</a></li>
+    <li><a href="{% url 'home_app:about_us' %}">درباره ما</a></li>
+  </ul>
+
+  <div class="nav-right-cluster">
+    <div class="nav-auth" id="navAuth">
+      {% if user.is_authenticated %}
+      <div class="auth-user" id="authUser">
+        <button
+          class="auth-user-btn"
+          id="authUserBtn"
+          onclick="toggleUserMenu(event)"
+        >
+          {% if user.profile_image %}
+          <img
+            class="auth-user-avatar"
+            src="{{ user.profile_image.url }}"
+            alt="{{ user.username }}"
+          />
+          {% else %}
+          <span class="auth-user-avatar">👤</span>
+          {% endif %}
+          <span class="auth-user-name">{{ user.fullname|default:user.username }}</span>
+        </button>
+        <div class="auth-user-menu" id="authUserMenu" role="menu">
+          <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
+          <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
+          <a href="{% url 'accounts_app:dashboard' %}#wishlist" role="menuitem">علاقه‌مندی‌ها</a>
+          <a href="{% url 'accounts_app:dashboard' %}#settings" role="menuitem">تنظیمات حساب</a>
+          <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form" role="none">
+            {% csrf_token %}
+            <button type="submit" class="auth-logout" role="menuitem">خروج</button>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <div class="auth-guest" id="authGuest">
+        <a href="{% url 'accounts_app:login' %}" class="auth-link-login">ورود</a>
+        <button
+          class="nav-cta"
+          onclick="window.location.href='{% url 'accounts_app:register' %}'"
+        >
+          ثبت‌نام
+        </button>
+      </div>
+      {% endif %}
+    </div>
+
+    <a
+      class="nav-cart-btn"
+      id="navCartBtn"
+      href="{% url 'shop:cart' %}"
+      aria-label="سبد خرید"
+    >
+      <svg class="nav-cart-icon" viewBox="0 0 24 24">
+        <path
+          d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"
+        />
+        <circle cx="10" cy="20.5" r="1.4" />
+        <circle cx="17" cy="20.5" r="1.4" />
+      </svg>
+      <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
+    </a>
+
+    <button
+      class="nav-menu-btn"
+      id="menuBtn"
+      onclick="toggleMenu()"
+      aria-label="منو"
+      aria-expanded="false"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     MOBILE DRAWER
+     ============================================================ -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <a href="{% url 'home_app:index' %}" onclick="closeMenu()">خانه</a>
+  <a href="{% url 'home_app:index' %}" onclick="closeMenu()">مدل‌ها</a>
+  <a href="{% url 'home_app:categories' %}" onclick="closeMenu()">فروشگاه</a>
+  <a href="{% url 'home_app:index' %}" onclick="closeMenu()">نظرات</a>
+  <a href="{% url 'home_app:articles' %}" onclick="closeMenu()">مقالات</a>
+  <a href="{% url 'home_app:about_us' %}" onclick="closeMenu()">درباره ما</a>
+  <a class="mobile-drawer-cta" href="{% url 'home_app:categories' %}" onclick="closeMenu()">خرید کنید</a>
+  {% if user.is_authenticated %}
+  <div class="drawer-auth-user" id="drawerAuthUser">
+    <div class="drawer-user-info">👤 <span>{{ user.fullname|default:user.username }}</span></div>
+    <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
+    <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
+    <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>
+    <a href="{% url 'accounts_app:dashboard' %}#settings">تنظیمات حساب</a>
+    <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form">
+      {% csrf_token %}
+      <button type="submit" class="auth-logout">خروج</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="drawer-auth" id="drawerAuthGuest">
+    <a href="{% url 'accounts_app:login' %}" class="drawer-auth-link">ورود</a>
+    <button
+      class="drawer-auth-register"
+      onclick="window.location.href='{% url 'accounts_app:register' %}'"
+    >
+      ثبت‌نام
+    </button>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ═══ SECTION 1: HERO ═══ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">برند اسکوتر برقی لوکس</div>
+    <h1 class="hero-h1">ما فقط اسکوتر<br><span class="gold">نمی‌فروشیم</span></h1>
+    <p class="hero-sub">ما آینده حمل‌ونقل شهری را بازتعریف می‌کنیم.</p>
+    <div class="hero-btns">
+      <button class="btn-primary">مشاهده محصولات</button>
+      <button class="btn-outline">همکاری با ما</button>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>پایین بروید</span>
+  </div>
+</section>
+
+<!-- ═══ SECTION 2: PHILOSOPHY ═══ -->
+<section id="philosophy">
+  <div class="container">
+    <div class="philosophy-grid">
+      <div class="philosophy-left reveal">
+        <div class="section-label">فلسفه برند</div>
+        <div class="big-quote">
+          جایی که <span class="gold">هنر</span><br>با فناوری<br>ملاقات می‌کند
+        </div>
+        <p>ما باور داریم که حرکت در شهر نباید صرفاً یک نیاز روزانه باشد. باید یک تجربه باشد. یک احساس. یک انتخاب هوشمند.</p>
+        <p>هر اسکوتر Nex Go داستانی است از دقت در جزئیات، عشق به طراحی، و تعهد به عملکرد. ما نه برای بازار انبوه، بلکه برای کسانی می‌سازیم که ارزش استثنایی بودن را می‌دانند.</p>
+        <div class="philosophy-pillars">
+          <div class="pillar-item">
+            <div class="pillar-num">۰۱</div>
+            <div class="pillar-title">نوآوری بی‌پایان</div>
+            <div class="pillar-desc">هر فصل، فناوری جدید. هر نسل، تجربه‌ای متفاوت‌تر.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num">۰۲</div>
+            <div class="pillar-title">کیفیت اثبات‌شده</div>
+            <div class="pillar-desc">۲۴۰۰+ ساعت آزمایش قبل از تحویل به دست شما.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num">۰۳</div>
+            <div class="pillar-title">طراحی هدفمند</div>
+            <div class="pillar-desc">زیبایی که از کارکرد زاده می‌شود، نه برعکس.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num">۰۴</div>
+            <div class="pillar-title">تجربه کامل</div>
+            <div class="pillar-desc">از اولین لمس تا سال‌ها استفاده روزانه.</div>
+          </div>
+        </div>
+      </div>
+      <div class="philosophy-visual reveal-right">
+        <div class="img-placeholder">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="0.7">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <div class="gold-frame"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 4: TIMELINE ═══ -->
+<section id="journey">
+  <div class="container">
+    <div class="timeline-header reveal">
+      <div class="section-label" style="justify-content:center;">مسیر ما</div>
+      <h2>از رویا تا واقعیت</h2>
+    </div>
+    <div class="timeline-wrap">
+      <div class="timeline-line"></div>
+      <div class="timeline-items">
+        <div class="tl-item reveal">
+          <div class="tl-left">
+            <div class="tl-content">
+              <h4>تأسیس Nex Go</h4>
+              <p>چهار مهندس با یک چشم‌انداز مشترک: جنبش برقی شهری که شایسته لوکس بودن باشد.</p>
+            </div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۰</div></div>
+          <div class="tl-right"></div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left"></div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۱</div></div>
+          <div class="tl-right">
+            <div class="tl-content">
+              <h4>اولین نمونه اولیه</h4>
+              <p>بعد از ۱۸ ماه تحقیق و توسعه، Nex Go S1 متولد شد. اولین آزمون‌ها از همه انتظارات پیشی گرفت.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left">
+            <div class="tl-content">
+              <h4>ورود به بازار</h4>
+              <p>عرضه اولیه به ۵۰۰ نفر. در ۴۸ ساعت اول تمام موجودی فروخته شد.</p>
+            </div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۲</div></div>
+          <div class="tl-right"></div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left"></div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۳</div></div>
+          <div class="tl-right">
+            <div class="tl-content">
+              <h4>گسترش ملی</h4>
+              <p>شبکه ۱۵۰ نمایندگی در سراسر کشور. ۵۰۰۰ مشتری راضی. جوایز بین‌المللی طراحی.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-left">
+            <div class="tl-content">
+              <h4>Nex Go X2 — آینده</h4>
+              <p>نسل بعدی در راه است. هوش مصنوعی تطبیقی، باتری جامد، طراحی که دوباره تعریف می‌شود.</p>
+            </div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-ring"></div><div class="tl-year">۱۴۰۴</div></div>
+          <div class="tl-right"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 5: DIFFERENTIATORS ═══ -->
+<section id="different">
+  <div class="container">
+    <div class="diff-header reveal">
+      <div class="section-label" style="justify-content:center;">تمایز ما</div>
+      <h2>چرا Nex Go انتخاب متفاوتی است</h2>
+      <p>ما در بازاری رقابت نمی‌کنیم. ما یک دسته جدید می‌سازیم.</p>
+    </div>
+    <div class="diff-grid">
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>طراحی مدرن</h3>
+        <p>هر خط با هدف طراحی شده. زیبایی که از مهندسی سرچشمه می‌گیرد، نه تزئین صرف.</p>
+        <div class="diff-number">۰۱</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>کیفیت ساخت ممتاز</h3>
+        <p>آلیاژ آلومینیوم هوافضایی. اتصالات تیتانیوم. استانداردهایی که از صنعت خودرو وام گرفته شده‌اند.</p>
+        <div class="diff-number">۰۲</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        </div>
+        <h3>فناوری پیشرفته</h3>
+        <p>کنترلر موتور بردار بومی، سیستم ترمز ABS هوشمند، و اتصال یکپارچه با اکوسیستم دیجیتال شما.</p>
+        <div class="diff-number">۰۳</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <h3>پشتیبانی واقعی</h3>
+        <p>تیم متخصص ما ۲۴ ساعته در کنار شماست. تعمیر در محل، تعویض قطعه در کمتر از ۴۸ ساعت.</p>
+        <div class="diff-number">۰۴</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <h3>شبکه گسترده فروش</h3>
+        <p>۱۵۰+ نمایندگی رسمی در سراسر کشور. هر شهر، یک نقطه تماس حضوری.</p>
+        <div class="diff-number">۰۵</div>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>تحویل سریع</h3>
+        <p>از سفارش تا درِ خانه شما در کمتر از ۷۲ ساعت. بسته‌بندی ویژه که خودش یک تجربه است.</p>
+        <div class="diff-number">۰۶</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 6: METRICS ═══ -->
+<section id="metrics">
+  <div class="metrics-bg"></div>
+  <div class="container metrics-wrap">
+    <div class="reveal">
+      <div class="section-label" style="justify-content:center;">اعداد واقعی</div>
+      <h2>اعتماد که با اعداد ثابت می‌شود</h2>
+      <p class="sub">ادعا نمی‌کنیم. نشان می‌دهیم.</p>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-box reveal">
+        <div class="metric-num" data-target="5000">۰</div>
+        <div class="metric-label">مشتری راضی</div>
+      </div>
+      <div class="metric-box reveal">
+        <div class="metric-num" data-target="150">۰</div>
+        <div class="metric-label">همکار تجاری</div>
+      </div>
+      <div class="metric-box reveal">
+        <div class="metric-num" data-target="98" data-suffix="%">۰</div>
+        <div class="metric-label">رضایت مشتری</div>
+      </div>
+      <div class="metric-box reveal">
+        <div class="metric-num" data-static="1">۲۴/۷</div>
+        <div class="metric-label">پشتیبانی</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ SECTION 8: VALUES ═══ -->
+<section id="values">
+  <div class="container">
+    <div class="values-header reveal">
+      <div class="section-label" style="justify-content:center;">ارزش‌های ما</div>
+      <h2>آنچه که ما را تعریف می‌کند</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <h4>اعتماد</h4>
+        <p>هر وعده‌ای که می‌دهیم، نگه می‌داریم.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <h4>کیفیت</h4>
+        <p>استانداردی که هر روز بالاتر می‌رود.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h4>نوآوری</h4>
+        <p>راه‌حل‌های جرئت‌مندانه. همیشه یک قدم جلوتر.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h4>تعهد</h4>
+        <p>به مشتریان، به محیط زیست، به آینده.</p>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+        </div>
+        <h4>رضایت مشتری</h4>
+        <p>موفقیت ما در لبخند مشتریان‌مان است.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 9: OUR STORY ═══ -->
+<section id="story">
+  <div class="container">
+    <div class="story-intro">
+      <div class="story-intro-left reveal-left">
+        <div class="story-glow-line"></div>
+        <div class="section-label">داستان ما</div>
+        <div class="story-subtitle">از یک ایده تا آینده حمل و نقل شهری</div>
+        <h2 class="story-title">داستان <span class="accent-grad">Nex Go</span></h2>
+        <p class="story-lead">This area is only placeholder text because I will replace it later.</p>
+        <div class="story-stats">
+          <div class="story-stat">
+            <div class="story-stat-num">۱۴۰۰</div>
+            <div class="story-stat-label">سال تأسیس</div>
+          </div>
+          <div class="story-stat">
+            <div class="story-stat-num">۲۴</div>
+            <div class="story-stat-label">شهر فعال</div>
+          </div>
+          <div class="story-stat">
+            <div class="story-stat-num">۰۵</div>
+            <div class="story-stat-label">مرحله رشد</div>
+          </div>
+        </div>
+      </div>
+      <div class="story-visual reveal-right" id="story-visual">
+        <div class="story-glow-orb" id="story-orb"></div>
+        <div class="story-gradient-shape story-shape-1"></div>
+        <div class="story-gradient-shape story-shape-2"></div>
+        <div class="story-float-circle story-fc-1"></div>
+        <div class="story-float-circle story-fc-2"></div>
+        <div class="story-float-circle story-fc-3"></div>
+        <div class="story-glass-card story-card-main">
+          <div class="gc-label">رشد سالانه</div>
+          <div class="gc-num">۴۸٪+</div>
+          <div class="gc-text">توسعه بازار در سال گذشته</div>
+          <div class="gc-bar"></div>
+        </div>
+        <div class="story-glass-card story-card-sub">
+          <div class="gc-label">شهر فعال</div>
+          <div class="gc-num">۲۴</div>
+          <div class="gc-text">حضور در سراسر کشور</div>
+        </div>
+        <div class="story-glass-card story-card-mini">
+          <div class="gc-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <div class="gc-text">۹۸٪ رضایت مشتری</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="story-roadmap">
+      <div class="story-roadmap-track">
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۱</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 22V4a2 2 0 012-2h9l5 5v15"/><path d="M6 2v20"/><path d="M6 9h9"/></svg>
+          </div>
+          <h4>سال تاسیس</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
+        </div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۲</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h4>شروع فعالیت</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
+        </div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۳</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <h4>گسترش بازار</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
+        </div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۴</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.5 7.3L12 12m0 0L3.5 7.3M12 12v9.5M20.5 16.7V7.3a2 2 0 00-1-1.7l-6.5-3.8a2 2 0 00-2 0L3.5 5.6a2 2 0 00-1 1.7v9.4a2 2 0 001 1.7l6.5 3.8a2 2 0 002 0l6.5-3.8a2 2 0 001-1.7z"/></svg>
+          </div>
+          <h4>ورود محصولات جدید</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
+        </div>
+        <div class="story-stage reveal">
+          <div class="story-stage-num">۰۵</div>
+          <div class="story-stage-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h4>چشم انداز آینده</h4>
+          <p>توضیحات این مرحله به‌زودی تکمیل می‌شود.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 10: OUR TEAM ═══ -->
+<section id="team">
+  <div class="container">
+    <div class="team-header reveal">
+      <div class="section-label" style="justify-content:center;">تیم ما</div>
+      <h2>افرادی که Nex Go را می‌سازند</h2>
+      <p>یک تیم کوچک، یک هدف بزرگ.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person1.jpg" alt="مدیرعامل">
+        </div>
+        <div class="team-body">
+          <div class="team-name">علی رضایی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیرعامل (CEO)</div>
+          <p class="team-desc">هدایت چشم‌انداز Nex Go و استراتژی رشد شرکت در بازار حمل‌ونقل شهری.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person2.jpg" alt="مدیر فناوری">
+        </div>
+        <div class="team-body">
+          <div class="team-name">سارا احمدی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیر فناوری (CTO)</div>
+          <p class="team-desc">مسئول توسعه فناوری باتری، نرم‌افزار خودرو و زیرساخت‌های هوشمند.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person3.jpg" alt="مدیر بازاریابی">
+        </div>
+        <div class="team-body">
+          <div class="team-name">مهدی کریمی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیر بازاریابی</div>
+          <p class="team-desc">طراحی و اجرای استراتژی برند Nex Go در بازارهای داخلی و منطقه‌ای.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-img-wrap">
+          <img src="team/person4.jpg" alt="مدیر پشتیبانی مشتریان">
+        </div>
+        <div class="team-body">
+          <div class="team-name">نیلوفر حسینی</div>
+          <div class="team-underline"></div>
+          <div class="team-role">مدیر پشتیبانی مشتریان</div>
+          <p class="team-desc">اطمینان از تجربه‌ای بی‌نقص برای هر مشتری، پیش و پس از خرید.</p>
+          <div class="team-socials">
+            <a href="#" aria-label="لینکدین"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="#" aria-label="اینستاگرام"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="#" aria-label="ایمیل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 11: VISION ═══ -->
+<section id="vision">
+  <div class="vision-bg-glow"></div>
+  <div class="container">
+    <div class="vision-grid">
+      <div class="vision-left reveal-left">
+        <div class="section-label">آینده Nex Go</div>
+        <h2>چشم انداز آینده</h2>
+        <p>ما در حال ساخت آینده حمل‌ونقل شهری هستیم؛ آینده‌ای که در آن نوآوری، پایداری و فناوری هوشمند در کنار هم به یک تجربه لوکس تبدیل می‌شوند.</p>
+        <button class="btn-primary">بیشتر بدانید</button>
+      </div>
+      <div class="vision-roadmap reveal-right">
+        <div class="vision-roadmap-line"></div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۴</div>
+            <div class="vision-ms-title">نوآوری</div>
+            <div class="vision-ms-desc">عرضه نسل جدید موتور و باتری هوشمند.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۵</div>
+            <div class="vision-ms-title">گسترش</div>
+            <div class="vision-ms-desc">ورود به بازارهای منطقه‌ای و افزایش نمایندگی‌ها.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۶</div>
+            <div class="vision-ms-title">فناوری</div>
+            <div class="vision-ms-desc">یکپارچگی کامل با اکوسیستم شهر هوشمند.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۷</div>
+            <div class="vision-ms-title">پایداری</div>
+            <div class="vision-ms-desc">تولید کربن-خنثی در تمام خطوط مونتاژ.</div>
+          </div>
+        </div>
+        <div class="vision-milestone">
+          <div class="vision-ms-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <div class="vision-ms-content">
+            <div class="vision-ms-year">۱۴۰۸</div>
+            <div class="vision-ms-title">حمل‌ونقل هوشمند</div>
+            <div class="vision-ms-desc">شبکه یکپارچه اسکوترهای خودران Nex Go.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 12: FINAL CTA ═══ -->
+<section id="final-cta">
+  <div class="cta-bg"></div>
+  <div class="cta-grid-bg"></div>
+  <div class="cta-content reveal">
+    <div class="cta-line"></div>
+    <h2>آینده از<br><span class="gold">همین‌جا</span> آغاز می‌شود</h2>
+    <p>به جمع هزاران مشتری و همکار ما بپیوندید.</p>
+    <div class="cta-btns">
+      <button class="btn-primary">مشاهده محصولات</button>
+      <button class="btn-outline">تماس با ما</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER — full luxury multi-column ═══ -->
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="ft-top">
+    <div class="ft-brand">
+      <span class="ft-logo">Nex Go</span>
+      <p class="ft-tag">
+        تعریف دوباره تحرک الکتریکی برای نسلی که متفاوت حرکت می‌کند. جسورانه.
+        دقیق. پایدار.
+      </p>
+      <div class="social-row" role="list" aria-label="شبکه‌های اجتماعی">
+        <a href="#" class="soc" aria-label="Nex Go در توییتر/X" role="listitem">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+        </a>
+        <a href="#" class="soc" aria-label="Nex Go در اینستاگرام" role="listitem">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+          </svg>
+        </a>
+        <a href="#" class="soc" aria-label="Nex Go در یوتیوب" role="listitem">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+        </a>
+        <a href="#" class="soc" aria-label="Nex Go در لینکدین" role="listitem">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="ft-col">
+      <h3>محصولات</h3>
+      <ul>
+        <li><a href="#">سری شهری</a></li>
+        <li><a href="#">آفرود</a></li>
+        <li><a href="#">اسپرت</a></li>
+        <li><a href="#">تاشو</a></li>
+        <li><a href="#">برد بلند</a></li>
+        <li><a href="#">پریمیوم</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h3>شرکت</h3>
+      <ul>
+        <li><a href="#">درباره Nex Go</a></li>
+        <li><a href="#">فناوری</a></li>
+        <li><a href="#">پایداری</a></li>
+        <li><a href="#">فرصت‌های شغلی</a></li>
+        <li><a href="#">اخبار</a></li>
+        <li><a href="#">سرمایه‌گذاران</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h3>پشتیبانی</h3>
+      <ul>
+        <li><a href="#">مرکز راهنمایی</a></li>
+        <li><a href="#">یافتن نمایندگی</a></li>
+        <li><a href="#">مرکز خدمات</a></li>
+        <li><a href="#">گارانتی</a></li>
+        <li><a href="#">تماس با ما</a></li>
+        <li><a href="#">جامعه کاربری</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ft-bot">
+    <div class="ft-copy">© ۱۴۰۴ Nex Go الکتریک. تمام حقوق محفوظ است.</div>
+    <nav class="ft-legal" aria-label="لینک‌های قانونی">
+      <a href="#">حریم خصوصی</a>
+      <a href="#">شرایط استفاده</a>
+      <a href="#">تنظیمات کوکی</a>
+      <a href="#">نقشه سایت</a>
+      <a href="https://AS-tech.company" target="_blank" rel="noopener noreferrer" style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Designed &amp; Developed by AS Tech</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+/* ─ MOBILE MENU (ported from home/index.html) ─ */
+function toggleMenu() {
+  const btn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('mobileDrawer');
+  const isOpen = drawer.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+function closeMenu() {
+  document.getElementById('menuBtn').classList.remove('open');
+  document.getElementById('mobileDrawer').classList.remove('open');
+  document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+}
+
+/* ─ USER MENU (ported from home/index.html) ─ */
+function toggleUserMenu(e) {
+  if (e) e.stopPropagation();
+  const btn = document.getElementById('authUserBtn');
+  const menu = document.getElementById('authUserMenu');
+  if (!btn || !menu) return;
+  const isOpen = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+document.addEventListener('click', () => {
+  const menu = document.getElementById('authUserMenu');
+  const btn = document.getElementById('authUserBtn');
+  if (menu && menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const menu = document.getElementById('authUserMenu');
+    const btn = document.getElementById('authUserBtn');
+    if (menu && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+      if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.focus(); }
+    }
+  }
+});
+
+/* ─ SCROLL REVEAL ─ */
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 70);
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+        .forEach(el => revealObs.observe(el));
+
+/* ─ COUNTER ANIMATION ─ */
+function animateCounter(el) {
+  if (el.dataset.static) return; // static values like 24/7
+  const target = parseInt(el.dataset.target);
+  const suffix = el.dataset.suffix || '+';
+  if (isNaN(target)) return;
+  const duration = 2000;
+  const start = Date.now();
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(eased * target);
+    if (progress < 1) {
+      el.textContent = current.toLocaleString('fa-IR');
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = target.toLocaleString('fa-IR') + suffix;
+    }
+  };
+  requestAnimationFrame(tick);
+}
+
+const metricObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.animated) {
+      e.target.dataset.animated = '1';
+      document.querySelectorAll('#metrics .metric-num').forEach(animateCounter);
+      metricObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.25 });
+
+const metricsSection = document.getElementById('metrics');
+if (metricsSection) metricObs.observe(metricsSection);
+
+/* ─ HERO PARALLAX (desktop only) ─ */
+if (window.matchMedia('(min-width: 769px)').matches) {
+  const heroContent = document.querySelector('.hero-content');
+  const heroGrid = document.querySelector('.hero-grid');
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    if (scrolled < window.innerHeight && heroContent) {
+      const tx = scrolled * 0.28;
+      const op = 1 - (scrolled / (window.innerHeight * 0.72));
+      heroContent.style.transform = `translateY(${tx}px)`;
+      heroContent.style.opacity = Math.max(op, 0);
+    }
+    if (heroGrid) heroGrid.style.transform = `translateY(${window.scrollY * 0.13}px)`;
+  }, { passive: true });
+}
+
+/* ─ STORY VISUAL — MOUSE REACTIVE GLOW ─ */
+const storyVisual = document.getElementById('story-visual');
+const storyOrb = document.getElementById('story-orb');
+if (storyVisual && storyOrb && window.matchMedia('(min-width: 769px)').matches) {
+  storyVisual.addEventListener('mousemove', (e) => {
+    const rect = storyVisual.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    storyOrb.style.left = `${x}%`;
+    storyOrb.style.top = `${y}%`;
+    storyOrb.style.transform = 'translate(-50%, -50%)';
+  });
+  storyVisual.addEventListener('mouseleave', () => {
+    storyOrb.style.left = '';
+    storyOrb.style.top = '';
+    storyOrb.style.transform = '';
+  });
+}
+</script>
+</body>
+</html>
