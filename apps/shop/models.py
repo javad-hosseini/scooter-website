@@ -463,7 +463,7 @@ class Product(models.Model):
     brand = models.CharField(
         max_length=100,
         blank=True,
-        default='VOLTEX',
+        default='NeX Go',
         verbose_name="برند"
     )
     mpn = models.CharField(
@@ -506,12 +506,12 @@ class Product(models.Model):
             self.slug = slugify(self.name, allow_unicode=True)
         if not self.cover_alt_text:
             # Never ship an empty alt on the product's primary image.
-            self.cover_alt_text = f'{self.name} — اسکوتر برقی {self.brand or "ولتکس"}'
+            self.cover_alt_text = f'{self.name} — اسکوتر برقی {self.brand or "نکس گو"}'
         super().save(*args, **kwargs)
         if not self.sku:
             # Needs the PK, so it has to happen after the first insert.
-            type(self).objects.filter(pk=self.pk).update(sku=f'VLX-{self.pk:05d}')
-            self.sku = f'VLX-{self.pk:05d}'
+            type(self).objects.filter(pk=self.pk).update(sku=f'NXG-{self.pk:05d}')
+            self.sku = f'NXG-{self.pk:05d}'
 
     def get_absolute_url(self):
         from django.urls import reverse

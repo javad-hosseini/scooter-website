@@ -139,7 +139,7 @@
       </div>
     </div>
 
-    <form method="POST" action="{% url 'shop_app:payment_callback' gateway='sandbox' order_id=order.id %}">
+    <form method="POST" action="{% url 'shop_app:payment_callback' gateway=gateway|default:'sandbox' order_id=order.id %}">
       {% csrf_token %}
       <div class="actions">
         <button type="submit" name="status" value="success" class="btn btn-pay">

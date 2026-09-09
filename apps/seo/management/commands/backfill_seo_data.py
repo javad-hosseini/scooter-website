@@ -92,14 +92,14 @@ class Command(BaseCommand):
         with transaction.atomic():
             for product in products.iterator():
                 if not dry_run:
-                    Product.objects.filter(pk=product.pk).update(sku=f'VLX-{product.pk:05d}')
+                    Product.objects.filter(pk=product.pk).update(sku=f'NXG-{product.pk:05d}')
                 updated += 1
         return updated
 
     def _fill_alt_text(self, dry_run):
         updated = 0
         for product in Product.objects.filter(cover_alt_text='').iterator():
-            product.cover_alt_text = f'{product.name} — اسکوتر برقی {product.brand or "ولتکس"}'
+            product.cover_alt_text = f'{product.name} — اسکوتر برقی {product.brand or "نکس گو"}'
             if not dry_run:
                 product.save(update_fields=['cover_alt_text'])
             updated += 1

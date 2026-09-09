@@ -37,3 +37,13 @@ class PaymentGatewayFactory:
                 gateway_class = ZarinpalGateway
 
         return gateway_class()
+
+    @classmethod
+    def list_gateways(cls) -> list[str]:
+        """لیست نام تمام درگاه‌های پشتیبانی‌شده"""
+        return list(cls._gateways.keys())
+
+    @classmethod
+    def register_gateway(cls, name: str, gateway_class: Type[BasePaymentGateway]) -> None:
+        """امکان ثبت درگاه جدید به صورت پویا (Pluggable)"""
+        cls._gateways[name.lower().strip()] = gateway_class

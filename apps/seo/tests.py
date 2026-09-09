@@ -28,7 +28,7 @@ def types_in(html):
     return {block.get('@type') for block in json_ld_blocks(html)}
 
 
-@override_settings(SITE_URL='https://voltex.test')
+@override_settings(SITE_URL='https://nexgo.test')
 class SEOPageTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -41,8 +41,8 @@ class SEOPageTests(TestCase):
         )
         cls.category = Category.objects.create(name='اسکوتر شهری', slug='city-scooter')
         cls.product = Product.objects.create(
-            name='Voltex X100',
-            slug='voltex-x100',
+            name='NexGo X100',
+            slug='nexgo-x100',
             category=cls.category,
             description='اسکوتر برقی شهری با برد ۶۰ کیلومتر و شارژ سریع.',
             price=48000000,
@@ -60,14 +60,14 @@ class SEOPageTests(TestCase):
     def test_product_page_ships_metadata_without_javascript(self):
         html = self.client.get(self.product.get_absolute_url()).content.decode()
 
-        self.assertIn('<title id="page-title">Voltex X100 | VOLTEX</title>', html)
+        self.assertIn('<title id="page-title">NexGo X100 | NeX Go</title>', html)
         self.assertIn(
             '<link rel="canonical" id="meta-canonical" '
-            'href="https://voltex.test/shop/product/voltex-x100/" />',
+            'href="https://nexgo.test/shop/product/nexgo-x100/" />',
             html,
         )
         self.assertIn('اسکوتر برقی شهری', html)  # description, not an empty tag
-        self.assertIn('<h1 class="hero-title" id="product-name">Voltex X100</h1>', html)
+        self.assertIn('<h1 class="hero-title" id="product-name">NexGo X100</h1>', html)
 
     def test_product_page_emits_product_and_breadcrumb_schema(self):
         html = self.client.get(self.product.get_absolute_url()).content.decode()
@@ -79,7 +79,7 @@ class SEOPageTests(TestCase):
         self.assertEqual(
             product_ld['offers']['availability'], 'https://schema.org/InStock'
         )
-        self.assertEqual(product_ld['sku'], f'VLX-{self.product.pk:05d}')
+        self.assertEqual(product_ld['sku'], f'NXG-{self.product.pk:05d}')
 
     def test_aggregate_rating_omitted_when_there_are_no_reviews(self):
         """Never claim a rating the site cannot show — it is a policy violation."""
@@ -101,7 +101,7 @@ class SEOPageTests(TestCase):
 
     def test_discontinued_product_301s_to_its_replacement(self):
         replacement = Product.objects.create(
-            name='Voltex X200', slug='voltex-x200', category=self.category,
+            name='NexGo X200', slug='nexgo-x200', category=self.category,
             description='نسل بعدی', price=52000000, stock=3,
         )
         self.product.is_discontinued = True
@@ -131,7 +131,7 @@ class SEOPageTests(TestCase):
         html = self.client.get(url, {'sort': 'price', 'color': 'blue'}).content.decode()
 
         self.assertIn('content="noindex, follow"', html)
-        self.assertIn(f'href="https://voltex.test{url}"', html)
+        self.assertIn(f'href="https://nexgo.test{url}"', html)
 
     def test_clean_category_url_is_indexable(self):
         html = self.client.get(self.category.get_absolute_url()).content.decode()
@@ -140,15 +140,15 @@ class SEOPageTests(TestCase):
     def test_paginated_page_self_canonicalises_and_gets_its_own_title(self):
         for i in range(30):
             Product.objects.create(
-                name=f'Voltex M{i}', slug=f'voltex-m{i}', category=self.category,
+                name=f'NexGo M{i}', slug=f'nexgo-m{i}', category=self.category,
                 description='مدل آزمایشی', price=10000000 + i, stock=1,
             )
         url = self.category.get_absolute_url()
         html = self.client.get(url, {'page': 2}).content.decode()
 
-        self.assertIn(f'href="https://voltex.test{url}?page=2"', html)
+        self.assertIn(f'href="https://nexgo.test{url}?page=2"', html)
         self.assertIn('صفحه 2', html)
-        self.assertIn(f'<link rel="prev" href="https://voltex.test{url}" />', html)
+        self.assertIn(f'<link rel="prev" href="https://nexgo.test{url}" />', html)
 
     # ---- articles ----
 
@@ -158,7 +158,7 @@ class SEOPageTests(TestCase):
         self.assertIn('چطور اسکوتر برقی مناسب انتخاب کنیم', html)
         self.assertIn('BlogPosting', types_in(html))
         self.assertIn(
-            f'href="https://voltex.test{self.article.get_absolute_url()}"', html
+            f'href="https://nexgo.test{self.article.get_absolute_url()}"', html
         )
 
     def test_syndicated_article_points_its_canonical_at_the_original(self):
@@ -196,7 +196,7 @@ class SEOPageTests(TestCase):
         self.assertEqual(response['Content-Type'], 'text/plain; charset=utf-8')
         self.assertIn('Disallow: /admin/', body)
         self.assertIn('Disallow: /*?*sort=', body)
-        self.assertIn('Sitemap: https://voltex.test/sitemap.xml', body)
+        self.assertIn('Sitemap: https://nexgo.test/sitemap.xml', body)
 
     def test_sitemap_index_lists_every_section(self):
         body = self.client.get('/sitemap.xml').content.decode()
@@ -232,9 +232,9 @@ class SEOPageTests(TestCase):
         self.assertEqual(response['Location'], self.product.get_absolute_url())
 
     def test_mixed_case_urls_301_to_lowercase(self):
-        response = self.client.get('/shop/product/Voltex-X100/')
+        response = self.client.get('/shop/product/NexGo-X100/')
         self.assertEqual(response.status_code, 301)
-        self.assertTrue(response['Location'].endswith('/shop/product/voltex-x100/'))
+        self.assertTrue(response['Location'].endswith('/shop/product/nexgo-x100/'))
 
     def test_missing_page_returns_a_real_404_with_navigation(self):
         response = self.client.get('/shop/product/does-not-exist/')
@@ -269,14 +269,14 @@ class SEOPageTests(TestCase):
             self.assertIn(entry['name'], html)
 
 
-@override_settings(SITE_URL='https://voltex.test')
+@override_settings(SITE_URL='https://nexgo.test')
 class MetaTextTests(TestCase):
     def test_titles_stay_within_the_serp_display_limit(self):
         from apps.seo.utils import meta_title
 
         title = meta_title('ا' * 200)
         self.assertLessEqual(len(title), 60)
-        self.assertTrue(title.endswith('| VOLTEX'))
+        self.assertTrue(title.endswith('| NeX Go'))
 
     def test_descriptions_are_stripped_of_markup_and_truncated(self):
         from apps.seo.utils import meta_description

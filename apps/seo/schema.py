@@ -161,7 +161,7 @@ def product(obj, request, reviews=None):
         'name': obj.name,
         'description': meta_description(obj.meta_description, obj.description, length=500),
         'image': [i for i in images if i],
-        'sku': obj.sku or f'VLX-{obj.pk}',
+        'sku': obj.sku or f'NXG-{obj.pk}',
         'brand': {'@type': 'Brand', 'name': obj.brand or settings.SITE_NAME},
         'category': obj.category.name if obj.category_id else '',
         'url': url,

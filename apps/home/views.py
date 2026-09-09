@@ -153,7 +153,7 @@ class ArticleListPageView(SEOMixin, ListView):
 
     seo_title = 'مجله اسکوتر برقی'
     seo_description = (
-        'راهنمای خرید، نگهداری و مقایسه اسکوتر برقی در مجله ولتکس؛ مقالات '
+        'راهنمای خرید، نگهداری و مقایسه اسکوتر برقی در مجله نکس گو؛ مقالات '
         'تخصصی درباره باتری، برد، سرعت و قوانین تردد اسکوتر برقی.'
     )
 
@@ -194,7 +194,7 @@ class ArticleListPageView(SEOMixin, ListView):
             seo.canonical = f'{base}?page={page_obj.number}'
             seo.title = meta_title(f'{self.seo_title} — صفحه {page_obj.number}')
             seo.description = meta_description(
-                f'صفحه {page_obj.number} از مقالات و راهنماهای خرید اسکوتر برقی ولتکس.'
+                f'صفحه {page_obj.number} از مقالات و راهنماهای خرید اسکوتر برقی نکس گو.'
             )
         if page_obj and page_obj.has_previous():
             prev_num = page_obj.previous_page_number()
@@ -358,7 +358,7 @@ class CategoryPageView(SEOMixin, TemplateView):
     template_name = 'home/categories.html'
 
     seo_title = 'دسته‌بندی اسکوترهای برقی'
-    seo_description = 'مشاهده تمام دسته‌بندی‌های اسکوتر برقی ولتکس'
+    seo_description = 'مشاهده تمام دسته‌بندی‌های اسکوتر برقی نکس گو'
 
     def get_context_data(self, **kwargs):
         from apps.shop.models import Category

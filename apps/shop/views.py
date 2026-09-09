@@ -402,7 +402,7 @@ class ProductListPageView(BaseProductListView):
 
     seo_title = 'اسکوتر برقی'
     seo_description = (
-        'خرید اسکوتر برقی ولتکس؛ مقایسه قیمت، برد، سرعت و زمان شارژ همه مدل‌ها '
+        'خرید اسکوتر برقی نکس گو؛ مقایسه قیمت، برد، سرعت و زمان شارژ همه مدل‌ها '
         'با گارانتی ۳ ساله و ارسال سریع به سراسر ایران.'
     )
 
@@ -439,7 +439,7 @@ class CategoryPageView(BaseProductListView):
         self.seo_description = meta_description(
             self.category.meta_description,
             self.category.description,
-            f'خرید {self.category.name} ولتکس با گارانتی رسمی، قیمت شفاف و ارسال '
+            f'خرید {self.category.name} نکس گو با گارانتی رسمی، قیمت شفاف و ارسال '
             f'سریع. مقایسه مشخصات فنی همه مدل‌های {self.category.name}.',
         )
         context = super().get_context_data(**kwargs)

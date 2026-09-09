@@ -1,8 +1,8 @@
 """URL canonicalisation.
 
 Django's ``CommonMiddleware`` already fixes missing trailing slashes. What it
-does not fix is casing: ``/shop/product/Voltex-X100/`` and
-``/shop/product/voltex-x100/`` would both resolve on a case-sensitive lookup
+does not fix is casing: ``/shop/product/NexGo-X100/`` and
+``/shop/product/nexgo-x100/`` would both resolve on a case-sensitive lookup
 only by accident, and any that do resolve serve the same content on two URLs.
 Slugs are generated with ``slugify()``, which lowercases, so folding the path
 to lowercase is always safe for content URLs.

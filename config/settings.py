@@ -50,7 +50,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 # SECURITY WARNING: never use '*' in production — it disables Django's Host
 # header validation and allows cache-poisoning / password-reset poisoning.
-# Set ALLOWED_HOSTS in .env, e.g. ALLOWED_HOSTS=voltex.ir,www.voltex.ir
+# Set ALLOWED_HOSTS in .env, e.g. ALLOWED_HOSTS=nexgo.ir,www.nexgo.ir
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
     default='localhost,127.0.0.1,[::1],testserver' if DEBUG else '',
@@ -58,7 +58,7 @@ ALLOWED_HOSTS = config(
 )
 
 # Origins trusted for CSRF (required behind HTTPS on Django 4+).
-# e.g. CSRF_TRUSTED_ORIGINS=https://voltex.ir,https://www.voltex.ir
+# e.g. CSRF_TRUSTED_ORIGINS=https://nexgo.ir,https://www.nexgo.ir
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -398,9 +398,9 @@ CACHES = {
             'CACHE_BACKEND',
             default='django.core.cache.backends.locmem.LocMemCache',
         ),
-        'LOCATION': config('CACHE_LOCATION', default='voltex-default-cache'),
+        'LOCATION': config('CACHE_LOCATION', default='nexgo-default-cache'),
         'TIMEOUT': 300,
-        'KEY_PREFIX': 'voltex',
+        'KEY_PREFIX': 'nexgo',
     }
 }
 
@@ -436,12 +436,12 @@ APPEND_SLASH = True
 # Canonical origin used for canonical tags, Open Graph URLs, sitemap entries
 # and JSON-LD @id values. Leave blank to derive it from the incoming request.
 SITE_URL = config('SITE_URL', default='').rstrip('/')
-SITE_NAME = config('SITE_NAME', default='VOLTEX')
+SITE_NAME = config('SITE_NAME', default='NeX Go')
 SITE_LOCALE = 'fa_IR'
 
-SEO_DEFAULT_TITLE = 'ولتکس | فروش اسکوتر برقی پریمیوم'
+SEO_DEFAULT_TITLE = 'نکس گو | فروش اسکوتر برقی پریمیوم'
 SEO_DEFAULT_DESCRIPTION = (
-    'خرید اسکوتر برقی پریمیوم ولتکس با گارانتی ۳ ساله، ارسال سریع و پشتیبانی '
+    'خرید اسکوتر برقی پریمیوم نکس گو با گارانتی ۳ ساله، ارسال سریع و پشتیبانی '
     'تخصصی. مقایسه مدل‌ها، بررسی قیمت و مشاوره رایگان خرید اسکوتر برقی.'
 )
 SEO_DEFAULT_IMAGE = 'images/og-default.svg'
@@ -450,9 +450,9 @@ SEO_TWITTER_SITE = config('SEO_TWITTER_SITE', default='')
 # Used to build the Organization / Store JSON-LD blocks.
 SEO_ORGANIZATION = {
     'name': SITE_NAME,
-    'legal_name': config('ORG_LEGAL_NAME', default='Voltex GmbH'),
+    'legal_name': config('ORG_LEGAL_NAME', default='Nex Go GmbH'),
     'logo': 'images/logo.svg',
-    'email': config('ORG_EMAIL', default='info@voltex.ir'),
+    'email': config('ORG_EMAIL', default='info@nexgo.ir'),
     'telephone': config('ORG_PHONE', default='+98-21-00000000'),
     'founding_date': config('ORG_FOUNDING_DATE', default=''),
     'social_profiles': config(

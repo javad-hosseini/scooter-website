@@ -26,16 +26,17 @@ class SandboxGateway(BasePaymentGateway):
         )
 
     def verify_payment(self, order, request_data: Dict[str, Any]) -> PaymentVerificationResult:
-        status_param = request_data.get('status', 'success')
+        status_param = str(request_data.get('status', 'success')).lower().strip()
         mock_ref_id = request_data.get('ref_id') or f"REF-{uuid.uuid4().hex[:8].upper()}"
         tracking = request_data.get('authority', f"TRK-{uuid.uuid4().hex[:6].upper()}")
+        order_amount = getattr(order, 'total', getattr(order, 'total_price', Decimal('0')))
 
-        if status_param == 'success':
+        if status_param in ['success', 'ok']:
             return PaymentVerificationResult(
                 success=True,
                 reference_id=mock_ref_id,
                 tracking_code=tracking,
-                amount=order.total,
+                amount=order_amount,
                 raw_data={'status': 'simulated_success'}
             )
         else:

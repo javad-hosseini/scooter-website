@@ -766,7 +766,7 @@ class Testimonial(models.Model):
 
 
 class Promise(models.Model):
-    """تعهدات VOLTEX در بخش پایانی"""
+    """تعهدات NeX Go در بخش پایانی"""
     PROMISE_COLORS = [
         ('neon', '#4fd8ff'),
         ('orange', '#ff9a3c'),

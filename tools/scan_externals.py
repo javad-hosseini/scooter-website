@@ -21,15 +21,15 @@ for sdir in SCAN_DIRS:
                     content = fp.read()
                     for m in HREF_SRC_REGEX.finditer(content):
                         url = m.group(1)
-                        if not any(ign in url for ign in ['schema.org', 'localhost', '127.0.0.1', 'testserver', 'voltex.test', 'voltex.ir', 'AS-tech.company']):
+                        if not any(ign in url for ign in ['schema.org', 'localhost', '127.0.0.1', 'testserver', 'voltex.test', 'voltex.ir', 'nexgo.test', 'nexgo.ir', 'AS-tech.company']):
                             all_found.append((filepath, url, 'href/src'))
                     for m in CSS_URL_REGEX.finditer(content):
                         url = m.group(1)
-                        if not any(ign in url for ign in ['schema.org', 'localhost', '127.0.0.1', 'testserver', 'voltex.test', 'voltex.ir', 'AS-tech.company']):
+                        if not any(ign in url for ign in ['schema.org', 'localhost', '127.0.0.1', 'testserver', 'voltex.test', 'voltex.ir', 'nexgo.test', 'nexgo.ir', 'AS-tech.company']):
                             all_found.append((filepath, url, 'css-url'))
                     for m in IMPORT_REGEX.finditer(content):
                         url = m.group(1)
-                        if not any(ign in url for ign in ['schema.org', 'localhost', '127.0.0.1', 'testserver', 'voltex.test', 'voltex.ir', 'AS-tech.company']):
+                        if not any(ign in url for ign in ['schema.org', 'localhost', '127.0.0.1', 'testserver', 'voltex.test', 'voltex.ir', 'nexgo.test', 'nexgo.ir', 'AS-tech.company']):
                             all_found.append((filepath, url, '@import'))
 
 print(f"Total occurrences: {len(all_found)}\n")

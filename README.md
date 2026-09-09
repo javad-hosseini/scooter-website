@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Nex go
+# ⚡ NeX Go
 
 ### Premium Electric Scooter Store — فروشگاه اسکوتر برقی
 
@@ -14,7 +14,7 @@ Fully **Persian (fa-IR)** and **RTL**, server-rendered, with a REST API for prog
 [![DRF](https://img.shields.io/badge/DRF-3.17-A30000?style=for-the-badge&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
-[![Tests](https://img.shields.io/badge/tests-69%20passing-2ea44f?style=flat-square)](#-testing)
+[![Tests](https://img.shields.io/badge/tests-78%20passing-2ea44f?style=flat-square)](#-testing)
 [![SEO](https://img.shields.io/badge/SEO-server%20rendered-4fd8ff?style=flat-square)](#-seo-architecture)
 [![Schema.org](https://img.shields.io/badge/Schema.org-JSON--LD-ff9a3c?style=flat-square)](#structured-data-jsonld)
 [![RTL](https://img.shields.io/badge/i18n-fa--IR%20RTL-8b7bff?style=flat-square)](#-internationalisation)
@@ -30,7 +30,7 @@ Fully **Persian (fa-IR)** and **RTL**, server-rendered, with a REST API for prog
 
 ## 📖 Overview
 
-VOLTEX is a full-stack Django storefront for selling electric scooters in the Iranian market. It ships
+NeX Go is a full-stack Django storefront for selling electric scooters in the Iranian market. It ships
 a **product catalogue**, a **content magazine**, **user accounts with OTP password reset**, and a
 **Persian-language admin** — all wrapped in an SEO layer that renders every crawlable signal on the
 server.
@@ -345,7 +345,7 @@ DATABASES = {
 | `LANGUAGE_CODE` | `fa` | Set `en-us` for an English admin |
 | `TIME_ZONE` | `Asia/Tehran` | — |
 | `SITE_URL` | *(from request)* | Canonical origin for canonicals, OG, sitemaps, JSON-LD |
-| `SITE_NAME` | `VOLTEX` | Brand suffix in titles |
+| `SITE_NAME` | `NeX Go` | Brand suffix in titles |
 | `SEO_TWITTER_SITE` | `''` | `@handle` for Twitter cards |
 | `ORG_LEGAL_NAME` / `ORG_EMAIL` / `ORG_PHONE` | — | Organization JSON-LD |
 | `ORG_SOCIAL_PROFILES` | `''` | Comma-separated → `sameAs` |
@@ -715,13 +715,13 @@ Honest status of what exists and what doesn't:
 
 ## 📄 License
 
-Proprietary — © Voltex GmbH. All rights reserved.
+Proprietary — © Nex Go GmbH. All rights reserved.
 
 <div align="center">
 <br>
 
 **Built with Django** · Persian-first · SEO-first
 
-<sub>⚡ VOLTEX</sub>
+<sub>⚡ NeX Go</sub>
 
 </div>

@@ -1,75 +1,81 @@
 <nav id="nav">
-  <a href="/" class="nav-logo">Nex Go</a>
+  <div class="nav-logo"><a href="{% url 'home_app:index' %}">Nex Go</a></div>
   <ul class="nav-links">
-    <li><a href="/">خانه</a></li>
-    <li><a href="/shop/">محصولات</a></li>
-    <li><a href="/blog/">مجله</a></li>
-    <li><a href="/about/">درباره ما</a></li>
+    <li><a href="{% url 'home_app:index' %}">خانه</a></li>
+    <li><a href="{% url 'shop_app:product_list' %}">محصولات</a></li>
+    <li><a href="{% url 'home_app:categories' %}">دسته‌بندی‌ها</a></li>
+    <li><a href="{% url 'home_app:articles' %}">مقالات</a></li>
+    <li><a href="{% url 'home_app:about_us' %}">درباره ما</a></li>
   </ul>
 
   <div class="nav-right-cluster">
     <div class="nav-auth" id="navAuth">
-      <div class="auth-guest" id="authGuest">
-        <a href="/accounts/login/" class="auth-link-login">ورود</a>
-        <button class="nav-cta" onclick="location.href = '/accounts/register/'">
-          ثبت‌نام
-        </button>
-      </div>
-      <div class="auth-user" id="authUser" style="display: none">
+      {% if user.is_authenticated %}
+      <div class="auth-user" id="authUser">
         <button
           class="auth-user-btn"
           id="authUserBtn"
           onclick="toggleUserMenu(event)"
+          aria-expanded="false"
+          aria-label="منوی کاربر"
         >
-          <span class="auth-user-avatar" id="userAvatar">👤</span>
-          <span class="auth-user-name" id="userName">کاربر</span>
+          {% if user.profile_image %}
+          <img
+            class="auth-user-avatar"
+            src="{{ user.profile_image.url }}"
+            alt="{{ user.username }}"
+          />
+          {% else %}
+          <span class="auth-user-avatar">👤</span>
+          {% endif %}
+          <span class="auth-user-name">{{ user.fullname|default:user.username }}</span>
         </button>
         <div class="auth-user-menu" id="authUserMenu" role="menu">
-          <a href="/accounts/profile/" role="menuitem">پروفایل</a>
-          <a href="/orders/" role="menuitem">سفارش‌های من</a>
-          <a href="/wishlist/" role="menuitem">علاقه‌مندی‌ها</a>
-          <a href="/accounts/settings/" role="menuitem">تنظیمات حساب</a>
-          <a
-            href="/accounts/logout/"
-            class="auth-logout"
-            role="menuitem"
-            onclick="
-              event.preventDefault();
-              document.getElementById('logout-form').submit();
-            "
-            >خروج</a
-          >
-          <form
-            id="logout-form"
-            action="/accounts/logout/"
-            method="POST"
-            style="display: none"
-          >
+          <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
+          <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
+          <a href="{% url 'accounts_app:dashboard' %}#wishlist" role="menuitem">علاقه‌مندی‌ها</a>
+          <a href="{% url 'accounts_app:dashboard' %}#settings" role="menuitem">تنظیمات حساب</a>
+          <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form" role="none">
             {% csrf_token %}
+            <button type="submit" class="auth-logout" role="menuitem">خروج</button>
           </form>
         </div>
       </div>
+      {% else %}
+      <div class="auth-guest" id="authGuest">
+        <a href="{% url 'accounts_app:login' %}" class="auth-link-login">ورود</a>
+        <button
+          class="nav-cta"
+          onclick="window.location.href='{% url 'accounts_app:register' %}'"
+        >
+          ثبت‌نام
+        </button>
+      </div>
+      {% endif %}
     </div>
 
-    <button
+    <a
       class="nav-cart-btn"
       id="navCartBtn"
+      href="{% url 'shop_app:cart' %}"
       aria-label="سبد خرید"
-      onclick="location.href = '/cart/'"
     >
       <svg class="nav-cart-icon" viewBox="0 0 24 24">
-        <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" />
+        <path
+          d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"
+        />
         <circle cx="10" cy="20.5" r="1.4" />
         <circle cx="17" cy="20.5" r="1.4" />
       </svg>
       <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
-    </button>
+    </a>
 
     <button
       class="nav-menu-btn"
       id="menuBtn"
       onclick="toggleMenu()"
       aria-label="منو"
+      aria-expanded="false"
     >
       <span></span><span></span><span></span>
     </button>
@@ -78,74 +84,36 @@
 
 <!-- ===== MOBILE DRAWER ===== -->
 <div class="mobile-drawer" id="mobileDrawer">
-  <a
-    href="/"
-    onclick="
-      closeMenu();
-      return false;
-    "
-    >خانه</a
-  >
-  <a
-    href="/shop/"
-    onclick="
-      closeMenu();
-      return false;
-    "
-    >محصولات</a
-  >
-  <a
-    href="/blog/"
-    onclick="
-      closeMenu();
-      return false;
-    "
-    >مجله</a
-  >
-  <a
-    href="/about/"
-    onclick="
-      closeMenu();
-      return false;
-    "
-    >درباره ما</a
-  >
-  <button
-    class="mobile-drawer-cta"
-    onclick="
-      closeMenu();
-      location.href = '/shop/';
-    "
-  >
-    خرید کنید
-  </button>
+  <a href="{% url 'home_app:index' %}" onclick="closeMenu()">خانه</a>
+  <a href="{% url 'shop_app:product_list' %}" onclick="closeMenu()">محصولات</a>
+  <a href="{% url 'home_app:categories' %}" onclick="closeMenu()">دسته‌بندی‌ها</a>
+  <a href="{% url 'home_app:articles' %}" onclick="closeMenu()">مقالات</a>
+  <a href="{% url 'home_app:about_us' %}" onclick="closeMenu()">درباره ما</a>
+  <button class="mobile-drawer-cta" onclick="closeMenu(); location.href='{% url 'shop_app:product_list' %}';">خرید کنید</button>
 
-  <div class="drawer-auth" id="drawerAuthGuest">
-    <a href="/accounts/login/" class="drawer-auth-link">ورود</a>
-    <button
-      class="drawer-auth-register"
-      onclick="location.href = '/accounts/register/'"
-    >
-      ثبت‌نام
-    </button>
-  </div>
-
-  <div class="drawer-auth-user" id="drawerAuthUser" style="display: none">
+  {% if user.is_authenticated %}
+  <div class="drawer-auth-user" id="drawerAuthUser">
     <div class="drawer-user-info">
-      👤 <span id="drawerUserName">کاربر</span>
+      {% if user.profile_image %}
+      <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
+      {% else %}
+      <span>👤</span>
+      {% endif %}
+      <span id="drawerUserName">{{ user.fullname|default:user.username }}</span>
     </div>
-    <a href="/accounts/profile/">پروفایل</a>
-    <a href="/orders/">سفارش‌های من</a>
-    <a href="/wishlist/">علاقه‌مندی‌ها</a>
-    <a href="/accounts/settings/">تنظیمات حساب</a>
-    <a
-      href="/accounts/logout/"
-      class="auth-logout"
-      onclick="
-        event.preventDefault();
-        document.getElementById('logout-form').submit();
-      "
-      >خروج</a
-    >
+    <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
+    <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
+    <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>
+    <a href="{% url 'accounts_app:dashboard' %}#settings">تنظیمات حساب</a>
+    <form method="post" action="{% url 'accounts_app:logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="auth-logout" style="background:none;border:none;color:#ff8a8a;font-family:inherit;font-size:inherit;cursor:pointer;padding:10px 0;width:100%;text-align:right;">خروج</button>
+    </form>
   </div>
+  {% else %}
+  <div class="drawer-auth" id="drawerAuthGuest">
+    <a href="{% url 'accounts_app:login' %}" class="drawer-auth-link">ورود</a>
+    <button class="drawer-auth-register" onclick="location.href='{% url 'accounts_app:register' %}'">ثبت‌نام</button>
+  </div>
+  {% endif %}
 </div>

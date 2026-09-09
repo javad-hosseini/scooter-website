@@ -1,7 +1,7 @@
 <script>
   /* ════════════════════════════════════
-   HEADER AUTH & MENU
-═══════════════════════════════════════ */
+     HEADER & MOBILE DRAWER SCRIPTS
+     ════════════════════════════════════ */
   function toggleUserMenu(e) {
     if (e) e.stopPropagation();
     const btn = document.getElementById("authUserBtn");
@@ -28,9 +28,8 @@
     if (btn) btn.setAttribute("aria-expanded", "false");
   }
 
-  // بستن منو با کلیک خارج از آن
+  // Close menus when clicking outside
   document.addEventListener("click", function (e) {
-    // بستن منوی کاربر
     const menu = document.getElementById("authUserMenu");
     const btn = document.getElementById("authUserBtn");
     if (menu && menu.classList.contains("open")) {
@@ -41,7 +40,7 @@
     }
   });
 
-  // بستن با کلید Escape
+  // Close menus on Escape key
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       const menu = document.getElementById("authUserMenu");
@@ -57,76 +56,30 @@
     }
   });
 
-  /* ════════════════════════════════════
-   CHECK USER LOGIN STATUS
-═══════════════════════════════════════ */
-  async function checkUserStatus() {
+  // Update cart item count badge
+  async function updateCartBadge() {
+    const badge = document.getElementById("navCartCount");
+    if (!badge) return;
     try {
-      const response = await fetch("/api/user/status/");
+      const response = await fetch("/shop/api/cart/", {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      });
       if (response.ok) {
         const data = await response.json();
-        if (data.is_authenticated) {
-          showLoggedInUser(data.user);
-        } else {
-          showLoggedOutUser();
-        }
-      }
-    } catch (error) {
-      console.error("Error checking user status:", error);
-    }
-  }
-
-  function showLoggedInUser(user) {
-    document.getElementById("authGuest").style.display = "none";
-    document.getElementById("authUser").style.display = "flex";
-    document.getElementById("drawerAuthGuest").style.display = "none";
-    document.getElementById("drawerAuthUser").style.display = "flex";
-
-    document.getElementById("userName").textContent =
-      user.full_name || user.username;
-    document.getElementById("drawerUserName").textContent =
-      user.full_name || user.username;
-
-    const avatar = document.getElementById("userAvatar");
-    if (user.avatar) {
-      avatar.innerHTML = `<img src="${user.avatar}" alt="${user.full_name}">`;
-    } else {
-      avatar.textContent = (user.full_name || user.username || "U")
-        .charAt(0)
-        .toUpperCase();
-    }
-  }
-
-  function showLoggedOutUser() {
-    document.getElementById("authGuest").style.display = "flex";
-    document.getElementById("authUser").style.display = "none";
-    document.getElementById("drawerAuthGuest").style.display = "flex";
-    document.getElementById("drawerAuthUser").style.display = "none";
-  }
-
-  // ===== اجرا در زمان بارگذاری صفحه =====
-  document.addEventListener("DOMContentLoaded", function () {
-    checkUserStatus();
-
-    // بروزرسانی تعداد سبد خرید (اختیاری)
-    updateCartCount();
-  });
-
-  async function updateCartCount() {
-    try {
-      const response = await fetch("/api/cart/count/");
-      if (response.ok) {
-        const data = await response.json();
-        const badge = document.getElementById("navCartCount");
-        if (data.count > 0) {
-          badge.textContent = data.count;
+        const count = data.item_count ?? data.total_items ?? (Array.isArray(data.items) ? data.items.length : 0);
+        if (count > 0) {
+          badge.textContent = count;
           badge.removeAttribute("hidden");
         } else {
           badge.setAttribute("hidden", "");
         }
       }
     } catch (error) {
-      console.error("Error updating cart count:", error);
+      console.warn("Could not fetch cart badge count:", error);
     }
   }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    updateCartBadge();
+  });
 </script>
