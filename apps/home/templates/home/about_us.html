@@ -20,17 +20,17 @@
 }
 
 :root {
-  --bg:       #070B14;
-  --bg2:      #0E1423;
-  --surface:  rgba(255,255,255,.03);
-  --text:     #FFFFFF;
-  --muted:    rgba(255,255,255,.65);
-  --primary:     #4F46E5;
-  --primary-h:   #6366F1;
-  --secondary: #06B6D4;
-  --accent:   #22C55E;
-  --border:   rgba(255,255,255,.08);
-  --glow:     rgba(79,70,229,.35);
+  --bg:       #050507;
+  --bg2:      #0c0c13;
+  --surface:  #101018;
+  --text:     #f6f6f8;
+  --muted:    rgba(246,246,248,.65);
+  --primary:  #4fd8ff;
+  --primary-h: #38bdf8;
+  --secondary: #8b7bff;
+  --accent:   #4fd8ff;
+  --border:   rgba(255,255,255,.07);
+  --glow:     rgba(79,216,255,.25);
   --font:     'Vazirmatn', system-ui, sans-serif;
 }
 
@@ -1908,8 +1908,6 @@ footer::before {
 
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script>
-{% include 'includes/header-scripts.html' %}
-
 /* ─ SCROLL REVEAL ─ */
 const revealObs = new IntersectionObserver((entries) => {
   entries.forEach((e, i) => {
@@ -1994,5 +1992,8 @@ if (storyVisual && storyOrb && window.matchMedia('(min-width: 769px)').matches) 
   });
 }
 </script>
+
+{% include 'includes/header-scripts.html' %}
+{% include 'includes/footer-scripts.html' %}
 </body>
 </html>

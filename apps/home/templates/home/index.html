@@ -41,6 +41,7 @@
      ============================================================ -->
     <link rel="preload" as="font" type="font/woff2" href="{% static 'fonts/vazirmatn-000.woff2' %}" crossorigin />
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/nav-footer.css' %}" />
 
     <!-- ============================================================
      STYLES — تمام استایل‌های فایل index.html رو اینجا کپی کن
@@ -198,8 +199,8 @@
         }
       }
 
-      /* ── NAV ── */
-      nav {
+      /* ── NAV (removed for index) ── */
+      nav#nav {
         position: fixed;
         top: 0;
         left: 0;
@@ -2429,7 +2430,7 @@ TABLET BREAKPOINT (768px–1023px)
         :root {
           --nav-h: 68px;
         }
-        nav {
+        nav#nav {
           padding: 0 36px;
         }
         .nav-menu-btn {
@@ -3539,7 +3540,7 @@ DESKTOP (1024px+)
         :root {
           --nav-h: 76px;
         }
-        nav {
+        nav#nav {
           padding: 0 64px;
         }
         .nav-menu-btn {
@@ -4701,7 +4702,7 @@ DESKTOP (1024px+)
         :root {
           --nav-h: 80px;
         }
-        nav {
+        nav#nav {
           padding: 0 84px;
         }
         .hero-inner {
@@ -5221,6 +5222,11 @@ DESKTOP (1024px+)
     </div>
 
     <div id="scroll-progress"></div>
+
+    <!-- ============================================================
+     HEADER
+     ============================================================ -->
+    {% include 'includes/header.html' %}
 
 
     <!-- ============================================================
@@ -6660,5 +6666,9 @@ DESKTOP (1024px+)
          ════════════════════════════════════ */
       loadIndexData();
     </script>
+
+    <!-- Header & Footer Scripts -->
+    {% include 'includes/header-scripts.html' %}
+    {% include 'includes/footer-scripts.html' %}
   </body>
 </html>

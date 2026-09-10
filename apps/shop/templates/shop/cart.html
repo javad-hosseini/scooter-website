@@ -23,7 +23,9 @@
         scroll-behavior: smooth;
       }
       body {
-        background: #0b0b0b;
+        background: #050507;
+        color: #f6f6f8;
+        font-family: 'Vazirmatn', sans-serif;
       }
       @media (prefers-reduced-motion: reduce) {
         *,
@@ -416,42 +418,12 @@
     >
 
     <!-- ================= HEADER ================= -->
-    <header
-      class="sticky top-0 z-40 border-b border-line/70 glass"
-      role="banner"
-    >
-      <div
-        class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between"
-      >
-        <a
-          href="{% url 'home_app:index' %}"
-          class="font-display font-bold text-xl tracking-wide text-white"
-        >
-          Nex<span class="text-gold">Go</span>
-        </a>
-        <div class="flex items-center gap-2 text-mute text-xs sm:text-sm">
-          <svg
-            class="w-4 h-4 text-cyan"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 10-8 0v4h8z"
-            />
-          </svg>
-          <span>پرداخت امن و رمزنگاری‌شده</span>
-        </div>
-      </div>
-    </header>
+    {% include 'includes/header.html' %}
 
     <main
       id="checkout-main"
       class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-12"
+      style="padding-top: calc(var(--nav-h, 64px) + 24px);"
     >
       <!-- ================= TOP SECTION ================= -->
       <section aria-labelledby="cart-title" class="mb-8 sm:mb-12 fade-up">
@@ -1746,5 +1718,8 @@
       loadProvinces();
       loadCart();
     </script>
+
+    {% include 'includes/header-scripts.html' %}
+    {% include 'includes/footer-scripts.html' %}
   </body>
 </html>

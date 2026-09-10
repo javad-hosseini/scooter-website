@@ -21,6 +21,24 @@
   --nav-r-lg: 20px;
 }
 
+@media (min-width: 768px) {
+  :root {
+    --nav-h: 68px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --nav-h: 76px;
+  }
+}
+
+/* Helper to provide safe clearance below the fixed navbar */
+.page-top-offset,
+.site-main-pad {
+  padding-top: calc(var(--nav-h) + 24px) !important;
+}
+
 /* ═══════════════════════════════════════════
    NAV BAR
 ═══════════════════════════════════════════ */
