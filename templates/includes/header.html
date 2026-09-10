@@ -73,17 +73,26 @@
     <button
       class="nav-menu-btn"
       id="menuBtn"
+      type="button"
       onclick="toggleMenu()"
       aria-label="منو"
       aria-expanded="false"
+      aria-controls="mobileDrawer"
     >
-      <span></span><span></span><span></span>
+      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
     </button>
   </div>
 </nav>
 
 <!-- ===== MOBILE DRAWER ===== -->
-<div class="mobile-drawer" id="mobileDrawer">
+<div
+  class="mobile-drawer"
+  id="mobileDrawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="منوی اصلی"
+  aria-hidden="true"
+>
   <a href="{% url 'home_app:index' %}" onclick="closeMenu()">خانه</a>
   <a href="{% url 'shop_app:product_list' %}" onclick="closeMenu()">محصولات</a>
   <a href="{% url 'home_app:categories' %}" onclick="closeMenu()">دسته‌بندی‌ها</a>
@@ -95,9 +104,9 @@
   <div class="drawer-auth-user" id="drawerAuthUser">
     <div class="drawer-user-info">
       {% if user.profile_image %}
-      <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
+      <img class="drawer-user-avatar" src="{{ user.profile_image.url }}" alt="" width="28" height="28">
       {% else %}
-      <span>👤</span>
+      <span aria-hidden="true">👤</span>
       {% endif %}
       <span id="drawerUserName">{{ user.fullname|default:user.username }}</span>
     </div>
@@ -105,9 +114,9 @@
     <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
     <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>
     <a href="{% url 'accounts_app:dashboard' %}#settings">تنظیمات حساب</a>
-    <form method="post" action="{% url 'accounts_app:logout' %}" style="display:inline;">
+    <form method="post" action="{% url 'accounts_app:logout' %}" class="drawer-logout-form">
       {% csrf_token %}
-      <button type="submit" class="auth-logout" style="background:none;border:none;color:#ff8a8a;font-family:inherit;font-size:inherit;cursor:pointer;padding:10px 0;width:100%;text-align:right;">خروج</button>
+      <button type="submit" class="auth-logout">خروج</button>
     </form>
   </div>
   {% else %}

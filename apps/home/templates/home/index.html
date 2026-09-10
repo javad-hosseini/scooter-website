@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     {% include "seo/_head.html" %}
     <meta name="enamad" content="Nex Go | اسکوتر های پرمیوم شهری " />
 
@@ -520,214 +520,18 @@
         display: none;
       }
 
-      /* Mobile-only auth block, lives inside the drawer since the fixed nav bar has no room */
-      .drawer-auth {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 14px;
-        margin-top: 22px;
-      }
-      .drawer-auth-link {
-        font-family: var(--font-ui);
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--dim);
-        text-decoration: none;
-        padding: 12px 30px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 100px;
-        transition: all 0.35s var(--ease-smooth);
-      }
-      .drawer-auth-link:hover {
-        border-color: var(--neon);
-        color: var(--neon);
-      }
-      .drawer-auth-register {
-        font-family: var(--font-ui);
-        font-size: 0.78rem;
-        font-weight: 600;
-        background: var(--white);
-        color: var(--black);
-        padding: 15px 46px;
-        border: none;
-        cursor: pointer;
-        border-radius: 100px;
-      }
-      .drawer-auth-user {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        margin-top: 22px;
-      }
-      .drawer-user-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--white);
-        font-family: var(--font-ui);
-        font-weight: 600;
-        font-size: 0.95rem;
-        margin-bottom: 10px;
-      }
-      .drawer-auth-user a {
-        font-family: var(--font-ui);
-        font-size: 0.85rem;
-        color: var(--dim);
-        text-decoration: none;
-        padding: 9px 0;
-        transition: color 0.3s var(--ease-smooth);
-      }
-      .drawer-auth-user a:hover {
-        color: var(--neon);
-      }
-      .drawer-auth-user a.auth-logout {
-        color: #ff8a8a;
-      }
+      /* ── MOBILE DRAWER ──
+         The drawer (.mobile-drawer, .mobile-drawer-cta, .drawer-auth*,
+         .drawer-user-info) is styled once in static/css/nav-footer.css and
+         deliberately NOT duplicated here.
 
-      /* Mobile drawer */
-      .mobile-drawer {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(5, 5, 8, 0.98);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        z-index: 999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        transform: translateY(-100%);
-        transition: transform 0.6s var(--ease-luxury);
-        padding-top: 80px;
-        overflow-y: auto;
-      }
-      .mobile-drawer.open {
-        transform: translateY(0);
-      }
-      .mobile-drawer a {
-        position: relative;
-        font-family: var(--font-display);
-        font-weight: 600;
-        font-size: 1.15rem;
-        letter-spacing: 0.01em;
-        color: var(--dim);
-        text-decoration: none;
-        padding: 14px 0;
-        width: min(240px, 70vw);
-        border-radius: var(--r-sm);
-        border-bottom: 1px solid var(--border);
-        transition:
-          color 0.35s var(--ease-smooth),
-          transform 0.35s var(--ease-smooth),
-          border-color 0.35s var(--ease-smooth),
-          background 0.35s var(--ease-smooth),
-          box-shadow 0.35s var(--ease-smooth);
-        display: block;
-        text-align: center;
-      }
-      .mobile-drawer a:last-of-type {
-        border-bottom: none;
-      }
-      /* Premium hover — restricted to true hover-capable pointers so touch
-         phones (no real hover) never get a stuck/sticky hover state */
-      @media (hover: hover) and (pointer: fine) {
-        .mobile-drawer a:hover {
-          color: var(--neon);
-          border-color: var(--border-lit);
-          background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
-          box-shadow: inset 0 0 0 1px rgba(79, 216, 255, 0.08);
-          transform: translateX(-6px);
-        }
-      }
-      .mobile-drawer a:active {
-        color: var(--neon);
-        border-color: var(--border-lit);
-        background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
-        transform: translateX(-4px);
-      }
-      /* Keyboard focus gets the same polished treatment as hover */
-      .mobile-drawer a:focus-visible {
-        color: var(--neon);
-        border-color: var(--border-lit);
-        background: linear-gradient(90deg, transparent, var(--glow) 45%, transparent);
-        box-shadow:
-          0 0 0 1px var(--border-lit),
-          0 0 20px -8px var(--neon);
-        outline: none;
-      }
-      .mobile-drawer-cta {
-        margin-top: 26px;
-        font-family: var(--font-ui);
-        font-size: 0.78rem;
-        font-weight: 600;
-        background: var(--white);
-        color: var(--black);
-        padding: 15px 46px;
-        border: none;
-        cursor: pointer;
-        border-radius: 100px;
-      }
+         The copy that used to live at this spot overrode the shared rules —
+         it set its own item width (min(210px, 72vw)) and its own type scale,
+         so the nav links sat on a narrower rail than the "خرید کنید" CTA and
+         the ثبت‌نام button, and the homepage drawer looked different from
+         every other page's. The shared stylesheet now gives all rows one
+         --drawer-item-w rail and one type scale across the whole site. */
 
-      /* ══════════════════════════════════════════
-         MOBILE HAMBURGER MENU — refinement (<= 767.98px only)
-         The trigger button (.nav-menu-btn) is only ever visible below
-         768px (hidden by the tablet/desktop nav rules further down),
-         so this drawer is already mobile-only in practice. It's still
-         wrapped in an explicit max-width query here so the smaller,
-         cleaner typography below can never affect Tablet/Desktop even
-         if that visibility rule ever changes. Only type scale, weight,
-         spacing and padding are touched — layout mechanics, colors,
-         functionality and the hamburger button itself are untouched.
-         ══════════════════════════════════════════ */
-      @media (max-width: 767.98px) {
-        .mobile-drawer {
-          gap: 2px;
-          padding-top: 74px;
-          width: 100vw;
-          height: 100vh; /* fallback for browsers without dvh support */
-          height: 100dvh;
-          max-height: 100vh;
-          max-height: 100dvh;
-          overflow-x: hidden;
-          overscroll-behavior: contain;
-          -webkit-overflow-scrolling: touch;
-        }
-        .mobile-drawer a {
-          font-family: var(--font-ui);
-          font-weight: 500;
-          font-size: 0.92rem;
-          letter-spacing: 0.01em;
-          padding: 11px 0;
-          width: min(210px, 72vw);
-        }
-        .mobile-drawer-cta {
-          margin-top: 20px;
-          padding: 13px 40px;
-        }
-        .drawer-auth {
-          margin-top: 16px;
-          gap: 10px;
-        }
-        .drawer-auth-link {
-          font-size: 0.82rem;
-          padding: 10px 26px;
-        }
-        .drawer-auth-register {
-          padding: 13px 38px;
-        }
-        .drawer-auth-user {
-          margin-top: 16px;
-        }
-        .drawer-user-info {
-          font-size: 0.88rem;
-        }
-      }
 
       /* ── SECTIONS WRAPPER ── */
       #sections-wrapper {
@@ -924,14 +728,20 @@ SLIDE 0: HERO
         position: relative;
         z-index: 3;
         width: 100%;
-        padding: calc(var(--nav-h) + 14px) 22px 22px;
+        padding: calc(var(--nav-h) + 14px + env(safe-area-inset-top)) 22px
+          calc(22px + env(safe-area-inset-bottom));
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
-        height: 100dvh;
+        /* `min-height` rather than `height`: the hero still fills the first
+           screen, but a longer Persian title or a short viewport grows the
+           box instead of silently cutting content off under overflow:hidden.
+           dvh keeps it in step with the iOS Safari toolbar. */
+        min-height: 100vh;
+        min-height: 100dvh;
         gap: 0;
-        overflow: hidden;
+        overflow: visible;
       }
       .hero-tag {
         font-family: var(--font-mono);
@@ -2364,6 +2174,40 @@ SLIDE 5: FINAL — MOBILE (FIXED FOR SCROLLING & OVERFLOW)
         height: auto !important;
         min-height: 0;
         overflow: visible !important;
+      }
+      /* ROOT CAUSE OF THE SITE'S HORIZONTAL OVERFLOW.
+         .hero-grid is a decorative perspective floor that deliberately bleeds
+         to left/right: -10%. In paging mode `.slide { overflow: hidden }`
+         clips it, but the rule above relaxes that to `visible` so tall mobile
+         sections aren't cut off — which let the bleed escape and made the
+         document 10% wider than the viewport at every phone width (+39px at
+         393px). `overflow-x: clip` re-clips the horizontal axis *without*
+         creating a scroll container, so vertical bleed still works and the
+         slide stays un-clipped downward. `hidden` is not usable here: paired
+         with `overflow-y: visible` it computes to `auto` and would introduce a
+         nested scroller. */
+      html.is-mobile-scroll #hero {
+        /* `position: relative` is the half that actually matters. The rule
+           above flattens every slide to `position: static`, which left the
+           absolutely-positioned .hero-grid and .hero-ambient resolving against
+           the initial containing block instead of the hero — so they sized to
+           the *document* and no amount of overflow on #hero could clip them.
+           Restoring the containing block re-parents them to the hero without
+           taking it out of normal flow, so the flattened mobile layout is
+           unchanged. */
+        position: relative !important;
+      }
+      @supports (overflow-x: clip) {
+        html.is-mobile-scroll #hero {
+          overflow-x: clip !important;
+        }
+      }
+      /* Pre-Safari-16 fallback: the hero's inner column is its own bounded
+         box, so clipping both axes here is safe. */
+      @supports not (overflow-x: clip) {
+        html.is-mobile-scroll #hero {
+          overflow: hidden !important;
+        }
       }
       /* Content should be visible immediately without waiting
          for the desktop "active slide" JS toggle — an
@@ -4755,7 +4599,10 @@ DESKTOP (1024px+)
           display: none !important;
         }
       }
-      @media (max-width: 767px) {
+      /* 767.98px, not 767px: the mobile-scroll matchMedia in <head> uses
+         767.98px, and the 767-768 band fell through both rules — a 767.5px
+         viewport got neither the mobile nor the desktop variant. */
+      @media (max-width: 767.98px) {
         .hero-right-desktop,
         .cat-desktop-wrap,
         .bs-desktop-wrap,
@@ -4773,22 +4620,35 @@ DESKTOP (1024px+)
          everything below via display:none above) is
          completely untouched by this block.
          ══════════════════════════════════════════ */
-      @media (max-width: 767px) {
+      @media (max-width: 767.98px) {
         /* Best sellers + testimonials: these rendered as
            horizontally swipeable card carousels
            (overflow-x: auto + scroll-snap). Convert to a
            normal vertical stack so the page only scrolls
-           up/down, matching every other mobile section. */
+           up/down, matching every other mobile section.
+
+           .cat-mobile-wrap and .guide-mobile-wrap are included here too:
+           they were left on a fixed `height: 100dvh` + `overflow: hidden`,
+           which clipped their content on short phones and, in the guide's
+           case, nested a second vertical scroller inside the page scroll. */
+        .cat-mobile-wrap,
         .bs-mobile-wrap,
-        .testi-mobile-wrap {
+        .testi-mobile-wrap,
+        .guide-mobile-wrap {
           height: auto;
+          min-height: 0;
           overflow: visible;
+        }
+        .guide-list {
+          overflow-y: visible;
         }
         .bs-carousel,
         .testi-carousel-m {
           flex-direction: column;
-          overflow-x: hidden;
-          overflow-y: visible;
+          /* `overflow-x: hidden` next to `overflow-y: visible` computes the
+             y-axis to `auto`, which silently created a nested scroll region.
+             As a vertical stack neither axis needs to be clipped. */
+          overflow: visible;
           scroll-snap-type: none;
         }
         .pc-card-m,
@@ -4946,21 +4806,9 @@ DESKTOP (1024px+)
         width: 100%;
       }
 
-      html.is-mobile-scroll .ft-col ul {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px 12px;
-      }
-
-      html.is-mobile-scroll .ft-col li {
-        margin-bottom: 4px;
-      }
-
-      html.is-mobile-scroll .ft-col a {
-        min-height: 28px;
-        line-height: 28px;
-        font-size: 0.82rem;
-      }
+      /* The 2-up link grid and the 28px link height that used to sit here
+         are gone: nav-footer.css gives every footer link a single column and
+         a 44px row, so the labels get full width and a real tap target. */
 
       /* Tablet-specific footer refinements */
       @media (min-width: 768px) and (max-width: 1023px) {
@@ -5000,214 +4848,50 @@ DESKTOP (1024px+)
           gap: 8px;
         }
 
-        .ft-legal a {
-          font-size: 0.6rem;
-          min-height: 24px;
-        }
       }
 
       @media (max-width: 360px) {
         .ft-top {
           gap: 16px;
         }
-
-        .ft-col a {
-          font-size: 0.75rem;
-          min-height: 24px;
-          line-height: 24px;
-        }
       }
 
-      /* ============================================================
-   FOOTER BASE STYLES (applies to both desktop & mobile)
-   ============================================================ */
-      footer {
-        position: relative;
-        z-index: 1;
-        background: rgba(255, 255, 255, 0.012);
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-        padding: clamp(40px, 6vw, 72px) clamp(22px, 5vw, 84px) 0;
-      }
-      footer::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          #00f0ff,
-          #a855f7,
-          transparent
-        );
-        opacity: 0.35;
-        pointer-events: none;
-      }
+      /* ── FOOTER ──
+         Styled once in static/css/nav-footer.css. The copy that lived here
+         had drifted from the shared rules (38px social buttons, 32px link
+         rows, an 8px copyright) and, being later in the cascade, won.
+         The html.is-mobile-scroll footer rules above still apply — they are
+         specific to this page's scroll-mode layout, not general styling. */
 
-      /* 4-col grid → 2-col → 1-col */
-      .ft-top {
-        display: grid;
-        grid-template-columns: 1.6fr repeat(3, 1fr);
-        gap: clamp(24px, 3vw, 48px);
-        max-width: 1400px;
-        margin: 0 auto;
-        padding-bottom: clamp(32px, 5vw, 60px);
-      }
-
-      .ft-logo {
-        font-family: var(--font-mono);
-        font-weight: 700;
-        font-size: clamp(1rem, 1.8vw, 1.28rem);
-        background: linear-gradient(135deg, #00f0ff, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: 0.14em;
-        margin-bottom: 12px;
-        display: block;
-      }
-      .ft-tag {
-        font-size: clamp(0.78rem, 1vw, 0.85rem);
-        color: rgba(255, 255, 255, 0.32);
-        line-height: 1.85;
-        max-width: 280px;
-        margin-bottom: 22px;
-      }
-      .social-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      .soc {
-        width: 38px;
-        height: 38px;
-        border-radius: 9px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.35s;
-        color: rgba(255, 255, 255, 0.45);
-        text-decoration: none;
-        flex-shrink: 0;
-      }
-      @media (hover: hover) {
-        .soc:hover {
-          background: rgba(0, 240, 255, 0.08);
-          border-color: rgba(0, 240, 255, 0.28);
-          color: #00f0ff;
-          transform: translateY(-2px);
+      /* ══════════════════════════════════════════
+         REDUCED MOTION
+         This page runs several always-on animations — the testimonial
+         marquee, the hero chevron bounce, the loader pulse and the 900ms
+         slide transition. Honour the OS-level preference instead of running
+         them unconditionally. Entrance states are forced visible so nothing
+         is left stuck at opacity:0 once transitions are disabled.
+         ══════════════════════════════════════════ */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
         }
-      }
-      .soc svg {
-        width: 15px;
-        height: 15px;
-        fill: currentColor;
-      }
-
-      .ft-col h3 {
-        font-family: var(--font-ui);
-        font-size: clamp(0.68rem, 0.85vw, 0.75rem);
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.3);
-        margin-bottom: clamp(12px, 1.5vw, 18px);
-      }
-      .ft-col ul {
-        list-style: none;
-      }
-      .ft-col li {
-        margin-bottom: clamp(7px, 1vw, 11px);
-      }
-      .ft-col a {
-        font-size: clamp(0.78rem, 0.95vw, 0.86rem);
-        color: rgba(255, 255, 255, 0.42);
-        text-decoration: none;
-        transition: color 0.3s;
-        display: block;
-        min-height: 32px;
-        line-height: 32px;
-      }
-      @media (hover: hover) {
-        .ft-col a:hover {
-          color: #fff;
+        .slide-anim,
+        .slide-anim-left,
+        .slide-anim-right,
+        .slide-anim-scale,
+        .fs-anim,
+        .hero-mobile-img,
+        .word-reveal .word span {
+          opacity: 1 !important;
+          transform: none !important;
         }
-      }
-
-      .ft-bot {
-        max-width: 1400px;
-        margin: 0 auto;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      .ft-copy {
-        font-family: var(--font-mono);
-        font-size: clamp(0.5rem, 0.65vw, 0.6rem);
-        color: rgba(255, 255, 255, 0.18);
-        letter-spacing: 0.06em;
-      }
-      .ft-legal {
-        display: flex;
-        flex-wrap: wrap;
-        gap: clamp(10px, 1.5vw, 20px);
-      }
-      .ft-legal a {
-        font-size: clamp(0.62rem, 0.75vw, 0.7rem);
-        color: rgba(255, 255, 255, 0.22);
-        text-decoration: none;
-        transition: color 0.3s;
-        min-height: 32px;
-        display: inline-flex;
-        align-items: center;
-      }
-      @media (hover: hover) {
-        .ft-legal a:hover {
-          color: rgba(255, 255, 255, 0.55);
-        }
-      }
-
-      /* ── Footer responsive breakpoints ── */
-      @media (max-width: 1024px) {
-        .ft-top {
-          grid-template-columns: 1.4fr 1fr 1fr 1fr;
-          gap: clamp(20px, 2.5vw, 36px);
-        }
-      }
-      @media (max-width: 820px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-          gap: 28px;
-        }
-        .ft-brand {
-          grid-column: 1 / -1;
-        }
-        .ft-tag {
-          max-width: 100%;
-        }
-      }
-      @media (max-width: 480px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-        }
-        .ft-bot {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-      }
-      @media (max-width: 360px) {
-        .ft-top {
-          grid-template-columns: 1fr;
-        }
-        .ft-legal {
-          gap: 8px;
+        .testimonials-track {
+          animation: none !important;
         }
       }
     </style>
@@ -5387,10 +5071,6 @@ DESKTOP (1024px+)
           pageData = data;
 
           // 🔍 دیباگ: ببین دیتا چی هست
-          console.log("📦 Full API Response:", pageData);
-          console.log("📂 Categories:", pageData.categories);
-          console.log("📂 Categories type:", typeof pageData.categories);
-          console.log("📂 Is Array:", Array.isArray(pageData.categories));
 
           renderAll();
           setTimeout(() => {
@@ -5418,7 +5098,6 @@ DESKTOP (1024px+)
           return;
         }
 
-        console.log("🔄 Rendering all sections...");
         renderHero(pageData);
         renderCategories(pageData);
         renderBestSellers(pageData);
@@ -5544,7 +5223,6 @@ DESKTOP (1024px+)
          RENDER CATEGORIES
          ════════════════════════════════════ */
       function renderCategories(data) {
-        console.log("🔄 renderCategories called with data:", data);
 
         // ✅ چک کن data وجود دارد
         if (!data) {
@@ -5569,8 +5247,6 @@ DESKTOP (1024px+)
           }
         }
 
-        console.log("📂 Final categories:", categories);
-        console.log("📂 Categories length:", categories.length);
 
         if (!categories.length) {
           console.warn("⚠️ هیچ دسته‌بندی برای نمایش وجود ندارد");
@@ -5964,23 +5640,49 @@ DESKTOP (1024px+)
           // اسکرول ایندیکیتور
           const carousel = document.getElementById("bsCarousel");
           if (carousel) {
+            /* The previous handler read offsetWidth and re-queried every dot
+               on every scroll event, forcing a layout pass per frame. The
+               card width is cached (invalidated on resize) and the DOM work
+               is coalesced into one rAF callback. */
+            const dots = cards.map((_, i) =>
+              document.getElementById(`bsDot${i}`),
+            );
+            let cardW = 0;
+            let ticking = false;
+            let lastIdx = -1;
+
+            const measure = () => {
+              cardW =
+                (carousel.querySelector(".pc-card-m")?.offsetWidth || 300) + 14;
+            };
+            measure();
+
+            const update = () => {
+              ticking = false;
+              if (!cardW) measure();
+              const idx = Math.min(
+                cards.length - 1,
+                Math.round(Math.abs(carousel.scrollLeft) / cardW),
+              );
+              if (idx === lastIdx) return;
+              lastIdx = idx;
+              dots.forEach((d, i) => {
+                if (d) d.classList.toggle("active", i === idx);
+              });
+            };
+
             carousel.addEventListener(
               "scroll",
               () => {
-                const cardW =
-                  (carousel.querySelector(".pc-card-m")?.offsetWidth || 300) +
-                  14;
-                const idx = Math.min(
-                  cards.length - 1,
-                  Math.round(Math.abs(carousel.scrollLeft) / cardW),
-                );
-                cards.forEach((_, i) => {
-                  const d = document.getElementById(`bsDot${i}`);
-                  if (d) d.classList.toggle("active", i === idx);
-                });
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(update);
               },
               { passive: true },
             );
+            // Recalculate after a resize or rotation so the active dot stays
+            // correct instead of tracking a stale card width.
+            window.addEventListener("resize", measure, { passive: true });
           }
         }
 
@@ -6590,59 +6292,10 @@ DESKTOP (1024px+)
         { passive: true },
       );
 
-      // Menu toggle
-      function toggleMenu() {
-        const btn = document.getElementById("menuBtn");
-        const drawer = document.getElementById("mobileDrawer");
-        if (!btn || !drawer) return;
-        const isOpen = drawer.classList.toggle("open");
-        btn.classList.toggle("open", isOpen);
-        btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      }
-
-      function closeMenu() {
-        const btn = document.getElementById("menuBtn");
-        const drawer = document.getElementById("mobileDrawer");
-        if (btn) {
-          btn.classList.remove("open");
-          btn.setAttribute("aria-expanded", "false");
-        }
-        if (drawer) drawer.classList.remove("open");
-      }
-
-      // User menu toggle
-      function toggleUserMenu(e) {
-        if (e) e.stopPropagation();
-        const btn = document.getElementById("authUserBtn");
-        const menu = document.getElementById("authUserMenu");
-        if (!btn || !menu) return;
-        const isOpen = menu.classList.toggle("open");
-        btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      }
-
-      document.addEventListener("click", () => {
-        const menu = document.getElementById("authUserMenu");
-        const btn = document.getElementById("authUserBtn");
-        if (menu && menu.classList.contains("open")) {
-          menu.classList.remove("open");
-          if (btn) btn.setAttribute("aria-expanded", "false");
-        }
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          const menu = document.getElementById("authUserMenu");
-          const btn = document.getElementById("authUserBtn");
-          if (menu && menu.classList.contains("open")) {
-            menu.classList.remove("open");
-            if (btn) {
-              btn.setAttribute("aria-expanded", "false");
-              btn.focus();
-            }
-          }
-        }
-      });
-
+      /* toggleMenu / closeMenu / toggleUserMenu and their document-level
+         click + Escape listeners live in includes/header-scripts.html, which
+         is loaded after this block. Duplicating them here registered two of
+         every listener and shipped a drawer with no body-scroll lock. */
 
       // Keep things sane if the viewport crosses the mobile/paging
       // boundary at runtime (window resize, orientation change, devtools

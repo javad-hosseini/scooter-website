@@ -3,7 +3,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
     {% include "seo/_head.html" %}
 
     <!-- Self-hosted Fonts -->
@@ -2396,12 +2396,16 @@
         }
         .skip-link:focus {
           top: 0;
+          /* Must clear the fixed nav, which is z-index 1000. */
+          z-index: 1001;
         }
 
         .breadcrumb {
           max-width: 1400px;
           margin: 0 auto;
-          padding: 88px 24px 0;
+          /* Tracks --nav-h (64/68/76px) instead of hardcoding 88px, which was
+             only correct below 768px and left 12px of clearance at 1024px+. */
+          padding: calc(var(--nav-h, 64px) + 24px) 24px 0;
           font-size: 13px;
         }
         .breadcrumb ol {
@@ -2456,6 +2460,67 @@
         .stock-out {
           color: #fbbf24;
         }
+
+        /* ═══════════════════════════════════════
+           MOBILE TOUCH & INPUT CORRECTIONS
+           Visual sizes are unchanged; only hit areas and the input font
+           scale change, and only on touch-sized viewports.
+        ════════════════════════════════════════ */
+        @media (max-width: 1023.98px) {
+          /* Under 16px, iOS Safari zooms the whole page on focus. */
+          .rv-input,
+          .rv-textarea {
+            font-size: 16px;
+          }
+        }
+
+        /* The rating stars, "helpful" button and colour chips all computed to
+           33-40px tall. A pseudo-element hit area is no good on .color-chip
+           because its clip-path corner-cut clips the pseudo-element too, so
+           these get a real min-height. Glyph and padding sizes are unchanged;
+           only the box grows to a tappable 44px. */
+        .rv-star-btn,
+        .rv-helpful-btn,
+        .color-chip {
+          min-height: 44px;
+        }
+        .rv-helpful-btn,
+        .rv-star-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        /* The gallery tiles carry role="button" and tabindex="0" but have no
+           click or key handler, so they were focus stops that did nothing.
+           Presenting them as plain images is the honest state until a
+           lightbox exists. */
+        .gcard {
+          cursor: default;
+        }
+    
+      /* ── REDUCED MOTION ──
+         This page runs continuous decorative animations (drifting blobs,
+         floating shapes, scroll-reveal transitions). Respect the OS-level
+         preference; entrance states are forced visible so nothing is left
+         stuck invisible once transitions are switched off. */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
+        }
+        .reveal,
+        .card,
+        .fade-up,
+        [class*="anim"] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      }
     </style>
 </head>
 <body>
@@ -2906,7 +2971,6 @@
 
     const slug = getSlugFromUrl();
     const API_BASE = "/shop/api/";
-    console.log("🔍 Slug:", slug);
 
     /* ════════════════════════════════════
        SECURITY HELPER: HTML ESCAPING
@@ -2960,14 +3024,12 @@
 
       try {
         const apiUrl = `${API_BASE}products/${encodeURIComponent(slug)}/`;
-        console.log("📡 Fetching:", apiUrl);
 
         const response = await fetch(apiUrl);
         if (!response.ok)
           throw new Error(`HTTP ${response.status}: محصول یافت نشد`);
 
         const product = await response.json();
-        console.log("✅ Product loaded:", product.name);
 
         spinner.style.display = "none";
         content.style.display = "block";
@@ -3247,8 +3309,9 @@
       notification.className = "custom-notification";
       notification.style.cssText = `
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: calc(30px + env(safe-area-inset-bottom));
+            right: 16px;
+            left: 16px;
             background: ${colors[type] || "#333"};
             color: white;
             padding: 16px 24px;
@@ -3258,7 +3321,13 @@
             z-index: 9999;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            max-width: 400px;
+            /* Was max-width:400px pinned to right:30px, so on a 360-393px
+               phone the toast ran off the left edge and got clipped. Anchored
+               to both sides with a max-width it now fits every target width
+               and still caps at 400px on desktop. */
+            max-width: min(400px, calc(100vw - 32px));
+            margin-inline: auto;
+            width: fit-content;
             direction: rtl;
             display: flex;
             align-items: center;
@@ -3413,8 +3482,7 @@
         gridEl.innerHTML = items
           .map(
             (item, i) => `
-          <div class="gcard" tabindex="0" role="button"
-              aria-label="${item.alt_text || item.color_label}"
+          <figure class="gcard"
               style="transition-delay:${Math.min(i, 8) * 0.05}s;">
               <div class="gcard-img">
                   <img src="${item.image_url}" alt="${item.alt_text || item.color_label}" loading="lazy" decoding="async">
@@ -3426,7 +3494,7 @@
                   </div>
                   <div class="overlay-title">${document.getElementById("product-name").textContent}</div>
               </div>
-          </div>
+          </figure>
       `,
           )
           .join("");

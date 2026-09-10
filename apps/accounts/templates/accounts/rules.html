@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
     />
     <title>قوانین و مقررات | فروشگاه اسکوتر ایسیار</title>
 
@@ -572,6 +572,28 @@
           animation-duration: 0.001ms !important;
           animation-iteration-count: 1 !important;
           transition-duration: 0.001ms !important;
+        }
+      }
+    
+      /* ── Mobile viewport & input corrections ──
+         100vh on iOS Safari resolves to the *largest* viewport (toolbars
+         retracted), so a vertically centred card is pushed down and its
+         footer starts below the fold. dvh tracks the visible area instead.
+         Inputs are raised to 16px because Safari zooms the whole page when a
+         focused control's font is smaller. */
+      @supports (min-height: 100dvh) {
+        .auth-page { min-height: 100dvh; }
+      }
+      @media (max-width: 1023.98px) {
+        .field input,
+        .otp-box,
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="password"],
+        select,
+        textarea {
+          font-size: 16px;
         }
       }
     </style>

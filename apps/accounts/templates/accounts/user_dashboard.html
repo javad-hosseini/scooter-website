@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title id="page-title">پنل کاربری | Nex Go</title>
     <meta
       name="description"
@@ -374,6 +374,31 @@
 
       .sidebar-drawer {
         transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      /* Tailwind is pre-compiled here, so the dvh variant can't be expressed
+         as a utility class. dvh tracks the iOS Safari toolbar so the drawer
+         doesn't overshoot the visible area. */
+      @supports (height: 100dvh) {
+        @media (max-width: 1023.98px) {
+          .sidebar-drawer {
+            height: calc(100dvh - var(--nav-h));
+          }
+        }
+      }
+      /* The closed drawer is translated 280px off-screen with no inset anchor,
+         which counts toward the document's scrollable width on some engines.
+         Clipping the horizontal axis at the page level costs nothing here —
+         the dashboard has no intentional horizontal bleed — and `clip` avoids
+         creating a scroll container. */
+      html,
+      body {
+        overflow-x: clip;
+      }
+      @supports not (overflow-x: clip) {
+        html,
+        body {
+          overflow-x: hidden;
+        }
       }
       .focus-ring:focus-visible {
         outline: 2px solid var(--gold);
@@ -1061,8 +1086,11 @@
       <div class="flex items-center justify-between px-4 py-3">
         <button
           id="menuBtn"
+          type="button"
           aria-label="باز کردن منو"
-          class="focus-ring w-10 h-10 rounded-xl border border-line flex items-center justify-center active:scale-95 transition"
+          aria-expanded="false"
+          aria-controls="sidebar"
+          class="focus-ring w-11 h-11 rounded-xl border border-line flex items-center justify-center active:scale-95 transition"
         >
           <svg
             width="20"
@@ -1111,6 +1139,9 @@
       <!-- ============ SIDEBAR ============ -->
       <aside
         id="sidebar"
+        role="navigation"
+        aria-label="منوی داشبورد"
+        aria-hidden="true"
         class="sidebar-drawer fixed lg:sticky top-[var(--nav-h)] lg:top-[calc(var(--nav-h)+1.5rem)] h-[calc(100vh-var(--nav-h))] lg:h-[calc(100vh-3rem-var(--nav-h))] w-[280px] shrink-0 z-50 lg:z-0 translate-x-full lg:translate-x-0 rtl:lg:translate-x-0 bg-bg-surface lg:bg-transparent card lg:rounded-2xl overflow-y-auto"
       >
         <div class="p-5 flex flex-col h-full">
@@ -1120,7 +1151,9 @@
             >
             <button
               id="closeDrawer"
-              class="lg:hidden focus-ring w-9 h-9 rounded-lg border border-line flex items-center justify-center"
+              type="button"
+              aria-label="بستن منو"
+              class="lg:hidden focus-ring w-11 h-11 rounded-lg border border-line flex items-center justify-center"
             >
               <svg
                 width="16"
@@ -2340,7 +2373,6 @@
           const response = await fetch(API_BASE + "dashboard/");
           if (!response.ok) throw new Error("Failed to load dashboard data");
           dashboardData = await response.json();
-          console.log("✅ Dashboard loaded:", dashboardData);
           renderAll();
         } catch (error) {
           console.error("❌ Error loading dashboard:", error);
@@ -3044,23 +3076,79 @@
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("drawerOverlay");
 
+      const drawerTrigger = document.getElementById("menuBtn");
+      let drawerScrollY = 0;
+
       function openDrawer() {
         sidebar.classList.remove("translate-x-full");
         overlay.classList.remove("hidden");
+        sidebar.removeAttribute("aria-hidden");
+        if (drawerTrigger) drawerTrigger.setAttribute("aria-expanded", "true");
+        /* The page kept scrolling behind the open drawer. showModal() in this
+           same file already locks the body; the drawer was simply missed.
+           position:fixed rather than overflow:hidden because iOS Safari
+           ignores the latter on <body>. */
+        drawerScrollY = window.scrollY || 0;
+        document.body.style.position = "fixed";
+        document.body.style.top = -drawerScrollY + "px";
+        document.body.style.insetInline = "0";
+        document.body.style.width = "100%";
+        const first = sidebar.querySelector("a, button");
+        if (first) first.focus();
       }
 
       function closeDrawer() {
         if (window.innerWidth < 1024) {
           sidebar.classList.add("translate-x-full");
           overlay.classList.add("hidden");
+          sidebar.setAttribute("aria-hidden", "true");
+          if (drawerTrigger) {
+            drawerTrigger.setAttribute("aria-expanded", "false");
+          }
+          document.body.style.position = "";
+          document.body.style.top = "";
+          document.body.style.insetInline = "";
+          document.body.style.width = "";
+          window.scrollTo(0, drawerScrollY);
         }
       }
 
-      document.getElementById("menuBtn").addEventListener("click", openDrawer);
+      if (drawerTrigger) drawerTrigger.addEventListener("click", openDrawer);
       document
         .getElementById("closeDrawer")
         .addEventListener("click", closeDrawer);
       overlay.addEventListener("click", closeDrawer);
+
+      // Escape closes the drawer and returns focus to the control that opened it.
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        if (overlay.classList.contains("hidden")) return;
+        closeDrawer();
+        if (drawerTrigger) drawerTrigger.focus();
+      });
+
+      /* The trigger is hidden from 1024px up, so a drawer left open across a
+         resize would strand the page with a locked body. */
+      const dashDesktopQuery = window.matchMedia("(min-width: 1024px)");
+      function handleDashBreakpoint(e) {
+        if (!e.matches) return;
+        overlay.classList.add("hidden");
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.insetInline = "";
+        document.body.style.width = "";
+        sidebar.removeAttribute("aria-hidden");
+        if (drawerTrigger) drawerTrigger.setAttribute("aria-expanded", "false");
+      }
+      if (dashDesktopQuery.addEventListener) {
+        dashDesktopQuery.addEventListener("change", handleDashBreakpoint);
+      } else if (dashDesktopQuery.addListener) {
+        dashDesktopQuery.addListener(handleDashBreakpoint); // Safari < 14
+      }
+      /* At >=1024px the sidebar is a permanently visible sticky column, so the
+         markup's default aria-hidden="true" (correct for the closed mobile
+         drawer) must be cleared on load. */
+      handleDashBreakpoint(dashDesktopQuery);
 
       /* ═══════════════════════════════════════
  MODALS / TOASTS

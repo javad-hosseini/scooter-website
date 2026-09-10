@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title id="page-title">سبد خرید و پرداخت | Nex Go</title>
     <meta
       name="description"
@@ -50,6 +50,93 @@
         background: rgba(22, 22, 22, 0.6);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
+      }
+      /* Without backdrop-filter the bar is 60% transparent over scrolling
+         content, which makes the total unreadable. */
+      @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .glass {
+          background: rgba(22, 22, 22, 0.96);
+        }
+      }
+
+      /* ── Mobile sticky checkout bar ──
+         The bar sat flush against the bottom edge, so on an iPhone its
+         contents fell under the home indicator. It also overlapped the last
+         ~65px of the footer, permanently hiding the copyright and legal
+         links, because nothing reserved space for it. */
+      #mobile-checkout-bar {
+        padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      }
+      @media (max-width: 1023.98px) {
+        body {
+          /* Bar height (~69px), a little breathing room so the last footer
+             row isn't flush against it, plus the home-indicator inset. */
+          padding-bottom: calc(69px + 12px + env(safe-area-inset-bottom));
+        }
+        /* An empty cart has nothing to check out, so the bar is hidden and
+           the reserved space released. */
+        body.cart-is-empty {
+          padding-bottom: 0;
+        }
+        body.cart-is-empty #mobile-checkout-bar {
+          display: none;
+        }
+      }
+
+      /* iOS Safari zooms the entire page when a focused control's font is
+         under 16px. Every text field here was 14px. Applied only on touch
+         widths so the desktop form keeps its 14px scale. */
+      @media (max-width: 1023.98px) {
+        /* The [class] attribute selector matches Tailwind's own (0,1,0)
+           specificity — a bare `select` element selector loses to `.text-sm`.
+           Checkboxes/radios are excluded: they don't take text input, so they
+           never trigger the zoom, and 16px would visibly resize them. */
+        input[class]:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+        select[class],
+        textarea[class] {
+          font-size: 16px;
+        }
+      }
+
+      /* Touch targets: the quantity steppers, colour swatches and remove
+         link were 32px, 20px and ~18px respectively. The visual sizes are
+         unchanged; only the hit areas grow. */
+      .qty-btn {
+        position: relative;
+      }
+      .qty-btn::after,
+      .remove-btn::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 44px;
+        height: 44px;
+      }
+      /* The swatches sit 12px apart in a row, so their hit areas are capped to
+         that slot (20px swatch + 12px gap) horizontally. A full 44px width
+         would overlap the neighbouring swatch and steal its taps. */
+      .color-option::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 44px;
+      }
+      .color-option,
+      .remove-btn {
+        position: relative;
+      }
+
+      /* The skip link came out 24px tall once focused. It is the first thing
+         a keyboard user reaches, so it should be a full-size target. */
+      .skip-to-content:focus {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
       }
 
       .fade-up {
@@ -196,9 +283,10 @@
         transform: scale(1.15);
       }
       .color-option.selected {
-        ring: 2px solid #d4af37;
-        ring-offset: 2px;
-        ring-offset-color: #161616;
+        /* Was written as `ring: …; ring-offset: …` — Tailwind class names, not
+           CSS properties, so the whole rule was dropped and the selected
+           swatch showed no state. box-shadow reproduces Tailwind's ring. */
+        box-shadow: 0 0 0 2px #161616, 0 0 0 4px #d4af37;
       }
 
       /* دکمه حذف */
@@ -220,192 +308,11 @@
       .qty-btn:active {
         transform: scale(0.85);
       }
+      /* ── FOOTER ──
+         Styled once in static/css/nav-footer.css. The copy that used to live
+         here won on cascade order and had drifted from the shared rules
+         (different grid breakpoints, 32px tap targets, an 8px copyright). */
 
-      /* ============================================================
-         FOOTER  — normalized to match home/index.html
-         ============================================================ */
-      footer {
-        position: relative;
-        z-index: 1;
-        background: rgba(255, 255, 255, 0.012);
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-        padding: clamp(40px, 6vw, 72px) clamp(22px, 5vw, 84px) 0;
-      }
-      footer::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          #00f0ff,
-          #a855f7,
-          transparent
-        );
-        opacity: 0.35;
-        pointer-events: none;
-      }
-      .ft-top {
-        display: grid;
-        grid-template-columns: 1.6fr repeat(3, 1fr);
-        gap: clamp(24px, 3vw, 48px);
-        max-width: 1400px;
-        margin: 0 auto;
-        padding-bottom: clamp(32px, 5vw, 60px);
-      }
-      .ft-logo {
-        font-family: "JetBrains Mono", "Vazirmatn", monospace;
-        font-weight: 700;
-        font-size: clamp(1rem, 1.8vw, 1.28rem);
-        background: linear-gradient(135deg, #00f0ff, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: 0.14em;
-        margin-bottom: 12px;
-        display: block;
-      }
-      .ft-tag {
-        font-size: clamp(0.78rem, 1vw, 0.85rem);
-        color: rgba(255, 255, 255, 0.32);
-        line-height: 1.85;
-        max-width: 280px;
-        margin-bottom: 22px;
-      }
-      .social-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      .soc {
-        width: 38px;
-        height: 38px;
-        border-radius: 9px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.35s;
-        color: rgba(255, 255, 255, 0.45);
-        text-decoration: none;
-        flex-shrink: 0;
-      }
-      @media (hover: hover) {
-        .soc:hover {
-          background: rgba(0, 240, 255, 0.08);
-          border-color: rgba(0, 240, 255, 0.28);
-          color: #00f0ff;
-          transform: translateY(-2px);
-        }
-      }
-      .soc svg {
-        width: 15px;
-        height: 15px;
-        fill: currentColor;
-      }
-      .ft-col h3 {
-        font-family: "Vazirmatn", "Inter", sans-serif;
-        font-size: clamp(0.68rem, 0.85vw, 0.75rem);
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.3);
-        margin-bottom: clamp(12px, 1.5vw, 18px);
-      }
-      .ft-col ul {
-        list-style: none;
-      }
-      .ft-col li {
-        margin-bottom: clamp(7px, 1vw, 11px);
-      }
-      .ft-col a {
-        font-size: clamp(0.78rem, 0.95vw, 0.86rem);
-        color: rgba(255, 255, 255, 0.42);
-        text-decoration: none;
-        transition: color 0.3s;
-        display: block;
-        min-height: 32px;
-        line-height: 32px;
-      }
-      @media (hover: hover) {
-        .ft-col a:hover {
-          color: #fff;
-        }
-      }
-      .ft-bot {
-        max-width: 1400px;
-        margin: 0 auto;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      .ft-copy {
-        font-family: "JetBrains Mono", "Vazirmatn", monospace;
-        font-size: clamp(0.5rem, 0.65vw, 0.6rem);
-        color: rgba(255, 255, 255, 0.18);
-        letter-spacing: 0.06em;
-      }
-      .ft-legal {
-        display: flex;
-        flex-wrap: wrap;
-        gap: clamp(10px, 1.5vw, 20px);
-      }
-      .ft-legal a {
-        font-size: clamp(0.62rem, 0.75vw, 0.7rem);
-        color: rgba(255, 255, 255, 0.22);
-        text-decoration: none;
-        transition: color 0.3s;
-        min-height: 32px;
-        display: inline-flex;
-        align-items: center;
-      }
-      @media (hover: hover) {
-        .ft-legal a:hover {
-          color: rgba(255, 255, 255, 0.55);
-        }
-      }
-      @media (max-width: 1024px) {
-        .ft-top {
-          grid-template-columns: 1.4fr 1fr 1fr 1fr;
-          gap: clamp(20px, 2.5vw, 36px);
-        }
-      }
-      @media (max-width: 820px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-          gap: 28px;
-        }
-        .ft-brand {
-          grid-column: 1 / -1;
-        }
-        .ft-tag {
-          max-width: 100%;
-        }
-      }
-      @media (max-width: 480px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-        }
-        .ft-bot {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-      }
-      @media (max-width: 360px) {
-        .ft-top {
-          grid-template-columns: 1fr;
-        }
-        .ft-legal {
-          gap: 8px;
-        }
-      }
     </style>
   </head>
   <body
@@ -413,7 +320,7 @@
   >
     <a
       href="#checkout-main"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-[100] bg-gold text-black px-4 py-2 rounded-lg font-medium"
+      class="skip-to-content sr-only focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-[100] bg-gold text-black px-4 py-2 rounded-lg font-medium"
       >رفتن به محتوای اصلی</a
     >
 
@@ -1008,6 +915,7 @@
 
     <!-- ================= MOBILE STICKY CHECKOUT BAR ================= -->
     <div
+      id="mobile-checkout-bar"
       class="lg:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-line px-4 py-3"
     >
       <div class="flex items-center justify-between gap-3">
@@ -1076,15 +984,18 @@
           const response = await fetch(CART_API);
           if (!response.ok) throw new Error("Failed to load cart");
           const data = await response.json();
-          console.log("✅ Cart loaded:", data);
 
           loading.style.display = "none";
 
           if (data.item_count === 0) {
             emptyCart.classList.remove("hidden");
+            // Hides the sticky bar (and releases the space reserved for it),
+            // which otherwise offered a "پرداخت نهایی" button for ۰ تومان.
+            document.body.classList.add("cart-is-empty");
             return;
           }
 
+          document.body.classList.remove("cart-is-empty");
           content.style.display = "block";
           renderCart(data);
         } catch (error) {
@@ -1141,7 +1052,7 @@
                         <span class="bg-green-500/10 text-green-400 border border-green-500/20 rounded-full px-2.5 py-1">موجود در انبار</span>
                       </div>
 
-                      <div class="flex items-center gap-1.5 mt-3" role="group" aria-label="انتخاب رنگ">
+                      <div class="flex items-center gap-3 mt-3" role="group" aria-label="انتخاب رنگ">
                         ${colors
                           .map(
                             (c) => `
@@ -1237,7 +1148,6 @@
         async function updateColorOnServer(productId, colorSlug) {
           try {
             const csrfToken = getCSRFToken();
-            console.log("📡 Sending to server:", { productId, colorSlug });
 
             const response = await fetch(CART_API, {
               method: "PATCH",
@@ -1253,7 +1163,6 @@
 
             if (response.ok) {
               const data = await response.json();
-              console.log("✅ Server response:", data);
             } else {
               const error = await response.json();
               console.error("❌ Server error:", error);
@@ -1277,12 +1186,6 @@
             // ✅ گرفتن درست کد رنگ از style
             const colorHex = this.style.backgroundColor || "#000000";
 
-            console.log("🎨 Color clicked:", {
-              productId,
-              colorSlug,
-              colorName,
-              colorHex,
-            });
 
             // حذف انتخاب قبلی
             const siblings =
@@ -1474,7 +1377,6 @@
           }
         });
 
-        console.log("✅ UI updated:", { productId, colorName, colorHex });
       }
 
       async function applyCoupon(code) {

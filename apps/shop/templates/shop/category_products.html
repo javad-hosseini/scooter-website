@@ -2,8 +2,11 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Marks JS as available before first paint, so the card entrance
+         animation is only armed when something can actually play it. -->
+    <script>document.documentElement.classList.add("js");</script>
     {% include "seo/_head.html" %}
 
     <!-- Self-hosted Fonts -->
@@ -90,6 +93,9 @@
         color: #021810;
         font-weight: 700;
         padding: 8px 20px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
         border-radius: 0 0 8px 8px;
         z-index: 9999;
         font-size: 13px;
@@ -332,6 +338,7 @@
       .slide-actions {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 12px;
         opacity: 0;
         transform: translateY(10px);
@@ -355,6 +362,7 @@
         gap: 8px;
       }
       .hero-dot {
+        position: relative;
         width: 24px;
         height: 3px;
         border-radius: 2px;
@@ -364,6 +372,19 @@
           background 0.35s,
           width 0.35s var(--ease);
         border: none;
+        padding: 0;
+      }
+      /* The visible dot stays 3px; the hit area is 44px tall so it can
+         actually be tapped on a phone. */
+      .hero-dot::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        min-width: 32px;
+        height: 44px;
       }
       .hero-dot.active {
         width: 48px;
@@ -441,10 +462,15 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
       .toolbar-wrap {
         position: sticky;
-        top: 64px;
+        /* Was a hardcoded 64px, which only matched --nav-h below 768px. At
+           1024px+ the nav is 76px, so the toolbar stuck 12px *underneath* it
+           and — being z-index 50 against the nav's 1000 — had its top clipped
+           away, taking part of the search field with it. */
+        top: var(--nav-h, 64px);
         z-index: 50;
         background: rgba(6, 7, 10, 0.9);
         backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--rim);
       }
       .toolbar {
@@ -476,14 +502,16 @@
       }
       .toolbar-search-input {
         width: 200px;
-        height: 34px;
+        height: 44px;
         background: var(--lift);
         border: 1px solid var(--rim);
         border-radius: 8px;
         padding: 0 12px 0 36px;
         color: var(--text);
         font-family: var(--fa);
-        font-size: 13px;
+        /* 16px keeps iOS Safari from zooming the whole page when the field
+           takes focus. */
+        font-size: 16px;
         outline: none;
         transition:
           border-color 0.2s,
@@ -514,7 +542,7 @@
       }
 
       .toolbar-select {
-        height: 34px;
+        height: 44px;
         padding: 0 12px;
         background: var(--lift);
         border: 1px solid var(--rim);
@@ -536,7 +564,7 @@
         outline: none;
       }
       .toolbar-filter-btn {
-        height: 34px;
+        height: 44px;
         padding: 0 14px;
         background: var(--lift);
         border: 1px solid var(--rim);
@@ -589,7 +617,9 @@
           minmax(clamp(220px, 18vw, 300px), 1fr)
         );
         gap: clamp(14px, 1.5vw, 28px);
-        align-items: start;
+        /* stretch (the default) lets .card-actions{margin-top:auto} line the
+           buttons up across a row; `start` left ragged card bottoms. */
+        align-items: stretch;
       }
 
       /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -604,14 +634,30 @@
         cursor: pointer;
         display: flex;
         flex-direction: column;
-        opacity: 0;
-        transform: translateY(28px);
         transition:
           opacity 0.7s var(--ease),
           transform 0.7s var(--ease),
           border-color 0.4s,
           box-shadow 0.4s;
       }
+      /* The hidden entrance state is applied only once JS has confirmed it can
+         reveal the cards again (html.js is set in <head>). Without this gate a
+         JS error — or simply a code path that never calls initReveal() — left
+         the whole product grid at opacity:0 with no way back. */
+      html.js .card {
+        opacity: 0;
+        transform: translateY(28px);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html.js .card {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      /* Selector must match the specificity of `html.js .card` above (0,2,1),
+         otherwise the hidden entrance state outranks the reveal and the cards
+         never appear. */
+      html.js .card.visible,
       .card.visible {
         opacity: 1;
         transform: translateY(0);
@@ -630,10 +676,35 @@
       .card-img-wrap {
         position: relative;
         width: 100%;
+        /* padding-top:125% kept as the fallback for browsers without
+           aspect-ratio; the modern property is easier to override per
+           breakpoint and avoids the percentage-padding hack's rounding, which
+           was leaving .card-img-inner 4-5px short of its box. */
         padding-top: 125%;
         overflow: hidden;
         background: var(--lift);
         flex-shrink: 0;
+      }
+      @supports (aspect-ratio: 4 / 5) {
+        .card-img-wrap {
+          padding-top: 0;
+          aspect-ratio: 4 / 5;
+        }
+      }
+      /* At 360-430px the grid is a single column, so a 4:5 image made each
+         card ~550-640px tall — barely one product per screen. A wider ratio
+         keeps the same layout and crop behaviour while fitting roughly two
+         cards per screen. */
+      @media (max-width: 599.98px) {
+        .card-img-wrap {
+          padding-top: 75%;
+        }
+        @supports (aspect-ratio: 4 / 3) {
+          .card-img-wrap {
+            padding-top: 0;
+            aspect-ratio: 4 / 3;
+          }
+        }
       }
       .card-img-inner {
         position: absolute;
@@ -742,11 +813,11 @@
 
       .card-wish {
         position: absolute;
-        top: 14px;
-        left: 14px;
+        top: 10px;
+        left: 10px;
         z-index: 6;
-        width: 34px;
-        height: 34px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         background: rgba(11, 13, 18, 0.65);
         backdrop-filter: blur(10px);
@@ -776,6 +847,17 @@
         outline-offset: 2px;
         opacity: 1;
         transform: scale(1);
+      }
+      /* Touch devices have no hover, so the reveal-on-hover rule above left
+         the wishlist and add-to-cart controls permanently invisible — but
+         still tappable — on every phone. Show them unconditionally wherever
+         hover isn't available. */
+      @media (hover: none), (pointer: coarse) {
+        .card-wish,
+        .btn-cart {
+          opacity: 1;
+          transform: none;
+        }
       }
       .card-wish svg {
         width: 14px;
@@ -808,26 +890,36 @@
         line-height: 1.25;
         margin-bottom: 14px;
         display: -webkit-box;
-        -webkit-line-clamp: 1;
+        /* Two lines, not one. Persian product names were being cut mid-name
+           inside a 328-398px card that has room for two lines. min-height
+           reserves both so a short name doesn't shift the price row up and
+           leave ragged card bottoms in a row. */
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        min-height: calc(2 * 1.25em);
       }
       .card-price-row {
         display: flex;
         align-items: baseline;
-        gap: 8px;
+        flex-wrap: wrap;
+        gap: 4px 8px;
         margin-bottom: 18px;
       }
       .card-price {
         font-size: 19px;
         font-weight: 700;
         color: var(--text);
-        line-height: 1;
+        line-height: 1.2;
+        /* The amount and "تومان" must not be split across lines. */
+        white-space: nowrap;
       }
       .card-price-old {
         font-size: 12px;
         color: var(--muted);
         text-decoration: line-through;
+        white-space: nowrap;
       }
 
       .card-actions {
@@ -837,7 +929,7 @@
       }
       .btn-view {
         flex: 1;
-        height: 38px;
+        height: 44px;
         background: transparent;
         border: 1px solid var(--rim2);
         border-radius: 10px;
@@ -879,8 +971,8 @@
       }
 
       .btn-cart {
-        width: 38px;
-        height: 38px;
+        width: 44px;
+        height: 44px;
         flex-shrink: 0;
         background: var(--accent-dd);
         border: 1px solid rgba(91, 255, 181, 0.2);
@@ -1136,11 +1228,14 @@
         .toolbar {
           gap: 12px;
         }
-        .toolbar-search-input {
-          width: 160px;
+        .toolbar-search {
+          flex: 1;
+          min-width: 0;
+          max-width: 320px;
         }
+        .toolbar-search-input,
         .toolbar-search-input:focus {
-          width: 200px;
+          width: 100%;
         }
         .slide-inner {
           padding-bottom: 88px;
@@ -1183,6 +1278,18 @@
         .toolbar-select {
           display: none;
         }
+        /* The search field was a fixed 160px next to the filter button, so
+           its Persian placeholder was cut off ("جستجوی محص…") on every phone.
+           Letting it take the remaining row width fixes that at all widths
+           without changing the toolbar's design. */
+        .toolbar-search {
+          flex: 1;
+          min-width: 0;
+        }
+        .toolbar-search-input,
+        .toolbar-search-input:focus {
+          width: 100%;
+        }
         .page {
           padding-top: 40px;
           padding-bottom: 80px;
@@ -1218,311 +1325,38 @@
         outline: 2px solid var(--accent);
         outline-offset: 3px;
       }
+      /* ── FOOTER ──
+         Styled once in static/css/nav-footer.css. The copy that used to live
+         here won on cascade order and had drifted from the shared rules
+         (different grid breakpoints, 32px tap targets, an 8px copyright). */
 
-      /* ============================================================
-         FOOTER (moved out of comment — was previously non-functional)
-         ============================================================ */
-      footer {
-        position: relative;
-        z-index: 1;
-        background: rgba(255, 255, 255, 0.012);
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-        padding: clamp(40px, 6vw, 72px) var(--side) 0;
-      }
-      footer::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          #00f0ff,
-          #a855f7,
-          transparent
-        );
-        opacity: 0.35;
-        pointer-events: none;
-      }
 
-      /* 4-col grid → 2-col → 1-col */
-      .ft-top {
-        display: grid;
-        grid-template-columns: 1.6fr repeat(3, 1fr);
-        gap: clamp(24px, 3vw, 48px);
-        max-width: 1400px;
-        margin: 0 auto;
-        padding-bottom: clamp(32px, 5vw, 60px);
-      }
+      /* ━━ Grid empty state / card links / pagination ━━
+         These rules used to sit INSIDE the @media (max-width: 360px) block
+         above, so pagination, the empty-grid message and the product-title
+         link styling only existed on a 360px-wide screen. Everywhere else the
+         pagination rendered as unstyled default-blue links. They are
+         viewport-independent, so they belong outside the query. The
+         breadcrumb declarations that were trapped with them are dropped here
+         because the fuller "BREADCRUMB & HEADING SPACING" block below already
+         defines the same selectors. */
+      .grid-empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted)}
+      /* The title is the main link into a product (the card itself has no
+         handler). As an inline <a> it was a 23px-tall target; making it fill
+         the clamped two-line title box gives it a 44px+ hit area without
+         changing how the text looks. */
+      .card-name a{color:inherit;text-decoration:none;display:block;min-height:44px}
+      .card-name a:hover,.card-name a:focus-visible{color:var(--accent)}
 
-      .ft-logo {
-        font-family: var(--mono);
-        font-weight: 700;
-        font-size: clamp(1rem, 1.8vw, 1.28rem);
-        background: linear-gradient(135deg, #00f0ff, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: 0.14em;
-        margin-bottom: 12px;
-        display: block;
-      }
-      .ft-tag {
-        font-size: clamp(0.78rem, 1vw, 0.85rem);
-        color: rgba(255, 255, 255, 0.32);
-        line-height: 1.85;
-        max-width: 280px;
-        margin-bottom: 22px;
-      }
-      .social-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      .soc {
-        width: 38px;
-        height: 38px;
-        border-radius: 9px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.35s;
-        color: rgba(255, 255, 255, 0.45);
-        text-decoration: none;
-        flex-shrink: 0;
-      }
-      @media (hover: hover) {
-        .soc:hover {
-          background: rgba(0, 240, 255, 0.08);
-          border-color: rgba(0, 240, 255, 0.28);
-          color: #00f0ff;
-          transform: translateY(-2px);
-        }
-      }
-      .soc svg {
-        width: 15px;
-        height: 15px;
-        fill: currentColor;
-      }
-
-      .ft-col h3 {
-        font-family: var(--font);
-        font-size: clamp(0.68rem, 0.85vw, 0.75rem);
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.3);
-        margin-bottom: clamp(12px, 1.5vw, 18px);
-      }
-      .ft-col ul {
-        list-style: none;
-      }
-      .ft-col li {
-        margin-bottom: clamp(7px, 1vw, 11px);
-      }
-      .ft-col a {
-        font-size: clamp(0.78rem, 0.95vw, 0.86rem);
-        color: rgba(255, 255, 255, 0.42);
-        text-decoration: none;
-        transition: color 0.3s;
-        display: block;
-        min-height: 32px;
-        line-height: 32px;
-      }
-      @media (hover: hover) {
-        .ft-col a:hover {
-          color: #fff;
-        }
-      }
-
-      /* Newsletter */
-      .ft-nl {
-        max-width: 1400px;
-        margin: 0 auto;
-        border-top: 1px solid rgba(255, 255, 255, 0.055);
-        padding: clamp(24px, 3.5vw, 40px) 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: clamp(16px, 2.5vw, 28px);
-        flex-wrap: wrap;
-      }
-      .nl-txt h3 {
-        font-size: clamp(0.88rem, 1.1vw, 0.96rem);
-        font-weight: 700;
-        margin-bottom: 4px;
-      }
-      .nl-txt p {
-        font-size: clamp(0.76rem, 0.9vw, 0.82rem);
-        color: rgba(255, 255, 255, 0.32);
-      }
-      .nl-form {
-        display: flex;
-        gap: 9px;
-        flex: 1;
-        min-width: min(100%, 260px);
-        max-width: 420px;
-      }
-      .nl-form input {
-        flex: 1;
-        min-width: 0;
-        padding: 10px 17px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 100px;
-        font-family: var(--font);
-        font-size: clamp(0.76rem, 0.9vw, 0.82rem);
-        color: #fff;
-        outline: none;
-        transition:
-          border-color 0.3s,
-          box-shadow 0.3s;
-        text-align: right;
-        min-height: 44px;
-      }
-      .nl-form input::placeholder {
-        color: rgba(255, 255, 255, 0.22);
-      }
-      .nl-form input:focus {
-        border-color: rgba(0, 240, 255, 0.38);
-        box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.07);
-      }
-      .nl-form button {
-        padding: 10px clamp(14px, 2vw, 22px);
-        background: linear-gradient(135deg, #00f0ff, #a855f7);
-        border: none;
-        border-radius: 100px;
-        font-family: var(--font);
-        font-size: clamp(0.76rem, 0.9vw, 0.82rem);
-        font-weight: 700;
-        color: #050505;
-        cursor: pointer;
-        transition:
-          transform 0.3s,
-          box-shadow 0.3s;
-        white-space: nowrap;
-        min-height: 44px;
-      }
-      @media (hover: hover) {
-        .nl-form button:hover {
-          transform: scale(1.04);
-          box-shadow: 0 0 22px rgba(0, 240, 255, 0.3);
-        }
-      }
-
-      .ft-bot {
-        max-width: 1400px;
-        margin: 0 auto;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      .ft-copy {
-        font-family: var(--mono);
-        font-size: clamp(0.5rem, 0.65vw, 0.6rem);
-        color: rgba(255, 255, 255, 0.18);
-        letter-spacing: 0.06em;
-      }
-      .ft-legal {
-        display: flex;
-        flex-wrap: wrap;
-        gap: clamp(10px, 1.5vw, 20px);
-      }
-      .ft-legal a {
-        font-size: clamp(0.62rem, 0.75vw, 0.7rem);
-        color: rgba(255, 255, 255, 0.22);
-        text-decoration: none;
-        transition: color 0.3s;
-        min-height: 32px;
-        display: inline-flex;
-        align-items: center;
-      }
-      @media (hover: hover) {
-        .ft-legal a:hover {
-          color: rgba(255, 255, 255, 0.55);
-        }
-      }
-
-      /* ── Footer responsive breakpoints */
-      @media (max-width: 1024px) {
-        .ft-top {
-          grid-template-columns: 1.4fr 1fr 1fr 1fr;
-          gap: clamp(20px, 2.5vw, 36px);
-        }
-      }
-      @media (max-width: 820px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-          gap: 28px;
-        }
-        .ft-brand {
-          grid-column: 1 / -1;
-        }
-        .ft-tag {
-          max-width: 100%;
-        }
-      }
-      @media (max-width: 480px) {
-        .ft-top {
-          grid-template-columns: 1fr 1fr;
-        }
-        .ft-nl {
-          flex-direction: column;
-          align-items: stretch;
-        }
-        .nl-form {
-          max-width: 100%;
-        }
-        .ft-bot {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-      }
-      @media (max-width: 360px) {
-        .ft-top {
-          grid-template-columns: 1fr;
-        }
-        .ft-legal {
-          gap: 8px;
-        }
-        .nl-form {
-          flex-direction: column;
-        }
-        .nl-form button {
-          width: 100%;
-        }
-        /* ━━ Breadcrumb / heading / pagination (server-rendered SEO markup) ━━ */
-        .breadcrumb-wrap{background:transparent}
-        .breadcrumb{padding:88px 0 0;font-size:13px}
-        .breadcrumb ol{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0;color:var(--muted)}
-        .breadcrumb li + li::before{content:"‹";margin-left:8px;color:var(--muted2)}
-        .breadcrumb a{color:var(--muted);text-decoration:none}
-        .breadcrumb a:hover,.breadcrumb a:focus-visible{color:var(--accent);text-decoration:underline}
-
-        .page-heading{padding:24px 0 4px}
-        .page-h1{font-family:'Syne',var(--font,sans-serif);font-size:clamp(28px,5vw,46px);line-height:1.15;margin:0 0 10px;color:var(--text)}
-        .page-intro{max-width:70ch;color:var(--muted);line-height:1.9;margin:0}
-
-        .grid-empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted)}
-        .card-name a{color:inherit;text-decoration:none}
-        .card-name a:hover,.card-name a:focus-visible{color:var(--accent)}
-
-        .pagination{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:40px 0 72px}
-        .page-link{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border:1px solid var(--rim2);border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
-        .page-link:hover,.page-link:focus-visible{border-color:var(--accent);color:var(--accent)}
-        .page-link.is-current{background:var(--accent);border-color:var(--accent);color:#021810;font-weight:700}
-        .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-      }
+      .pagination{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:40px 0 72px}
+      /* 44px, not 40px: this is a primary navigation control on touch. */
+      .page-link{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border:1px solid var(--rim2);border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
+      .page-link:hover,.page-link:focus-visible{border-color:var(--accent);color:var(--accent)}
+      .page-link.is-current{background:var(--accent);border-color:var(--accent);color:#021810;font-weight:700}
 
       /* ━━ BREADCRUMB & HEADING SPACING ━━ */
       .breadcrumb-wrap {
+        background: transparent;
         padding-top: calc(var(--nav-h, 64px) + 24px);
         margin-bottom: 12px;
       }
@@ -1594,7 +1428,13 @@
     </div>
 
 
-    <!-- ━━ HERO SLIDER ━━ -->
+    <!-- ━━ HERO SLIDER ━━
+         Slides are injected by loadCategoryData(), which only runs on a
+         category page. On /shop/ (server-rendered, no category slug) the
+         slider stayed empty but still occupied a full 700px screen, so the
+         listing opened on a blank viewport with two stray arrows. Rendering
+         it only when there is a category to show removes that dead screen. -->
+    {% if category %}
     <section
       class="hero"
       id="heroSlider"
@@ -1623,6 +1463,7 @@
         <span id="counterTotal">۵</span>
       </div>
     </section>
+    {% endif %}
 
     <!-- ━━ MAIN ━━ -->
     <main id="main">
@@ -1764,7 +1605,6 @@
       // اسلاگ را از data-attribute تزریق‌شده توسط جنگو می‌خوانیم، نه از URL
       const categorySlug = document.getElementById("productGrid")
         ?.dataset.categorySlug || "";
-      console.log("🔍 Category Slug:", categorySlug || "(all products - SSR)");
 
       /* ═══════════════════════════════════════
    LOAD CATEGORY DATA
@@ -1777,7 +1617,6 @@
           if (!response.ok) throw new Error("دسته‌بندی یافت نشد");
 
           categoryData = await response.json();
-          console.log("✅ Category loaded:", categoryData);
 
           heroProducts = categoryData.hero_products || [];
           products = categoryData.products || [];
@@ -1853,6 +1692,9 @@
       function buildSlides() {
         const container = document.getElementById("slidesContainer");
         const dots = document.getElementById("heroDots");
+        // The hero markup only exists on a category page now, so bail out
+        // rather than throwing on /shop/.
+        if (!container || !dots) return;
         document.getElementById("counterTotal").textContent = toPersianNum(
           heroProducts.length,
         );
@@ -1923,6 +1765,9 @@
         if (idx === currentSlide || heroProducts.length === 0) return;
         const slides = document.querySelectorAll(".slide");
         const dots = document.querySelectorAll(".hero-dot");
+        // No hero markup on /shop/, and indices must exist on both lists.
+        if (!slides.length || !dots.length) return;
+        if (!slides[currentSlide] || !dots[currentSlide]) return;
 
         slides[currentSlide].classList.remove("active");
         dots[currentSlide].classList.remove("active");
@@ -2271,6 +2116,12 @@
       // فقط برای صفحات کتگوری API فراخوانی می‌شود — صفحه /shop/ از SSR استفاده می‌کند
       if (categorySlug) {
         loadCategoryData();
+      } else {
+        /* /shop/ renders its grid server-side, so renderGrid() — and with it
+           initReveal() — never ran. `.card` starts at opacity:0 and was only
+           ever un-hidden by the reveal observer, which left the entire
+           product listing invisible on this page. */
+        initReveal();
       }
       /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         NEWSLETTER SUBMIT

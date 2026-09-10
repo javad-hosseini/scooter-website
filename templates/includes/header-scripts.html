@@ -2,49 +2,128 @@
   /* ════════════════════════════════════
      HEADER & MOBILE DRAWER SCRIPTS
      ════════════════════════════════════ */
-  function toggleUserMenu(e) {
-    if (e) e.stopPropagation();
-    const btn = document.getElementById("authUserBtn");
-    const menu = document.getElementById("authUserMenu");
-    if (!btn || !menu) return;
-    const isOpen = menu.classList.toggle("open");
-    btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-  }
+  (function () {
+    "use strict";
 
-  function toggleMenu() {
-    const btn = document.getElementById("menuBtn");
-    const drawer = document.getElementById("mobileDrawer");
-    if (!btn || !drawer) return;
-    const isOpen = drawer.classList.toggle("open");
-    btn.classList.toggle("open", isOpen);
-    btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-  }
+    var scrollY = 0;
 
-  function closeMenu() {
-    const btn = document.getElementById("menuBtn");
-    const drawer = document.getElementById("mobileDrawer");
-    if (btn) btn.classList.remove("open");
-    if (drawer) drawer.classList.remove("open");
-    if (btn) btn.setAttribute("aria-expanded", "false");
-  }
-
-  // Close menus when clicking outside
-  document.addEventListener("click", function (e) {
-    const menu = document.getElementById("authUserMenu");
-    const btn = document.getElementById("authUserBtn");
-    if (menu && menu.classList.contains("open")) {
-      if (!menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.classList.remove("open");
-        if (btn) btn.setAttribute("aria-expanded", "false");
-      }
+    function el(id) {
+      return document.getElementById(id);
     }
-  });
 
-  // Close menus on Escape key
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      const menu = document.getElementById("authUserMenu");
-      const btn = document.getElementById("authUserBtn");
+    /* ── Body scroll lock ──
+       iOS Safari ignores `overflow: hidden` on <body>, so the page keeps
+       scrolling behind the drawer. Pinning the body with position:fixed and
+       restoring the offset afterwards is the only approach that holds there. */
+    function lockScroll() {
+      scrollY = window.scrollY || window.pageYOffset || 0;
+      document.body.style.position = "fixed";
+      document.body.style.top = -scrollY + "px";
+      document.body.style.insetInline = "0";
+      document.body.style.width = "100%";
+    }
+
+    function unlockScroll() {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.insetInline = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
+    }
+
+    function drawerIsOpen() {
+      var drawer = el("mobileDrawer");
+      return !!drawer && drawer.classList.contains("open");
+    }
+
+    window.toggleMenu = function () {
+      if (drawerIsOpen()) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    };
+
+    window.openMenu = function () {
+      var btn = el("menuBtn");
+      var drawer = el("mobileDrawer");
+      if (!btn || !drawer || drawer.classList.contains("open")) return;
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+      btn.classList.add("open");
+      btn.setAttribute("aria-expanded", "true");
+      lockScroll();
+      // Move focus into the dialog so keyboard and screen-reader users land
+      // inside it rather than continuing through the page behind.
+      var first = drawer.querySelector("a, button");
+      if (first) first.focus();
+    };
+
+    window.closeMenu = function () {
+      var btn = el("menuBtn");
+      var drawer = el("mobileDrawer");
+      if (!drawer || !drawer.classList.contains("open")) return;
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      if (btn) {
+        btn.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
+      }
+      unlockScroll();
+    };
+
+    /* Returning focus to the trigger is only correct when the user dismissed
+       the menu; following a link should let the new page take focus. */
+    function closeMenuAndRestoreFocus() {
+      if (!drawerIsOpen()) return;
+      closeMenu();
+      var btn = el("menuBtn");
+      if (btn) btn.focus();
+    }
+
+    window.toggleUserMenu = function (e) {
+      if (e) e.stopPropagation();
+      var btn = el("authUserBtn");
+      var menu = el("authUserMenu");
+      if (!btn || !menu) return;
+      var isOpen = menu.classList.toggle("open");
+      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    };
+
+    // Keep focus inside the drawer while it is open.
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Tab" || !drawerIsOpen()) return;
+      var drawer = el("mobileDrawer");
+      var items = drawer.querySelectorAll("a[href], button:not([disabled])");
+      if (!items.length) return;
+      var first = items[0];
+      var last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+
+    // Close menus when clicking outside
+    document.addEventListener("click", function (e) {
+      var menu = el("authUserMenu");
+      var btn = el("authUserBtn");
+      if (menu && menu.classList.contains("open")) {
+        if (!menu.contains(e.target) && btn && !btn.contains(e.target)) {
+          menu.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+        }
+      }
+    });
+
+    // Close menus on Escape key
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var menu = el("authUserMenu");
+      var btn = el("authUserBtn");
       if (menu && menu.classList.contains("open")) {
         menu.classList.remove("open");
         if (btn) {
@@ -52,34 +131,46 @@
           btn.focus();
         }
       }
-      closeMenu();
-    }
-  });
+      closeMenuAndRestoreFocus();
+    });
 
-  // Update cart item count badge
-  async function updateCartBadge() {
-    const badge = document.getElementById("navCartCount");
-    if (!badge) return;
-    try {
-      const response = await fetch("/shop/api/cart/", {
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-      });
-      if (response.ok) {
+    /* The hamburger is hidden from 768px up, so a drawer left open across a
+       resize or rotation would strand the page with a locked body. */
+    var desktopQuery = window.matchMedia("(min-width: 768px)");
+    function handleBreakpointChange(e) {
+      if (e.matches) closeMenu();
+    }
+    if (desktopQuery.addEventListener) {
+      desktopQuery.addEventListener("change", handleBreakpointChange);
+    } else if (desktopQuery.addListener) {
+      desktopQuery.addListener(handleBreakpointChange); // Safari < 14
+    }
+
+    // Update cart item count badge
+    async function updateCartBadge() {
+      var badge = el("navCartCount");
+      if (!badge) return;
+      try {
+        const response = await fetch("/shop/api/cart/", {
+          headers: { "X-Requested-With": "XMLHttpRequest" }
+        });
+        if (!response.ok) return;
         const data = await response.json();
-        const count = data.item_count ?? data.total_items ?? (Array.isArray(data.items) ? data.items.length : 0);
+        const count =
+          data.item_count ??
+          data.total_items ??
+          (Array.isArray(data.items) ? data.items.length : 0);
         if (count > 0) {
           badge.textContent = count;
           badge.removeAttribute("hidden");
         } else {
           badge.setAttribute("hidden", "");
         }
+      } catch (error) {
+        /* A failed badge refresh must never break the header. */
       }
-    } catch (error) {
-      console.warn("Could not fetch cart badge count:", error);
     }
-  }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    updateCartBadge();
-  });
+    document.addEventListener("DOMContentLoaded", updateCartBadge);
+  })();
 </script>

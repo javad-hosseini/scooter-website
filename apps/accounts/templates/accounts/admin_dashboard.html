@@ -5,7 +5,7 @@
     <title id="page-title">اسکوتیکس | داشبورد مدیریت</title>
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
     />
 
     <!-- Self-hosted Fonts -->
@@ -1452,7 +1452,6 @@
           const response = await fetch(API_URL);
           if (!response.ok) throw new Error("Failed to load dashboard data");
           dashboardData = await response.json();
-          console.log("✅ Dashboard loaded:", dashboardData);
           renderAll();
         } catch (error) {
           console.error("❌ Error loading dashboard:", error);
@@ -1575,7 +1574,6 @@
           const sampleValues = [12, 18, 25, 30, 28, 35, 42, 38, 45, 50, 55, 60];
           chartCategories = sampleMonths;
           chartData = sampleValues;
-          console.log("📊 Using sample data for chart");
         } else {
           chartCategories = data.map((d) => d.month);
           chartData = data.map((d) => d.total || 0);
@@ -1779,7 +1777,6 @@
               }
 
               // لاگ برای دیباگ
-              console.log(`Product ${i}:`, p.name, "cover_image:", coverImage);
 
               return `
                 <div class="col-md-6">

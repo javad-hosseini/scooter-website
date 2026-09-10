@@ -19,6 +19,14 @@
   --nav-r-sm: 10px;
   --nav-r-md: 14px;
   --nav-r-lg: 20px;
+  /* Single rail width shared by every mobile-drawer row (links, CTA, auth),
+     so all drawer items line up on the same left/right edges. */
+  --drawer-item-w: min(260px, 76vw);
+  /* One row height for every drawer item; also clears the 44px touch min. */
+  --drawer-row-h: 48px;
+  /* Minimum comfortable touch target. The visual icon stays small; only the
+     hit area grows. */
+  --tap-min: 44px;
 }
 
 @media (min-width: 768px) {
@@ -98,7 +106,9 @@ nav#nav {
   height: 1.5px;
   background: var(--nav-neon);
   transform: scaleX(0);
-  transform-origin: left;
+  /* Logical origin so the underline grows from the start edge — the right
+     side in this RTL document. */
+  transform-origin: inline-start;
   transition: transform 0.35s var(--nav-ease);
 }
 
@@ -280,6 +290,29 @@ nav#nav {
   flex-shrink: 0;
   text-decoration: none;
   transition: border-color 0.3s, background 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Grow the hit area past 44px without changing the 40px visual box, so the
+   header keeps its exact current proportions on every breakpoint. 48px rather
+   than exactly 44px leaves room for sub-pixel rounding; the 14px cluster gap
+   means the two areas still never overlap. */
+.nav-cart-btn::after,
+.nav-menu-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+}
+
+/* The wordmark was a 93x26 target. Height only — the type is untouched. */
+.nav-logo a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
 }
 
 .nav-cart-btn:hover {
@@ -328,6 +361,7 @@ nav#nav {
 }
 
 .nav-menu-btn {
+  position: relative;
   width: 40px;
   height: 40px;
   background: transparent;
@@ -342,6 +376,7 @@ nav#nav {
   padding: 0;
   flex-shrink: 0;
   transition: border-color 0.3s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .nav-menu-btn:hover {
@@ -372,10 +407,11 @@ nav#nav {
 ═══════════════════════════════════════════ */
 .mobile-drawer {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  /* dvh tracks the iOS Safari toolbar as it collapses/expands, so the drawer
+     never ends up taller or shorter than the visible area. */
+  height: 100vh;
+  height: 100dvh;
   background: rgba(5, 5, 8, 0.98);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -384,118 +420,229 @@ nav#nav {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 2px;
   transform: translateY(-100%);
-  transition: transform 0.55s var(--nav-ease);
-  padding: 80px 24px 30px;
+  /* `visibility` keeps the off-screen drawer out of the tab order; without it
+     the links stay focusable while invisible. */
+  visibility: hidden;
+  transition: transform 0.55s var(--nav-ease), visibility 0.55s;
+  padding: calc(var(--nav-h) + 14px + env(safe-area-inset-top)) 24px
+    calc(28px + env(safe-area-inset-bottom));
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mobile-drawer.open {
   transform: translateY(0);
+  visibility: visible;
+}
+
+/* ── Drawer rows ──
+   Every row — nav link, CTA, login, register, logout — is exactly
+   --drawer-item-w wide and --drawer-row-h tall, so they share one left/right
+   rail and one vertical rhythm. Height comes from min-height + flex centring
+   rather than vertical padding: padding-driven heights drifted by 2-3px
+   between rows whenever the font size or border differed. */
+.mobile-drawer a,
+.mobile-drawer-cta,
+.drawer-auth-link,
+.drawer-auth-register,
+.drawer-auth-user button.auth-logout {
+  width: var(--drawer-item-w);
+  min-height: var(--drawer-row-h);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  font-family: inherit;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .mobile-drawer a {
-  font-family: inherit;
   font-weight: 500;
-  font-size: 1.4rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
   color: var(--nav-dim);
   text-decoration: none;
-  padding: 10px 0;
-  display: block;
-  text-align: center;
-  transition: color 0.25s, transform 0.25s;
+  border-radius: var(--nav-r-sm);
+  border-bottom: 1px solid var(--nav-border);
+  transition: color 0.3s var(--nav-ease-sm), background 0.3s var(--nav-ease-sm),
+    border-color 0.3s var(--nav-ease-sm);
 }
 
-.mobile-drawer a:hover,
+/* The login link is an <a> inside the drawer, so `.mobile-drawer a` above
+   also matches it. Drop the divider there — it carries its own pill border. */
+.mobile-drawer a:last-of-type,
+.mobile-drawer .drawer-auth-link {
+  border-bottom: none;
+}
+
+/* Hover only where a real pointer exists, so tapped links on a phone don't
+   keep a stuck highlight. */
+@media (hover: hover) and (pointer: fine) {
+  .mobile-drawer a:hover {
+    color: var(--nav-neon);
+    border-color: var(--nav-border-lit);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(79, 216, 255, 0.12) 45%,
+      transparent
+    );
+  }
+}
+
 .mobile-drawer a:active {
   color: var(--nav-neon);
-  transform: translateX(-6px);
+  border-color: var(--nav-border-lit);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(79, 216, 255, 0.12) 45%,
+    transparent
+  );
 }
 
-.drawer-auth {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  margin-top: 24px;
-  width: 100%;
-  max-width: 260px;
+.mobile-drawer a:focus-visible {
+  color: var(--nav-neon);
+  border-color: var(--nav-border-lit);
+  outline: 1.5px solid var(--nav-neon);
+  outline-offset: 2px;
 }
 
-.drawer-auth-link {
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
-  color: var(--nav-dim) !important;
-  text-decoration: none;
-  padding: 12px 30px !important;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 100px;
-  width: 100%;
-  text-align: center;
-}
-
-.drawer-auth-register {
-  font-family: inherit;
+/* The primary drawer CTA. Previously unstyled outside the homepage, which
+   rendered it as a ~19px-tall default button. */
+.mobile-drawer-cta {
+  margin-top: 20px;
   font-size: 0.88rem;
   font-weight: 600;
   background: var(--nav-white);
   color: var(--nav-black);
-  padding: 13px 40px;
   border: none;
   cursor: pointer;
   border-radius: 100px;
-  width: 100%;
+  transition: background 0.25s var(--nav-ease-sm);
+  -webkit-tap-highlight-color: transparent;
 }
 
+.mobile-drawer-cta:active {
+  background: var(--nav-neon);
+}
+
+.drawer-auth,
 .drawer-auth-user {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  width: 100%;
+  gap: 10px;
+  margin-top: 18px;
+  width: var(--drawer-item-w);
+}
+
+.drawer-auth-link {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--nav-dim);
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 100px;
+  transition: border-color 0.25s, color 0.25s;
+}
+
+.drawer-auth-link:active {
+  border-color: var(--nav-neon);
+  color: var(--nav-neon);
+}
+
+.drawer-auth-register {
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: var(--nav-white);
+  color: var(--nav-black);
+  border: none;
+  cursor: pointer;
+  border-radius: 100px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .drawer-user-info {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   color: var(--nav-white);
   font-weight: 600;
-  font-size: 0.95rem;
-  margin-bottom: 8px;
+  font-size: 0.92rem;
+  margin-bottom: 4px;
+  width: var(--drawer-item-w);
 }
 
 .drawer-auth-user button.auth-logout {
-  font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
   color: #ff8a8a;
   background: none;
-  border: none;
+  border: 1px solid rgba(255, 138, 138, 0.25);
+  border-radius: 100px;
   cursor: pointer;
-  padding: 10px;
+  margin-top: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The logout form wraps a drawer row, so it has to carry the rail width too —
+   otherwise the button inside it centres against the drawer instead. */
+.drawer-logout-form {
+  width: var(--drawer-item-w);
+  display: flex;
+}
+
+.drawer-logout-form button.auth-logout {
+  width: 100%;
+}
+
+.drawer-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
+  nav#nav { padding: 0 36px; }
   .nav-auth { display: flex; }
+  .nav-links { display: flex; }
+  .nav-menu-btn { display: none; }
+  /* The trigger is gone at this width, so the drawer must never be able to
+     linger open after a resize or orientation change. */
+  .mobile-drawer { display: none; }
 }
 
 @media (min-width: 1024px) {
   nav#nav { padding: 0 64px; }
-  .nav-links { display: flex; }
-  .nav-menu-btn { display: none; }
 }
 
 /* ═══════════════════════════════════════════
    FOOTER
+   Single source of truth. cart.html, category_products.html, articles.html,
+   article_detail.html and about_us.html each carried a near-identical copy of
+   this block in their own <style>, which won on cascade order and drifted:
+   different grid breakpoints (820/480/360 vs 640), different link sizes, and
+   32px tap targets. The richer fluid version from those copies is kept here;
+   the copies are gone.
 ═══════════════════════════════════════════ */
 footer[role="contentinfo"] {
   position: relative;
   z-index: 10;
   background: rgba(255, 255, 255, 0.012);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 60px 24px 20px;
-  margin-top: 60px;
+  /* Bottom inset keeps the legal row clear of the iPhone home indicator. */
+  padding: clamp(40px, 6vw, 72px) clamp(22px, 5vw, 84px)
+    env(safe-area-inset-bottom);
 }
 
 footer[role="contentinfo"]::before {
@@ -506,38 +653,42 @@ footer[role="contentinfo"]::before {
   right: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, #00f0ff, #a855f7, transparent);
-  opacity: 0.4;
+  opacity: 0.35;
   pointer-events: none;
 }
 
 .ft-top {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 36px;
-  max-width: 1300px;
+  gap: clamp(24px, 3vw, 48px);
+  max-width: 1400px;
   margin: 0 auto;
-  padding-bottom: 40px;
+  padding-bottom: clamp(32px, 5vw, 60px);
 }
 
 .ft-brand { max-width: 320px; }
 
 .ft-logo {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "JetBrains Mono", "Vazirmatn", monospace;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 1.8vw, 1.28rem);
   background: linear-gradient(135deg, #00f0ff, #a855f7);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: 0.14em;
   margin-bottom: 12px;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
 }
 
 .ft-tag {
-  font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.38);
+  font-size: clamp(0.78rem, 1vw, 0.85rem);
+  color: rgba(255, 255, 255, 0.32);
   line-height: 1.85;
-  margin-bottom: 20px;
+  max-width: 280px;
+  margin-bottom: 22px;
 }
 
 .social-row {
@@ -547,25 +698,27 @@ footer[role="contentinfo"]::before {
 }
 
 .soc {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 11px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
-  color: rgba(255, 255, 255, 0.5);
+  transition: background 0.35s, border-color 0.35s, color 0.35s, transform 0.35s;
+  color: rgba(255, 255, 255, 0.45);
   text-decoration: none;
   flex-shrink: 0;
 }
 
-.soc:hover {
-  background: rgba(0, 240, 255, 0.08);
-  border-color: rgba(0, 240, 255, 0.3);
-  color: #00f0ff;
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .soc:hover {
+    background: rgba(0, 240, 255, 0.08);
+    border-color: rgba(0, 240, 255, 0.28);
+    color: #00f0ff;
+    transform: translateY(-2px);
+  }
 }
 
 .soc svg {
@@ -575,74 +728,107 @@ footer[role="contentinfo"]::before {
 }
 
 .ft-col h3 {
-  font-size: 0.78rem;
+  font-family: "Vazirmatn", "Inter", sans-serif;
+  font-size: clamp(0.72rem, 0.85vw, 0.78rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 16px;
+  color: rgba(255, 255, 255, 0.32);
+  margin-bottom: clamp(8px, 1.2vw, 14px);
 }
 
 .ft-col ul {
   list-style: none;
 }
 
+/* The link supplies the row height, so no extra spacer is needed — this keeps
+   the 44px targets from making the footer taller than it needs to be. */
 .ft-col li {
-  margin-bottom: 9px;
+  margin-bottom: 0;
 }
 
 .ft-col a {
-  font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.48);
+  font-size: clamp(0.8rem, 0.95vw, 0.86rem);
+  color: rgba(255, 255, 255, 0.42);
   text-decoration: none;
-  transition: color 0.25s;
-  display: inline-block;
+  transition: color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
 }
 
-.ft-col a:hover {
-  color: #ffffff;
+@media (hover: hover) {
+  .ft-col a:hover {
+    color: #fff;
+  }
 }
 
 .ft-bot {
-  max-width: 1300px;
+  max-width: 1400px;
   margin: 0 auto;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 24px;
+  padding: clamp(14px, 2vw, 22px) 0 clamp(20px, 3vw, 32px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .ft-copy {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.25);
-  letter-spacing: 0.04em;
+  font-family: "JetBrains Mono", "Vazirmatn", monospace;
+  /* Was clamp(0.5rem, …) — an 8px floor on every phone, since the 0.65vw
+     middle term never exceeds it below ~1230px. */
+  font-size: clamp(0.68rem, 0.65vw, 0.72rem);
+  color: rgba(255, 255, 255, 0.28);
+  letter-spacing: 0.06em;
 }
 
 .ft-legal {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: clamp(10px, 1.5vw, 20px);
 }
 
 .ft-legal a {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: clamp(0.7rem, 0.75vw, 0.74rem);
+  color: rgba(255, 255, 255, 0.3);
   text-decoration: none;
-  transition: color 0.25s;
+  transition: color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
 }
 
-.ft-legal a:hover {
-  color: rgba(255, 255, 255, 0.7);
+@media (hover: hover) {
+  .ft-legal a:hover {
+    color: rgba(255, 255, 255, 0.6);
+  }
 }
 
-@media (min-width: 640px) {
+/* Two columns from 480px so link labels keep a usable measure, the full
+   four-column layout from 1024px. */
+@media (min-width: 480px) {
   .ft-top {
-    grid-template-columns: 1.5fr repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
+  }
+  .ft-brand {
+    grid-column: 1 / -1;
+    max-width: 100%;
+  }
+  .ft-tag {
+    max-width: 100%;
   }
 }
 
 @media (min-width: 1024px) {
-  footer[role="contentinfo"] { padding: 70px 64px 28px; }
+  .ft-top {
+    grid-template-columns: 1.6fr repeat(3, 1fr);
+  }
+  .ft-brand {
+    grid-column: auto;
+    max-width: 320px;
+  }
+  .ft-tag {
+    max-width: 280px;
+  }
 }

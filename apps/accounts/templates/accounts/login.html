@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
     />
     <title>ورود | پنل مدیریت فروش اسکوتر Nex Go</title>
 
@@ -625,6 +625,9 @@
         color: var(--accent-2);
         font-weight: 600;
         position: relative;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
       }
       .forgot-link::after {
         content: "";
@@ -788,6 +791,7 @@
       .support-link {
         display: flex;
         align-items: center;
+        min-height: 44px;
         gap: 0.4rem;
         font-size: 0.78rem;
         color: var(--text-mid);
@@ -857,6 +861,28 @@
         .shape-c,
         .shape-d {
           opacity: 0.5;
+        }
+      }
+    
+      /* ── Mobile viewport & input corrections ──
+         100vh on iOS Safari resolves to the *largest* viewport (toolbars
+         retracted), so a vertically centred card is pushed down and its
+         footer starts below the fold. dvh tracks the visible area instead.
+         Inputs are raised to 16px because Safari zooms the whole page when a
+         focused control's font is smaller. */
+      @supports (min-height: 100dvh) {
+        .auth-page { min-height: 100dvh; }
+      }
+      @media (max-width: 1023.98px) {
+        .field input,
+        .otp-box,
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="password"],
+        select,
+        textarea {
+          font-size: 16px;
         }
       }
     </style>
