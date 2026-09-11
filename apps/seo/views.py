@@ -114,11 +114,16 @@ def server_error(request):
 def _error_seo(request, title):
     from .seo import PageSEO
 
+    try:
+        image_url = absolute_url(static(settings.SEO_DEFAULT_IMAGE), request)
+    except Exception:
+        image_url = ''
+
     return PageSEO(
         title=f'{title} | {settings.SITE_NAME}',
         description='',
         canonical='',
         # Error pages must never be indexed, even if something links to them.
         robots='noindex, nofollow',
-        image=absolute_url(static(settings.SEO_DEFAULT_IMAGE), request),
+        image=image_url,
     )
