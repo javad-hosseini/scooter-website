@@ -20,30 +20,31 @@ from decouple import Config, Csv, RepositoryEnv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import os
+import sys
+
 # ══════════════════════════════════════════════════════════════════════
-#  ENVIRONMENT SWITCH — 1 of 2
-#
-#  Switch this together with the DATABASES block further down (marked
-#  "ENVIRONMENT SWITCH — 2 of 2"). Both must point at the same
-#  environment.
+#  ENVIRONMENT CONFIGURATION
+#  Auto-detects .env.prod, .env, or .env.dev, and falls back to os.environ.
 # ══════════════════════════════════════════════════════════════════════
 
-# ---- DEVELOPMENT (active) ----
-ENV_FILE = BASE_DIR / '.env.dev'
+if os.environ.get('DJANGO_ENV') == 'production':
+    ENV_FILES = [BASE_DIR / '.env.prod', BASE_DIR / '.env', BASE_DIR / '.env.dev']
+else:
+    ENV_FILES = [BASE_DIR / '.env.dev', BASE_DIR / '.env.prod', BASE_DIR / '.env']
 
-# ---- PRODUCTION (commented out) ----
-# ENV_FILE = BASE_DIR / '.env.prod'
-
-# Explicit file, rather than decouple's search for a file named ".env".
-# Real environment variables still win over the file, so a container or
-# systemd unit can override any single value without editing anything.
-config = Config(RepositoryEnv(ENV_FILE))
+for env_path in ENV_FILES:
+    if env_path.is_file():
+        config = Config(RepositoryEnv(env_path))
+        break
+else:
+    from decouple import config
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production-^!8@2#9$')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
@@ -257,39 +258,47 @@ LOGOUT_REDIRECT_URL = "/"
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # ══════════════════════════════════════════════════════════════════════
-#  ENVIRONMENT SWITCH — 2 of 2  (Database)
-#  https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-#
-#  Exactly one of the two blocks below is active. Switch this together
-#  with ENV_FILE at the top of this file.
+#  DATABASE CONFIGURATION
+#  Supports SQLite, PostgreSQL, and MySQL/MariaDB via environment variables.
 # ══════════════════════════════════════════════════════════════════════
 
-# ---- DEVELOPMENT — SQLite (active) ----
-# Needs no server and no DB_* variables in .env.dev.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+IS_TESTING = 'test' in sys.argv
 
-# ---- PRODUCTION — PostgreSQL (commented out) ----
-# Uncomment this block, comment out the SQLite block above, and set
-# ENV_FILE to .env.prod.
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME'),
-#         'USER': config('DB_USER'),
-#         'PASSWORD': config('DB_PASSWORD'),
-#         'HOST': config('DB_HOST'),
-#         'PORT': config('DB_PORT'),
-#         # Reuse connections between requests — cuts a TCP+TLS handshake
-#         # off every request's TTFB.
-#         'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
-#         'CONN_HEALTH_CHECKS': True,
-#     }
-# }
+if IS_TESTING:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+else:
+    DB_ENGINE = config('DB_ENGINE', default='')
+    if not DB_ENGINE:
+        if config('DB_NAME', default=''):
+            DB_ENGINE = 'django.db.backends.postgresql'
+        else:
+            DB_ENGINE = 'django.db.backends.sqlite3'
+
+    if DB_ENGINE == 'django.db.backends.sqlite3':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': DB_ENGINE,
+                'NAME': config('DB_NAME', default=''),
+                'USER': config('DB_USER', default=''),
+                'PASSWORD': config('DB_PASSWORD', default=''),
+                'HOST': config('DB_HOST', default='127.0.0.1'),
+                'PORT': config('DB_PORT', default='5432' if 'postgresql' in DB_ENGINE else '3306'),
+                'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
+                'CONN_HEALTH_CHECKS': True,
+            }
+        }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -334,7 +343,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ============ Static files (CSS/JS/فونت - فایل‌های خودت) ============
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']       # جایی که تو dev خودت فایل می‌ذاری
-STATIC_ROOT = BASE_DIR / 'staticfiles'         # مقصد collectstatic برای production
+STATIC_ROOT = Path(config('STATIC_ROOT', default=str(BASE_DIR / 'staticfiles')))         # مقصد collectstatic برای production
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -370,7 +379,7 @@ WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
 # ============ Media files (آپلودهای کاربر - عکس/mp3/pdf مقالات) ============
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path(config('MEDIA_ROOT', default=str(BASE_DIR / 'media')))
 
 # ============ Asset bundling / minification (django-compressor) ============
 COMPRESS_ENABLED = config('COMPRESS_ENABLED', default=not DEBUG, cast=bool)
