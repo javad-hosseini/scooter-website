@@ -13,7 +13,8 @@ else:
 if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)
 
-# Set Django settings module
+# Set environment
+os.environ.setdefault('DJANGO_ENV', 'production')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 from django.core.wsgi import get_wsgi_application
