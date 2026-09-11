@@ -24,6 +24,31 @@ import os
 import sys
 
 # ══════════════════════════════════════════════════════════════════════
+#  RESILIENCE: Safely handle missing media files for ImageField
+#  Prevents unhandled FileNotFoundError crashes when media files on disk
+#  are missing or not yet uploaded.
+# ══════════════════════════════════════════════════════════════════════
+from django.db.models.fields.files import ImageField
+from django.core.files.images import ImageFile
+
+_orig_update_dimension_fields = ImageField.update_dimension_fields
+def _safe_update_dimension_fields(self, instance, force=False, *args, **kwargs):
+    try:
+        return _orig_update_dimension_fields(self, instance, force=force, *args, **kwargs)
+    except (FileNotFoundError, OSError, ValueError):
+        return
+ImageField.update_dimension_fields = _safe_update_dimension_fields
+
+_orig_get_image_dimensions = ImageFile._get_image_dimensions
+def _safe_get_image_dimensions(self):
+    try:
+        return _orig_get_image_dimensions(self)
+    except (FileNotFoundError, OSError, ValueError):
+        return (None, None)
+ImageFile._get_image_dimensions = _safe_get_image_dimensions
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  ENVIRONMENT CONFIGURATION
 #  Auto-detects .env.prod, .env, or .env.dev, and falls back to os.environ.
 # ══════════════════════════════════════════════════════════════════════
