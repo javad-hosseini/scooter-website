@@ -17,10 +17,10 @@ JAZZMIN_SETTINGS = {
     "site_header": "scooter admin",
     "site_brand": "Scooter",
 
-    "site_logo": "images/logo.png",
-    "site_icon": "images/favicon.ico",
+    "site_logo": "images/logo.svg",
+    "site_icon": "images/favicon.svg",
 
-    "login_logo": "images/logo.png",
+    "login_logo": "images/logo.svg",
     "login_logo_dark": None,
 
     "site_logo_classes": "img-circle elevation-2",
@@ -58,7 +58,7 @@ JAZZMIN_SETTINGS = {
     # ------------------------------------------------------
 
     "search_model": [
-        "auth.User",
+        "accounts.CustomUser",
     ],
 
     # ------------------------------------------------------
@@ -99,9 +99,7 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-users",
 
         # Django Models
-
-        "auth.user": "fas fa-user",
-
+        "accounts.customuser": "fas fa-user",
         "auth.group": "fas fa-users-cog",
 
     },
@@ -120,7 +118,7 @@ JAZZMIN_SETTINGS = {
 
     "changeform_format_overrides": {
 
-        "auth.user": "collapsible",
+        "accounts.customuser": "collapsible",
 
     },
 
