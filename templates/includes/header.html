@@ -12,24 +12,23 @@
     <div class="nav-auth" id="navAuth">
       {% if user.is_authenticated %}
       <div class="auth-user" id="authUser">
-        <button
+        <a
           class="auth-user-btn"
           id="authUserBtn"
-          onclick="toggleUserMenu(event)"
-          aria-expanded="false"
-          aria-label="منوی کاربر"
+          href="{% url 'accounts_app:dashboard' %}"
+          aria-label="پروفایل"
         >
           {% if user.profile_image %}
           <img
             class="auth-user-avatar"
             src="{{ user.profile_image.url }}"
-            alt="{{ user.username }}"
+            alt="{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}"
           />
           {% else %}
           <span class="auth-user-avatar">👤</span>
           {% endif %}
-          <span class="auth-user-name">{{ user.fullname|default:user.username }}</span>
-        </button>
+          <span class="auth-user-name">{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
+        </a>
         <div class="auth-user-menu" id="authUserMenu" role="menu">
           <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
           <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
@@ -54,6 +53,7 @@
       {% endif %}
     </div>
 
+    {% if user.is_authenticated %}
     <a
       class="nav-cart-btn"
       id="navCartBtn"
@@ -69,6 +69,7 @@
       </svg>
       <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
     </a>
+    {% endif %}
 
     <button
       class="nav-menu-btn"
@@ -102,14 +103,14 @@
 
   {% if user.is_authenticated %}
   <div class="drawer-auth-user" id="drawerAuthUser">
-    <div class="drawer-user-info">
+    <a href="{% url 'accounts_app:dashboard' %}" class="drawer-user-info" style="text-decoration:none;">
       {% if user.profile_image %}
       <img class="drawer-user-avatar" src="{{ user.profile_image.url }}" alt="" width="28" height="28">
       {% else %}
       <span aria-hidden="true">👤</span>
       {% endif %}
-      <span id="drawerUserName">{{ user.fullname|default:user.username }}</span>
-    </div>
+      <span id="drawerUserName">{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
+    </a>
     <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
     <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
     <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>

@@ -999,14 +999,14 @@
         <div class="nav-auth" id="navAuth">
           {% if user.is_authenticated %}
           <div class="auth-user" id="authUser">
-            <button class="auth-user-btn" id="authUserBtn" onclick="toggleUserMenu(event)">
+            <a class="auth-user-btn" id="authUserBtn" href="{% url 'accounts_app:dashboard' %}" aria-label="پروفایل">
               {% if user.profile_image %}
-              <img class="auth-user-avatar" src="{{ user.profile_image.url }}" alt="{{ user.username }}" />
+              <img class="auth-user-avatar" src="{{ user.profile_image.url }}" alt="{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}" />
               {% else %}
               <span class="auth-user-avatar">👤</span>
               {% endif %}
-              <span class="auth-user-name">{{ user.fullname|default:user.username }}</span>
-            </button>
+              <span class="auth-user-name">{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
+            </a>
             <div class="auth-user-menu" id="authUserMenu" role="menu">
               <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
               <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
@@ -1026,7 +1026,8 @@
           {% endif %}
         </div>
 
-        <a class="nav-cart-btn" id="navCartBtn" href="{% url 'shop:cart' %}" aria-label="سبد خرید">
+        {% if user.is_authenticated %}
+        <a class="nav-cart-btn" id="navCartBtn" href="{% url 'shop_app:cart' %}" aria-label="سبد خرید">
           <svg class="nav-cart-icon" viewBox="0 0 24 24">
             <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" />
             <circle cx="10" cy="20.5" r="1.4" />
@@ -1034,6 +1035,7 @@
           </svg>
           <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
         </a>
+        {% endif %}
 
         <button class="nav-menu-btn" id="vxMenuBtn" onclick="toggleVxMenu()" aria-label="منو">
           <span></span><span></span><span></span>
@@ -1050,14 +1052,14 @@
 
       {% if user.is_authenticated %}
       <div class="drawer-auth-user" id="drawerAuthUser">
-        <div class="drawer-user-info">
+        <a href="{% url 'accounts_app:dashboard' %}" class="drawer-user-info" style="text-decoration:none;">
           {% if user.profile_image %}
-          <img class="auth-user-avatar" src="{{ user.profile_image.url }}" alt="{{ user.username }}" style="width:32px;height:32px;" />
+          <img class="auth-user-avatar" src="{{ user.profile_image.url }}" alt="" style="width:32px;height:32px;" />
           {% else %}
           <span class="auth-user-avatar">👤</span>
           {% endif %}
-          <span>{{ user.fullname|default:user.username }}</span>
-        </div>
+          <span>{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
+        </a>
         <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
         <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
         <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>

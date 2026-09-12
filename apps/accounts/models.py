@@ -107,6 +107,16 @@ class CustomUser(AbstractUser):
 
     USERNAME_FIELD = 'username'
 
+    def save(self, *args, **kwargs):
+        if self.fullname and not (self.first_name or self.last_name):
+            parts = self.fullname.strip().split(' ', 1)
+            self.first_name = parts[0]
+            if len(parts) > 1:
+                self.last_name = parts[1]
+        elif (self.first_name or self.last_name) and not self.fullname:
+            self.fullname = f"{self.first_name} {self.last_name}".strip()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.fullname or self.email
 

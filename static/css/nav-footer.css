@@ -231,6 +231,8 @@ nav#nav {
   z-index: 1001;
 }
 
+.auth-user:hover .auth-user-menu,
+.auth-user:focus-within .auth-user-menu,
 .auth-user-menu.open {
   opacity: 1;
   visibility: visible;
