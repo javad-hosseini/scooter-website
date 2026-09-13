@@ -96,7 +96,9 @@ _LEGACY_REDIRECTS = [
     ('guide/', '/articles/'),
     ('register/', '/accounts/register/'),
     ('login/', '/accounts/login/'),
+    ('logout/', '/accounts/logout/'),
     ('dashboard/', '/accounts/dashboard/'),
+    ('cart/', '/shop/cart/'),
 ]
 urlpatterns += [
     path(source, RedirectView.as_view(url=target, permanent=True))

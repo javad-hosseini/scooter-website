@@ -11,7 +11,7 @@ app_name = 'accounts_app'
 
 urlpatterns = [
     path('dashboard/', views.DashboardPageView.as_view(), name='dashboard'),
-    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
+    path('logout/', views.UserLogoutView.as_view(), name='logout'),
     path('register/', RegisterPageView.as_view(), name='register'),
     path('api/register/', UserRegistrationAPIView.as_view(), name='api_register'),
     path('login/', LoginPageView.as_view(), name='login'),

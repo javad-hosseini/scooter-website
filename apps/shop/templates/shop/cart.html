@@ -313,6 +313,156 @@
          here won on cascade order and had drifted from the shared rules
          (different grid breakpoints, 32px tap targets, an 8px copyright). */
 
+      /* ── TOAST NOTIFICATIONS ── */
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+      }
+      .toast {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 280px;
+        max-width: 420px;
+        padding: 14px 20px;
+        border-radius: 14px;
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        animation: toastIn 350ms cubic-bezier(0.34,1.56,0.64,1) forwards;
+        direction: rtl;
+      }
+      .toast.toast-out {
+        animation: toastOut 280ms ease forwards;
+      }
+      .toast-success {
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #6ee7b7;
+      }
+      .toast-error {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+      }
+      .toast-warning {
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: #fcd34d;
+      }
+      .toast-info {
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #93c5fd;
+      }
+      .toast-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      @keyframes toastIn {
+        from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      @keyframes toastOut {
+        from { opacity: 1; transform: translateY(0) scale(1); }
+        to   { opacity: 0; transform: translateY(-20px) scale(0.95); }
+      }
+
+      /* ── CONFIRM MODAL ── */
+      .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        animation: fadeIn 200ms ease;
+      }
+      .confirm-box {
+        background: #1a1a1e;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 28px 24px 20px;
+        max-width: 380px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+        animation: modalPop 300ms cubic-bezier(0.34,1.56,0.64,1) forwards;
+        direction: rtl;
+      }
+      .confirm-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+      }
+      .confirm-title {
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: #f6f6f8;
+        margin-bottom: 8px;
+      }
+      .confirm-msg {
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 14px;
+        color: #a1a1aa;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+      .confirm-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .confirm-btn {
+        padding: 10px 24px;
+        border-radius: 12px;
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 100px;
+      }
+      .confirm-btn-danger {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+      .confirm-btn-danger:hover {
+        background: rgba(239, 68, 68, 0.35);
+      }
+      .confirm-btn-cancel {
+        background: rgba(255,255,255,0.05);
+        color: #a1a1aa;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .confirm-btn-cancel:hover {
+        background: rgba(255,255,255,0.1);
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+      @keyframes modalPop {
+        from { opacity: 0; transform: scale(0.9) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+      }
+
     </style>
   </head>
   <body
@@ -326,6 +476,9 @@
 
     <!-- ================= HEADER ================= -->
     {% include 'includes/header.html' %}
+
+    <!-- Custom Toast Notification Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
     <main
       id="checkout-main"
@@ -439,10 +592,9 @@
               </div>
             </section>
 
-            <!-- ============ COUPON / GIFT CARD ============ -->
+            <!-- ============ COUPON ============ -->
             <section
               aria-labelledby="coupon-heading"
-              class="grid sm:grid-cols-2 gap-4"
             >
               <div class="bg-card border border-line rounded-2xl p-4 sm:p-5">
                 <h2
@@ -465,27 +617,6 @@
                   <button
                     type="button"
                     id="apply-coupon-btn"
-                    class="ripple bg-white/5 hover:bg-white/10 border border-line rounded-xl px-4 text-sm font-medium transition-colors"
-                  >
-                    اعمال
-                  </button>
-                </div>
-              </div>
-              <div class="bg-card border border-line rounded-2xl p-4 sm:p-5">
-                <h2 class="font-display font-medium text-sm mb-3">کارت هدیه</h2>
-                <div class="flex gap-2">
-                  <label for="giftcard" class="sr-only"
-                    >کد کارت هدیه را وارد کنید</label
-                  >
-                  <input
-                    id="giftcard"
-                    name="gift_card_code"
-                    type="text"
-                    placeholder="کد ۱۶ رقمی"
-                    class="flex-1 bg-card2 border border-line rounded-xl px-3 py-2.5 text-sm placeholder:text-mute/60 focus:border-gold"
-                  />
-                  <button
-                    type="button"
                     class="ripple bg-white/5 hover:bg-white/10 border border-line rounded-xl px-4 text-sm font-medium transition-colors"
                   >
                     اعمال
@@ -956,7 +1087,7 @@
       <input type="hidden" name="save_address" id="hf_save_address" />
       <input type="hidden" name="payment_method" id="hf_payment_method" />
       <input type="hidden" name="coupon_code" id="hf_coupon" />
-      <input type="hidden" name="gift_card_code" id="hf_gift_card" />
+
       <input
         type="hidden"
         name="installment_months"
@@ -971,6 +1102,94 @@
       const API_BASE = "/shop/api/";
       const CART_API = API_BASE + "cart/";
       const CHECKOUT_API = '{% url "shop_app:checkout_submit" %}';
+
+      /* ════════════════════════════════════
+         CUSTOM TOASTS & MODAL DIALOGS
+      ═══════════════════════════════════════ */
+      function getToastContainer() {
+        let container = document.getElementById("toast-container");
+        if (!container) {
+          container = document.createElement("div");
+          container.id = "toast-container";
+          container.className = "toast-container";
+          container.setAttribute("aria-live", "polite");
+          document.body.appendChild(container);
+        }
+        return container;
+      }
+
+      function showToast(message, type = "info", duration = 3500) {
+        const container = getToastContainer();
+        const toast = document.createElement("div");
+        toast.className = `toast toast-${type}`;
+
+        let iconSvg = "";
+        if (type === "success") {
+          iconSvg = `<svg class="toast-icon w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+        } else if (type === "error") {
+          iconSvg = `<svg class="toast-icon w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+        } else if (type === "warning") {
+          iconSvg = `<svg class="toast-icon w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+        } else {
+          iconSvg = `<svg class="toast-icon w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+        }
+
+        toast.innerHTML = `${iconSvg}<span>${message}</span>`;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add("toast-out");
+          setTimeout(() => {
+            toast.remove();
+          }, 300);
+        }, duration);
+      }
+
+      function showConfirmModal({ title, message, confirmText = "حذف", cancelText = "انصراف", onConfirm, onCancel }) {
+        const existing = document.querySelector(".confirm-overlay");
+        if (existing) existing.remove();
+
+        const overlay = document.createElement("div");
+        overlay.className = "confirm-overlay";
+
+        const box = document.createElement("div");
+        box.className = "confirm-box";
+
+        box.innerHTML = `
+          <div class="confirm-icon">🗑️</div>
+          <div class="confirm-title">${title}</div>
+          <div class="confirm-msg">${message}</div>
+          <div class="confirm-actions">
+            <button type="button" class="confirm-btn confirm-btn-danger" id="confirm-modal-ok">${confirmText}</button>
+            <button type="button" class="confirm-btn confirm-btn-cancel" id="confirm-modal-cancel">${cancelText}</button>
+          </div>
+        `;
+
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+
+        const close = () => {
+          overlay.style.opacity = "0";
+          setTimeout(() => overlay.remove(), 200);
+        };
+
+        box.querySelector("#confirm-modal-ok").addEventListener("click", () => {
+          close();
+          if (typeof onConfirm === "function") onConfirm();
+        });
+
+        box.querySelector("#confirm-modal-cancel").addEventListener("click", () => {
+          close();
+          if (typeof onCancel === "function") onCancel();
+        });
+
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) {
+            close();
+            if (typeof onCancel === "function") onCancel();
+          }
+        });
+      }
 
       /* ════════════════════════════════════
    LOAD CART
@@ -1139,9 +1358,15 @@
         document.querySelectorAll(".remove-btn").forEach((btn) => {
           btn.addEventListener("click", function () {
             const productId = this.dataset.product;
-            if (confirm("آیا از حذف این محصول از سبد خرید مطمئن هستید؟")) {
-              removeFromCart(productId);
-            }
+            showConfirmModal({
+              title: "حذف محصول از سبد خرید",
+              message: "آیا از حذف این محصول از سبد خرید خود اطمینان دارید؟",
+              confirmText: "حذف محصول",
+              cancelText: "انصراف",
+              onConfirm: () => {
+                removeFromCart(productId);
+              },
+            });
           });
         });
 
@@ -1213,7 +1438,7 @@
           ?.addEventListener("click", function () {
             const code = document.getElementById("coupon").value.trim();
             if (!code) {
-              alert("لطفاً کد تخفیف را وارد کنید");
+              showToast("لطفاً کد تخفیف را وارد کنید", "warning");
               return;
             }
             applyCoupon(code);
@@ -1251,12 +1476,12 @@
             updateSummary(data);
           } else {
             const data = await response.json();
-            alert(data.error || "خطا در به‌روزرسانی تعداد");
+            showToast(data.error || "خطا در به‌روزرسانی تعداد", "error");
             loadCart(); // ریلود کامل
           }
         } catch (error) {
           console.error("Error updating quantity:", error);
-          alert("خطا در ارتباط با سرور");
+          showToast("خطا در ارتباط با سرور", "error");
         }
       }
 
@@ -1276,13 +1501,14 @@
 
           if (response.ok) {
             loadCart(); // ریلود کامل
+            showToast("محصول با موفقیت از سبد خرید حذف شد", "success");
           } else {
             const data = await response.json();
-            alert(data.error || "خطا در حذف محصول");
+            showToast(data.error || "خطا در حذف محصول", "error");
           }
         } catch (error) {
           console.error("Error removing item:", error);
-          alert("خطا در ارتباط با سرور");
+          showToast("خطا در ارتباط با سرور", "error");
         }
       }
 
@@ -1395,29 +1621,46 @@
 
           if (response.ok) {
             const data = await response.json();
-            alert("✅ کد تخفیف با موفقیت اعمال شد!");
+            showToast("کد تخفیف با موفقیت اعمال شد!", "success");
             loadCart(); // ریلود
           } else {
             const data = await response.json();
-            alert(data.error || "کد تخفیف نامعتبر است");
+            showToast(data.error || "کد تخفیف نامعتبر است", "error");
           }
         } catch (error) {
           console.error("Error applying coupon:", error);
-          alert("خطا در ارتباط با سرور");
+          showToast("خطا در ارتباط با سرور", "error");
         }
       }
 
       function updateSummary(data) {
         // به‌روزرسانی خلاصه سفارش بدون ریلود کامل
-        document.getElementById("item-count").textContent = data.item_count;
-        document.getElementById("subtotal").textContent =
-          formatPrice(data.subtotal) + " تومان";
-        document.getElementById("discount").textContent =
-          "−" + formatPrice(data.discount_total) + " تومان";
-        document.getElementById("final-total").textContent =
-          formatPrice(data.final_total) + " تومان";
-        document.getElementById("mobile-final-total").textContent =
-          formatPrice(data.final_total) + " تومان";
+        if (!data) return;
+        const itemCountEl = document.getElementById("item-count");
+        if (itemCountEl) itemCountEl.textContent = data.item_count ?? 0;
+
+        const subtotalEl = document.getElementById("subtotal");
+        if (subtotalEl) subtotalEl.textContent = formatPrice(data.subtotal || 0) + " تومان";
+
+        const discountEl = document.getElementById("discount");
+        if (discountEl) discountEl.textContent = "−" + formatPrice(data.discount_total || 0) + " تومان";
+
+        const shippingEl = document.getElementById("shipping");
+        if (shippingEl) {
+          shippingEl.textContent =
+            typeof data.shipping_cost === "number" && data.shipping_cost > 0
+              ? formatPrice(data.shipping_cost) + " تومان"
+              : (data.shipping_cost || "رایگان");
+        }
+
+        const taxEl = document.getElementById("tax");
+        if (taxEl) taxEl.textContent = formatPrice(data.tax_amount || 0) + " تومان";
+
+        const finalTotalEl = document.getElementById("final-total");
+        if (finalTotalEl) finalTotalEl.textContent = formatPrice(data.final_total || 0) + " تومان";
+
+        const mobileFinalTotalEl = document.getElementById("mobile-final-total");
+        if (mobileFinalTotalEl) mobileFinalTotalEl.textContent = formatPrice(data.final_total || 0) + " تومان";
       }
 
       /* ════════════════════════════════════
@@ -1571,8 +1814,6 @@
         document.getElementById("hf_payment_method").value = paymentMethod;
         document.getElementById("hf_coupon").value =
           document.getElementById("coupon")?.value || "";
-        document.getElementById("hf_gift_card").value =
-          document.getElementById("giftcard")?.value || "";
         document.getElementById("hf_installment_months").value =
           document.getElementById("installment-months")?.value || 6;
 

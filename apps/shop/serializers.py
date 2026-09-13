@@ -231,7 +231,10 @@ class CategoryDetailSerializer(serializers.ModelSerializer):  # ← این رو 
         return '#4fd8ff'
 
     def get_products(self, obj):
-        products = obj.products.filter(is_published=True, is_available=True)
+        category_ids = [obj.pk] + list(
+            obj.children.filter(is_active=True).values_list('pk', flat=True)
+        )
+        products = Product.objects.for_listing().filter(category_id__in=category_ids)
         return ProductListSerializer(products, many=True, context=self.context).data
 
 

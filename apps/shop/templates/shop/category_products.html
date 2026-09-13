@@ -1444,7 +1444,7 @@
       >
         <div class="fluid toolbar">
           <div class="toolbar-count" aria-live="polite">
-            <strong id="visibleCount">۰</strong> محصول
+            <strong id="visibleCount">{{ products|length }}</strong> محصول
           </div>
           <div class="toolbar-spacer"></div>
           <div class="toolbar-search">
@@ -1764,13 +1764,20 @@
    PRODUCT CARD BUILDER
 ═══════════════════════════════════════ */
       function makeCard(p) {
-        const coverUrl = p.cover_image_url || "/images/default-product.jpg";
-        const finalPrice = p.discount_price || p.price;
-        const hasDiscount = p.discount_price && p.discount_price < p.price;
-        const isInWishlist = p.is_in_wishlist || false;
+        const pPrice = Number(p.price) || 0;
+        const pDiscount = Number(p.discount_price);
+        const hasDiscount = Boolean(pDiscount && pDiscount > 0 && pDiscount < pPrice);
+        const finalPrice = hasDiscount ? pDiscount : pPrice;
+        const coverUrl = p.cover_image_url || "/static/images/default-product.svg";
+        const productUrl = `/shop/product/${p.slug}/`;
 
         return `
-<article class="card" data-id="${p.id}" role="listitem" tabindex="0" aria-label="${p.name}" data-name="${p.name}" data-price="${p.price}" data-discount-price="${p.discount_price || ''}" data-created="${p.created_at || ''}" data-slug="${p.slug || ''}">
+<article class="card visible" data-id="${p.id}" role="listitem" tabindex="0"
+         aria-label="${p.name}" data-name="${p.name}"
+         data-price="${pPrice}"
+         data-discount-price="${hasDiscount ? pDiscount : ''}"
+         data-created="${p.created_at || ''}"
+         data-slug="${p.slug || ''}">
   <div class="card-img-wrap">
     <div class="card-img-inner">
       <img class="card-img"
@@ -1784,23 +1791,15 @@
     </div>
     <div class="card-bloom" aria-hidden="true"></div>
     <div class="card-shine" aria-hidden="true"></div>
-    <button class="card-wish" data-wished="${isInWishlist ? "1" : "0"}" data-product-id="${p.id}"
-      aria-label="${isInWishlist ? "حذف از" : "افزودن به"} علاقه‌مندی‌ها"
-      onclick="toggleWish(event,this)">
-      <svg viewBox="0 0 24 24" aria-hidden="true" style="${isInWishlist ? "fill:#f87171;stroke:#f87171;" : ""}"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-    </button>
   </div>
   <div class="card-body">
-    <h3 class="card-name">${p.name}</h3>
+    <h2 class="card-name"><a href="${productUrl}">${p.name}</a></h2>
     <div class="card-price-row">
       <span class="card-price">${formatPrice(finalPrice)}</span>
-      ${hasDiscount ? `<span class="card-price-old">${formatPrice(p.price)}</span>` : ""}
+      ${hasDiscount ? `<span class="card-price-old">${formatPrice(pPrice)}</span>` : ""}
     </div>
     <div class="card-actions">
-      <a href="/shop/product/${p.slug}/" class="btn-view" aria-label="مشاهده جزئیات ${p.name}">مشاهده جزئیات</a>
-      <button class="btn-cart" aria-label="افزودن ${p.name} به سبد خرید" onclick="event.stopPropagation();addToCart(event, ${p.id})">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      </button>
+      <a href="${productUrl}" class="btn-view" aria-label="مشاهده جزئیات ${p.name}">مشاهده جزئیات</a>
     </div>
   </div>
 </article>`;
@@ -1823,7 +1822,7 @@
         if (!data || data.length === 0) {
           grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted);">
-        <p style="font-size:1.1rem;">هیچ محصولی در این دسته‌بندی یافت نشد</p>
+        <p style="font-size:1.1rem;">هیچ محصولی مطابق با جستجو یا فیلتر شما یافت نشد</p>
       </div>
     `;
           document.getElementById("visibleCount").textContent = "۰";
@@ -1834,27 +1833,6 @@
         document.getElementById("visibleCount").textContent = toPersianNum(
           data.length,
         );
-
-        // Load More
-        const lm = document.createElement("div");
-        lm.className = "loadmore-col";
-        lm.innerHTML = `
-<div class="loadmore-wrap" id="loadmoreWrap">
-  <button class="loadmore-btn" id="loadmoreBtn" aria-label="بارگذاری مدل‌های بیشتر">
-    <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
-    بارگذاری مدل‌های بیشتر
-  </button>
-  <div class="loadmore-meta" aria-live="polite">نمایش ${toPersianNum(data.length)} از ${toPersianNum(data.length)} مدل</div>
-  <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-    <div class="progress-fill" id="pFill" style="width:100%;"></div>
-  </div>
-</div>`;
-        grid.appendChild(lm);
-
-        document
-          .getElementById("loadmoreBtn")
-          .addEventListener("click", handleLoadMore);
-        initReveal();
       }
 
       let allProducts = [];
@@ -1956,15 +1934,74 @@
       }
 
       /* ═══════════════════════════════════════
-   ADD TO CART
+   ADD TO CART & NOTIFICATIONS
 ═══════════════════════════════════════ */
+      function showCartNotification(type, message, actionUrl = null, actionText = null) {
+        const old = document.querySelector(".shop-cart-toast");
+        if (old) old.remove();
+
+        const colors = {
+          success: "#15803d",
+          error: "#b91c1c",
+          warning: "#1e1e24",
+          info: "#1d4ed8",
+        };
+
+        const notification = document.createElement("div");
+        notification.className = "shop-cart-toast";
+        notification.style.cssText = `
+          position: fixed;
+          bottom: calc(24px + env(safe-area-inset-bottom));
+          right: 16px;
+          left: 16px;
+          background: ${colors[type] || "#1e1e24"};
+          color: white;
+          padding: 14px 20px;
+          border-radius: 14px;
+          font-family: 'Vazirmatn', sans-serif;
+          font-size: 14px;
+          z-index: 9999;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+          border: 1px solid ${type === "warning" ? "rgba(245, 158, 11, 0.4)" : "rgba(255,255,255,0.15)"};
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          max-width: min(480px, calc(100vw - 32px));
+          margin-inline: auto;
+          width: fit-content;
+          direction: rtl;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        `;
+
+        const icon =
+          type === "success"
+            ? "✅"
+            : type === "error"
+              ? "❌"
+              : type === "warning"
+                ? "🔐"
+                : "ℹ️";
+
+        let actionHtml = "";
+        if (actionUrl && actionText) {
+          actionHtml = `<a href="${actionUrl}" style="background:#f59e0b; color:#0f0f11; padding:7px 16px; border-radius:10px; font-weight:700; font-size:13px; text-decoration:none; white-space:nowrap; margin-right:auto; box-shadow:0 2px 10px rgba(245,158,11,0.3); transition:all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${actionText}</a>`;
+        }
+
+        notification.innerHTML = `<span style="font-size:22px; flex-shrink:0;">${icon}</span> <span style="line-height:1.5; flex:1;">${message}</span> ${actionHtml}`;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.opacity = "0";
+          notification.style.transform = "translateY(20px)";
+          notification.style.transition = "all 0.3s ease";
+          setTimeout(() => notification.remove(), 300);
+        }, actionUrl ? 7000 : 4000);
+      }
+
       async function addToCart(e, productId) {
         if (e) e.stopPropagation();
-
-        if (!HEADER_IS_AUTHENTICATED) {
-          alert("برای افزودن به سبد خرید ابتدا وارد حساب کاربری خود شوید.");
-          return;
-        }
 
         try {
           const response = await fetch("/shop/api/cart/add/", {
@@ -1979,15 +2016,23 @@
 
           const data = await response.json();
 
-          if (!response.ok) {
-            throw new Error(data.error || "خطا در افزودن محصول به سبد خرید");
+          if (response.ok) {
+            showCartNotification("success", "محصول با موفقیت به سبد خرید اضافه شد!");
+            updateCartBadge();
+          } else if (response.status === 401 || data.login_required) {
+            const loginUrl = data.login_url || `/accounts/login/?next=${encodeURIComponent(window.location.pathname)}`;
+            showCartNotification(
+              "warning",
+              data.error || "برای افزودن محصول به سبد خرید، لطفاً ابتدا وارد حساب کاربری شوید.",
+              loginUrl,
+              "ورود به حساب"
+            );
+          } else {
+            showCartNotification("error", data.error || "خطا در افزودن محصول به سبد خرید");
           }
-
-          alert("✅ محصول به سبد خرید اضافه شد!");
-          updateCartBadge();
         } catch (error) {
           console.error("❌ Error adding to cart:", error);
-          alert(`❌ ${error.message}`);
+          showCartNotification("error", "خطا در ارتباط با سرور");
         }
       }
 
@@ -2000,27 +2045,46 @@
 
       function applyFilters() {
         const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
-        let data = products.filter(
-          (p) => !q || p.name.toLowerCase().includes(q),
-        );
+        let data = products.filter((p) => {
+          if (!q) return true;
+          const name = (p.name || "").toLowerCase();
+          const slug = (p.slug || "").toLowerCase();
+          return name.includes(q) || slug.includes(q);
+        });
 
         const sort = sortSelect ? sortSelect.value : "";
-        if (sort === "price-asc")
-          data.sort(
-            (a, b) =>
-              (a.discount_price || a.price) - (b.discount_price || b.price),
-          );
-        if (sort === "price-desc")
-          data.sort(
-            (a, b) =>
-              (b.discount_price || b.price) - (a.discount_price || a.price),
-          );
-        if (sort === "newest")
-          data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        if (sort === "oldest")
-          data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-        countEl.textContent = toPersianNum(data.length);
+        const getEffectivePrice = (item) => {
+          const p = Number(item.price) || 0;
+          const dp = Number(item.discount_price);
+          return dp > 0 && dp < p ? dp : p;
+        };
+
+        const getTimeOrId = (item) => {
+          if (item.created_at) {
+            const t = new Date(item.created_at).getTime();
+            if (!isNaN(t)) return t;
+          }
+          return item.id ? Number(item.id) : 0;
+        };
+
+        if (sort === "price-asc") {
+          data.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+        } else if (sort === "price-desc") {
+          data.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
+        } else if (sort === "newest") {
+          data.sort((a, b) => {
+            const diff = getTimeOrId(b) - getTimeOrId(a);
+            return diff !== 0 ? diff : (Number(b.id) || 0) - (Number(a.id) || 0);
+          });
+        } else if (sort === "oldest") {
+          data.sort((a, b) => {
+            const diff = getTimeOrId(a) - getTimeOrId(b);
+            return diff !== 0 ? diff : (Number(a.id) || 0) - (Number(b.id) || 0);
+          });
+        }
+
+        if (countEl) countEl.textContent = toPersianNum(data.length);
         renderGrid(data, { force: true });
       }
 
@@ -2038,7 +2102,7 @@
       /* ═══════════════════════════════════════
    HERO KEYBOARD/TOUCH
 ═══════════════════════════════════════ */
-      if (heroProducts && heroProducts.length > 1) {
+      if (typeof heroProducts !== "undefined" && heroProducts && heroProducts.length > 1) {
         const heroEl = document.getElementById("heroSlider");
         if (heroEl) {
           heroEl.addEventListener("mouseenter", () => clearInterval(slideTimer));
@@ -2081,32 +2145,34 @@
       /* ═══════════════════════════════════════
    START
 ═══════════════════════════════════════ */
-      // فقط برای صفحات کتگوری API فراخوانی می‌شود — صفحه /shop/ از SSR استفاده می‌کند
-      if (categorySlug) {
-        loadCategoryData();
-      } else {
-        /* /shop/ renders its grid server-side. Populate the `products` array
-           from the DOM so that the search bar and sort dropdown work. */
-        const serverCards = grid.querySelectorAll(".card");
-        products = Array.from(serverCards).map((card) => {
-          const imgEl = card.querySelector(".card-img");
-          const nameEl = card.querySelector(".card-name a, .card-name");
-          const priceRaw = Number(card.dataset.price) || 0;
-          const discountRaw = card.dataset.discountPrice ? Number(card.dataset.discountPrice) : null;
-          return {
-            id: Number(card.dataset.id),
-            name: card.dataset.name || (nameEl ? nameEl.textContent.trim() : ""),
-            slug: card.dataset.slug || "",
-            price: priceRaw,
-            discount_price: discountRaw || null,
-            created_at: card.dataset.created || new Date().toISOString(),
-            cover_image_url: imgEl ? imgEl.src : "",
-            cover_alt_text: imgEl ? imgEl.alt : "",
-            is_in_wishlist: false,
-          };
-        });
-        initReveal();
+      /* Both /shop/ and category pages render the grid server-side.
+         Populate the products array from DOM cards so search & sort
+         preserve all category and child-category products reliably. */
+      const serverCards = grid.querySelectorAll(".card");
+      products = Array.from(serverCards).map((card) => {
+        const imgEl = card.querySelector(".card-img");
+        const nameEl = card.querySelector(".card-name a, .card-name");
+        const priceRaw = Number(card.dataset.price) || 0;
+        const discountRaw = card.dataset.discountPrice
+          ? Number(card.dataset.discountPrice)
+          : null;
+        return {
+          id: Number(card.dataset.id) || 0,
+          name: card.dataset.name || (nameEl ? nameEl.textContent.trim() : ""),
+          slug: card.dataset.slug || "",
+          price: priceRaw,
+          discount_price: discountRaw,
+          created_at: card.dataset.created || "",
+          cover_image_url: imgEl ? imgEl.src : "",
+          cover_alt_text: imgEl ? imgEl.alt : "",
+          is_in_wishlist: false,
+        };
+      });
+
+      if (countEl) {
+        countEl.textContent = toPersianNum(products.length);
       }
+      initReveal();
       /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         NEWSLETTER SUBMIT
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */

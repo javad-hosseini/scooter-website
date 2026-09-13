@@ -6,12 +6,14 @@ from datetime import timedelta
 import filetype
 from PIL import Image
 
-from django.contrib.auth import login as django_login
+from django.contrib.auth import login as django_login, logout as django_logout
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
+from django.views import View
 from django.views.generic import TemplateView
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
@@ -532,9 +534,18 @@ class CityListAPIView(generics.ListAPIView):
         return City.objects.none()
 
 
-class DashboardPageView(TemplateView):
+class UserLogoutView(View):
+    """خروج کاربر و ابطال کامل نشست (پشتیبانی از هر دو متد GET و POST)"""
+    def dispatch(self, request, *args, **kwargs):
+        django_logout(request)
+        request.session.flush()
+        return redirect('accounts_app:login')
+
+
+class DashboardPageView(LoginRequiredMixin, TemplateView):
     """صفحه داشبورد کاربر"""
     template_name = 'accounts/user_dashboard.html'
+    login_url = 'accounts_app:login'
 
 
 class RulesView(TemplateView):

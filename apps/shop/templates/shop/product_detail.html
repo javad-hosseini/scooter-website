@@ -3258,6 +3258,19 @@
             btn.style.background = "";
             btn.disabled = false;
           }, 2000);
+        } else if (response.status === 401 || data.login_required) {
+          // کاربر لاگین نیست
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          const loginUrl =
+            data.login_url ||
+            `/accounts/login/?next=${encodeURIComponent(window.location.pathname)}`;
+          showNotification(
+            "warning",
+            data.error || "برای افزودن به سبد خرید ابتدا وارد حساب کاربری شوید.",
+            loginUrl,
+            "ورود به حساب",
+          );
         } else {
           // خطا
           btn.innerHTML = "❌ خطا";
@@ -3272,12 +3285,9 @@
         }
       } catch (error) {
         console.error("Add to cart error:", error);
-        btn.innerHTML = "❌ خطا";
+        btn.innerHTML = originalText;
+        btn.disabled = false;
         showNotification("error", "خطا در ارتباط با سرور");
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }, 2000);
       }
     }
 
@@ -3294,15 +3304,16 @@
       return "black";
     }
 
-    function showNotification(type, message) {
+    function showNotification(type, message, actionUrl = null, actionText = null) {
       // حذف نوتیفیکیشن قبلی
       const old = document.querySelector(".custom-notification");
       if (old) old.remove();
 
       const colors = {
-        success: "#22c55e",
-        error: "#ef4444",
-        info: "#3b82f6",
+        success: "#15803d",
+        error: "#b91c1c",
+        warning: "#1e1e24",
+        info: "#1d4ed8",
       };
 
       const notification = document.createElement("div");
@@ -3312,20 +3323,19 @@
             bottom: calc(30px + env(safe-area-inset-bottom));
             right: 16px;
             left: 16px;
-            background: ${colors[type] || "#333"};
+            background: ${colors[type] || "#1e1e24"};
             color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
+            padding: 14px 20px;
+            border-radius: 14px;
             font-family: 'Vazirmatn', sans-serif;
             font-size: 14px;
             z-index: 9999;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid ${type === "warning" ? "rgba(245, 158, 11, 0.4)" : "rgba(255,255,255,0.15)"};
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            /* Was max-width:400px pinned to right:30px, so on a 360-393px
-               phone the toast ran off the left edge and got clipped. Anchored
-               to both sides with a max-width it now fits every target width
-               and still caps at 400px on desktop. */
-            max-width: min(400px, calc(100vw - 32px));
+            max-width: min(480px, calc(100vw - 32px));
             margin-inline: auto;
             width: fit-content;
             direction: rtl;
@@ -3334,18 +3344,34 @@
             gap: 12px;
         `;
 
-      const icon = type === "success" ? "✅" : type === "error" ? "❌" : "ℹ️";
-      notification.innerHTML = `<span style="font-size:20px;">${icon}</span> <span>${escapeHTML(message)}</span>`;
+      const icon =
+        type === "success"
+          ? "✅"
+          : type === "error"
+            ? "❌"
+            : type === "warning"
+              ? "🔐"
+              : "ℹ️";
+
+      let actionHtml = "";
+      if (actionUrl && actionText) {
+        actionHtml = `<a href="${actionUrl}" style="background:#f59e0b; color:#0f0f11; padding:7px 16px; border-radius:10px; font-weight:700; font-size:13px; text-decoration:none; white-space:nowrap; margin-right:auto; box-shadow:0 2px 10px rgba(245,158,11,0.3); transition:all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${actionText}</a>`;
+      }
+
+      notification.innerHTML = `<span style="font-size:22px; flex-shrink:0;">${icon}</span> <span style="line-height:1.5; flex:1;">${escapeHTML(message)}</span> ${actionHtml}`;
 
       document.body.appendChild(notification);
 
-      // حذف خودکار بعد از 4 ثانیه
-      setTimeout(() => {
-        notification.style.opacity = "0";
-        notification.style.transform = "translateY(20px)";
-        notification.style.transition = "all 0.3s ease";
-        setTimeout(() => notification.remove(), 300);
-      }, 4000);
+      // حذف خودکار بعد از 5 ثانیه (یا 7 ثانیه اگر دکمه اکشن دارد)
+      setTimeout(
+        () => {
+          notification.style.opacity = "0";
+          notification.style.transform = "translateY(20px)";
+          notification.style.transition = "all 0.3s ease";
+          setTimeout(() => notification.remove(), 300);
+        },
+        actionUrl ? 7000 : 4000,
+      );
     }
 
     async function updateCartBadge() {

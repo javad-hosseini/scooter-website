@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.views.generic import DetailView, ListView, RedirectView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 logger = logging.getLogger(__name__)
 
@@ -748,10 +749,12 @@ class AdminDashboardStatsAPIView(APIView):
 
 
 class CartAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_cart(self, request):
         """دریافت یا ایجاد سبد خرید فعال کاربر"""
+        if not request.user.is_authenticated:
+            return None
         cart, created = Cart.objects.get_or_create(
             user=request.user,
             defaults={'is_active': True}
@@ -848,6 +851,16 @@ class CartAPIView(APIView):
 
     def post(self, request):
         """افزودن محصول به سبد خرید"""
+        if not request.user.is_authenticated:
+            referer = request.META.get('HTTP_REFERER', '/shop/')
+            login_url = f"{reverse('accounts_app:login')}?next={referer}"
+            return Response({
+                'status': 'login_required',
+                'login_required': True,
+                'error': 'برای افزودن محصول به سبد خرید، لطفاً ابتدا وارد حساب کاربری شوید.',
+                'login_url': login_url,
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
         product_id = request.data.get('product_id')
         quantity = int(request.data.get('quantity', 1))
         color_slug = request.data.get('color_slug', 'black')
@@ -900,6 +913,14 @@ class CartAPIView(APIView):
 
     def put(self, request):
         """به‌روزرسانی تعداد یک آیتم در سبد خرید"""
+        if not request.user.is_authenticated:
+            return Response({
+                'status': 'login_required',
+                'login_required': True,
+                'error': 'برای ویرایش سبد خرید، لطفاً ابتدا وارد حساب کاربری شوید.',
+                'login_url': reverse('accounts_app:login'),
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
         product_id = request.data.get('product_id')
         quantity = int(request.data.get('quantity', 1))
 
@@ -931,14 +952,19 @@ class CartAPIView(APIView):
         cart_item.quantity = quantity
         cart_item.save()
 
-        return Response({
-            'status': 'updated',
-            'message': 'تعداد آیتم به‌روزرسانی شد',
-            'item': CartItemSerializer(cart_item).data,
-        })
+        # Return the full cart so the frontend can update all totals
+        return self.get(request)
 
     def patch(self, request):
         """به‌روزرسانی آیتم سبد خرید (رنگ یا تعداد)"""
+        if not request.user.is_authenticated:
+            return Response({
+                'status': 'login_required',
+                'login_required': True,
+                'error': 'برای ویرایش سبد خرید، لطفاً ابتدا وارد حساب کاربری شوید.',
+                'login_url': reverse('accounts_app:login'),
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
         product_id = request.data.get('product_id')
         color_slug = request.data.get('color_slug')
         quantity = request.data.get('quantity')
@@ -990,6 +1016,14 @@ class CartAPIView(APIView):
 
     def delete(self, request):
         """حذف یک آیتم از سبد خرید"""
+        if not request.user.is_authenticated:
+            return Response({
+                'status': 'login_required',
+                'login_required': True,
+                'error': 'برای ویرایش سبد خرید، لطفاً ابتدا وارد حساب کاربری شوید.',
+                'login_url': reverse('accounts_app:login'),
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
         product_id = request.data.get('product_id')
 
         if not product_id:
@@ -1085,9 +1119,10 @@ class CartAPIView(APIView):
         return None
 
 
-class CheckoutPageView(TemplateView):
+class CheckoutPageView(LoginRequiredMixin, TemplateView):
     """صفحه تسویه حساب و پرداخت"""
     template_name = 'shop/cart.html'
+    login_url = 'accounts_app:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
