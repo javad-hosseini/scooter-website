@@ -4,6 +4,8 @@ Contains realistic categories, products, specifications, and articles
 tailored for an electric and mechanical scooter store.
 """
 
+import random
+
 # Base categories tree: (name, slug, icon, description, children_tuples)
 SCOOTER_CATEGORIES = [
     (

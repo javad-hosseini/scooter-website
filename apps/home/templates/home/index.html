@@ -5083,11 +5083,9 @@ DESKTOP (1024px+)
 
       /* تابع فرمت قیمت */
       function formatPrice(val) {
-        if (!val) return "0 تومان";
-        const num = parseFloat(val);
-        if (isNaN(num)) return val;
-        // کلمه تومان + عدد جدا شده
-        return "تومان " + num.toLocaleString("fa-IR");
+        if (!val && val !== 0) return "۰ تومان";
+        const num = Math.round(parseFloat(val) || 0);
+        return num.toLocaleString("fa-IR") + " تومان";
       }
 
       async function loadIndexData() {
@@ -5334,10 +5332,7 @@ DESKTOP (1024px+)
             { label: "وزن", value: "19", unit: "kg" },
             {
               label: "شروع از",
-              value: formatPrice("1299000").replace(
-                " <small>تومان</small>",
-                "",
-              ),
+              value: formatPrice("1299000").replace("تومان", "").trim(),
               unit: "تومان",
             }, // نمونه عددی
           ];

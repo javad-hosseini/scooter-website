@@ -531,6 +531,21 @@ class Product(models.Model):
         return self.discount_price if self.discount_price else self.price
 
     @property
+    def formatted_price(self):
+        """قیمت اصلی با جداکننده سه رقمی"""
+        return f"{int(self.price):,}" if self.price is not None else "0"
+
+    @property
+    def formatted_final_price(self):
+        """قیمت نهایی با جداکننده سه رقمی"""
+        return f"{int(self.final_price):,}" if self.final_price is not None else "0"
+
+    @property
+    def formatted_discount_price(self):
+        """قیمت با تخفیف با جداکننده سه رقمی"""
+        return f"{int(self.discount_price):,}" if self.discount_price is not None else ""
+
+    @property
     def average_rating(self):
         """میانگین امتیازات تایید شده
 
@@ -710,6 +725,18 @@ class Order(models.Model):
 
     # اطلاعات اضافی
     notes = models.TextField(blank=True, verbose_name="یادداشت")
+
+    @property
+    def formatted_total(self):
+        return f"{int(self.total):,}" if self.total is not None else "0"
+
+    @property
+    def formatted_subtotal(self):
+        return f"{int(self.subtotal):,}" if self.subtotal is not None else "0"
+
+    @property
+    def formatted_discount(self):
+        return f"{int(self.discount_amount):,}" if self.discount_amount is not None else "0"
 
     class Meta:
         verbose_name = "سفارش"

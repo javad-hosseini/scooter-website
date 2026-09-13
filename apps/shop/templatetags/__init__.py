@@ -1,0 +1,1 @@
+# apps/shop/templatetags package

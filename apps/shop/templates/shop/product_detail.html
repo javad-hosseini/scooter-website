@@ -2557,13 +2557,13 @@
                 <h1 class="hero-title" id="product-name">{{ product.name }}</h1>
                 <p class="hero-tagline" id="product-tagline">{{ product.tagline }}</p>
                 <div class="hero-divider"></div>
-                <p class="hero-desc" id="product-description">{{ product.description }}</p>
+                <div class="hero-desc" id="product-description">{{ product.description|safe }}</div>
 
                 <p class="hero-price">
                   {% if product.discount_price %}
-                  <s class="hero-price-old">{{ product.price|floatformat:0 }} تومان</s>
+                  <s class="hero-price-old">{{ product.price|intcomma }} تومان</s>
                   {% endif %}
-                  <strong>{{ product.final_price|floatformat:0 }} تومان</strong>
+                  <strong>{{ product.final_price|intcomma }} تومان</strong>
                   {% if product.is_in_stock %}
                   <span class="stock-badge stock-in">موجود در انبار</span>
                   {% elif product.restock_expected %}

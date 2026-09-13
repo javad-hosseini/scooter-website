@@ -1546,9 +1546,9 @@
             <div class="card-body">
               <h2 class="card-name"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
               <div class="card-price-row">
-                <span class="card-price">{{ product.final_price|floatformat:0 }} تومان</span>
+                <span class="card-price">{{ product.final_price|intcomma }} تومان</span>
                 {% if product.discount_price %}
-                <span class="card-price-old">{{ product.price|floatformat:0 }} تومان</span>
+                <span class="card-price-old">{{ product.price|intcomma }} تومان</span>
                 {% endif %}
               </div>
               <div class="card-actions">
