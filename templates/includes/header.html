@@ -1,4 +1,4 @@
-phon<nav id="nav">
+<nav id="nav">
   <div class="nav-logo"><a href="{% url 'home_app:index' %}">Nex Go</a></div>
   <ul class="nav-links">
     <li><a href="{% url 'home_app:index' %}">خانه</a></li>
@@ -111,10 +111,6 @@ phon<nav id="nav">
       {% endif %}
       <span id="drawerUserName">{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
     </a>
-    <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
-    <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
-    <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>
-    <a href="{% url 'accounts_app:dashboard' %}#settings">تنظیمات حساب</a>
     <form method="post" action="{% url 'accounts_app:logout' %}" class="drawer-logout-form">
       {% csrf_token %}
       <button type="submit" class="auth-logout">خروج</button>

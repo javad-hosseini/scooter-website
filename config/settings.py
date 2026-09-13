@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     'apps.home.apps.HomeConfig',
     'apps.shop.apps.ShopConfig',
     'apps.seo.apps.SeoConfig',
+    'apps.seeder.apps.SeederConfig',
 
     'rest_framework',
     "drf_spectacular",

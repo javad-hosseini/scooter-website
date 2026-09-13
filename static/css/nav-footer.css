@@ -131,13 +131,13 @@ nav#nav {
    AUTH BUTTONS & USER MENU
 ═══════════════════════════════════════════ */
 .nav-auth {
-  display: none;
+  display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .auth-guest {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 14px;
 }
@@ -174,22 +174,29 @@ nav#nav {
 
 .auth-user {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .auth-user-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
   background: transparent;
   border: 1px solid var(--nav-border);
-  border-radius: 100px;
-  padding: 5px 14px 5px 6px;
   font-family: inherit;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--nav-white);
   cursor: pointer;
+  text-decoration: none;
+  position: relative;
   transition: border-color 0.3s var(--nav-ease-sm), background 0.3s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .auth-user-btn:hover {
@@ -197,46 +204,26 @@ nav#nav {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.auth-user-name {
+  display: none;
+}
+
 .auth-user-avatar {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(79, 216, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   flex-shrink: 0;
   line-height: 1;
   object-fit: cover;
 }
 
 .auth-user-menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  min-width: 190px;
-  background: var(--nav-card);
-  border: 1px solid var(--nav-border);
-  border-radius: var(--nav-r-md);
-  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.85);
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: opacity 0.25s var(--nav-ease-sm), transform 0.25s var(--nav-ease-sm), visibility 0.25s;
-  z-index: 1001;
-}
-
-.auth-user:hover .auth-user-menu,
-.auth-user:focus-within .auth-user-menu,
-.auth-user-menu.open {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+  display: none !important;
 }
 
 .auth-user-menu a,
@@ -616,12 +603,53 @@ nav#nav {
 
 @media (min-width: 768px) {
   nav#nav { padding: 0 36px; }
-  .nav-auth { display: flex; }
+  .nav-auth { display: flex; gap: 14px; }
+  .auth-guest { display: flex; }
   .nav-links { display: flex; }
   .nav-menu-btn { display: none; }
   /* The trigger is gone at this width, so the drawer must never be able to
      linger open after a resize or orientation change. */
   .mobile-drawer { display: none; }
+
+  .auth-user-btn {
+    width: auto;
+    height: auto;
+    padding: 5px 14px 5px 6px;
+    border-radius: 100px;
+    gap: 8px;
+  }
+
+  .auth-user-name {
+    display: inline;
+  }
+
+  .auth-user-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 190px;
+    background: var(--nav-card);
+    border: 1px solid var(--nav-border);
+    border-radius: var(--nav-r-md);
+    box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.85);
+    padding: 8px;
+    display: flex !important;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.25s var(--nav-ease-sm), transform 0.25s var(--nav-ease-sm), visibility 0.25s;
+    z-index: 1001;
+  }
+
+  .auth-user:hover .auth-user-menu,
+  .auth-user:focus-within .auth-user-menu,
+  .auth-user-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 1024px) {

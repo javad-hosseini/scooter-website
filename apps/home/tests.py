@@ -74,3 +74,24 @@ class HeaderAuthenticationUITests(TestCase):
         self.assertContains(response, 'Sina')
         self.assertContains(response, 'Moradi')
 
+    def test_mobile_drawer_removed_account_buttons(self):
+        user = User.objects.create_user(
+            username='draweruser',
+            password='Password123!',
+            first_name='Reza',
+            last_name='Ahmadi'
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(self.home_url)
+        self.assertEqual(response.status_code, 200)
+
+        # In drawerAuthUser, the 4 specific links are removed
+        # Ensure #orders, #wishlist, #settings links are not in drawer
+        content = response.content.decode('utf-8')
+        self.assertIn('id="drawerAuthUser"', content)
+        drawer_part = content.split('id="drawerAuthUser"')[1].split('</div>')[0]
+        self.assertNotIn('#orders', drawer_part)
+        self.assertNotIn('#wishlist', drawer_part)
+        self.assertNotIn('#settings', drawer_part)
+

@@ -15,6 +15,14 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+            sys.stderr.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
+    if len(sys.argv) > 1 and sys.argv[1].startswith('seed-'):
+        sys.argv[1] = sys.argv[1].replace('-', '_')
     execute_from_command_line(sys.argv)
 
 

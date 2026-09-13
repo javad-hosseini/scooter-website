@@ -616,13 +616,13 @@
       }
 
       .nav-auth {
-        display: none;
+        display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 10px;
         flex-shrink: 0;
       }
       .auth-guest {
-        display: flex;
+        display: none;
         align-items: center;
         gap: 16px;
       }
@@ -640,67 +640,53 @@
       }
       .auth-user {
         position: relative;
+        display: flex;
+        align-items: center;
       }
       .auth-user-btn {
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
         background: transparent;
         border: 1px solid var(--h-border);
-        border-radius: 100px;
-        padding: 6px 16px 6px 8px;
+        border-radius: 50%;
         font-family: var(--font-ui);
         font-size: 0.76rem;
         font-weight: 600;
         color: var(--h-white);
         cursor: pointer;
+        text-decoration: none;
+        position: relative;
         transition:
           border-color 0.3s var(--ease-smooth),
           background 0.3s var(--ease-smooth);
+        -webkit-tap-highlight-color: transparent;
       }
       .auth-user-btn:hover {
         border-color: var(--h-border-lit);
         background: rgba(255, 255, 255, 0.02);
       }
+      .auth-user-name {
+        display: none;
+      }
       .auth-user-avatar {
-        width: 26px;
-        height: 26px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background: rgba(79, 216, 255, 0.14);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.82rem;
+        font-size: 0.85rem;
         flex-shrink: 0;
         line-height: 1;
         object-fit: cover;
       }
       .auth-user-menu {
-        position: absolute;
-        top: calc(100% + 12px);
-        right: 0;
-        min-width: 190px;
-        background: var(--h-card);
-        border: 1px solid var(--h-border);
-        border-radius: var(--r-md);
-        box-shadow: var(--shadow-lift);
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-8px);
-        transition:
-          opacity 0.25s var(--ease-smooth),
-          transform 0.25s var(--ease-smooth),
-          visibility 0.25s;
-        z-index: 1001;
-      }
-      .auth-user-menu.open {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
+        display: none !important;
       }
       .auth-user-menu a,
       .auth-user-menu button.auth-logout {
@@ -742,6 +728,49 @@
       @media (min-width: 768px) {
         .nav-auth {
           display: flex;
+          gap: 14px;
+        }
+        .auth-guest {
+          display: flex;
+        }
+        .auth-user-btn {
+          width: auto;
+          height: auto;
+          padding: 6px 16px 6px 8px;
+          border-radius: 100px;
+          gap: 8px;
+        }
+        .auth-user-name {
+          display: inline;
+        }
+        .auth-user-menu {
+          position: absolute;
+          top: calc(100% + 12px);
+          right: 0;
+          min-width: 190px;
+          background: var(--h-card);
+          border: 1px solid var(--h-border);
+          border-radius: var(--r-md);
+          box-shadow: var(--shadow-lift);
+          padding: 8px;
+          display: flex !important;
+          flex-direction: column;
+          gap: 2px;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-8px);
+          transition:
+            opacity 0.25s var(--ease-smooth),
+            transform 0.25s var(--ease-smooth),
+            visibility 0.25s;
+          z-index: 1001;
+        }
+        .auth-user:hover .auth-user-menu,
+        .auth-user:focus-within .auth-user-menu,
+        .auth-user-menu.open {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
         }
       }
 
@@ -1060,10 +1089,6 @@
           {% endif %}
           <span>{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
         </a>
-        <a href="{% url 'accounts_app:dashboard' %}">پروفایل</a>
-        <a href="{% url 'accounts_app:dashboard' %}#orders">سفارش‌های من</a>
-        <a href="{% url 'accounts_app:dashboard' %}#wishlist">علاقه‌مندی‌ها</a>
-        <a href="{% url 'accounts_app:dashboard' %}#settings">تنظیمات حساب</a>
         <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form">
           {% csrf_token %}
           <button type="submit" class="auth-logout">خروج</button>

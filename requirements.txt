@@ -21,6 +21,7 @@ djangorestframework==3.17.1
 djangorestframework-stubs==3.17.0
 drf-spectacular==0.29.0
 et_xmlfile==2.0.0
+faker==40.38.0
 filetype==1.2.0
 idna==3.18
 inflection==0.5.1
