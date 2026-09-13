@@ -3415,8 +3415,9 @@
           },
         );
 
+        const data = await response.json().catch(() => ({}));
+
         if (response.ok) {
-          const data = await response.json();
           if (data.status === "added") {
             btn.classList.add("in-wishlist");
             icon.className = "fas fa-heart";
@@ -3426,12 +3427,25 @@
             icon.className = "far fa-heart";
             text.textContent = "علاقه‌مندی";
           }
+        } else if (response.status === 401 || data.login_required) {
+          const loginUrl =
+            data.login_url ||
+            `/accounts/login/?next=${encodeURIComponent(window.location.pathname)}`;
+          showNotification(
+            "warning",
+            data.error || "برای افزودن به علاقه‌مندی‌ها ابتدا وارد حساب کاربری شوید.",
+            loginUrl,
+            "ورود به حساب",
+          );
         } else {
-          alert("خطا در عملیات. لطفاً دوباره تلاش کنید.");
+          showNotification(
+            "error",
+            data.error || "خطا در عملیات. لطفاً دوباره تلاش کنید.",
+          );
         }
       } catch (error) {
         console.error("Wishlist error:", error);
-        alert("خطا در ارتباط با سرور.");
+        showNotification("error", "خطا در ارتباط با سرور.");
       }
     }
 

@@ -1191,6 +1191,19 @@
         });
       }
 
+      function updateNavBadge(count) {
+        const badges = document.querySelectorAll("#navCartCount, .nav-cart-badge");
+        const num = parseInt(count) || 0;
+        badges.forEach((badge) => {
+          if (num > 0) {
+            badge.textContent = num;
+            badge.removeAttribute("hidden");
+          } else {
+            badge.setAttribute("hidden", "");
+          }
+        });
+      }
+
       /* ════════════════════════════════════
    LOAD CART
 ═══════════════════════════════════════ */
@@ -1204,27 +1217,33 @@
           if (!response.ok) throw new Error("Failed to load cart");
           const data = await response.json();
 
-          loading.style.display = "none";
+          if (loading) loading.style.display = "none";
 
-          if (data.item_count === 0) {
-            emptyCart.classList.remove("hidden");
+          if (data.item_count === 0 || !data.items || data.items.length === 0) {
+            if (emptyCart) emptyCart.classList.remove("hidden");
+            if (content) content.style.display = "none";
             // Hides the sticky bar (and releases the space reserved for it),
             // which otherwise offered a "پرداخت نهایی" button for ۰ تومان.
             document.body.classList.add("cart-is-empty");
+            updateNavBadge(0);
             return;
           }
 
+          if (emptyCart) emptyCart.classList.add("hidden");
           document.body.classList.remove("cart-is-empty");
-          content.style.display = "block";
+          if (content) content.style.display = "block";
           renderCart(data);
+          updateNavBadge(data.item_count || 0);
         } catch (error) {
           console.error("❌ Error loading cart:", error);
-          loading.innerHTML = `
-            <div class="text-center text-mute">
-              <p class="text-xl mb-4">😕 خطا در بارگذاری سبد خرید</p>
-              <button onclick="location.reload()" class="px-6 py-3 bg-gold text-black rounded-xl">بارگذاری مجدد</button>
-            </div>
-          `;
+          if (loading) {
+            loading.innerHTML = `
+              <div class="text-center text-mute">
+                <p class="text-xl mb-4">😕 خطا در بارگذاری سبد خرید</p>
+                <button onclick="location.reload()" class="px-6 py-3 bg-gold text-black rounded-xl">بارگذاری مجدد</button>
+              </div>
+            `;
+          }
         }
       }
 
@@ -1486,6 +1505,57 @@
       }
 
       async function removeFromCart(productId) {
+        const itemEl = document.querySelector(
+          `article[data-product-id="${productId}"]`
+        );
+
+        // ۱. پردازش فوری در سمت فرانت (Optimistic UI Update)
+        if (itemEl) {
+          itemEl.style.transition = "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)";
+          itemEl.style.opacity = "0";
+          itemEl.style.transform = "scale(0.96) translateY(-10px)";
+          itemEl.style.maxHeight = itemEl.offsetHeight + "px";
+          void itemEl.offsetHeight; // force reflow
+          itemEl.style.maxHeight = "0px";
+          itemEl.style.paddingTop = "0px";
+          itemEl.style.paddingBottom = "0px";
+          itemEl.style.marginTop = "0px";
+          itemEl.style.marginBottom = "0px";
+          itemEl.style.overflow = "hidden";
+          setTimeout(() => {
+            if (itemEl && itemEl.parentNode) {
+              itemEl.remove();
+            }
+          }, 350);
+        }
+
+        // بررسی اقلام باقی‌مانده در فرانت
+        const remainingItems = document.querySelectorAll(
+          `#cart-items-container article[data-product-id]:not([data-product-id="${productId}"])`
+        );
+
+        if (remainingItems.length === 0) {
+          // اگر محصول آخرین آیتم بود، بلافاصله سبد خالی نمایش داده شود
+          setTimeout(() => {
+            const emptyCart = document.getElementById("empty-cart");
+            const content = document.getElementById("cart-content");
+            if (emptyCart) emptyCart.classList.remove("hidden");
+            if (content) content.style.display = "none";
+            document.body.classList.add("cart-is-empty");
+            updateNavBadge(0);
+          }, 250);
+        } else {
+          // کاهش لحظه‌ای تعداد کل در رابط کاربری
+          const itemCountEl = document.getElementById("item-count");
+          if (itemCountEl) {
+            const cur = parseInt(itemCountEl.textContent) || 1;
+            const nextCount = Math.max(0, cur - 1);
+            itemCountEl.textContent = nextCount;
+            updateNavBadge(nextCount);
+          }
+        }
+
+        // ۲. ارسال درخواست حذف به بک‌اند در پس‌زمینه
         try {
           const csrfToken = getCSRFToken();
           const response = await fetch(CART_API, {
@@ -1495,20 +1565,33 @@
               "X-CSRFToken": csrfToken,
             },
             body: JSON.stringify({
-              product_id: productId,
+              product_id: parseInt(productId),
             }),
           });
 
           if (response.ok) {
-            loadCart(); // ریلود کامل
+            const data = await response.json();
+            if (data.item_count === 0 || !data.items || data.items.length === 0) {
+              const emptyCart = document.getElementById("empty-cart");
+              const content = document.getElementById("cart-content");
+              if (emptyCart) emptyCart.classList.remove("hidden");
+              if (content) content.style.display = "none";
+              document.body.classList.add("cart-is-empty");
+              updateNavBadge(0);
+            } else {
+              updateSummary(data);
+              updateNavBadge(data.item_count || 0);
+            }
             showToast("محصول با موفقیت از سبد خرید حذف شد", "success");
           } else {
-            const data = await response.json();
-            showToast(data.error || "خطا در حذف محصول", "error");
+            const data = await response.json().catch(() => ({}));
+            showToast(data.error || data.detail || "خطا در حذف محصول", "error");
+            loadCart(); // بازگردانی سبد از سرور در صورت بروز خطا
           }
         } catch (error) {
           console.error("Error removing item:", error);
           showToast("خطا در ارتباط با سرور", "error");
+          loadCart(); // بازگردانی سبد در صورت خطای شبکه
         }
       }
 

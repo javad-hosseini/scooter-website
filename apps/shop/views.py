@@ -196,9 +196,16 @@ class ProductReviewListCreateAPIView(APIView):
 
 
 class WishlistToggleAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def post(self, request, slug=None):
+        if not request.user.is_authenticated:
+            referer = request.META.get('HTTP_REFERER', '/shop/')
+            login_url = f"{reverse('accounts_app:login')}?next={referer}"
+            return Response({
+                'status': 'login_required',
+                'login_required': True,
+                'error': 'برای افزودن به علاقه‌مندی‌ها، لطفاً ابتدا وارد حساب کاربری شوید.',
+                'login_url': login_url,
+            }, status=status.HTTP_401_UNAUTHORIZED)
         if slug:
             product = get_object_or_404(Product, slug=slug, is_published=True)
         else:
@@ -1034,18 +1041,12 @@ class CartAPIView(APIView):
 
         cart = self.get_cart(request)
 
-        deleted = CartItem.objects.filter(cart=cart, product_id=product_id).delete()
+        CartItem.objects.filter(cart=cart, product_id=product_id).delete()
 
-        if deleted[0] > 0:
-            return Response({
-                'status': 'removed',
-                'message': 'محصول از سبد خرید حذف شد',
-            })
-        else:
-            return Response(
-                {'error': 'آیتم در سبد خرید یافت نشد'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        response = self.get(request)
+        response.data['status'] = 'removed'
+        response.data['message'] = 'محصول از سبد خرید حذف شد'
+        return response
 
     # ===== متدهای کمکی =====
 

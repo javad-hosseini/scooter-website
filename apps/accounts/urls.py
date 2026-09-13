@@ -3,8 +3,7 @@ from django.urls import path, re_path
 from . import views
 
 from .views import RegisterPageView, UserRegistrationAPIView, LoginPageView, UserLoginAPIView, \
-    PasswordResetRequestAPIView, PasswordResetConfirmAPIView, PasswordResetVerifyAPIView, PasswordResetPageView, \
-    ChangePasswordAPIView
+    PasswordResetRequestAPIView, PasswordResetConfirmAPIView, PasswordResetVerifyAPIView, PasswordResetPageView
 from ..shop.views import WishlistToggleAPIView
 
 app_name = 'accounts_app'
@@ -20,7 +19,6 @@ urlpatterns = [
     path('api/password-reset/verify/', PasswordResetVerifyAPIView.as_view(), name='api_password_reset_verify'),
     path('api/password-reset/confirm/', PasswordResetConfirmAPIView.as_view(), name='api_password_reset_confirm'),
     path('password-reset/', PasswordResetPageView.as_view(), name='password_reset'),  # صفحه‌ی HTML سه‌مرحله‌ای
-    path('api/change-password/', ChangePasswordAPIView.as_view(), name='api_change_password'),
     # ===== API =====
     path('api/dashboard/', views.DashboardDataAPIView.as_view(), name='api_dashboard'),
     path('api/profile/update/', views.UserProfileUpdateAPIView.as_view(), name='api_profile_update'),

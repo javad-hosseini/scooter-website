@@ -137,7 +137,7 @@ class PasswordChangeTests(TestCase):
         self.client = APIClient()
         reset_throttles()
         self.user = make_user(password='Old-Passw0rd-1')
-        self.url = reverse('accounts_app:api_change_password')
+        self.url = reverse('accounts_app:api_password_change')
 
     def test_requires_authentication(self):
         resp = self.client.post(self.url, {}, format='json')

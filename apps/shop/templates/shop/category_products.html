@@ -1912,16 +1912,41 @@
             body: JSON.stringify({ product_id: productId }),
           });
 
-          if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+
+          if (response.ok) {
+            // Success: update aria-label
+            btn.setAttribute(
+              "aria-label",
+              data.is_in_wishlist ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"
+            );
+          } else if (response.status === 401 || data.login_required) {
+            // Revert on unauthenticated
+            btn.dataset.wished = isWished ? "1" : "0";
+            svg.style.fill = isWished ? "#f87171" : "none";
+            svg.style.stroke = isWished ? "#f87171" : "currentColor";
+            btn.setAttribute("aria-label", isWished ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها");
+
+            const loginUrl = data.login_url || `/accounts/login/?next=${encodeURIComponent(window.location.pathname)}`;
+            showCartNotification(
+              "warning",
+              data.error || "برای افزودن به علاقه‌مندی‌ها، لطفاً ابتدا وارد حساب کاربری شوید.",
+              loginUrl,
+              "ورود به حساب"
+            );
+          } else {
             // Revert on error
             btn.dataset.wished = isWished ? "1" : "0";
             svg.style.fill = isWished ? "#f87171" : "none";
             svg.style.stroke = isWished ? "#f87171" : "currentColor";
-            throw new Error("Failed");
+            showCartNotification("error", data.error || "خطا در عملیات علاقه‌مندی");
           }
         } catch (error) {
           console.error("Wishlist error:", error);
-          alert("خطا در عملیات. لطفاً دوباره تلاش کنید.");
+          btn.dataset.wished = isWished ? "1" : "0";
+          svg.style.fill = isWished ? "#f87171" : "none";
+          svg.style.stroke = isWished ? "#f87171" : "currentColor";
+          showCartNotification("error", "خطا در ارتباط با سرور");
         }
       }
 
