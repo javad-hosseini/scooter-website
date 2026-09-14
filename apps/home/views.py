@@ -293,6 +293,21 @@ class IndexPageView(SEOMixin, TemplateView):
     """صفحه اصلی سایت"""
     template_name = 'home/index.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        # The header this page renders depends on who is signed in, so the HTML
+        # must never be stored in a *shared* cache. SEOHeadersMiddleware would
+        # otherwise stamp anonymous responses with
+        # "public, s-maxage=300, stale-while-revalidate=600", which lets a CDN
+        # keep one anonymous render of "/" and replay it to signed-in visitors —
+        # they then see the guest header until the edge entry expires. The
+        # Vary: Cookie that should prevent that is ignored for HTML by most
+        # edge caches. This flag is the middleware's existing opt-out; it only
+        # changes the response header, so the per-process anonymous page cache
+        # from @cached_page_class() still does its job.
+        response.seo_no_cache = True
+        return response
+
     def get_context_data(self, **kwargs):
         from apps.shop.models import Category, Product
 
