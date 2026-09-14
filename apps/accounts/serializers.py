@@ -12,6 +12,36 @@ from apps.accounts.models import Province, City, Address
 User = get_user_model()
 
 
+#: Django's own password-validator messages are translated by LocaleMiddleware,
+#: which follows the browser's Accept-Language. On a Persian-only site that
+#: means an English-locale browser gets English validation text back. Mapping
+#: by the validator's stable `code` gives one clear Persian sentence regardless
+#: of the request locale, and says what to do rather than only what is wrong.
+PASSWORD_ERROR_MESSAGES = {
+    'password_too_short': 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
+    'password_too_common': 'این رمز عبور بسیار رایج است. ترکیبی از حروف، عدد و نماد انتخاب کنید.',
+    'password_entirely_numeric': 'رمز عبور نمی‌تواند فقط عدد باشد. حداقل یک حرف اضافه کنید.',
+    'password_too_similar': 'رمز عبور نباید شبیه نام کاربری، ایمیل یا نام شما باشد.',
+}
+
+#: Fallback when a validator raises without a code we recognise.
+PASSWORD_ERROR_FALLBACK = 'رمز عبور انتخاب‌شده معتبر نیست. رمز قوی‌تری انتخاب کنید.'
+
+
+def localized_password_errors(error):
+    """Translate a Django password ValidationError into Persian messages."""
+    messages = []
+    for item in getattr(error, 'error_list', []) or []:
+        code = getattr(item, 'code', None)
+        if code in PASSWORD_ERROR_MESSAGES:
+            messages.append(PASSWORD_ERROR_MESSAGES[code])
+        else:
+            # Unknown validator (e.g. a custom one): keep its own message,
+            # which is authored rather than machine-generated.
+            messages.extend(item.messages or [PASSWORD_ERROR_FALLBACK])
+    return messages or [PASSWORD_ERROR_FALLBACK]
+
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password1 = serializers.CharField(
         write_only=True,
@@ -195,7 +225,8 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password1 = serializers.CharField(
         required=True,
         write_only=True,
-        validators=[validate_password],
+        # validate_password is run in validate() instead, where the user is
+        # available for the similarity check and the messages get localised.
         error_messages={'required': 'رمز عبور جدید الزامی است'}
     )
     new_password2 = serializers.CharField(
@@ -210,19 +241,23 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError('رمز عبور فعلی اشتباه است')
         return value
 
+    def validate_new_password1(self, value):
+        # Field-level rather than inside validate(): DRF skips validate()
+        # entirely once any field fails, so running the strength check here
+        # means a weak new password and a wrong current password are both
+        # reported in the same response instead of one at a time.
+        try:
+            validate_password(value, user=self.context['request'].user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(localized_password_errors(e))
+        return value
+
     def validate(self, data):
         if data['new_password1'] != data['new_password2']:
             raise serializers.ValidationError({'new_password2': 'رمز عبور و تکرار آن یکسان نیستند'})
 
         if data['old_password'] == data['new_password1']:
             raise serializers.ValidationError({'new_password1': 'رمز عبور جدید نباید با رمز عبور فعلی یکسان باشد'})
-
-        # اجرای validate_password با user context کامل
-        user = self.context['request'].user
-        try:
-            validate_password(data['new_password1'], user=user)
-        except DjangoValidationError as e:
-            raise serializers.ValidationError({'new_password1': list(e.messages)})
 
         return data
 

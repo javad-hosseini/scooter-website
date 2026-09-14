@@ -21,6 +21,8 @@ urlpatterns = [
     path('password-reset/', PasswordResetPageView.as_view(), name='password_reset'),  # صفحه‌ی HTML سه‌مرحله‌ای
     # ===== API =====
     path('api/dashboard/', views.DashboardDataAPIView.as_view(), name='api_dashboard'),
+    path('api/notifications/read/', views.NotificationsMarkReadAPIView.as_view(),
+         name='api_notifications_mark_read'),
     path('api/profile/update/', views.UserProfileUpdateAPIView.as_view(), name='api_profile_update'),
     path('api/password/change/', views.ChangePasswordAPIView.as_view(), name='api_password_change'),
     re_path(r'^api/products/(?P<slug>.+)/wishlist/$', WishlistToggleAPIView.as_view(), name='api_wishlist_toggle'),

@@ -17,6 +17,11 @@
   <!-- Compiled Local Tailwind CSS -->
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
 
+  <!-- Shared site header/footer styles. Loaded before the page's own <style>
+       so the dashboard can still override page-specific bits, but the nav
+       itself now matches every other page instead of a private copy. -->
+  <link rel="stylesheet" href="{% static 'css/nav-footer.css' %}" />
+
   <!-- ============================================================
    STYLES — تمام استایل‌های فایل user_dashboard.html رو اینجا کپی کن
    (از <style> تا </style> فایل اصلی)
@@ -453,6 +458,189 @@
       border-radius: 8px;
     }
 
+    /* ── Form validation states ──
+       Invalid fields get a red border and a message underneath, instead of
+       the previous behaviour where every failure produced one generic toast
+       and nothing on the field itself. */
+    .input.is-invalid,
+    select.is-invalid,
+    textarea.is-invalid {
+      border-color: var(--danger, #f87171);
+      background: rgba(248, 113, 113, 0.06);
+    }
+
+    .input.is-invalid:focus,
+    select.is-invalid:focus,
+    textarea.is-invalid:focus {
+      outline: 2px solid rgba(248, 113, 113, 0.55);
+      outline-offset: 1px;
+    }
+
+    .field-error {
+      color: #f87171;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-top: 6px;
+    }
+
+    .form-error-banner {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      background: rgba(248, 113, 113, 0.08);
+      color: #fca5a5;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    /* ── Favourites card actions ──
+       The two buttons were 11px text on 6px padding (~26px tall) sitting side
+       by side in a 2-column mobile grid, so they were cramped and under the
+       44px touch minimum. They now share one row that wraps to a stack when
+       the card is narrow, and both use the same height and type scale. */
+    /* Stacked rather than side by side: in this grid a card is ~190px wide at
+       4 columns, so two Persian labels in one row left ~90px each — which is
+       what made the original pair look cramped. Full-width keeps both labels
+       readable and both targets 40px tall at every column count. */
+    .wish-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .wish-btn {
+      width: 100%;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      text-align: center;
+      text-decoration: none;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .wish-btn.btn-ghost {
+      border: 1px solid var(--line);
+    }
+
+    .wish-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    /* The heart was a 32px circle — below the touch minimum, and its hit area
+       overlapped the product image link. 40px visual, 44px hit area. */
+    .wish-heart-btn {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .wish-heart-btn::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      transform: translate(-50%, -50%);
+    }
+
+    .wish-heart-btn:hover {
+      background: rgba(248, 113, 113, 0.85);
+      transform: scale(1.06);
+    }
+
+    .wish-heart-btn[data-busy="1"] {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* Two-line product title without a layout jump between short and long
+       names, so every card in a row lines its price and buttons up. */
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── Notifications ──
+       "mark all read" was an 11px bare text link with no hit area. */
+    #markAllReadBtn {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 10px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    #markAllReadBtn:hover:not(:disabled) {
+      border-color: var(--line);
+    }
+
+    #markAllReadBtn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .notif-row {
+      display: flex;
+      gap: 16px;
+      position: relative;
+      padding-bottom: 24px;
+    }
+
+    .notif-row:last-child {
+      padding-bottom: 0;
+    }
+
+    /* The timeline rail was drawn with a border on every row including the
+       last, which left a stub hanging below the final icon. */
+    .notif-row:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 40px;
+      bottom: 0;
+      inset-inline-start: 19px;
+      width: 2px;
+      background: var(--line);
+    }
+
+    .notif-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
     @keyframes ring {
       to {
         stroke-dashoffset: var(--offset);
@@ -494,7 +682,12 @@
       --font-mono-h: "JetBrains Mono", "Vazirmatn", monospace;
       --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
       --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-      --nav-h: 64px;
+      /* --nav-h intentionally NOT redeclared: nav-footer.css steps it
+         64 → 68 → 76px at 768/1024. A flat value in this later :root beat
+         those media queries (media queries add no specificity), which left
+         the dashboard with a 64px-tall nav at desktop widths while the rest
+         of the site grew — and the sidebar/mobile header offsets that read
+         var(--nav-h) were then misaligned too. */
       --r-sm: 10px;
       --r-md: 14px;
       --shadow-lift:
@@ -579,540 +772,12 @@
       transition: width 0.5s var(--ease-luxury);
     }
 
-    nav.vx-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      height: var(--nav-h);
-      padding: 0 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(5, 5, 7, 0.78);
-      backdrop-filter: blur(22px) saturate(140%);
-      -webkit-backdrop-filter: blur(22px) saturate(140%);
-      border-bottom: 1px solid var(--h-border);
-    }
-
-    .nav-logo {
-      font-family: "Space Grotesk", sans-serif;
-      font-weight: 700;
-      font-size: 1.25rem;
-      letter-spacing: 0.22em;
-      color: var(--h-white);
-      flex-shrink: 0;
-      direction: ltr;
-      text-decoration: none;
-    }
-
-    .nav-logo span {
-      color: var(--h-neon);
-    }
-
-    .nav-links {
-      display: none;
-    }
-
-    .nav-menu-btn {
-      width: 40px;
-      height: 40px;
-      background: transparent;
-      border: 1px solid var(--h-border);
-      border-radius: var(--r-sm);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      cursor: pointer;
-      padding: 0;
-      transition:
-        border-color 0.35s var(--ease-smooth),
-        background 0.35s var(--ease-smooth);
-      flex-shrink: 0;
-    }
-
-    .nav-menu-btn:hover {
-      border-color: var(--h-border-lit);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .nav-menu-btn span {
-      display: block;
-      width: 16px;
-      height: 1.5px;
-      background: var(--h-dim);
-      transition: all 0.35s var(--ease-luxury);
-    }
-
-    .nav-menu-btn.open span:nth-child(1) {
-      transform: rotate(45deg) translate(4px, 4px);
-    }
-
-    .nav-menu-btn.open span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .nav-menu-btn.open span:nth-child(3) {
-      transform: rotate(-45deg) translate(4px, -4px);
-    }
-
-    .nav-cta {
-      font-family: var(--font-ui);
-      font-size: 0.76rem;
-      font-weight: 600;
-      background: var(--h-white);
-      color: var(--h-black);
-      padding: 9px 20px;
-      border: none;
-      cursor: pointer;
-      border-radius: 100px;
-      transition:
-        transform 0.35s var(--ease-luxury),
-        background 0.35s var(--ease-smooth);
-      flex-shrink: 0;
-    }
-
-    .nav-cta:hover {
-      background: var(--h-neon);
-    }
-
-    .nav-cta:active {
-      transform: scale(0.95);
-    }
-
-    .nav-auth {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-
-    .auth-guest {
-      display: none;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .auth-link-login {
-      font-family: var(--font-ui);
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--h-dim);
-      text-decoration: none;
-      position: relative;
-      transition: color 0.3s var(--ease-smooth);
-    }
-
-    .auth-link-login:hover {
-      color: var(--h-white);
-    }
-
-    .auth-user {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .auth-user-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      background: transparent;
-      border: 1px solid var(--h-border);
-      border-radius: 50%;
-      font-family: var(--font-ui);
-      font-size: 0.76rem;
-      font-weight: 600;
-      color: var(--h-white);
-      cursor: pointer;
-      text-decoration: none;
-      position: relative;
-      transition:
-        border-color 0.3s var(--ease-smooth),
-        background 0.3s var(--ease-smooth);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .auth-user-btn:hover {
-      border-color: var(--h-border-lit);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .auth-user-name {
-      display: none;
-    }
-
-    .auth-user-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(79, 216, 255, 0.14);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-      line-height: 1;
-      object-fit: cover;
-    }
-
-    .auth-user-menu {
-      display: none !important;
-    }
-
-    .auth-user-menu a,
-    .auth-user-menu button.auth-logout {
-      font-family: var(--font-ui);
-      font-size: 0.78rem;
-      color: var(--h-dim);
-      text-decoration: none;
-      padding: 9px 12px;
-      border-radius: var(--r-sm);
-      transition:
-        background 0.2s var(--ease-smooth),
-        color 0.2s var(--ease-smooth);
-    }
-
-    .auth-user-menu a:hover,
-    .auth-user-menu button.auth-logout:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--h-white);
-    }
-
-    .auth-user-menu a.auth-logout,
-    .auth-user-menu button.auth-logout {
-      color: #ff8a8a;
-      border-top: 1px solid var(--h-border);
-      margin-top: 4px;
-      padding-top: 11px;
-      background: none;
-      border-inline: none;
-      border-bottom: none;
-      width: 100%;
-      text-align: right;
-      cursor: pointer;
-    }
-
-    .auth-user-menu a.auth-logout:hover,
-    .auth-user-menu button.auth-logout:hover {
-      background: rgba(255, 108, 108, 0.08);
-    }
-
-    .auth-logout-form {
-      margin: 0;
-    }
-
-    @media (min-width: 768px) {
-      .nav-auth {
-        display: flex;
-        gap: 14px;
-      }
-
-      .auth-guest {
-        display: flex;
-      }
-
-      .auth-user-btn {
-        width: auto;
-        height: auto;
-        padding: 6px 16px 6px 8px;
-        border-radius: 100px;
-        gap: 8px;
-      }
-
-      .auth-user-name {
-        display: inline;
-      }
-
-      .auth-user-menu {
-        position: absolute;
-        top: calc(100% + 12px);
-        right: 0;
-        min-width: 190px;
-        background: var(--h-card);
-        border: 1px solid var(--h-border);
-        border-radius: var(--r-md);
-        box-shadow: var(--shadow-lift);
-        padding: 8px;
-        display: flex !important;
-        flex-direction: column;
-        gap: 2px;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-8px);
-        transition:
-          opacity 0.25s var(--ease-smooth),
-          transform 0.25s var(--ease-smooth),
-          visibility 0.25s;
-        z-index: 1001;
-      }
-
-      .auth-user:hover .auth-user-menu,
-      .auth-user:focus-within .auth-user-menu,
-      .auth-user-menu.open {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-    }
-
-    .nav-right-cluster {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-shrink: 0;
-    }
-
-    .nav-cart-btn {
-      position: relative;
-      width: 40px;
-      height: 40px;
-      background: transparent;
-      border: 1px solid var(--h-border);
-      border-radius: var(--r-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
-      flex-shrink: 0;
-    }
-
-    .nav-cart-btn:hover {
-      border-color: var(--h-border-lit);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .nav-cart-icon {
-      width: 18px;
-      height: 18px;
-      stroke: var(--h-dim);
-      fill: none;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .nav-cart-btn:hover .nav-cart-icon {
-      stroke: var(--h-white);
-    }
-
-    .nav-cart-badge {
-      position: absolute;
-      top: -5px;
-      left: -5px;
-      min-width: 16px;
-      height: 16px;
-      padding: 0 4px;
-      background: var(--h-neon);
-      color: var(--h-black);
-      font-family: var(--font-mono-h);
-      font-size: 0.6rem;
-      font-weight: 600;
-      border-radius: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      direction: ltr;
-      box-shadow: 0 0 0 2px var(--h-black);
-    }
-
-    .nav-cart-badge[hidden] {
-      display: none;
-    }
-
-    .drawer-auth {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      margin-top: 22px;
-    }
-
-    .drawer-auth-link {
-      font-family: var(--font-ui);
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--h-dim);
-      text-decoration: none;
-      padding: 12px 30px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 100px;
-    }
-
-    .drawer-auth-link:hover {
-      border-color: var(--h-neon);
-      color: var(--h-neon);
-    }
-
-    .drawer-auth-register {
-      font-family: var(--font-ui);
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: var(--h-white);
-      color: var(--h-black);
-      padding: 15px 46px;
-      border: none;
-      cursor: pointer;
-      border-radius: 100px;
-    }
-
-    .drawer-auth-user {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      margin-top: 22px;
-    }
-
-    .drawer-user-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--h-white);
-      font-family: var(--font-ui);
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 10px;
-    }
-
-    .drawer-auth-user a,
-    .drawer-auth-user button.auth-logout {
-      font-family: var(--font-ui);
-      font-size: 0.85rem;
-      color: var(--h-dim);
-      text-decoration: none;
-      padding: 9px 0;
-      display: block;
-      width: 100%;
-      text-align: right;
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-
-    .drawer-auth-user a:hover,
-    .drawer-auth-user button.auth-logout:hover {
-      color: var(--h-neon);
-    }
-
-    .drawer-auth-user a.auth-logout,
-    .drawer-auth-user button.auth-logout {
-      color: #ff8a8a;
-    }
-
-    .mobile-drawer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(5, 5, 8, 0.98);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      z-index: 1050;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transform: translateY(-100%);
-      transition: transform 0.6s var(--ease-luxury);
-      padding-top: 80px;
-      overflow-y: auto;
-    }
-
-    .mobile-drawer.open {
-      transform: translateY(0);
-    }
-
-    .mobile-drawer a {
-      font-family: var(--font-display);
-      font-weight: 500;
-      font-size: 1.9rem;
-      letter-spacing: 0.02em;
-      color: var(--h-dim);
-      text-decoration: none;
-      padding: 12px 0;
-      display: block;
-      text-align: center;
-    }
-
-    .mobile-drawer a:hover,
-    .mobile-drawer a:active {
-      color: var(--h-neon);
-      transform: translateX(-6px);
-    }
-
-    @media (min-width: 768px) and (max-width: 1023px) {
-      nav.vx-nav {
-        padding: 0 36px;
-      }
-
-      .nav-menu-btn {
-        display: none;
-      }
-
-      .nav-links {
-        display: flex;
-        gap: 24px;
-        list-style: none;
-      }
-
-      .nav-links a {
-        font-family: var(--font-ui);
-        font-size: 0.74rem;
-        font-weight: 500;
-        color: var(--h-dim);
-        text-decoration: none;
-        transition: color 0.3s var(--ease-smooth);
-      }
-
-      .nav-links a:hover {
-        color: var(--h-white);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      nav.vx-nav {
-        padding: 0 64px;
-      }
-
-      .nav-menu-btn {
-        display: none;
-      }
-
-      .nav-links {
-        display: flex;
-        gap: 36px;
-        list-style: none;
-      }
-
-      .nav-links a {
-        font-family: var(--font-ui);
-        font-size: 0.78rem;
-        font-weight: 500;
-        color: var(--h-dim);
-        text-decoration: none;
-        transition: color 0.3s var(--ease-smooth);
-      }
-
-      .nav-links a:hover {
-        color: var(--h-white);
-      }
-
-      .nav-cta {
-        font-size: 0.78rem;
-        padding: 11px 26px;
-      }
-    }
+    /* ── SITE HEADER ──
+       The nav, its auth controls and the mobile drawer are styled once in
+       static/css/nav-footer.css and rendered from templates/includes/header.html.
+       A ~530-line private copy used to live here (nav.vx-nav), which is why the
+       dashboard shipped a different logo, different links and an unstyled
+       avatar button compared with every other page. */
 
     /* هماهنگ کردن چیدمان صفحه با نوار ناوبری ثابت جدید */
     body {
@@ -1132,99 +797,12 @@
 
   <div id="header-scroll-progress"></div>
 
-  <nav class="vx-nav" id="vxNav">
-    <a href="{% url 'home_app:index' %}" class="nav-logo">Nex<span>Go</span></a>
-    <ul class="nav-links">
-      <li><a href="{% url 'home_app:index' %}#hero">مدل‌ها</a></li>
-      <li><a href="{% url 'home_app:categories' %}">فروشگاه</a></li>
-      <li><a href="{% url 'home_app:index' %}#testimonials">نظرات</a></li>
-      <li><a href="{% url 'home_app:articles' %}">مقالات</a></li>
-      <li><a href="{% url 'home_app:about_us' %}">درباره ما</a></li>
-    </ul>
-
-    <div class="nav-right-cluster">
-      <div class="nav-auth" id="navAuth">
-        {% if user.is_authenticated %}
-        <div class="auth-user" id="authUser">
-          <a class="auth-user-btn" id="authUserBtn" href="{% url 'accounts_app:dashboard' %}" aria-label="پروفایل">
-            {% if user.profile_image %}
-            <img class="auth-user-avatar" src="{{ user.profile_image.url }}"
-              alt="{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}" />
-            {% else %}
-            <span class="auth-user-avatar">👤</span>
-            {% endif %}
-            <span class="auth-user-name">{% if user.first_name and user.last_name %}{{ user.first_name }} {{
-              user.last_name }}{% elif user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name
-              }}{% elif user.fullname %}{{ user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
-          </a>
-          <div class="auth-user-menu" id="authUserMenu" role="menu">
-            <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
-            <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
-            <a href="{% url 'accounts_app:dashboard' %}#wishlist" role="menuitem">علاقه‌مندی‌ها</a>
-            <a href="{% url 'accounts_app:dashboard' %}#settings" role="menuitem">تنظیمات حساب</a>
-            <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form" role="none">
-              {% csrf_token %}
-              <button type="submit" class="auth-logout" role="menuitem">خروج</button>
-            </form>
-          </div>
-        </div>
-        {% else %}
-        <div class="auth-guest" id="authGuest">
-          <a href="{% url 'accounts_app:login' %}" class="auth-link-login">ورود</a>
-          <button class="nav-cta" onclick="window.location.href='{% url 'accounts_app:register' %}'">ثبت‌نام</button>
-        </div>
-        {% endif %}
-      </div>
-
-      {% if user.is_authenticated %}
-      <a class="nav-cart-btn" id="navCartBtn" href="{% url 'shop_app:cart' %}" aria-label="سبد خرید">
-        <svg class="nav-cart-icon" viewBox="0 0 24 24">
-          <path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" />
-          <circle cx="10" cy="20.5" r="1.4" />
-          <circle cx="17" cy="20.5" r="1.4" />
-        </svg>
-        <span class="nav-cart-badge" id="navCartCount" hidden>0</span>
-      </a>
-      {% endif %}
-
-      <button class="nav-menu-btn" id="vxMenuBtn" onclick="toggleVxMenu()" aria-label="منو">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
-
-  <div class="mobile-drawer" id="vxMobileDrawer">
-    <a href="{% url 'home_app:index' %}#hero" onclick="closeVxMenu()">مدل‌ها</a>
-    <a href="{% url 'home_app:categories' %}" onclick="closeVxMenu()">فروشگاه</a>
-    <a href="{% url 'home_app:index' %}#testimonials" onclick="closeVxMenu()">نظرات</a>
-    <a href="{% url 'home_app:articles' %}" onclick="closeVxMenu()">مقالات</a>
-    <a href="{% url 'home_app:about_us' %}" onclick="closeVxMenu()">درباره ما</a>
-
-    {% if user.is_authenticated %}
-    <div class="drawer-auth-user" id="drawerAuthUser">
-      <a href="{% url 'accounts_app:dashboard' %}" class="drawer-user-info" style="text-decoration:none;">
-        {% if user.profile_image %}
-        <img class="auth-user-avatar" src="{{ user.profile_image.url }}" alt="" style="width:32px;height:32px;" />
-        {% else %}
-        <span class="auth-user-avatar">👤</span>
-        {% endif %}
-        <span>{% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% elif
-          user.first_name %}{{ user.first_name }}{% elif user.last_name %}{{ user.last_name }}{% elif user.fullname %}{{
-          user.fullname }}{% else %}{{ user.username }}{% endif %}</span>
-      </a>
-      <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form">
-        {% csrf_token %}
-        <button type="submit" class="auth-logout">خروج</button>
-      </form>
-    </div>
-    {% else %}
-    <div class="drawer-auth" id="drawerAuthGuest">
-      <a href="{% url 'accounts_app:login' %}" class="drawer-auth-link">ورود</a>
-      <button class="drawer-auth-register"
-        onclick="window.location.href='{% url 'accounts_app:register' %}'">ثبت‌نام</button>
-    </div>
-    {% endif %}
-  </div>
+  <!-- ============ HEADER ============
+       The shared site header, exactly as every other page renders it. The
+       dashboard previously inlined its own <nav class="vx-nav"> copy with a
+       different logo, different links and its own drawer, which is why this
+       page looked like a different site. -->
+  {% include 'includes/header.html' %}
   <!-- ============ END HEADER ============ -->
   <!-- ============ TOAST CONTAINER ============ -->
   <div id="toastContainer" class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2 items-start"></div>
@@ -1232,7 +810,7 @@
   <!-- ============ MOBILE TOP HEADER ============ -->
   <header class="lg:hidden sticky z-40 glass border-b border-line" style="top: var(--nav-h)">
     <div class="flex items-center justify-between px-4 py-3">
-      <button id="menuBtn" type="button" aria-label="باز کردن منو" aria-expanded="false" aria-controls="sidebar"
+      <button id="sidebarMenuBtn" type="button" aria-label="باز کردن منوی حساب" aria-expanded="false" aria-controls="sidebar"
         class="focus-ring w-11 h-11 rounded-xl border border-line flex items-center justify-center active:scale-95 transition">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round">
@@ -1448,7 +1026,13 @@
           اطلاعات حساب کاربری خود را ویرایش کنید
         </p>
 
-        <form id="personalForm" class="card p-5 lg:p-7" enctype="multipart/form-data">
+        <!-- novalidate: the browser's own constraint validation silently blocked
+             submission for type="email" (no submit event fired at all, so the
+             server's field errors were never reached) and showed native tooltips
+             in the browser's language rather than this page's Persian messages.
+             Validation is handled by the serializer + applyFormErrors instead;
+             the input types are kept for the right mobile keyboard. -->
+        <form id="personalForm" class="card p-5 lg:p-7" enctype="multipart/form-data" novalidate>
           {% csrf_token %}
 
           <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-6 mb-6 border-b border-line">
@@ -1542,6 +1126,22 @@
             </div>
           </div>
 
+          <!-- Changing email / username / mobile is an identity change and the
+               API requires the current password for it. The field was missing
+               entirely, so those edits always failed with an explanation the
+               user never saw. It is revealed only when one of those three
+               fields actually changes. -->
+          <div id="identityConfirm" class="hidden mt-6 pt-5 border-t border-line">
+            <label class="label" for="currentPassword">رمز عبور فعلی</label>
+            <p class="text-ink-faint text-xs mb-2">
+              برای تغییر ایمیل، نام کاربری یا شماره موبایل، رمز عبور فعلی خود را وارد کنید.
+            </p>
+            <input id="currentPassword" name="current_password" type="password" autocomplete="current-password"
+              class="input max-w-sm" placeholder="••••••••" />
+          </div>
+
+          <div id="personalFormError" class="form-error-banner hidden" role="alert"></div>
+
           <div class="flex items-center gap-3 mt-7 pt-5 border-t border-line">
             <button type="submit" class="btn-primary rounded-xl px-6 py-2.5 text-sm focus-ring">
               ذخیره تغییرات
@@ -1568,7 +1168,7 @@
           رمز عبور و تنظیمات امنیتی حساب خود را مدیریت کنید
         </p>
 
-        <form id="passForm" class="card p-5 lg:p-7 max-w-xl">
+        <form id="passForm" class="card p-5 lg:p-7 max-w-xl" novalidate>
           {% csrf_token %}
           <div class="space-y-5">
             <!-- رمز عبور فعلی -->
@@ -1638,8 +1238,8 @@
           </div>
 
           <!-- خطای عمومی فرم (مثلاً خطای سرور) -->
-          <div id="general-error" class="text-red-500 text-sm mt-4 hidden"></div>
-          <div id="success-msg" class="text-green-500 text-sm mt-4 hidden"></div>
+          <div id="general-error" class="form-error-banner hidden" role="alert"></div>
+          <div id="success-msg" class="text-green-500 text-sm mt-4 hidden" role="status"></div>
 
           <button type="submit" id="submitBtn" class="btn-primary rounded-xl px-6 py-2.5 text-sm mt-6 focus-ring">
             به‌روزرسانی رمز عبور
@@ -1658,16 +1258,29 @@
               پیگیری و مشاهده جزئیات سفارش‌ها
             </p>
           </div>
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-          </svg>
+          <!-- The search field's own markup had been deleted at some point,
+               leaving only the orphan <circle>/<path>/</svg> below it plus one
+               extra </div>. That stray </div> closed <main> early, so every
+               section after this one (comments, wishlist, addresses,
+               notifications, settings) was parsed as a direct child of <body>
+               and fell outside the dashboard layout entirely. -->
+          <div class="relative">
+            <label for="orderSearch" class="sr-only">جستجو در سفارش‌ها</label>
+            <input id="orderSearch" type="search" class="input ps-10 w-full sm:w-64"
+              placeholder="جستجو با شماره سفارش" />
+            <svg class="absolute top-1/2 -translate-y-1/2 start-3 text-ink-faint pointer-events-none"
+              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </div>
         </div>
-  </div>
 
-  <div id="orderTabs" class="flex gap-1 overflow-x-auto mb-5 border-b border-line" role="tablist"></div>
-  <div id="ordersList" class="space-y-4 stagger"></div>
-  <div id="ordersEmpty" class="hidden"></div>
-  </section>
+        <div id="orderTabs" class="flex gap-1 overflow-x-auto mb-5 border-b border-line" role="tablist"></div>
+        <div id="ordersList" class="space-y-4 stagger"></div>
+        <div id="ordersEmpty" class="hidden"></div>
+      </section>
 
   <!-- ============ COMMENTS ============ -->
   <section id="section-comments" class="dashboard-section hidden-section">
@@ -1956,6 +1569,7 @@ ICONS
     const ICONS = {
       box: '<path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
       check: '<path d="M20 6 9 17l-5-5"/>',
+      x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
       clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
       comment:
         '<path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4A9 9 0 0 1 3 12a8.4 8.4 0 0 1 8.9-8.5 8.5 8.5 0 0 1 9.1 8Z"/>',
@@ -2014,13 +1628,26 @@ LOAD DASHBOARD DATA
 
     async function loadDashboard() {
       try {
-        const response = await fetch(API_BASE + "dashboard/");
-        if (!response.ok) throw new Error("Failed to load dashboard data");
+        const response = await fetch(API_BASE + "dashboard/", {
+          credentials: "same-origin",
+        });
+        if (!response.ok) {
+          // A 401 here means the session lapsed while the page was open;
+          // sending the user back to login is more useful than a toast.
+          if (response.status === 401 || response.status === 403) {
+            window.location.href = `/accounts/login/?next=${encodeURIComponent(
+              window.location.pathname + window.location.hash,
+            )}`;
+            return;
+          }
+          showToast(describeRequestFailure(response), "danger");
+          return;
+        }
         dashboardData = await response.json();
         renderAll();
+        syncIdentityConfirm();
       } catch (error) {
-        console.error("❌ Error loading dashboard:", error);
-        showToast("خطا در بارگذاری اطلاعات", "danger");
+        showToast(describeRequestFailure(null), "danger");
       }
     }
 
@@ -2188,8 +1815,8 @@ RENDER RECENT NOTIFICATIONS
   <div class="flex gap-3">
     <div class="w-8 h-8 rounded-lg bg-elevated border border-line flex items-center justify-center shrink-0">${icon(n.icon || "bell", 14, "#C9A961")}</div>
     <div class="min-w-0">
-      <p class="text-xs font-medium">${n.title}</p>
-      <p class="text-ink-faint text-[11px] mt-0.5">${n.time}</p>
+      <p class="text-xs font-medium truncate">${escapeHtml(n.title)}</p>
+      <p class="text-ink-faint text-[11px] mt-0.5">${toPersianNum(escapeHtml(n.time || ""))}</p>
     </div>
   </div>
 `,
@@ -2442,11 +2069,11 @@ WISHLIST
       el.innerHTML = wishlist
         .map(
           (p) => `
-      <div class="card card-hover overflow-hidden group">
-          <div class="relative aspect-square overflow-hidden bg-elevated">
+      <div class="card card-hover overflow-hidden group flex flex-col" data-wishlist-card="${p.product_id}">
+          <div class="relative aspect-square overflow-hidden bg-elevated shrink-0">
               <img src="${p.product_image || "/static/img/default-product.jpg"}"
                    class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                   loading="lazy" alt="${p.product_name}">
+                   loading="lazy" alt="${escapeHtml(p.product_name)}">
               ${p.discount_price
               ? `
                   <span class="absolute top-2 right-2 badge bg-danger/90 text-white border-0">
@@ -2455,35 +2082,39 @@ WISHLIST
               `
               : ""
             }
-              <button onclick="toggleWishlist(${p.product_id}, this)"
+              <button type="button"
+                      onclick="toggleWishlist(${p.product_id}, this)"
                       data-in-wishlist="true"
-                      aria-label="حذف از علاقه‌مندی"
-                      class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur flex items-center justify-center focus-ring hover:bg-danger/80 transition">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
+                      aria-label="حذف از علاقه‌مندی‌ها"
+                      title="حذف از علاقه‌مندی‌ها"
+                      class="wish-heart-btn absolute top-2 left-2 focus-ring">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2" aria-hidden="true">
                       <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
                   </svg>
               </button>
               ${!p.in_stock
               ? `
-                  <div class="absolute inset-0 bg-black/55 flex items-center justify-center">
+                  <div class="absolute inset-0 bg-black/55 flex items-center justify-center pointer-events-none">
                       <span class="text-[11px] text-white/90">ناموجود</span>
                   </div>
               `
               : ""
             }
           </div>
-          <div class="p-3">
-              <p class="text-xs font-medium truncate">${p.product_name || ""}</p>
+          <div class="p-3 flex flex-col flex-1">
+              <p class="text-xs font-medium line-clamp-2 min-h-[2.4em]">${escapeHtml(p.product_name || "")}</p>
               <p class="font-mono text-sm mt-1.5 text-gold-bright">
                   ${formatPrice(p.final_price || p.price)}
               </p>
-              <div class="flex gap-1.5 mt-2.5">
-                  <button ${!p.in_stock ? "disabled" : ""}
-                          class="flex-1 btn-primary text-[11px] py-1.5 rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">
-                      افزودن به سبد
+              <div class="wish-actions mt-auto pt-2.5">
+                  <button type="button"
+                          ${!p.in_stock ? "disabled" : ""}
+                          onclick="addWishlistItemToCart(${p.product_id}, this)"
+                          class="wish-btn btn-primary rounded-lg focus-ring disabled:opacity-40 disabled:cursor-not-allowed">
+                      ${p.in_stock ? "افزودن به سبد" : "ناموجود"}
                   </button>
-                  <a href="/shop/product/${p.product_slug}/"
-                     class="btn-ghost text-[11px] px-2.5 py-1.5 rounded-lg focus-ring">
+                  <a href="/shop/product/${encodeURIComponent(p.product_slug)}/"
+                     class="wish-btn btn-ghost rounded-lg focus-ring">
                       مشاهده
                   </a>
               </div>
@@ -2494,11 +2125,85 @@ WISHLIST
         .join("");
     }
 
+    /* Product names come from the database and are injected as HTML here, so
+       they have to be escaped — both in the card body and in the alt text. */
+    function escapeHtml(value) {
+      return String(value ?? "").replace(
+        /[&<>"']/g,
+        (ch) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[ch],
+      );
+    }
+
+    /* Favourites had an "افزودن به سبد" button with no handler attached at
+       all — it was inert markup. This reuses the same endpoint and the same
+       401/login_required contract as the shop's add-to-cart. */
+    async function addWishlistItemToCart(productId, btn) {
+      const original = btn.textContent.trim();
+      btn.disabled = true;
+      btn.textContent = "در حال افزودن…";
+      try {
+        const response = await fetch("/shop/api/cart/add/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          credentials: "same-origin",
+          body: JSON.stringify({ product_id: productId, quantity: 1 }),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          btn.textContent = "افزوده شد ✓";
+          showToast("محصول به سبد خرید اضافه شد", "ok");
+          updateCartBadgeFromCount(data.item_count);
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.disabled = false;
+          }, 1800);
+          return;
+        }
+
+        if (response.status === 401 || data.login_required) {
+          window.location.href =
+            data.login_url ||
+            `/accounts/login/?next=${encodeURIComponent(window.location.pathname)}`;
+          return;
+        }
+        showToast(data.error || "افزودن به سبد خرید ناموفق بود", "danger");
+      } catch (error) {
+        showToast("ارتباط با سرور برقرار نشد. اتصال اینترنت خود را بررسی کنید.", "danger");
+      }
+      btn.textContent = original;
+      btn.disabled = false;
+    }
+
+    /* The header badge is rendered by the shared header script; keep it in
+       sync when the cart changes from inside the dashboard. */
+    function updateCartBadgeFromCount(count) {
+      const badge = document.getElementById("navCartCount");
+      if (!badge || typeof count !== "number") return;
+      if (count > 0) {
+        badge.textContent = count;
+        badge.removeAttribute("hidden");
+      } else {
+        badge.setAttribute("hidden", "");
+      }
+    }
+
     // ===== تابع یکپارچه برای اضافه/حذف علاقه‌مندی =====
     async function toggleWishlist(productId, btn) {
+      if (btn.dataset.busy === "1") return;
+      btn.dataset.busy = "1";
       try {
-        const isInWishlist = btn.dataset.inWishlist === "true";
-
         const response = await fetch("/shop/api/wishlist/toggle/", {
           method: "POST",
           headers: {
@@ -2508,39 +2213,62 @@ WISHLIST
           credentials: "same-origin",
           body: JSON.stringify({ product_id: productId }),
         });
+        const data = await response.json().catch(() => ({}));
 
-        if (response.ok) {
-          const data = await response.json();
+        if (response.status === 401 || data.login_required) {
+          window.location.href =
+            data.login_url ||
+            `/accounts/login/?next=${encodeURIComponent(window.location.pathname)}`;
+          return;
+        }
 
-          // بروزرسانی دکمه
-          if (data.is_in_wishlist) {
-            btn.dataset.inWishlist = "true";
-            btn.innerHTML = `
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171" stroke="#f87171" stroke-width="2">
-                      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
-                  </svg>
-              `;
-            btn.setAttribute("aria-label", "حذف از علاقه‌مندی");
-            showToast("به علاقه‌مندی‌ها اضافه شد", "ok");
-          } else {
-            btn.dataset.inWishlist = "false";
-            btn.innerHTML = `
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
-                  </svg>
-              `;
-            btn.setAttribute("aria-label", "افزودن به علاقه‌مندی");
-            showToast("از علاقه‌مندی‌ها حذف شد", "ok");
-          }
+        if (!response.ok) {
+          showToast(
+            data.error || "حذف از علاقه‌مندی‌ها ناموفق بود. دوباره تلاش کنید.",
+            "danger",
+          );
+          return;
+        }
 
-          // بروزرسانی لیست (با ریلود کردن دیتا)
-          loadDashboard();
-        } else {
-          showToast("خطا در عملیات", "danger");
+        if (data.is_in_wishlist) {
+          btn.dataset.inWishlist = "true";
+          btn.setAttribute("aria-label", "حذف از علاقه‌مندی‌ها");
+          showToast("به علاقه‌مندی‌ها اضافه شد", "ok");
+          return;
+        }
+
+        /* Removed. Drop the card and the local copy straight away instead of
+           refetching the whole dashboard — the old code called loadDashboard()
+           on every toggle, so the grid only updated after a full round trip. */
+        const card = btn.closest("[data-wishlist-card]");
+        if (card) {
+          card.style.transition = "opacity .2s ease, transform .2s ease";
+          card.style.opacity = "0";
+          card.style.transform = "scale(.96)";
+          setTimeout(() => card.remove(), 200);
+        }
+        dashboardData.wishlist = (dashboardData.wishlist || []).filter(
+          (item) => String(item.product_id) !== String(productId),
+        );
+        if (dashboardData.stats) {
+          dashboardData.stats.wishlist_count = dashboardData.wishlist.length;
+        }
+        updateBadges();
+        const countEl = document.getElementById("navWishlistCount");
+        if (countEl) countEl.textContent = dashboardData.wishlist.length;
+        showToast("از علاقه‌مندی‌ها حذف شد", "ok");
+
+        // Re-render only once the list is empty, so the empty state appears.
+        if (dashboardData.wishlist.length === 0) {
+          setTimeout(renderWishlist, 220);
         }
       } catch (error) {
-        console.error("Wishlist error:", error);
-        showToast("خطا در ارتباط با سرور", "danger");
+        showToast(
+          "ارتباط با سرور برقرار نشد. اتصال اینترنت خود را بررسی کنید.",
+          "danger",
+        );
+      } finally {
+        delete btn.dataset.busy;
       }
     }
     /* ═══════════════════════════════════════
@@ -2627,28 +2355,29 @@ NOTIFICATIONS
       el.classList.remove("hidden");
       emptyEl.classList.add("hidden");
 
-      el.innerHTML =
-        `<div class="space-y-0">` +
-        notifs
-          .map(
-            (n, i) => `
-  <div class="flex gap-4 relative pb-6 ${i === notifs.length - 1 ? "" : "border-r-2 border-line mr-[19px]"}">
-    <div class="w-10 h-10 rounded-full ${n.unread ? "bg-gold/15 border border-gold/30" : "bg-elevated border border-line"} flex items-center justify-center shrink-0 -mr-5 z-10">
+      el.innerHTML = notifs
+        .map(
+          (n) => `
+  <div class="notif-row">
+    <div class="notif-icon ${n.unread ? "bg-gold/15 border border-gold/30" : "bg-elevated border border-line"}">
       ${icon(n.icon || "bell", 16, n.unread ? "#E4C77E" : "#9C9BA6")}
     </div>
-    <div class="flex-1 pt-1.5">
+    <div class="flex-1 pt-1.5 min-w-0">
       <div class="flex items-center gap-2">
-        <p class="text-sm font-medium">${n.title || ""}</p>
-        ${n.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-gold"></span>' : ""}
+        <p class="text-sm font-medium">${escapeHtml(n.title || "")}</p>
+        ${n.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-gold shrink-0"></span>' : ""}
       </div>
-      <p class="text-ink-muted text-xs mt-1">${n.desc || ""}</p>
-      <p class="text-ink-faint text-[11px] mt-1.5">${n.time || ""}</p>
+      <p class="text-ink-muted text-xs mt-1 break-words">${escapeHtml(n.desc || "")}</p>
+      <p class="text-ink-faint text-[11px] mt-1.5">${toPersianNum(escapeHtml(n.time || ""))}</p>
     </div>
   </div>
 `,
-          )
-          .join("") +
-        `</div>`;
+        )
+        .join("");
+
+      // Nothing to mark when everything has already been read.
+      const markBtn = document.getElementById("markAllReadBtn");
+      if (markBtn) markBtn.disabled = unreadCount === 0;
     }
 
     /* ═══════════════════════════════════════
@@ -2691,9 +2420,40 @@ NAVIGATION
       "settings",
     ];
 
-    function goToSection(name) {
+    /* Aliases the rest of the site links to. The header user-menu points at
+       /accounts/dashboard/#orders, #wishlist and #settings, and "پروفایل"
+       goes to the bare URL, which lands on the overview. */
+    const SECTION_ALIASES = {
+      "": "overview",
+      dashboard: "overview",
+      profile: "personal",
+      personal: "personal",
+      account: "settings",
+      favorites: "wishlist",
+      favourites: "wishlist",
+    };
+
+    /* Always resolves to a real section: an empty or unrecognised fragment
+       falls back to the overview rather than leaving whatever happened to be
+       open on screen. */
+    function sectionFromHash() {
+      const raw = decodeURIComponent(window.location.hash.replace(/^#/, ""))
+        .trim()
+        .toLowerCase();
+      const name = SECTION_ALIASES[raw] || raw;
+      return sections.includes(name) ? name : "overview";
+    }
+
+    // Set while we write the hash ourselves, so the resulting hashchange
+    // doesn't bounce straight back into goToSection().
+    let syncingHash = false;
+
+    function goToSection(name, { updateHash = true, scroll = true } = {}) {
+      if (!sections.includes(name)) name = "overview";
+
       sections.forEach((s) => {
         const el = document.getElementById("section-" + s);
+        if (!el) return;
         if (s === name) {
           el.classList.remove("hidden-section");
           el.classList.add("fade-in");
@@ -2704,8 +2464,32 @@ NAVIGATION
       document.querySelectorAll(".nav-item[data-section]").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.section === name);
       });
+
+      /* Keep the address bar in step so the section is linkable, bookmarkable
+         and survives a reload — this is what the header's #orders / #wishlist
+         / #settings links depend on. */
+      if (updateHash) {
+        const target = name === "overview" ? "" : "#" + name;
+        if (window.location.hash !== target) {
+          syncingHash = true;
+          if (target) {
+            window.location.hash = target;
+          } else {
+            history.replaceState(
+              null,
+              "",
+              window.location.pathname + window.location.search,
+            );
+          }
+          // hashchange is async; release on the next tick.
+          setTimeout(() => {
+            syncingHash = false;
+          }, 0);
+        }
+      }
+
       closeDrawer();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     document.querySelectorAll(".section-link").forEach((btn) => {
@@ -2714,11 +2498,27 @@ NAVIGATION
       );
     });
 
+    /* Arriving at /accounts/dashboard/#orders (or #wishlist / #settings) from
+       the header user-menu used to land on the overview: nothing ever read
+       location.hash, so every one of those links looked like a plain link to
+       the dashboard. Handle both the initial load and later hash changes. */
+    window.addEventListener("hashchange", () => {
+      if (syncingHash) return;
+      goToSection(sectionFromHash(), { updateHash: false });
+    });
+
+    function applyInitialSection() {
+      goToSection(sectionFromHash(), { updateHash: false, scroll: false });
+    }
+
     /* mobile drawer */
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("drawerOverlay");
 
-    const drawerTrigger = document.getElementById("menuBtn");
+    // Renamed from "menuBtn": the shared header include already owns that id
+    // for the site-wide hamburger, and a duplicate id would have made
+    // getElementById return the wrong button for both.
+    const drawerTrigger = document.getElementById("sidebarMenuBtn");
     let drawerScrollY = 0;
 
     function openDrawer() {
@@ -2845,6 +2645,237 @@ MODALS / TOASTS
       hideModal("confirmModal");
     });
 
+    /* ═══════════════════════════════════════
+FORM VALIDATION — field-level error rendering
+
+Both dashboard forms used to read `err.detail`, which DRF never sets for
+these endpoints: profile update returns a flat {field: [msg]} dict and
+password change returns {success, errors: {...}, message}. `err.detail` was
+always undefined, so every failure collapsed into one generic toast and the
+specific per-field messages the serializers already produce were discarded.
+These helpers render them against the right input instead.
+═══════════════════════════════════════ */
+
+    /* Field name → the label the user actually sees, so a form-level summary
+       can name the field rather than echoing an API key. */
+    const FIELD_LABELS = {
+      full_name: "نام و نام خانوادگی",
+      fullname: "نام و نام خانوادگی",
+      username: "نام کاربری",
+      email: "ایمیل",
+      mobile: "شماره موبایل",
+      national_code: "کد ملی",
+      birth_date: "تاریخ تولد",
+      gender: "جنسیت",
+      bio: "درباره من",
+      avatar: "تصویر پروفایل",
+      profile_image: "تصویر پروفایل",
+      current_password: "رمز عبور فعلی",
+      old_password: "رمز عبور فعلی",
+      new_password1: "رمز عبور جدید",
+      new_password2: "تکرار رمز عبور جدید",
+    };
+
+    /* A few DRF/Django defaults read like internal validation output. Where a
+       clearer sentence exists, use it — the rest are already written in
+       Persian by the serializers and pass through untouched. */
+    const MESSAGE_OVERRIDES = [
+      [/این مقدار نباید خالی باشد|این فیلد نمی‌تواند خالی باشد|may not be blank/i,
+        "این فیلد را کامل کنید."],
+      [/this field is required|این فیلد لازم است/i, "این فیلد را کامل کنید."],
+      [/حداقل 10|at least 10 characters/i, "کد ملی باید دقیقاً ۱۰ رقم باشد."],
+      [/enter a valid email|پست الکترونیکی صحیح/i,
+        "ایمیل معتبر نیست. نمونه درست: name@example.com"],
+      [/already exists|از قبل موجود است|قبلا.*استفاده/i,
+        "این مقدار قبلاً برای حساب دیگری ثبت شده است."],
+      [/ensure this field has no more than (\d+)/i,
+        "طول این مقدار بیش از حد مجاز است."],
+    ];
+
+    function humanizeMessage(message) {
+      const text = String(message || "").trim();
+      if (!text) return "مقدار وارد شده معتبر نیست.";
+      for (const [pattern, replacement] of MESSAGE_OVERRIDES) {
+        if (pattern.test(text)) return replacement;
+      }
+      return text;
+    }
+
+    /* DRF hands back strings, arrays or nested objects depending on where the
+       error was raised. Flatten to a single readable sentence. */
+    function flattenMessages(value) {
+      if (value == null) return [];
+      if (Array.isArray(value)) return value.flatMap(flattenMessages);
+      if (typeof value === "object") return Object.values(value).flatMap(flattenMessages);
+      return [String(value)];
+    }
+
+    function clearFormErrors(form) {
+      form.querySelectorAll(".is-invalid").forEach((el) => {
+        el.classList.remove("is-invalid");
+        el.removeAttribute("aria-invalid");
+        el.removeAttribute("aria-describedby");
+      });
+      form.querySelectorAll("[data-field-error]").forEach((el) => {
+        el.textContent = "";
+        el.classList.add("hidden");
+      });
+      const banner = form.querySelector(".form-error-banner");
+      if (banner) {
+        banner.textContent = "";
+        banner.classList.add("hidden");
+      }
+    }
+
+    /* Finds (or creates) the message element that belongs to a field. The
+       security form already ships #error-<name> placeholders; the personal
+       form had none, so one is inserted after the field's control. */
+    function errorSlotFor(form, name, input) {
+      const existing =
+        form.querySelector(`#error-${CSS.escape(name)}`) ||
+        form.querySelector(`[data-field-error="${CSS.escape(name)}"]`);
+      if (existing) {
+        existing.setAttribute("data-field-error", name);
+        existing.id = existing.id || `error-${name}`;
+        return existing;
+      }
+      if (!input) return null;
+
+      const slot = document.createElement("p");
+      slot.className = "field-error";
+      slot.id = `error-${name}`;
+      slot.setAttribute("data-field-error", name);
+      // Sit outside any relative wrapper (icon/eye button) the input lives in.
+      const anchor = input.closest(".relative") || input;
+      anchor.parentNode.insertBefore(slot, anchor.nextSibling);
+      return slot;
+    }
+
+    function fieldInput(form, name) {
+      return (
+        form.querySelector(`[name="${CSS.escape(name)}"]`) ||
+        form.querySelector(`#${CSS.escape(name)}`)
+      );
+    }
+
+    /**
+     * Render an API error payload onto a form.
+     * Returns true when at least one message was shown.
+     */
+    function applyFormErrors(form, payload, fallbackMessage) {
+      clearFormErrors(form);
+
+      // Password change nests under `errors`; profile update is flat.
+      const errors =
+        payload && typeof payload === "object" && payload.errors
+          ? payload.errors
+          : payload;
+
+      const formLevel = [];
+      let firstInvalid = null;
+      let shown = 0;
+
+      if (errors && typeof errors === "object" && !Array.isArray(errors)) {
+        for (const [name, rawValue] of Object.entries(errors)) {
+          const messages = flattenMessages(rawValue).map(humanizeMessage);
+          if (!messages.length) continue;
+
+          // `detail` and `non_field_errors` describe the request, not a field.
+          if (name === "non_field_errors" || name === "detail") {
+            formLevel.push(...messages);
+            continue;
+          }
+
+          const input = fieldInput(form, name);
+          const slot = errorSlotFor(form, name, input);
+
+          if (!input && !slot) {
+            const label = FIELD_LABELS[name];
+            formLevel.push(
+              ...messages.map((m) => (label ? `${label}: ${m}` : m)),
+            );
+            continue;
+          }
+
+          if (slot) {
+            slot.textContent = messages.join(" ");
+            slot.classList.remove("hidden");
+          }
+          if (input) {
+            input.classList.add("is-invalid");
+            input.setAttribute("aria-invalid", "true");
+            if (slot) input.setAttribute("aria-describedby", slot.id);
+            if (!firstInvalid) firstInvalid = input;
+          }
+          shown += 1;
+        }
+      } else {
+        formLevel.push(...flattenMessages(errors).map(humanizeMessage));
+      }
+
+      const banner = form.querySelector(".form-error-banner");
+      if (formLevel.length && banner) {
+        banner.textContent = formLevel.join(" ");
+        banner.classList.remove("hidden");
+        shown += 1;
+      }
+
+      if (!shown) {
+        if (banner) {
+          banner.textContent = fallbackMessage;
+          banner.classList.remove("hidden");
+        } else {
+          showToast(fallbackMessage, "danger");
+        }
+        return false;
+      }
+
+      if (firstInvalid) {
+        firstInvalid.focus({ preventScroll: true });
+        firstInvalid.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+      return true;
+    }
+
+    /* Clear a field's error as soon as the user starts correcting it. */
+    function wireErrorClearing(form) {
+      form.addEventListener("input", (e) => {
+        const input = e.target;
+        if (!input.classList || !input.classList.contains("is-invalid")) return;
+        input.classList.remove("is-invalid");
+        input.removeAttribute("aria-invalid");
+        const slotId = input.getAttribute("aria-describedby");
+        const slot = slotId && document.getElementById(slotId);
+        if (slot) {
+          slot.textContent = "";
+          slot.classList.add("hidden");
+        }
+      });
+    }
+
+    /** Translate a transport/HTTP failure into something a user can act on. */
+    function describeRequestFailure(response) {
+      if (!response) {
+        return "ارتباط با سرور برقرار نشد. اتصال اینترنت خود را بررسی کنید.";
+      }
+      switch (response.status) {
+        case 401:
+          return "نشست شما منقضی شده است. دوباره وارد حساب خود شوید.";
+        case 403:
+          return "این درخواست مجاز نیست. صفحه را تازه کنید و دوباره تلاش کنید.";
+        case 413:
+          return "حجم فایل ارسالی بیش از حد مجاز است.";
+        case 429:
+          return "تعداد تلاش‌ها زیاد بود. چند دقیقه دیگر دوباره تلاش کنید.";
+        default:
+          break;
+      }
+      if (response.status >= 500) {
+        return "خطایی در سرور رخ داد. کمی بعد دوباره تلاش کنید.";
+      }
+      return "درخواست انجام نشد. دوباره تلاش کنید.";
+    }
+
     function showToast(msg, type = "ok") {
       const colors = { ok: "#4ADE80", danger: "#F87171", info: "#60A5FA" };
       const el = document.createElement("div");
@@ -2960,41 +2991,100 @@ PERSONAL INFO — avatar upload + form
         avatarInput.value = "";
       });
 
-    document
-      .getElementById("personalForm")
-      ?.addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
+    const personalForm = document.getElementById("personalForm");
+    if (personalForm) wireErrorClearing(personalForm);
 
-        try {
-          const response = await fetch(API_BASE + "profile/update/", {
-            method: "PUT", // یا 'POST'
-            headers: {
-              "X-CSRFToken": getCSRFToken(),
-              // ❌ حذف 'Content-Type': 'application/json' ← این رو نذار
-            },
-            credentials: "same-origin",
-            body: formData, // ← FormData ارسال کن
-          });
+    /* Reveal the current-password confirmation only when one of the three
+       identity fields has actually been changed — that is exactly when
+       UserUpdateSerializer.validate() starts requiring it. */
+    function syncIdentityConfirm() {
+      const box = document.getElementById("identityConfirm");
+      if (!box || !dashboardData.user) return;
+      const u = dashboardData.user;
+      const changed =
+        (document.getElementById("username")?.value || "") !== (u.username || "") ||
+        (document.getElementById("email")?.value || "") !== (u.email || "") ||
+        (document.getElementById("mobile")?.value || "") !== (u.mobile || "");
+      box.classList.toggle("hidden", !changed);
+      if (!changed) {
+        const field = document.getElementById("currentPassword");
+        if (field) field.value = "";
+      }
+    }
 
-          if (response.ok) {
-            const tick = document.getElementById("saveSuccessTick");
-            tick.classList.remove("hidden");
-            tick.classList.add("flex");
-            showToast("اطلاعات با موفقیت ذخیره شد", "ok");
-            setTimeout(() => {
-              tick.classList.add("hidden");
-              tick.classList.remove("flex");
-            }, 2500);
-            loadDashboard();
-          } else {
-            const err = await response.json();
-            showToast(err.detail || "خطا در ذخیره اطلاعات", "danger");
-          }
-        } catch (error) {
-          showToast("خطا در ارتباط با سرور", "danger");
-        }
+    ["username", "email", "mobile"].forEach((id) => {
+      document.getElementById(id)?.addEventListener("input", syncIdentityConfirm);
+    });
+
+    personalForm?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const formData = new FormData(this);
+
+      // An empty file input still serialises; sending it makes the API treat
+      // it as an upload attempt and fail image validation.
+      const avatarField = formData.get("avatar");
+      if (!avatarField || (avatarField instanceof File && avatarField.size === 0)) {
+        formData.delete("avatar");
+      }
+      // Only send the confirmation when it was actually filled in.
+      if (!formData.get("current_password")) formData.delete("current_password");
+
+      /* Fields that are optional on the model. Posting them empty made the
+         serializer validate "" — validate_mobile rejects it outright — so a
+         user who had never set a phone number could not save anything else
+         on the form either. The API patches partially, so omitting a blank
+         optional field simply leaves it untouched. */
+      ["mobile", "national_code", "birth_date", "bio", "gender"].forEach((name) => {
+        const value = formData.get(name);
+        if (typeof value === "string" && !value.trim()) formData.delete(name);
       });
+
+      clearFormErrors(this);
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const response = await fetch(API_BASE + "profile/update/", {
+          method: "PUT",
+          headers: { "X-CSRFToken": getCSRFToken() },
+          credentials: "same-origin",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const tick = document.getElementById("saveSuccessTick");
+          tick.classList.remove("hidden");
+          tick.classList.add("flex");
+          showToast("اطلاعات با موفقیت ذخیره شد", "ok");
+          setTimeout(() => {
+            tick.classList.add("hidden");
+            tick.classList.remove("flex");
+          }, 2500);
+          document.getElementById("identityConfirm")?.classList.add("hidden");
+          const pwField = document.getElementById("currentPassword");
+          if (pwField) pwField.value = "";
+          await loadDashboard();
+          return;
+        }
+
+        // 400 carries field errors; anything else is a transport-level problem
+        // that has no field to attach to.
+        if (response.status === 400) {
+          const payload = await response.json().catch(() => null);
+          applyFormErrors(this, payload, "ذخیره اطلاعات انجام نشد. مقادیر واردشده را بررسی کنید.");
+          // Server asked for the password — make sure the field is reachable.
+          if (payload && payload.current_password) {
+            document.getElementById("identityConfirm")?.classList.remove("hidden");
+          }
+        } else {
+          applyFormErrors(this, null, describeRequestFailure(response));
+        }
+      } catch (error) {
+        applyFormErrors(this, null, describeRequestFailure(null));
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
     /* ═══════════════════════════════════════
 SECURITY — password visibility + strength meter
 ═══════════════════════════════════════ */
@@ -3052,54 +3142,86 @@ SECURITY — password visibility + strength meter
         }
       });
 
-    document
-      .getElementById("passForm")
-      ?.addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const n = document.getElementById("newPass").value;
-        const c = document.getElementById("confPass").value;
-        const old = document.getElementById("curPass").value;
+    const passForm = document.getElementById("passForm");
+    if (passForm) wireErrorClearing(passForm);
 
-        if (n !== c) {
-          showToast("رمز عبور و تکرار آن یکسان نیستند", "danger");
-          return;
-        }
-        if (passwordScore(n) < 2) {
-          showToast("رمز عبور باید قوی‌تر باشد", "danger");
-          return;
-        }
+    passForm?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById("submitBtn");
+      const old = document.getElementById("curPass").value;
+      const n = document.getElementById("newPass").value;
+      const c = document.getElementById("confPass").value;
 
-        try {
-          const response = await fetch(API_BASE + "password/change/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCSRFToken(),
-            },
-            credentials: "same-origin",
-            body: JSON.stringify({
-              old_password: old,
-              new_password1: n,
-              new_password2: c,
-            }),
-          });
+      clearFormErrors(this);
+      document.getElementById("success-msg")?.classList.add("hidden");
 
-          if (response.ok) {
-            showToast("رمز عبور با موفقیت به‌روزرسانی شد", "ok");
-            this.reset();
-            document
-              .querySelectorAll("#strengthBars span")
-              .forEach((b) => (b.style.background = "#26262F"));
-            document.getElementById("strengthLabel").textContent =
-              "قدرت رمز عبور";
-          } else {
-            const err = await response.json();
-            showToast(err.detail || "خطا در تغییر رمز عبور", "danger");
+      /* Client-side checks mirror the serializer's own rules and name the
+         field they belong to. Everything else is left to the server, which
+         returns a specific reason per field — the previous code blocked on a
+         vague "رمز عبور باید قوی‌تر باشد" before ever asking it. */
+      const clientErrors = {};
+      if (!old) clientErrors.old_password = ["رمز عبور فعلی را وارد کنید."];
+      if (!n) clientErrors.new_password1 = ["رمز عبور جدید را وارد کنید."];
+      if (!c) {
+        clientErrors.new_password2 = ["تکرار رمز عبور جدید را وارد کنید."];
+      } else if (n && n !== c) {
+        clientErrors.new_password2 = [
+          "رمز عبور جدید و تکرار آن یکسان نیستند.",
+        ];
+      }
+      if (Object.keys(clientErrors).length) {
+        applyFormErrors(this, clientErrors, "فرم را کامل کنید.");
+        return;
+      }
+
+      if (submitBtn) submitBtn.disabled = true;
+      try {
+        const response = await fetch(API_BASE + "password/change/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+          },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            old_password: old,
+            new_password1: n,
+            new_password2: c,
+          }),
+        });
+
+        if (response.ok) {
+          showToast("رمز عبور با موفقیت به‌روزرسانی شد", "ok");
+          const success = document.getElementById("success-msg");
+          if (success) {
+            success.textContent = "رمز عبور شما تغییر کرد.";
+            success.classList.remove("hidden");
           }
-        } catch (error) {
-          showToast("خطا در ارتباط با سرور", "danger");
+          this.reset();
+          document
+            .querySelectorAll("#strengthBars span")
+            .forEach((b) => (b.style.background = "#26262F"));
+          document.getElementById("strengthLabel").textContent = "قدرت رمز عبور";
+          document.getElementById("matchMsg")?.classList.add("hidden");
+          return;
         }
-      });
+
+        if (response.status === 400) {
+          const payload = await response.json().catch(() => null);
+          applyFormErrors(
+            this,
+            payload,
+            "تغییر رمز عبور انجام نشد. مقادیر واردشده را بررسی کنید.",
+          );
+        } else {
+          applyFormErrors(this, null, describeRequestFailure(response));
+        }
+      } catch (error) {
+        applyFormErrors(this, null, describeRequestFailure(null));
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
 
     /* generic toggle switches */
     document.querySelectorAll("[data-toggle-switch]").forEach((t) => {
@@ -3114,15 +3236,33 @@ SECURITY — password visibility + strength meter
     /* ═══════════════════════════════════════
 MARK ALL NOTIFICATIONS READ
 ═══════════════════════════════════════ */
+    /* Read state is persisted server-side (a timestamp on the session), so it
+       survives a reload. The old handler only flipped the in-memory flags and
+       everything came back unread on the next page load. */
     document
       .getElementById("markAllReadBtn")
-      ?.addEventListener("click", () => {
-        if (dashboardData && dashboardData.notifications) {
+      ?.addEventListener("click", async function () {
+        if (!dashboardData || !(dashboardData.notifications || []).length) return;
+        this.disabled = true;
+        try {
+          const response = await fetch(API_BASE + "notifications/read/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCSRFToken(),
+            },
+            credentials: "same-origin",
+          });
+          if (!response.ok) throw new Error("request failed");
+
           dashboardData.notifications.forEach((n) => (n.unread = false));
           renderNotifs();
+          showToast("همه اعلان‌ها خوانده‌شده علامت خوردند", "ok");
+        } catch (error) {
+          this.disabled = false;
           showToast(
-            "همه اعلان‌ها به‌عنوان خوانده‌شده علامت‌گذاری شدند",
-            "ok",
+            "ثبت وضعیت اعلان‌ها ناموفق بود. دوباره تلاش کنید.",
+            "danger",
           );
         }
       });
@@ -3131,79 +3271,23 @@ MARK ALL NOTIFICATIONS READ
 INIT
 ═══════════════════════════════════════ */
     loadProvinces();
+    // Open the section named in the URL before data arrives, so a deep link
+    // doesn't flash the overview first.
+    applyInitialSection();
     loadDashboard();
   </script>
 
+  <!-- Shared header behaviour: drawer open/close with body scroll lock and
+       focus handling, Escape/outside-click closing, and the cart badge.
+       The dashboard used to re-implement all of this against its own vx-*
+       element ids, plus a cart-badge fetch pointing at "/api/shop/cart/",
+       which is not a route in this project (the real one is
+       /shop/api/cart/), so the badge never updated. -->
+  {% include 'includes/header-scripts.html' %}
+
   <script>
-    /* ============ HEADER (Nex Go) JS ============ */
-    const HEADER_IS_AUTHENTICATED = {% if user.is_authenticated %}true{% else %} false{% endif %};
-    const HEADER_CART_URL = "/api/shop/cart/"; // TODO: با urls.py واقعی خودت هماهنگ کن
-
-    async function updateCartBadge() {
-      const badge = document.getElementById("navCartCount");
-      if (!HEADER_IS_AUTHENTICATED || !badge) return;
-      try {
-        const response = await fetch(HEADER_CART_URL, {
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        });
-        if (!response.ok) throw new Error("Failed to fetch cart");
-        const cart = await response.json();
-        const count = cart.item_count || 0;
-        badge.textContent = count;
-        badge.hidden = count === 0;
-      } catch (error) {
-        console.error("❌ Error loading cart count:", error);
-      }
-    }
-
-    function toggleVxMenu() {
-      const btn = document.getElementById("vxMenuBtn");
-      const drawer = document.getElementById("vxMobileDrawer");
-      const isOpen = drawer.classList.toggle("open");
-      btn.classList.toggle("open", isOpen);
-      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    }
-
-    function closeVxMenu() {
-      document.getElementById("vxMenuBtn").classList.remove("open");
-      document.getElementById("vxMobileDrawer").classList.remove("open");
-      document.getElementById("vxMenuBtn").setAttribute("aria-expanded", "false");
-    }
-
-    function toggleUserMenu(e) {
-      if (e) e.stopPropagation();
-      const btn = document.getElementById("authUserBtn");
-      const menu = document.getElementById("authUserMenu");
-      if (!btn || !menu) return;
-      const isOpen = menu.classList.toggle("open");
-      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    }
-
-    document.addEventListener("click", () => {
-      const menu = document.getElementById("authUserMenu");
-      const btn = document.getElementById("authUserBtn");
-      if (menu && menu.classList.contains("open")) {
-        menu.classList.remove("open");
-        if (btn) btn.setAttribute("aria-expanded", "false");
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        const menu = document.getElementById("authUserMenu");
-        const btn = document.getElementById("authUserBtn");
-        if (menu && menu.classList.contains("open")) {
-          menu.classList.remove("open");
-          if (btn) {
-            btn.setAttribute("aria-expanded", "false");
-            btn.focus();
-          }
-        }
-      }
-    });
-
+    /* Hide the intro loader once the page is up. */
     window.addEventListener("load", () => {
-      updateCartBadge();
       setTimeout(() => {
         const loader = document.getElementById("loader");
         if (loader) loader.classList.add("done");

@@ -13,6 +13,7 @@ from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.views import View
 from django.views.generic import TemplateView
 from rest_framework import generics, status
@@ -276,7 +277,132 @@ class ChangePasswordAPIView(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
 
 
-# apps/accounts/views.py
+# ══════════════════════════════════════════════════════════════════════
+#  Dashboard notifications
+#
+#  There is no Notification model, and the previous implementation shipped a
+#  single hard-coded entry ("سفارش شما ارسال شد") that every user saw whether
+#  or not they had ever placed an order. Notifications are derived from the
+#  user's own records instead — the same approach the admin dashboard already
+#  uses in apps/shop/views.py — so no schema change is needed.
+#
+#  Read state is kept as a timestamp in the session rather than a new model:
+#  anything that happened at or before that moment counts as read.
+# ══════════════════════════════════════════════════════════════════════
+
+NOTIFICATIONS_READ_AT_SESSION_KEY = 'notifications_read_at'
+
+#: Notifications older than this are not worth surfacing on the dashboard.
+NOTIFICATION_MAX_AGE_DAYS = 60
+NOTIFICATION_LIMIT = 20
+
+
+def get_notifications_read_at(request):
+    """The moment the user last marked their notifications read, or None."""
+    raw = request.session.get(NOTIFICATIONS_READ_AT_SESSION_KEY)
+    if not raw:
+        return None
+    parsed = parse_datetime(raw)
+    if parsed is None:
+        return None
+    return parsed if timezone.is_aware(parsed) else timezone.make_aware(parsed)
+
+
+def humanize_since(dt):
+    """Relative Persian time, matching the admin dashboard's wording."""
+    seconds = int((timezone.now() - dt).total_seconds())
+    if seconds < 60:
+        return 'لحظاتی پیش'
+    if seconds < 3600:
+        return f'{seconds // 60} دقیقه پیش'
+    if seconds < 86400:
+        return f'{seconds // 3600} ساعت پیش'
+    if seconds < 604800:
+        return f'{seconds // 86400} روز پیش'
+    return f'{seconds // 604800} هفته پیش'
+
+
+#: Wording and icon per order status. `delivered` and `shipping` are the two
+#: the customer actually wants to hear about; the rest are still useful.
+ORDER_STATUS_NOTIFICATIONS = {
+    'pending': ('clock', 'سفارش در انتظار پرداخت', 'سفارش {number} هنوز پرداخت نشده است'),
+    'processing': ('box', 'سفارش در حال پردازش', 'سفارش {number} در حال آماده‌سازی است'),
+    'shipping': ('truck', 'سفارش شما ارسال شد', 'سفارش {number} تحویل پست شد'),
+    'delivered': ('check', 'سفارش تحویل داده شد', 'سفارش {number} با موفقیت تحویل شما شد'),
+    'cancelled': ('x', 'سفارش لغو شد', 'سفارش {number} لغو شده است'),
+}
+
+
+def build_user_notifications(user, orders_qs, product_comments_qs,
+                             article_comments_qs, read_at=None):
+    """Derive the user's notification feed from their own records."""
+    cutoff = timezone.now() - timedelta(days=NOTIFICATION_MAX_AGE_DAYS)
+    events = []
+
+    def add(when, icon, title, desc):
+        if when is None or when < cutoff:
+            return
+        events.append({'when': when, 'icon': icon, 'title': title, 'desc': desc})
+
+    # ── سفارش‌ها ──
+    for order in orders_qs.filter(updated_at__gte=cutoff).order_by('-updated_at')[:NOTIFICATION_LIMIT]:
+        icon, title, desc = ORDER_STATUS_NOTIFICATIONS.get(
+            order.status, ('box', 'به‌روزرسانی سفارش', 'وضعیت سفارش {number} تغییر کرد')
+        )
+        # delivered_at / paid_at are more accurate than updated_at when set.
+        when = order.delivered_at if order.status == 'delivered' and order.delivered_at else order.updated_at
+        add(when, icon, title, desc.format(number=order.order_number))
+
+    # ── نتیجه بررسی نظرات محصول ──
+    for review in product_comments_qs.filter(
+        updated_at__gte=cutoff, status__in=('approved', 'rejected')
+    ).select_related('product').order_by('-updated_at')[:NOTIFICATION_LIMIT]:
+        if review.status == 'approved':
+            add(review.updated_at, 'check', 'نظر شما تایید شد',
+                f'نظر شما درباره «{review.product.name}» منتشر شد')
+        else:
+            reason = review.rejection_reason or 'مطابق قوانین سایت نبود'
+            add(review.updated_at, 'x', 'نظر شما تایید نشد',
+                f'نظر شما درباره «{review.product.name}» رد شد: {reason}')
+
+    # ── نتیجه بررسی نظرات مقاله ──
+    for comment in article_comments_qs.filter(
+        updated_at__gte=cutoff, status__in=('approved', 'rejected')
+    ).select_related('article').order_by('-updated_at')[:NOTIFICATION_LIMIT]:
+        when = comment.updated_at
+        if comment.status == 'approved':
+            add(when, 'check', 'دیدگاه شما تایید شد',
+                f'دیدگاه شما در «{comment.article.title}» منتشر شد')
+        else:
+            reason = comment.rejection_reason or 'مطابق قوانین سایت نبود'
+            add(when, 'x', 'دیدگاه شما تایید نشد',
+                f'دیدگاه شما در «{comment.article.title}» رد شد: {reason}')
+
+    events.sort(key=lambda item: item['when'], reverse=True)
+
+    return [
+        {
+            'icon': event['icon'],
+            'title': event['title'],
+            'desc': event['desc'],
+            'time': humanize_since(event['when']),
+            'timestamp': event['when'].isoformat(),
+            'unread': read_at is None or event['when'] > read_at,
+        }
+        for event in events[:NOTIFICATION_LIMIT]
+    ]
+
+
+class NotificationsMarkReadAPIView(APIView):
+    """Mark every current notification as read for this session."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        now = timezone.now()
+        request.session[NOTIFICATIONS_READ_AT_SESSION_KEY] = now.isoformat()
+        request.session.modified = True
+        return Response({'success': True, 'read_at': now.isoformat()})
+
 
 class DashboardDataAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -372,10 +498,13 @@ class DashboardDataAPIView(APIView):
         addresses_data = AddressSerializer(addresses, many=True).data
 
         # ===== اعلان‌ها =====
-        notifications = [
-            {'icon': 'truck', 'title': 'سفارش شما ارسال شد',
-             'desc': 'سفارش شما تحویل پست شد', 'time': '۲ ساعت پیش', 'unread': True},
-        ]
+        notifications = build_user_notifications(
+            user,
+            orders_qs=orders_qs,
+            product_comments_qs=product_comments_qs,
+            article_comments_qs=article_comments_qs,
+            read_at=get_notifications_read_at(request),
+        )
 
         # ===== کاربر =====
         user_data = UserProfileSerializer(user).data

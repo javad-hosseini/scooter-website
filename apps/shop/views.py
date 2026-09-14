@@ -196,6 +196,14 @@ class ProductReviewListCreateAPIView(APIView):
 
 
 class WishlistToggleAPIView(APIView):
+    #: Without this the project-wide DEFAULT_PERMISSION_CLASSES (IsAuthenticated)
+    #: rejected anonymous callers with a bare 403 {"detail": ...} before post()
+    #: ever ran, so the login_required branch below was unreachable and the
+    #: client fell through to its generic "خطا در عملیات" message. CartAPIView
+    #: opts out the same way so that Add to Cart can return its own 401 payload;
+    #: the like button now behaves identically.
+    permission_classes = [AllowAny]
+
     def post(self, request, slug=None):
         if not request.user.is_authenticated:
             referer = request.META.get('HTTP_REFERER', '/shop/')
