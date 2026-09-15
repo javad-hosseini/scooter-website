@@ -1,0 +1,42 @@
+{% extends "support/_support_base.html" %}
+
+{% block title %}ثبت تیکت پشتیبانی | Nex Go{% endblock %}
+{% block meta_description %}ثبت درخواست پشتیبانی برای سفارش، ارسال یا محصول Nex Go.{% endblock %}
+
+{% block support_content %}
+<div class="support-head">
+  <div>
+    <h1>ثبت تیکت جدید</h1>
+    <p>مشکل خود را توضیح دهید تا کارشناسان ما پیگیری کنند.</p>
+  </div>
+  <a href="{% url 'support:ticket_list' %}" class="support-btn support-btn-ghost">بازگشت</a>
+</div>
+
+<div class="support-card">
+  {% if form.non_field_errors %}
+  <div class="support-alert is-error">
+    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+  </div>
+  {% endif %}
+
+  {# enctype is required: without it the browser posts filenames only and every attachment is silently dropped. #}
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+    <div class="support-field">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+      {% if field.errors %}
+      <ul class="support-errors">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="support-btn">ارسال تیکت</button>
+  </form>
+</div>
+{% endblock %}

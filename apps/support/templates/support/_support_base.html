@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% comment %}
+Shared shell for the three support pages.
+
+Extends the site base so support inherits the real header (with its پشتیبانی
+link), footer and scripts. Styling is plain CSS on the base template's own
+custom properties rather than utility classes: the Tailwind build here is
+pre-compiled per page (static/css/cart.css), so a new page cannot introduce
+new utility classes without a rebuild step.
+{% endcomment %}
+
+{% block extra_styles %}
+<style>
+  .support-wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: calc(var(--nav-h) + 32px) 20px 80px;
+  }
+
+  .support-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .support-head h1 {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .support-head p {
+    color: var(--dim);
+    font-size: 14px;
+  }
+
+  /* ── Buttons ── */
+  .support-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: var(--r-sm);
+    border: 1px solid transparent;
+    background: var(--gold);
+    color: #14140f;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s var(--ease-smooth), opacity 0.2s var(--ease-smooth);
+  }
+
+  .support-btn:hover { filter: brightness(1.08); }
+  .support-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .support-btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--white);
+  }
+
+  .support-btn-ghost:hover {
+    border-color: var(--border-lit);
+    filter: none;
+  }
+
+  /* ── Cards ── */
+  .support-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 22px;
+  }
+
+  /* ── Status pills ── */
+  .support-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .support-status.is-waiting-support {
+    background: rgba(233, 201, 127, 0.14);
+    color: var(--gold);
+  }
+
+  .support-status.is-waiting-user {
+    background: rgba(79, 216, 255, 0.14);
+    color: var(--neon);
+  }
+
+  .support-status.is-closed {
+    background: rgba(246, 246, 248, 0.08);
+    color: var(--muted);
+  }
+
+  /* ── Forms ── */
+  .support-field { margin-bottom: 18px; }
+
+  .support-field > label {
+    display: block;
+    font-size: 13px;
+    color: var(--dim);
+    margin-bottom: 7px;
+  }
+
+  .support-field input[type="text"],
+  .support-field select,
+  .support-field textarea,
+  .support-field input[type="file"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 11px 14px;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: border-color 0.2s var(--ease-smooth);
+  }
+
+  .support-field textarea { resize: vertical; line-height: 1.8; }
+
+  .support-field input:focus,
+  .support-field select:focus,
+  .support-field textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .support-field .helptext {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .support-errors {
+    list-style: none;
+    margin: 7px 0 0;
+    padding: 0;
+    color: #ff8a8a;
+    font-size: 12.5px;
+  }
+
+  .support-alert {
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    font-size: 13.5px;
+    margin-bottom: 20px;
+    border: 1px solid;
+  }
+
+  .support-alert.is-error {
+    background: rgba(255, 108, 108, 0.08);
+    border-color: rgba(255, 108, 108, 0.3);
+    color: #ff9c9c;
+  }
+
+  .support-alert.is-success {
+    background: rgba(79, 216, 255, 0.08);
+    border-color: rgba(79, 216, 255, 0.3);
+    color: var(--neon);
+  }
+
+  .support-alert.is-info {
+    background: rgba(246, 246, 248, 0.04);
+    border-color: var(--border);
+    color: var(--dim);
+  }
+
+  /* ── Empty state ── */
+  .support-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--dim);
+  }
+
+  .support-empty h2 {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .support-empty p { font-size: 14px; margin-bottom: 22px; }
+
+  @media (max-width: 640px) {
+    .support-wrap { padding-top: calc(var(--nav-h) + 20px); }
+    .support-card { padding: 18px; }
+  }
+</style>
+{% block support_styles %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="support-wrap">
+  {% if messages %}
+    {% for message in messages %}
+    <div class="support-alert {% if message.tags == 'error' %}is-error{% elif message.tags == 'success' %}is-success{% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block support_content %}{% endblock %}
+</div>
+{% endblock %}

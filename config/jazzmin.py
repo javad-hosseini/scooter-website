@@ -120,6 +120,10 @@ JAZZMIN_SETTINGS = {
 
         "accounts.customuser": "collapsible",
 
+        # Support agents read the conversation and reply on the same screen;
+        # tabs would hide the chat behind a click.
+        "support.ticket": "single",
+
     },
 
     # ------------------------------------------------------

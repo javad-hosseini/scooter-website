@@ -643,6 +643,26 @@
                     اعمال
                   </button>
                 </div>
+
+                <!-- وضعیت کد اعمال‌شده -->
+                <div
+                  id="coupon-applied"
+                  class="hidden mt-3 flex items-center justify-between gap-3 bg-green-500/10 border border-green-500/30 rounded-xl px-3.5 py-2.5"
+                >
+                  <p class="text-sm text-green-400">
+                    کد
+                    <span class="font-mono font-semibold" id="applied-coupon-code"></span>
+                    اعمال شد
+                    <span class="text-xs text-green-400/80" id="applied-coupon-amount"></span>
+                  </p>
+                  <button
+                    type="button"
+                    id="remove-coupon-btn"
+                    class="text-xs text-mute hover:text-red-400 underline underline-offset-2 transition-colors"
+                  >
+                    حذف
+                  </button>
+                </div>
               </div>
             </section>
 
@@ -988,6 +1008,16 @@
                 <div class="flex justify-between text-green-400">
                   <dt>تخفیف</dt>
                   <dd class="font-mono" id="discount">−۰ تومان</dd>
+                </div>
+                <div
+                  class="flex justify-between text-green-400 hidden"
+                  id="coupon-row"
+                >
+                  <dt>
+                    کد تخفیف
+                    <span class="font-mono text-xs" id="coupon-row-code"></span>
+                  </dt>
+                  <dd class="font-mono" id="coupon-discount">−۰ تومان</dd>
                 </div>
                 <div class="flex justify-between">
                   <dt class="text-mute">هزینه ارسال</dt>
@@ -1395,6 +1425,7 @@
           data.shipping_cost || "رایگان";
         document.getElementById("tax").textContent =
           formatPrice(data.tax_amount) + " تومان";
+        renderCouponState(data);
         document.getElementById("final-total").textContent =
           formatPrice(data.final_total) + " تومان";
         document.getElementById("mobile-final-total").textContent =
@@ -1497,18 +1528,6 @@
             updateColorOnServer(productId, colorSlug);
           });
         });
-
-        // ===== دکمه اعمال کوپن =====
-        document
-          .getElementById("apply-coupon-btn")
-          ?.addEventListener("click", function () {
-            const code = document.getElementById("coupon").value.trim();
-            if (!code) {
-              showToast("لطفاً کد تخفیف را وارد کنید", "warning");
-              return;
-            }
-            applyCoupon(code);
-          });
 
         // ===== تیک ذخیره آدرس =====
         const saveAddressCheckbox = document.getElementById("save_address");
@@ -1735,32 +1754,91 @@
 
       }
 
+      /* مسیر واقعی اندپوینت. قبلاً «cart/coupon/» صدا زده می‌شد که در urls.py
+         وجود ندارد، پس هر بار ۴۰۴ می‌گرفت و پیام «خطا در ارتباط با سرور»
+         نشان داده می‌شد. */
+      const COUPON_API = API_BASE + "cart/apply-coupon/";
+
       async function applyCoupon(code) {
+        const btn = document.getElementById("apply-coupon-btn");
+        if (btn) btn.disabled = true;
         try {
-          const csrfToken = getCSRFToken();
-          const response = await fetch(API_BASE + "cart/coupon/", {
+          const response = await fetch(COUPON_API, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-CSRFToken": csrfToken,
+              "X-CSRFToken": getCSRFToken(),
             },
-            body: JSON.stringify({
-              coupon_code: code,
-            }),
+            credentials: "same-origin",
+            body: JSON.stringify({ coupon_code: code }),
           });
 
+          const data = await response.json().catch(() => ({}));
+
           if (response.ok) {
-            const data = await response.json();
-            showToast("کد تخفیف با موفقیت اعمال شد!", "success");
-            loadCart(); // ریلود
+            showToast(data.message || "کد تخفیف اعمال شد", "success");
+            await loadCart();
           } else {
-            const data = await response.json();
             showToast(data.error || "کد تخفیف نامعتبر است", "error");
           }
         } catch (error) {
           console.error("Error applying coupon:", error);
           showToast("خطا در ارتباط با سرور", "error");
+        } finally {
+          if (btn) btn.disabled = false;
         }
+      }
+
+      async function removeCoupon() {
+        try {
+          const response = await fetch(COUPON_API, {
+            method: "DELETE",
+            headers: { "X-CSRFToken": getCSRFToken() },
+            credentials: "same-origin",
+          });
+          if (response.ok) {
+            const input = document.getElementById("coupon");
+            if (input) input.value = "";
+            showToast("کد تخفیف حذف شد", "info");
+            await loadCart();
+          } else {
+            showToast("حذف کد تخفیف انجام نشد", "error");
+          }
+        } catch (error) {
+          console.error("Error removing coupon:", error);
+          showToast("خطا در ارتباط با سرور", "error");
+        }
+      }
+
+      /* یک نقطه‌ی واحد برای نمایش وضعیت کوپن، چون هم renderCart و هم
+         updateSummary خلاصه‌ی سفارش را به‌روز می‌کنند و نباید از هم جدا
+         بیفتند. سرور تنها مرجع است: اگر کد در این فاصله منقضی شده باشد،
+         پاسخ سبد خرید آن را برنمی‌گرداند و این تابع خودش پاکش می‌کند. */
+      function renderCouponState(data) {
+        const row = document.getElementById("coupon-row");
+        const box = document.getElementById("coupon-applied");
+        const amount = Number(data.coupon_discount || 0);
+        const code = data.applied_coupon || null;
+
+        if (!code || amount <= 0) {
+          row?.classList.add("hidden");
+          box?.classList.add("hidden");
+          return;
+        }
+
+        const codeEl = document.getElementById("coupon-row-code");
+        if (codeEl) codeEl.textContent = `(${code})`;
+        const discountEl = document.getElementById("coupon-discount");
+        if (discountEl)
+          discountEl.textContent = "−" + formatPrice(amount) + " تومان";
+        row?.classList.remove("hidden");
+
+        const appliedCode = document.getElementById("applied-coupon-code");
+        if (appliedCode) appliedCode.textContent = code;
+        const appliedAmount = document.getElementById("applied-coupon-amount");
+        if (appliedAmount)
+          appliedAmount.textContent = `(${formatPrice(amount)} تومان)`;
+        box?.classList.remove("hidden");
       }
 
       function updateSummary(data) {
@@ -1785,6 +1863,8 @@
 
         const taxEl = document.getElementById("tax");
         if (taxEl) taxEl.textContent = formatPrice(data.tax_amount || 0) + " تومان";
+
+        renderCouponState(data);
 
         const finalTotalEl = document.getElementById("final-total");
         if (finalTotalEl) finalTotalEl.textContent = formatPrice(data.final_total || 0) + " تومان";
@@ -2191,6 +2271,25 @@
       /* ════════════════════════════════════
    START
 ═══════════════════════════════════════ */
+      /* ===== دکمه‌های کد تخفیف =====
+         بیرون از attachEvents() بسته می‌شوند: آن تابع با هر بار رندر شدن سبد
+         خرید دوباره اجرا می‌شود، ولی این دو دکمه بخشی از markup ثابت صفحه‌اند
+         و شنونده‌ی تکراری می‌گرفتند. */
+      document
+        .getElementById("apply-coupon-btn")
+        ?.addEventListener("click", function () {
+          const code = document.getElementById("coupon").value.trim();
+          if (!code) {
+            showToast("لطفاً کد تخفیف را وارد کنید", "warning");
+            return;
+          }
+          applyCoupon(code);
+        });
+
+      document
+        .getElementById("remove-coupon-btn")
+        ?.addEventListener("click", removeCoupon);
+
       // loadSavedAddresses after loadProvinces: selecting a saved card sets the
       // province <select> by value, which only sticks once its options exist.
       loadProvinces().then(loadSavedAddresses);

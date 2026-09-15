@@ -6,6 +6,7 @@
     <li><a href="{% url 'home_app:categories' %}">دسته‌بندی‌ها</a></li>
     <li><a href="{% url 'home_app:articles' %}">مقالات</a></li>
     <li><a href="{% url 'home_app:about_us' %}">درباره ما</a></li>
+    <li><a href="{% url 'support:ticket_list' %}">پشتیبانی</a></li>
   </ul>
 
   <div class="nav-right-cluster">
@@ -33,6 +34,7 @@
           <a href="{% url 'accounts_app:dashboard' %}" role="menuitem">پروفایل</a>
           <a href="{% url 'accounts_app:dashboard' %}#orders" role="menuitem">سفارش‌های من</a>
           <a href="{% url 'accounts_app:dashboard' %}#wishlist" role="menuitem">علاقه‌مندی‌ها</a>
+          <a href="{% url 'support:ticket_list' %}" role="menuitem">تیکت‌های پشتیبانی</a>
           <a href="{% url 'accounts_app:dashboard' %}#settings" role="menuitem">تنظیمات حساب</a>
           <form method="post" action="{% url 'accounts_app:logout' %}" class="auth-logout-form" role="none">
             {% csrf_token %}
@@ -99,6 +101,7 @@
   <a href="{% url 'home_app:categories' %}" onclick="closeMenu()">دسته‌بندی‌ها</a>
   <a href="{% url 'home_app:articles' %}" onclick="closeMenu()">مقالات</a>
   <a href="{% url 'home_app:about_us' %}" onclick="closeMenu()">درباره ما</a>
+  <a href="{% url 'support:ticket_list' %}" onclick="closeMenu()">پشتیبانی</a>
   <button class="mobile-drawer-cta" onclick="closeMenu(); location.href='{% url 'shop_app:product_list' %}';">خرید کنید</button>
 
   {% if user.is_authenticated %}

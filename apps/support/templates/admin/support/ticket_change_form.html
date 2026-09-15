@@ -1,0 +1,120 @@
+{% extends "admin/change_form.html" %}
+{% comment %}
+Adds the staff reply box and the close/reopen controls to the ticket page.
+
+The panel is appended AFTER {{ block.super }} in the `content` block rather than
+inside `after_field_sets`, because every field-set block sits inside jazzmin's
+own <form>. HTML forbids nested forms, so a reply <form> placed there is dropped
+by the browser and its button silently submits the admin's save form instead —
+which is exactly what happened before this was moved out.
+
+The three actions post to the custom admin URLs registered in
+TicketAdmin.get_urls(). Each is its own POST form, so closing a ticket can never
+be triggered by a link the browser prefetches.
+{% endcomment %}
+
+{% block content %}
+{{ block.super }}
+
+{% if original %}
+<style>
+  .support-admin-panel {
+    margin: 20px 0 40px;
+    padding: 18px 20px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+  }
+  .support-admin-panel h2 {
+    font-size: 15px;
+    margin: 0 0 14px;
+    color: #245C43;
+  }
+  .support-admin-panel textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .support-admin-panel .row { margin-bottom: 12px; }
+  .support-admin-panel label {
+    display: block;
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  .support-admin-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+  }
+  .support-admin-btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #245C43;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .support-admin-btn.secondary { background: #6E756F; }
+  .support-admin-btn.warn { background: #E87932; }
+  .support-admin-note {
+    font-size: 12.5px;
+    color: #8a6d3b;
+    background: #fcf8e3;
+    border: 1px solid #faebcc;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+</style>
+
+<div class="support-admin-panel">
+  <h2>پاسخ پشتیبانی — تیکت {{ original.tracking_code }}</h2>
+
+  {% if original.is_closed %}
+    <p class="support-admin-note">این تیکت بسته شده است. برای ارسال پاسخ ابتدا آن را باز کنید.</p>
+  {% elif not original.can_support_send_message %}
+    <p class="support-admin-note">این تیکت در انتظار پاسخ کاربر است؛ تا پیام بعدی کاربر نمی‌توانید پاسخ بفرستید.</p>
+  {% else %}
+    <form method="post"
+          action="{% url 'admin:support-ticket-reply' object_id=original.pk %}"
+          enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        <label for="id_support_message">متن پاسخ</label>
+        <textarea id="id_support_message" name="message" rows="4"
+                  placeholder="پاسخ خود را بنویسید..." required></textarea>
+      </div>
+      <div class="row">
+        <label for="id_support_attachments">پیوست‌ها (حداکثر ۳ فایل — JPG، PNG، WEBP یا PDF)</label>
+        <input id="id_support_attachments" type="file" name="attachments" multiple
+               accept=".jpg,.jpeg,.png,.webp,.pdf">
+      </div>
+      <button type="submit" class="support-admin-btn">ارسال پاسخ</button>
+    </form>
+  {% endif %}
+
+  <div class="support-admin-actions">
+    {% if original.is_closed %}
+    <form method="post" action="{% url 'admin:support-ticket-reopen' object_id=original.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="support-admin-btn warn">باز کردن تیکت</button>
+    </form>
+    {% else %}
+    <form method="post" action="{% url 'admin:support-ticket-close' object_id=original.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="support-admin-btn secondary">بستن تیکت</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

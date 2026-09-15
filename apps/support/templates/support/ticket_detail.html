@@ -1,0 +1,196 @@
+{% extends "support/_support_base.html" %}
+{% load support_extras %}
+
+{% block title %}تیکت {{ ticket.tracking_code }} | Nex Go{% endblock %}
+{% block meta_description %}گفتگوی پشتیبانی Nex Go.{% endblock %}
+
+{% block support_styles %}
+<style>
+  .ticket-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  .ticket-code {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    letter-spacing: 0.06em;
+  }
+
+  .chat {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 26px 0;
+  }
+
+  .msg { display: flex; }
+  .msg.is-customer { justify-content: flex-start; }
+  .msg.is-support { justify-content: flex-end; }
+
+  .msg-bubble {
+    max-width: 76%;
+    border-radius: var(--r-md);
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    background: var(--card);
+  }
+
+  .msg.is-support .msg-bubble {
+    background: rgba(233, 201, 127, 0.07);
+    border-color: rgba(233, 201, 127, 0.24);
+  }
+
+  .msg-sender {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .msg.is-support .msg-sender { color: var(--gold); }
+
+  /* pre-wrap keeps the customer's own line breaks without letting any markup
+     through — the text is still autoescaped. */
+  .msg-text {
+    font-size: 14px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .msg-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .msg-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .msg-file {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--neon);
+    background: var(--surface);
+    max-width: 100%;
+  }
+
+  .msg-file span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .reply-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .msg-bubble { max-width: 92%; }
+  }
+</style>
+{% endblock %}
+
+{% block support_content %}
+<div class="support-head">
+  <div>
+    <h1>{{ ticket.title }}</h1>
+    <div class="ticket-summary">
+      <span>کد پیگیری: <span class="ticket-code">{{ ticket.tracking_code|persian_digits }}</span></span>
+      <span>{{ ticket.get_subject_display }}</span>
+      <span>{{ ticket.created_at|jalali_datetime }}</span>
+    </div>
+  </div>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <span class="support-status {% if ticket.status == 'WAITING_FOR_SUPPORT' %}is-waiting-support{% elif ticket.status == 'WAITING_FOR_USER' %}is-waiting-user{% else %}is-closed{% endif %}">
+      {{ ticket.get_status_display }}
+    </span>
+    <a href="{% url 'support:ticket_list' %}" class="support-btn support-btn-ghost">بازگشت</a>
+  </div>
+</div>
+
+<div class="chat">
+  {% for msg in messages_list %}
+  <div class="msg {% if msg.sender_id == ticket.user_id %}is-customer{% else %}is-support{% endif %}">
+    <div class="msg-bubble">
+      <div class="msg-sender">
+        {% if msg.sender_id == ticket.user_id %}شما{% else %}پشتیبانی Nex Go{% endif %}
+      </div>
+      <div class="msg-text">{{ msg.message }}</div>
+
+      {% if msg.attachments.all %}
+      <div class="msg-files">
+        {% for att in msg.attachments.all %}
+        <a class="msg-file" href="{{ att.file.url }}" target="_blank" rel="noopener noreferrer">
+          📎 <span>{{ att.original_name }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="msg-time">{{ msg.created_at|jalali_datetime }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% comment %}
+The same rule the service enforces, mirrored in the UI: the form only appears
+when it is the customer's turn. The server remains the authority — this just
+avoids offering a box whose submission would be rejected.
+{% endcomment %}
+{% if ticket.is_closed %}
+<div class="support-alert is-info">
+  این تیکت بسته شده است. برای موضوع جدید، یک تیکت تازه ثبت کنید.
+</div>
+<a href="{% url 'support:ticket_create' %}" class="support-btn">تیکت جدید</a>
+{% elif ticket.can_customer_send_message %}
+<div class="support-card">
+  <p class="reply-title">پاسخ شما</p>
+
+  {% if form.non_field_errors %}
+  <div class="support-alert is-error">
+    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+    <div class="support-field">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+      {% if field.errors %}
+      <ul class="support-errors">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="support-btn">ارسال پیام</button>
+  </form>
+</div>
+{% else %}
+<div class="support-alert is-info">
+  پیام شما ثبت شد و در انتظار پاسخ پشتیبانی است. به‌محض پاسخ، امکان ارسال پیام بعدی فعال می‌شود.
+</div>
+{% endif %}
+{% endblock %}

@@ -32,7 +32,7 @@ from apps.seo.utils import canonical_url, image_url, meta_description, meta_titl
 
 from .models import (
     Product, Category, ProductReview, Wishlist, Cart, CartItem, ProductImage,
-    Order, OrderItem, Transaction, RefundRequest
+    Order, OrderItem, Transaction, RefundRequest, Coupon
 )
 from .pagination import ProductPagination
 from .serializers import (
@@ -43,6 +43,7 @@ from .serializers import (
     AdminProductReviewSerializer, CartSerializer
 )
 from django.views import View
+from .utils.coupon_utils import CouponManager
 from .utils.inventory_utils import InventoryManager, InsufficientStockError
 from .utils.shipping_utils import ShippingCalculator
 from .utils.tax_utils import TaxCalculator
@@ -843,11 +844,18 @@ class CartAPIView(APIView):
                 'total': int(item_subtotal),
             })
 
+        # کوپن هر بار از نو بررسی و محاسبه می‌شود: مبلغ سبد خرید از وقتی کد
+        # اعمال شده تغییر کرده و ممکن است کوپن در این فاصله منقضی یا غیرفعال
+        # شده باشد. مقدار ذخیره‌شده روی سبد فقط یک snapshot برای نمایش است.
+        coupon_discount, coupon_code = self._sync_cart_coupon(
+            cart, request.user, subtotal - discount_total
+        )
+
         # محاسبه مالیات و هزینه ارسال (با توابع فرضی)
         tax_amount = self._calculate_tax(subtotal)
         shipping_method = request.query_params.get('shipping_method', 'standard')
         shipping_cost = self._calculate_shipping(subtotal, shipping_method)
-        final_total = subtotal - discount_total + shipping_cost + tax_amount
+        final_total = subtotal - discount_total - coupon_discount + shipping_cost + tax_amount
 
         return Response({
             'items': items_data,
@@ -857,10 +865,10 @@ class CartAPIView(APIView):
             'shipping_cost': int(shipping_cost),
             'shipping_methods': self._get_shipping_methods(),
             'selected_shipping_method': shipping_method,
-            'applied_coupon': getattr(cart, 'coupon_code', None),
-            'coupon_discount': int(getattr(cart, 'coupon_discount', 0)),
+            'applied_coupon': coupon_code,
+            'coupon_discount': int(coupon_discount),
             'tax_amount': int(tax_amount),
-            'final_total': int(final_total),
+            'final_total': int(max(Decimal('0'), final_total)),
             'estimated_delivery': 3,
         })
 
@@ -1127,6 +1135,32 @@ class CartAPIView(APIView):
             return last_address.province_id
         return None
 
+    @staticmethod
+    def _sync_cart_coupon(cart, user, discountable_amount):
+        """کوپن ذخیره‌شده روی سبد را دوباره اعتبارسنجی و محاسبه می‌کند.
+
+        اگر کد دیگر معتبر نباشد (منقضی شده، غیرفعال شده، یا مبلغ سبد زیر حد
+        نصاب افتاده) از سبد برداشته می‌شود تا کاربر تخفیفی را نبیند که سر
+        پرداخت اعمال نخواهد شد.
+
+        Returns:
+            tuple: (مبلغ تخفیف, کد تخفیف یا None)
+        """
+        if not cart.coupon_code:
+            return Decimal('0'), None
+
+        result = CouponManager.validate(cart.coupon_code, user, discountable_amount)
+        if not result.is_valid:
+            cart.coupon_code = None
+            cart.coupon_discount = 0
+            cart.save(update_fields=['coupon_code', 'coupon_discount', 'updated_at'])
+            return Decimal('0'), None
+
+        if cart.coupon_discount != result.discount:
+            cart.coupon_discount = result.discount
+            cart.save(update_fields=['coupon_discount', 'updated_at'])
+        return result.discount, result.coupon.code
+
 
 class CheckoutPageView(LoginRequiredMixin, TemplateView):
     """صفحه تسویه حساب و پرداخت"""
@@ -1158,18 +1192,27 @@ class CartClearAPIView(APIView):
         })
 
 
+def cart_discountable_amount(cart):
+    """مبلغی از سبد خرید که کد تخفیف روی آن اعمال می‌شود.
+
+    جمع کالاها پس از کسر تخفیف خودِ محصولات و پیش از مالیات و هزینه‌ی ارسال —
+    تا کوپن روی مالیات و کرایه‌ی پست تخفیف ندهد.
+    """
+    amount = Decimal('0')
+    for item in cart.items.select_related('product').all():
+        product = item.product
+        unit = Decimal(str(product.discount_price or product.price))
+        amount += unit * item.quantity
+    return amount
+
+
 class CartApplyCouponAPIView(APIView):
-    """اعمال کد تخفیف به سبد خرید"""
+    """اعمال و حذف کد تخفیف روی سبد خرید"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        coupon_code = request.data.get('coupon_code', '').strip()
-
-        if not coupon_code:
-            return Response(
-                {'error': 'کد تخفیف را وارد کنید'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        coupon_code = request.data.get('coupon_code', '') or ''
+        coupon_code = coupon_code.strip()
 
         cart = Cart.objects.filter(user=request.user, is_active=True).first()
         if not cart or not cart.items.exists():
@@ -1178,29 +1221,35 @@ class CartApplyCouponAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # TODO: اعتبارسنجی کوپن
-        # از مدل Coupon استفاده کن
-        # coupon = get_object_or_404(Coupon, code=coupon_code, is_active=True)
+        result = CouponManager.validate(
+            coupon_code, request.user, cart_discountable_amount(cart)
+        )
+        if not result.is_valid:
+            return Response({'error': result.error}, status=status.HTTP_400_BAD_REQUEST)
 
-        # مثال:
-        # if coupon.is_expired():
-        #     return Response({'error': 'کد تخفیف منقضی شده است'})
-        # if coupon.usage_limit and coupon.used_count >= coupon.usage_limit:
-        #     return Response({'error': 'تعداد استفاده از این کد به پایان رسیده است'})
-        # if coupon.min_order_amount and cart.subtotal < coupon.min_order_amount:
-        #     return Response({'error': f'حداقل مبلغ برای این کد {coupon.min_order_amount} تومان است'})
-
-        # اعمال کوپن (مثال)
-        discount_amount = 50000  # از مدل Coupon بگیر
-        cart.coupon_code = coupon_code
-        cart.coupon_discount = discount_amount
-        cart.save()
+        cart.coupon_code = result.coupon.code
+        cart.coupon_discount = result.discount
+        cart.save(update_fields=['coupon_code', 'coupon_discount', 'updated_at'])
 
         return Response({
             'status': 'applied',
-            'message': 'کد تخفیف با موفقیت اعمال شد',
-            'coupon_code': coupon_code,
-            'discount_amount': discount_amount,
+            'message': f'کد تخفیف {result.coupon.percentage}٪ اعمال شد',
+            'coupon_code': result.coupon.code,
+            'percentage': result.coupon.percentage,
+            'discount_amount': int(result.discount),
+        })
+
+    def delete(self, request):
+        """برداشتن کد تخفیف از سبد خرید"""
+        cart = Cart.objects.filter(user=request.user, is_active=True).first()
+        if cart:
+            cart.coupon_code = None
+            cart.coupon_discount = 0
+            cart.save(update_fields=['coupon_code', 'coupon_discount', 'updated_at'])
+
+        return Response({
+            'status': 'removed',
+            'message': 'کد تخفیف حذف شد',
         })
 
 
@@ -1323,10 +1372,24 @@ class CheckoutSubmitAPIView(APIView):
         available_shipping_methods = ShippingCalculator.get_available_methods(subtotal)
 
         # ===== 5. اعمال کوپن =====
+        # کد تخفیف دوباره از صفر اعتبارسنجی می‌شود. مقدار ذخیره‌شده روی سبد
+        # خرید فقط برای نمایش است و نباید مبنای مبلغ پرداختی باشد: بین اعمال
+        # کد تا ثبت سفارش، سبد تغییر می‌کند و کوپن ممکن است منقضی یا پر شده
+        # باشد. اگر کد معتبر نمانده باشد سفارش رد می‌شود تا کاربر مبلغی را
+        # پرداخت نکند که با چیزی که دیده فرق دارد.
+        coupon = None
         coupon_discount = Decimal('0')
         if cart.coupon_code:
-            # TODO: اعتبارسنجی کوپن
-            coupon_discount = Decimal(str(cart.coupon_discount))
+            coupon_result = CouponManager.validate(
+                cart.coupon_code, user, cart_discountable_amount(cart)
+            )
+            if not coupon_result.is_valid:
+                return Response(
+                    {'error': f'کد تخفیف قابل استفاده نیست: {coupon_result.error}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            coupon = coupon_result.coupon
+            coupon_discount = coupon_result.discount
 
         # ===== 6. محاسبه مبلغ نهایی =====
         total = TaxCalculator.calculate_total(
@@ -1347,8 +1410,21 @@ class CheckoutSubmitAPIView(APIView):
             status='pending',
             payment_status='pending',
             shipping_method=shipping_method,
+            coupon=coupon,
+            coupon_code=coupon.code if coupon else '',
+            coupon_discount=coupon_discount,
             notes=f"روش پرداخت: {data['payment_method']}"
         )
+
+        # ===== 7.۱ ثبت مصرف کوپن =====
+        # F() به‌جای used_count + 1 در پایتون، تا دو سفارش هم‌زمان یک شمارنده
+        # را روی هم ننویسند و سقف استفاده قابل دور زدن نباشد.
+        if coupon:
+            Coupon.objects.filter(pk=coupon.pk).update(used_count=F('used_count') + 1)
+            # کد مصرف شد؛ روی سبد خرید نماند تا به سفارش بعدی سرایت نکند.
+            cart.coupon_code = None
+            cart.coupon_discount = 0
+            cart.save(update_fields=['coupon_code', 'coupon_discount', 'updated_at'])
 
         # ===== 8. ایجاد آیتم‌های سفارش =====
         for item_data in items_list:

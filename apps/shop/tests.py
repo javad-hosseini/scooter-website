@@ -1,5 +1,9 @@
+import json
+from datetime import timedelta
 from decimal import Decimal
+
 from django.test import TestCase
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
@@ -403,3 +407,338 @@ class SavedAddressCheckoutTests(TestCase):
         html = res.content.decode()
         self.assertIn('id="saved-addresses"', html)
         self.assertIn('hf_address_id', html)
+
+
+class CouponTests(TestCase):
+    """کد تخفیف درصدی: تعریف در ادمین، اعمال در سبد خرید، و ثبت سفارش."""
+
+    def setUp(self):
+        from apps.accounts.models import Province, City, Address
+        from apps.shop.models import Cart, CartItem
+
+        self.user = User.objects.create_user(
+            username='couponbuyer',
+            email='couponbuyer@test.com',
+            password='testpassword123',
+            fullname='خریدار کوپن',
+            mobile='09150000000',
+        )
+        self.province = Province.objects.create(name='تهران')
+        self.city = City.objects.create(province=self.province, name='تهران')
+        self.address = Address.objects.create(
+            user=self.user,
+            recipient_name='خریدار کوپن',
+            recipient_phone='09150000000',
+            province=self.province,
+            city=self.city,
+            address='خیابان آزادی',
+            postal_code='1234567890',
+            plaque='5',
+        )
+
+        category = Category.objects.create(name='اسکوتر', slug='scooter-coupon')
+        # قیمت گرد است تا ۱۰٪ آن دقیقاً محاسبه‌شدنی باشد.
+        self.product = Product.objects.create(
+            name='NexGo C1',
+            slug='nexgo-c1-coupon',
+            category=category,
+            price=Decimal('10000000'),
+            stock=50,
+        )
+        self.cart = Cart.objects.create(user=self.user, is_active=True)
+        CartItem.objects.create(
+            cart=self.cart,
+            product=self.product,
+            quantity=1,
+            price_snapshot=Decimal('10000000'),
+        )
+        self.client.force_login(self.user)
+
+    # ---------- کمک‌کننده‌ها ----------
+
+    def _coupon(self, **kwargs):
+        from apps.shop.models import Coupon
+        defaults = {'code': 'VOLT10', 'percentage': 10}
+        defaults.update(kwargs)
+        return Coupon.objects.create(**defaults)
+
+    def _apply(self, code):
+        return self.client.post(
+            reverse('shop_app:api_cart_apply_coupon'),
+            data=json.dumps({'coupon_code': code}),
+            content_type='application/json',
+        )
+
+    def _cart(self):
+        return self.client.get(reverse('shop_app:api_cart')).json()
+
+    def _refill_cart(self):
+        """سبد را برای سفارش بعدی آماده می‌کند.
+
+        ثبت سفارش در این پروژه سبد خرید را خالی نمی‌کند، پس آیتم معمولاً هنوز
+        هست؛ این متد فقط مطمئن می‌شود یک عدد از محصول در سبد وجود دارد.
+        """
+        from apps.shop.models import CartItem
+
+        CartItem.objects.update_or_create(
+            cart=self.cart,
+            product=self.product,
+            defaults={'quantity': 1, 'price_snapshot': Decimal('10000000')},
+        )
+
+    def _checkout(self):
+        return self.client.post(reverse('shop_app:checkout_submit'), {
+            'first_name': 'خریدار',
+            'last_name': 'کوپن',
+            'phone': '09150000000',
+            'province_id': self.province.id,
+            'city_id': self.city.id,
+            'postal_code': '1234567890',
+            'address': 'خیابان آزادی',
+            'payment_method': 'card',
+        })
+
+    # ---------- مدل ----------
+
+    def test_code_is_normalised_to_uppercase(self):
+        """کد یکتاست، پس باید یک شکل ذخیره شود تا volt10 و VOLT10 یکی باشند."""
+        coupon = self._coupon(code='  volt10  ')
+        self.assertEqual(coupon.code, 'VOLT10')
+
+    def test_percentage_is_calculated_on_the_given_amount(self):
+        coupon = self._coupon(percentage=15)
+        self.assertEqual(coupon.discount_for(Decimal('2000000')), Decimal('300000'))
+
+    def test_max_discount_amount_caps_the_percentage(self):
+        coupon = self._coupon(percentage=50, max_discount_amount=Decimal('500000'))
+        self.assertEqual(coupon.discount_for(Decimal('10000000')), Decimal('500000'))
+
+    def test_discount_never_exceeds_the_amount(self):
+        coupon = self._coupon(percentage=100)
+        self.assertEqual(coupon.discount_for(Decimal('1000')), Decimal('1000'))
+
+    # ---------- اعمال در سبد خرید ----------
+
+    def test_valid_coupon_applies_and_reduces_cart_total(self):
+        self._coupon(percentage=10)
+        before = self._cart()
+
+        res = self._apply('VOLT10')
+        self.assertEqual(res.status_code, 200, res.content[:300])
+        self.assertEqual(res.json()['discount_amount'], 1000000)
+
+        after = self._cart()
+        self.assertEqual(after['applied_coupon'], 'VOLT10')
+        self.assertEqual(after['coupon_discount'], 1000000)
+        self.assertEqual(before['final_total'] - after['final_total'], 1000000)
+
+    def test_coupon_lookup_is_case_insensitive(self):
+        self._coupon(code='VOLT10')
+        res = self._apply('volt10')
+        self.assertEqual(res.status_code, 200, res.content[:300])
+        self.assertEqual(res.json()['coupon_code'], 'VOLT10')
+
+    def test_unknown_code_is_rejected(self):
+        res = self._apply('DOES-NOT-EXIST')
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['error'], 'کد تخفیف نامعتبر است')
+        self.assertEqual(self._cart()['coupon_discount'], 0)
+
+    def test_inactive_code_is_rejected(self):
+        self._coupon(is_active=False)
+        res = self._apply('VOLT10')
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['error'], 'این کد تخفیف فعال نیست')
+
+    def test_expired_code_is_rejected(self):
+        self._coupon(valid_until=timezone.now() - timedelta(days=1))
+        res = self._apply('VOLT10')
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['error'], 'این کد تخفیف منقضی شده است')
+
+    def test_code_that_has_not_started_is_rejected(self):
+        self._coupon(valid_from=timezone.now() + timedelta(days=1))
+        res = self._apply('VOLT10')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('هنوز نرسیده', res.json()['error'])
+
+    def test_exhausted_code_is_rejected(self):
+        coupon = self._coupon(usage_limit=2)
+        coupon.used_count = 2
+        coupon.save()
+        res = self._apply('VOLT10')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('ظرفیت', res.json()['error'])
+
+    def test_min_order_amount_is_enforced(self):
+        self._coupon(min_order_amount=Decimal('20000000'))
+        res = self._apply('VOLT10')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('حداقل مبلغ', res.json()['error'])
+
+    def test_coupon_can_be_removed(self):
+        self._coupon()
+        self._apply('VOLT10')
+        res = self.client.delete(reverse('shop_app:api_cart_apply_coupon'))
+        self.assertEqual(res.status_code, 200)
+        cart = self._cart()
+        self.assertIsNone(cart['applied_coupon'])
+        self.assertEqual(cart['coupon_discount'], 0)
+
+    def test_discount_follows_the_cart_when_quantity_changes(self):
+        """تخفیف با هر بار خواندن سبد از نو حساب می‌شود، نه از مقدار ذخیره‌شده."""
+        from apps.shop.models import CartItem
+
+        self._coupon(percentage=10)
+        self._apply('VOLT10')
+        self.assertEqual(self._cart()['coupon_discount'], 1000000)
+
+        item = CartItem.objects.get(cart=self.cart)
+        item.quantity = 2
+        item.save()
+
+        self.assertEqual(self._cart()['coupon_discount'], 2000000)
+
+    def test_coupon_is_dropped_when_it_becomes_invalid(self):
+        """کدی که بعد از اعمال منقضی شود نباید در سبد نمایش داده شود."""
+        from apps.shop.models import Coupon
+
+        coupon = self._coupon()
+        self._apply('VOLT10')
+        self.assertEqual(self._cart()['coupon_discount'], 1000000)
+
+        Coupon.objects.filter(pk=coupon.pk).update(
+            valid_until=timezone.now() - timedelta(minutes=1)
+        )
+
+        cart = self._cart()
+        self.assertIsNone(cart['applied_coupon'])
+        self.assertEqual(cart['coupon_discount'], 0)
+        self.cart.refresh_from_db()
+        self.assertIsNone(self.cart.coupon_code)
+
+    # ---------- ثبت سفارش ----------
+
+    def test_order_total_includes_the_coupon_discount(self):
+        self._coupon(percentage=10)
+
+        control = self._checkout()
+        self.assertEqual(control.status_code, 201, control.content[:300])
+        control_total = Order.objects.get(
+            order_number=control.json()['order_number']
+        ).total
+
+        self._refill_cart()
+        self._apply('VOLT10')
+        res = self._checkout()
+        self.assertEqual(res.status_code, 201, res.content[:300])
+
+        order = Order.objects.get(order_number=res.json()['order_number'])
+        self.assertEqual(order.coupon_code, 'VOLT10')
+        self.assertEqual(order.coupon_discount, Decimal('1000000'))
+        self.assertEqual(control_total - order.total, Decimal('1000000'))
+
+    def test_used_count_increases_after_checkout(self):
+        coupon = self._coupon()
+        self._apply('VOLT10')
+        self._checkout()
+        coupon.refresh_from_db()
+        self.assertEqual(coupon.used_count, 1)
+
+    def test_coupon_does_not_survive_into_the_next_order(self):
+        """کد مصرف‌شده نباید روی سبد بماند و به سفارش بعدی سرایت کند."""
+        self._coupon()
+        self._apply('VOLT10')
+        self._checkout()
+
+        self.cart.refresh_from_db()
+        self.assertIsNone(self.cart.coupon_code)
+        self.assertEqual(self.cart.coupon_discount, 0)
+
+        self._refill_cart()
+        res = self._checkout()
+        order = Order.objects.get(order_number=res.json()['order_number'])
+        self.assertEqual(order.coupon_discount, Decimal('0'))
+
+    def test_per_user_limit_blocks_a_second_use(self):
+        self._coupon(usage_limit_per_user=1)
+        self._apply('VOLT10')
+        self._checkout()
+
+        self._refill_cart()
+        res = self._apply('VOLT10')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('قبلاً', res.json()['error'])
+
+    def test_checkout_rejects_a_code_that_expired_after_it_was_applied(self):
+        """مبلغ پرداختی از روی مقدار ذخیره‌شده‌ی سبد ساخته نمی‌شود."""
+        from apps.shop.models import Coupon
+
+        coupon = self._coupon()
+        self._apply('VOLT10')
+        # کوپن را مستقیم در دیتابیس منقضی می‌کنیم و سبد را دست نمی‌زنیم،
+        # پس cart.coupon_discount هنوز مقدار قدیمی را دارد.
+        Coupon.objects.filter(pk=coupon.pk).update(is_active=False)
+
+        res = self._checkout()
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('کد تخفیف', res.json()['error'])
+        self.assertEqual(Order.objects.count(), 0)
+
+    def test_a_made_up_code_no_longer_grants_a_discount(self):
+        """رگرسیون: قبلاً هر رشته‌ای ۵۰٬۰۰۰ تومان تخفیف می‌گرفت."""
+        res = self._apply('I-JUST-MADE-THIS-UP')
+        self.assertEqual(res.status_code, 400)
+
+        checkout = self._checkout()
+        order = Order.objects.get(order_number=checkout.json()['order_number'])
+        self.assertEqual(order.coupon_discount, Decimal('0'))
+        self.assertEqual(order.discount_amount, Decimal('0'))
+
+    # ---------- پنل ادمین ----------
+
+    def test_admin_can_create_a_coupon(self):
+        """ادمین باید بتواند کد و درصدش را از پنل تعریف کند."""
+        from apps.shop.models import Coupon
+
+        admin_user = User.objects.create_superuser(
+            username='couponadmin',
+            email='couponadmin@test.com',
+            password='testpassword123',
+            fullname='مدیر',
+            mobile='09150000009',
+        )
+        self.client.force_login(admin_user)
+
+        add_url = reverse('admin:shop_coupon_add')
+        self.assertEqual(self.client.get(add_url).status_code, 200)
+
+        res = self.client.post(add_url, {
+            'code': 'ADMIN20',
+            'percentage': '20',
+            'min_order_amount': '0',
+            'is_active': 'on',
+        })
+        self.assertEqual(res.status_code, 302, res.content[:500])
+        coupon = Coupon.objects.get(code='ADMIN20')
+        self.assertEqual(coupon.percentage, 20)
+
+        # و همان کد بلافاصله در سبد خرید کار می‌کند.
+        self.client.force_login(self.user)
+        apply_res = self._apply('ADMIN20')
+        self.assertEqual(apply_res.status_code, 200, apply_res.content[:300])
+        self.assertEqual(apply_res.json()['discount_amount'], 2000000)
+
+    def test_admin_changelist_renders(self):
+        self._coupon()
+        admin_user = User.objects.create_superuser(
+            username='couponadmin2',
+            email='couponadmin2@test.com',
+            password='testpassword123',
+            fullname='مدیر ۲',
+            mobile='09150000008',
+        )
+        self.client.force_login(admin_user)
+        res = self.client.get(reverse('admin:shop_coupon_changelist'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'VOLT10')

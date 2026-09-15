@@ -1,0 +1,113 @@
+{% extends "support/_support_base.html" %}
+{% load support_extras %}
+
+{% block title %}تیکت‌های پشتیبانی | Nex Go{% endblock %}
+{% block meta_description %}پیگیری درخواست‌های پشتیبانی و گفتگو با تیم Nex Go.{% endblock %}
+
+{% block support_styles %}
+<style>
+  .ticket-row {
+    display: block;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    transition: border-color 0.25s var(--ease-smooth), background 0.25s var(--ease-smooth);
+  }
+
+  .ticket-row:hover {
+    background: var(--card-hover);
+    border-color: var(--border-lit);
+  }
+
+  .ticket-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .ticket-row-title {
+    font-size: 15px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ticket-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .ticket-code {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    letter-spacing: 0.06em;
+  }
+
+  .support-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--dim);
+  }
+
+  .support-pagination a { color: var(--neon); }
+</style>
+{% endblock %}
+
+{% block support_content %}
+<div class="support-head">
+  <div>
+    <h1>تیکت‌های پشتیبانی</h1>
+    <p>درخواست‌های خود را اینجا پیگیری کنید.</p>
+  </div>
+  <a href="{% url 'support:ticket_create' %}" class="support-btn">تیکت جدید</a>
+</div>
+
+{% if tickets %}
+  {% for ticket in tickets %}
+  <a href="{% url 'support:ticket_detail' tracking_code=ticket.tracking_code %}" class="ticket-row">
+    <div class="ticket-row-top">
+      <span class="ticket-row-title">{{ ticket.title }}</span>
+      <span class="support-status {% if ticket.status == 'WAITING_FOR_SUPPORT' %}is-waiting-support{% elif ticket.status == 'WAITING_FOR_USER' %}is-waiting-user{% else %}is-closed{% endif %}">
+        {{ ticket.get_status_display }}
+      </span>
+    </div>
+    <div class="ticket-row-meta">
+      <span>کد پیگیری: <span class="ticket-code">{{ ticket.tracking_code|persian_digits }}</span></span>
+      <span>{{ ticket.get_subject_display }}</span>
+      <span>{{ ticket.created_at|jalali_date }}</span>
+      <span>{{ ticket.messages.count|persian_digits }} پیام</span>
+    </div>
+  </a>
+  {% endfor %}
+
+  {% if is_paginated %}
+  <nav class="support-pagination" aria-label="صفحه‌بندی">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+    {% endif %}
+    <span>صفحه {{ page_obj.number|persian_digits }} از {{ page_obj.paginator.num_pages|persian_digits }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">بعدی</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+{% else %}
+<div class="support-empty">
+  <h2>هنوز تیکتی ثبت نکرده‌اید</h2>
+  <p>اگر درباره سفارش، ارسال یا محصول سؤالی دارید، برای ما بنویسید.</p>
+  <a href="{% url 'support:ticket_create' %}" class="support-btn">ثبت اولین تیکت</a>
+</div>
+{% endif %}
+{% endblock %}

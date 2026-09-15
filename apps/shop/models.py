@@ -1,5 +1,6 @@
 # apps/shop/models.py
 import uuid
+from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -617,6 +618,144 @@ class CategoryHeroProduct(models.Model):
         return f"{self.category.name} - {self.product.name}"
 
 
+class Coupon(models.Model):
+    """کد تخفیف درصدی که مدیر از پنل ادمین تعریف می‌کند.
+
+    اعتبارسنجی در دو نقطه انجام می‌شود: وقتی کاربر کد را در سبد خرید وارد
+    می‌کند و دوباره موقع ثبت سفارش. دلیل تکرار این است که مبلغ سبد خرید و
+    وضعیت کوپن بین این دو لحظه تغییر می‌کند و مقدار ذخیره‌شده روی سبد خرید
+    نباید به‌تنهایی مبنای مبلغ پرداختی باشد.
+    """
+
+    code = models.CharField(
+        max_length=32,
+        unique=True,
+        verbose_name="کد تخفیف",
+        help_text="کاربر همین کد را در سبد خرید وارد می‌کند. بزرگی و کوچکی حروف مهم نیست."
+    )
+    percentage = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        verbose_name="درصد تخفیف",
+        help_text="عددی بین ۱ تا ۱۰۰"
+    )
+    max_discount_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        verbose_name="سقف مبلغ تخفیف",
+        help_text="بیشترین تخفیفی که این کد می‌دهد (تومان). خالی یعنی بدون سقف."
+    )
+    min_order_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="حداقل مبلغ سبد خرید",
+        help_text="اگر مبلغ سبد خرید کمتر از این باشد کد پذیرفته نمی‌شود. صفر یعنی بدون محدودیت."
+    )
+    valid_from = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="شروع اعتبار",
+        help_text="خالی یعنی از همین حالا معتبر است."
+    )
+    valid_until = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="پایان اعتبار",
+        help_text="خالی یعنی تاریخ انقضا ندارد."
+    )
+    usage_limit = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="سقف کل دفعات استفاده",
+        help_text="مجموع دفعاتی که همه‌ی کاربران می‌توانند از این کد استفاده کنند. خالی یعنی نامحدود."
+    )
+    usage_limit_per_user = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="سقف استفاده برای هر کاربر",
+        help_text="مثلاً ۱ یعنی هر کاربر فقط یک‌بار. خالی یعنی نامحدود."
+    )
+    used_count = models.PositiveIntegerField(
+        default=0,
+        editable=False,
+        verbose_name="دفعات استفاده‌شده"
+    )
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "کد تخفیف"
+        verbose_name_plural = "کدهای تخفیف"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.code} ({self.percentage}%)"
+
+    def save(self, *args, **kwargs):
+        # کد یکتاست، پس باید یک شکل استاندارد داشته باشد؛ وگرنه «volt10» و
+        # «VOLT10» دو ردیف جدا می‌شوند و کاربر بسته به شکل تایپش نتیجه‌ی
+        # متفاوتی می‌گیرد.
+        self.code = (self.code or '').strip().upper()
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        return bool(self.valid_until and timezone.now() > self.valid_until)
+
+    @property
+    def has_started(self):
+        return not self.valid_from or timezone.now() >= self.valid_from
+
+    @property
+    def is_exhausted(self):
+        return bool(self.usage_limit is not None and self.used_count >= self.usage_limit)
+
+    @property
+    def remaining_uses(self):
+        if self.usage_limit is None:
+            return None
+        return max(0, self.usage_limit - self.used_count)
+
+    def times_used_by(self, user):
+        """چند سفارش ثبت‌شده‌ی این کاربر با این کد بوده است."""
+        if user is None or not getattr(user, 'is_authenticated', False):
+            return 0
+        return self.orders.filter(user=user).count()
+
+    def error_for(self, user, amount):
+        """اگر کد برای این کاربر و این مبلغ قابل استفاده نیست، پیام خطا را برمی‌گرداند."""
+        if not self.is_active:
+            return 'این کد تخفیف فعال نیست'
+        if not self.has_started:
+            return 'زمان استفاده از این کد تخفیف هنوز نرسیده است'
+        if self.is_expired:
+            return 'این کد تخفیف منقضی شده است'
+        if self.is_exhausted:
+            return 'ظرفیت استفاده از این کد تخفیف تمام شده است'
+        if self.usage_limit_per_user is not None and self.times_used_by(user) >= self.usage_limit_per_user:
+            return 'شما قبلاً از این کد تخفیف استفاده کرده‌اید'
+        if self.min_order_amount and amount < self.min_order_amount:
+            return f'حداقل مبلغ سبد خرید برای این کد {int(self.min_order_amount):,} تومان است'
+        return None
+
+    def discount_for(self, amount):
+        """مبلغ تخفیف این کد روی مبلغ داده‌شده.
+
+        سقف کوپن و خودِ مبلغ سبد خرید هر دو اعمال می‌شوند تا تخفیف هیچ‌وقت از
+        مبلغ قابل پرداخت بیشتر نشود و جمع نهایی منفی نگردد.
+        """
+        amount = Decimal(str(amount or 0))
+        if amount <= 0:
+            return Decimal('0')
+        discount = (amount * Decimal(self.percentage) / Decimal('100')).quantize(Decimal('1'))
+        if self.max_discount_amount is not None:
+            discount = min(discount, Decimal(str(self.max_discount_amount)))
+        return min(discount, amount)
+
+
 class Order(models.Model):
     """مدل سفارشات"""
     STATUS_CHOICES = [
@@ -665,6 +804,28 @@ class Order(models.Model):
         on_delete=models.PROTECT,
         related_name='orders',
         verbose_name="آدرس ارسال"
+    )
+
+    # کد تخفیف استفاده‌شده — برای گزارش‌گیری ادمین و شمردن سقف استفاده‌ی هر کاربر.
+    coupon = models.ForeignKey(
+        'Coupon',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders',
+        verbose_name="کد تخفیف"
+    )
+    coupon_code = models.CharField(
+        max_length=32,
+        blank=True,
+        verbose_name="کد تخفیف واردشده",
+        help_text="متن کد در لحظه‌ی ثبت سفارش؛ اگر بعداً کوپن حذف شود این باقی می‌ماند."
+    )
+    coupon_discount = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=0,
+        verbose_name="تخفیف کد تخفیف"
     )
 
     # وضعیت

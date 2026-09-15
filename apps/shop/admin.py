@@ -9,7 +9,8 @@ from django.utils.html import format_html
 from .models import (
     Product, Category, ProductSpec, TrustBadge,
     MarketingFeature, StatFeature, ProductImage,
-    ProductReview, Wishlist, CategoryHeroProduct, OrderItem, Order
+    ProductReview, Wishlist, CategoryHeroProduct, OrderItem, Order,
+    Coupon
 )
 from .actions import (
     export_selected_orders_to_pdf,
@@ -550,3 +551,74 @@ class OrderItemAdmin(admin.ModelAdmin):
             formatted_total
         )
     total_display.short_description = 'جمع'
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = [
+        'code', 'percentage_display', 'status_badge', 'usage_display',
+        'min_order_display', 'valid_until', 'is_active',
+    ]
+    list_editable = ['is_active']
+    list_filter = ['is_active', 'valid_from', 'valid_until']
+    search_fields = ['code']
+    ordering = ['-created_at']
+    readonly_fields = ['used_count', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('کد تخفیف', {
+            'fields': ('code', 'percentage', 'is_active'),
+            'description': 'کاربر این کد را در صفحه‌ی سبد خرید وارد می‌کند و درصد واردشده از مبلغ کالاها کم می‌شود.',
+        }),
+        ('محدودیت مبلغ', {
+            'fields': ('max_discount_amount', 'min_order_amount'),
+        }),
+        ('بازه‌ی زمانی', {
+            'fields': ('valid_from', 'valid_until'),
+            'description': 'هر دو اختیاری‌اند؛ خالی گذاشتن یعنی بدون محدودیت زمانی.',
+        }),
+        ('سقف استفاده', {
+            'fields': ('usage_limit', 'usage_limit_per_user', 'used_count'),
+        }),
+        ('زمان', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def percentage_display(self, obj):
+        return f'{obj.percentage}٪'
+
+    percentage_display.short_description = 'درصد تخفیف'
+    percentage_display.admin_order_field = 'percentage'
+
+    def min_order_display(self, obj):
+        if not obj.min_order_amount:
+            return '—'
+        return f'{int(obj.min_order_amount):,} تومان'
+
+    min_order_display.short_description = 'حداقل مبلغ سبد'
+
+    def usage_display(self, obj):
+        if obj.usage_limit is None:
+            return f'{obj.used_count} / نامحدود'
+        return f'{obj.used_count} / {obj.usage_limit}'
+
+    usage_display.short_description = 'دفعات استفاده'
+
+    def status_badge(self, obj):
+        """چرا این کد الان کار می‌کند یا نمی‌کند — بدون باز کردن رکورد."""
+        if not obj.is_active:
+            label, color = 'غیرفعال', '#9ca3af'
+        elif not obj.has_started:
+            label, color = 'هنوز شروع نشده', '#d97706'
+        elif obj.is_expired:
+            label, color = 'منقضی', '#dc2626'
+        elif obj.is_exhausted:
+            label, color = 'ظرفیت تمام', '#dc2626'
+        else:
+            label, color = 'فعال', '#16a34a'
+        return format_html(
+            '<span style="color:{};font-weight:600">{}</span>', color, label
+        )
+
+    status_badge.short_description = 'وضعیت'

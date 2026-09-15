@@ -72,6 +72,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls', namespace='accounts_app')),
     path('shop/', include('apps.shop.urls', namespace='shop_app')),
+    path('support/', include('apps.support.urls', namespace='support')),
     path('api/shop/cart/', include([
         path('', shop_views.CartAPIView.as_view()),
         path('add/', shop_views.CartAPIView.as_view()),
