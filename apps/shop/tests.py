@@ -276,3 +276,130 @@ class CKEditor5IntegrationTests(TestCase):
         field = Article._meta.get_field('description')
         self.assertIsInstance(field, CKEditor5Field)
         self.assertEqual(field.config_name, 'extends')
+
+
+class SavedAddressCheckoutTests(TestCase):
+    """انتخاب یکی از آدرس‌های ذخیره‌شده در سبد خرید."""
+
+    def setUp(self):
+        from apps.accounts.models import Province, City, Address
+        from apps.shop.models import Cart, CartItem
+
+        self.user = User.objects.create_user(
+            username='savedaddrbuyer',
+            email='savedaddr@test.com',
+            password='testpassword123',
+            fullname='کاربر آدرس',
+            mobile='09120000000',
+        )
+        self.province = Province.objects.create(name='تهران')
+        self.city = City.objects.create(province=self.province, name='تهران')
+        self.address = Address.objects.create(
+            user=self.user,
+            recipient_name='کاربر آدرس',
+            recipient_phone='09120000000',
+            province=self.province,
+            city=self.city,
+            address='خیابان ولیعصر، پلاک ۱۲',
+            postal_code='1234567890',
+            plaque='12',
+        )
+
+        category = Category.objects.create(name='اسکوتر', slug='scooter-saved-addr')
+        self.product = Product.objects.create(
+            name='NexGo S1',
+            slug='nexgo-s1-saved-addr',
+            category=category,
+            price=Decimal('1000000'),
+            stock=5,
+        )
+        cart = Cart.objects.create(user=self.user, is_active=True)
+        CartItem.objects.create(
+            cart=cart,
+            product=self.product,
+            quantity=1,
+            price_snapshot=Decimal('1000000'),
+        )
+        self.client.force_login(self.user)
+
+    def _payload(self, **overrides):
+        data = {
+            'first_name': 'کاربر',
+            'last_name': 'آدرس',
+            'phone': '09120000000',
+            'province_id': self.province.id,
+            'city_id': self.city.id,
+            'postal_code': '1234567890',
+            'address': 'خیابان ولیعصر، پلاک ۱۲',
+            'payment_method': 'card',
+        }
+        data.update(overrides)
+        return data
+
+    def test_selected_saved_address_is_reused(self):
+        """address_id سفارش را به همان رکورد وصل می‌کند و آدرس تکراری نمی‌سازد."""
+        from apps.accounts.models import Address
+
+        res = self.client.post(
+            reverse('shop_app:checkout_submit'),
+            self._payload(address_id=self.address.id),
+        )
+        self.assertEqual(res.status_code, 201, res.content[:500])
+        self.assertEqual(Address.objects.filter(user=self.user).count(), 1)
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.address_id, self.address.id)
+
+    def test_address_of_another_user_is_rejected(self):
+        """فرستادن address_id کاربر دیگر باید رد شود."""
+        from apps.accounts.models import Address
+
+        other = User.objects.create_user(
+            username='otherbuyer',
+            email='other@test.com',
+            password='testpassword123',
+            fullname='کاربر دیگر',
+            mobile='09120000001',
+        )
+        foreign = Address.objects.create(
+            user=other,
+            recipient_name='کاربر دیگر',
+            recipient_phone='09120000001',
+            province=self.province,
+            city=self.city,
+            address='نشانی دیگر',
+            postal_code='9999999999',
+            plaque='1',
+        )
+        res = self.client.post(
+            reverse('shop_app:checkout_submit'),
+            self._payload(address_id=foreign.id),
+        )
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(Order.objects.count(), 0)
+
+    def test_checkout_without_address_id_still_works(self):
+        """مسیر قبلی (پر کردن دستی فرم) دست‌نخورده باقی می‌ماند."""
+        from apps.accounts.models import Address
+
+        res = self.client.post(
+            reverse('shop_app:checkout_submit'),
+            self._payload(save_address=True),
+        )
+        self.assertEqual(res.status_code, 201, res.content[:500])
+        self.assertEqual(Address.objects.filter(user=self.user).count(), 1)
+
+    def test_address_list_api_feeds_the_cart_picker(self):
+        """لیست آدرس‌ها شناسه‌ی استان/شهر را می‌دهد تا فرم قابل پر شدن باشد."""
+        res = self.client.get(reverse('accounts_app:api_addresses'))
+        self.assertEqual(res.status_code, 200)
+        body = res.json()
+        self.assertEqual(len(body), 1)
+        self.assertEqual(body[0]['province'], self.province.id)
+        self.assertEqual(body[0]['city'], self.city.id)
+
+    def test_cart_page_renders_the_address_picker(self):
+        res = self.client.get(reverse('shop_app:cart'))
+        self.assertEqual(res.status_code, 200)
+        html = res.content.decode()
+        self.assertIn('id="saved-addresses"', html)
+        self.assertIn('hf_address_id', html)

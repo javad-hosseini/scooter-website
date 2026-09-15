@@ -1240,22 +1240,47 @@ class CheckoutSubmitAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # ===== 3. پیدا کردن یا ایجاد آدرس =====
-        province = get_object_or_404(Province, id=data['province_id'])
-        city = get_object_or_404(City, id=data['city_id'])
-        full_name = f"{data['first_name']} {data['last_name']}"
+        save_address = data.get('save_address', False)
 
-        address, created = Address.objects.get_or_create(
-            user=user,
-            recipient_name=full_name,
-            recipient_phone=data['phone'],
-            province=province,
-            city=city,
-            address=data['address'],
-            postal_code=data['postal_code'],
-            defaults={
-                'is_active': data.get('save_address', False)
-            }
-        )
+        # اگر کاربر یکی از آدرس‌های ذخیره‌شده‌اش را در سبد خرید انتخاب کرده باشد،
+        # همان رکورد استفاده می‌شود. فیلتر روی user انجام می‌شود تا کسی نتواند با
+        # فرستادن id دلخواه، سفارش را به آدرس کاربر دیگری وصل کند.
+        address = None
+        if data.get('address_id'):
+            address = Address.objects.filter(
+                pk=data['address_id'], user=user
+            ).first()
+            if address is None:
+                return Response(
+                    {'error': 'آدرس انتخاب‌شده معتبر نیست'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        if address is None:
+            province = get_object_or_404(Province, id=data['province_id'])
+            city = get_object_or_404(City, id=data['city_id'])
+            full_name = f"{data['first_name']} {data['last_name']}"
+
+            address, created = Address.objects.get_or_create(
+                user=user,
+                recipient_name=full_name,
+                recipient_phone=data['phone'],
+                province=province,
+                city=city,
+                address=data['address'],
+                postal_code=data['postal_code'],
+                defaults={
+                    'is_active': save_address
+                }
+            )
+
+            # is_active همان «ذخیره‌شده» است و در لیست آدرس‌های کاربر نمایش داده
+            # می‌شود. defaults فقط هنگام ساخت اعمال می‌شود، پس اگر آدرس از قبل
+            # به شکل ذخیره‌نشده وجود داشت و کاربر این بار تیک ذخیره را زده،
+            # اینجا فعالش می‌کنیم.
+            if not created and save_address and not address.is_active:
+                address.is_active = True
+                address.save(update_fields=['is_active', 'updated_at'])
 
         # ===== 4. محاسبه قیمت‌ها با استفاده از utils =====
         subtotal = Decimal('0')
@@ -1284,10 +1309,15 @@ class CheckoutSubmitAPIView(APIView):
         # محاسبه مالیات و هزینه ارسال با utils
         tax_amount = TaxCalculator.calculate_tax(subtotal)
         shipping_method = request.query_params.get('shipping_method', 'standard')
+        # _get_user_province_id() lives on CartAPIView, not here, so this call
+        # raised AttributeError and every checkout 500'd before reaching the
+        # gateway. The order's own address is the right province anyway — the
+        # helper guessed from the user's first saved address, which is not
+        # necessarily where this order ships.
         shipping_cost = ShippingCalculator.calculate_shipping(
             subtotal=subtotal,
             method=shipping_method,
-            province_id=self._get_user_province_id(user)
+            province_id=address.province_id
         )
 
         available_shipping_methods = ShippingCalculator.get_available_methods(subtotal)

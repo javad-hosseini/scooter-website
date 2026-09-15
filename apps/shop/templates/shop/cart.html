@@ -185,6 +185,8 @@
 
       .float-label-group input:focus + label,
       .float-label-group input:not(:placeholder-shown) + label,
+      .float-label-group textarea:focus + label,
+      .float-label-group textarea:not(:placeholder-shown) + label,
       .float-label-group select:focus + label,
       .float-label-group select:not([value=""]) + label {
         transform: translateY(-1.55rem) translateX(0.1rem) scale(0.78);
@@ -199,6 +201,25 @@
 
       .qty-btn:active {
         transform: scale(0.9);
+      }
+
+      /* ── Saved address cards ── */
+      .saved-address-card {
+        text-align: right;
+        transition:
+          border-color 160ms ease,
+          background-color 160ms ease;
+      }
+      .saved-address-card[aria-checked="true"] {
+        border-color: #d4af37;
+        background-color: rgba(212, 175, 55, 0.07);
+      }
+      .saved-address-card[aria-checked="true"] .saved-address-tick {
+        opacity: 1;
+      }
+      .saved-address-tick {
+        opacity: 0;
+        transition: opacity 160ms ease;
       }
 
       ::-webkit-scrollbar {
@@ -636,6 +657,31 @@
               >
                 اطلاعات ارسال
               </h2>
+
+              <!-- ---- انتخاب از آدرس‌های ذخیره‌شده ---- -->
+              <div id="saved-addresses-block" class="hidden mb-6">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-display font-medium text-sm">
+                    آدرس‌های ذخیره‌شده
+                  </h3>
+                  <a
+                    href="{% url 'accounts_app:dashboard' %}#addresses"
+                    class="text-[11px] text-gold hover:underline"
+                    >مدیریت آدرس‌ها</a
+                  >
+                </div>
+                <div
+                  id="saved-addresses"
+                  class="grid sm:grid-cols-2 gap-3"
+                  role="radiogroup"
+                  aria-label="آدرس‌های ذخیره‌شده"
+                ></div>
+                <p class="text-[11px] text-mute mt-2">
+                  یک آدرس را انتخاب کنید تا فرم زیر پر شود، یا «آدرس جدید» را
+                  بزنید.
+                </p>
+              </div>
+
               <form
                 id="shipping-form"
                 class="grid sm:grid-cols-2 gap-4 sm:gap-5"
@@ -1085,6 +1131,7 @@
       <input type="hidden" name="postal_code" id="hf_postal_code" />
       <input type="hidden" name="address" id="hf_address" />
       <input type="hidden" name="save_address" id="hf_save_address" />
+      <input type="hidden" name="address_id" id="hf_address_id" />
       <input type="hidden" name="payment_method" id="hf_payment_method" />
       <input type="hidden" name="coupon_code" id="hf_coupon" />
 
@@ -1767,31 +1814,229 @@
         }
       }
 
+      /* شهرها هم با تغییر دستی استان پر می‌شوند و هم وقتی یکی از آدرس‌های
+         ذخیره‌شده انتخاب می‌شود؛ در حالت دوم باید بشود شهرِ همان آدرس را هم
+         از قبل انتخاب کرد، برای همین این بخش جدا از هندلر change است. */
+      async function loadCities(provinceId, selectedCityId = null) {
+        const citySelect = document.getElementById("city");
+        if (!citySelect) return;
+        citySelect.innerHTML =
+          '<option value="" disabled selected>انتخاب شهر</option>';
+        if (!provinceId) return;
+
+        try {
+          const response = await fetch(
+            `${API_BASE}cities/?province=${provinceId}`,
+          );
+          if (response.ok) {
+            const cities = await response.json();
+            cities.forEach((c) => {
+              const opt = document.createElement("option");
+              opt.value = c.id;
+              opt.textContent = c.name;
+              citySelect.appendChild(opt);
+            });
+            if (selectedCityId) citySelect.value = String(selectedCityId);
+          }
+        } catch (error) {
+          console.error("Error loading cities:", error);
+        }
+      }
+
       document
         .getElementById("province")
-        ?.addEventListener("change", async function () {
-          const citySelect = document.getElementById("city");
-          citySelect.innerHTML =
-            '<option value="" disabled selected>انتخاب شهر</option>';
-          if (!this.value) return;
-
-          try {
-            const response = await fetch(
-              `${API_BASE}cities/?province=${this.value}`,
-            );
-            if (response.ok) {
-              const cities = await response.json();
-              cities.forEach((c) => {
-                const opt = document.createElement("option");
-                opt.value = c.id;
-                opt.textContent = c.name;
-                citySelect.appendChild(opt);
-              });
-            }
-          } catch (error) {
-            console.error("Error loading cities:", error);
-          }
+        ?.addEventListener("change", function () {
+          loadCities(this.value);
         });
+
+      /* ════════════════════
+   SAVED ADDRESSES
+════════════════════ */
+      const ADDRESS_API = "/accounts/api/addresses/";
+      let savedAddresses = [];
+      let selectedAddressId = null;
+      // در حین پر کردن خودکار فرم، شنونده‌ی تغییرِ فیلدها نباید انتخاب
+      // آدرس را پاک کند؛ آن شنونده فقط برای ویرایش دستی کاربر است.
+      let fillingForm = false;
+
+      const HTML_ESCAPES = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      };
+
+      function escapeHtml(value) {
+        return String(value === null || value === undefined ? "" : value).replace(
+          /[&<>"']/g,
+          (ch) => HTML_ESCAPES[ch],
+        );
+      }
+
+      async function loadSavedAddresses() {
+        try {
+          const response = await fetch(ADDRESS_API, {
+            credentials: "same-origin",
+            headers: { Accept: "application/json" },
+          });
+          if (!response.ok) return;
+          const data = await response.json();
+          savedAddresses = Array.isArray(data) ? data : [];
+        } catch (error) {
+          console.error("Error loading saved addresses:", error);
+          return;
+        }
+        renderSavedAddresses();
+      }
+
+      function renderSavedAddresses() {
+        const block = document.getElementById("saved-addresses-block");
+        const grid = document.getElementById("saved-addresses");
+        if (!block || !grid) return;
+
+        if (!savedAddresses.length) {
+          block.classList.add("hidden");
+          grid.innerHTML = "";
+          return;
+        }
+        block.classList.remove("hidden");
+
+        const cards = savedAddresses.map((a) => {
+          const region = [a.province_name, a.city_name]
+            .filter(Boolean)
+            .join("، ");
+          return `
+            <button
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-address-id="${a.id}"
+              class="saved-address-card bg-card2 border border-line rounded-xl p-3.5 hover:border-gold/60"
+            >
+              <span class="flex items-start justify-between gap-2">
+                <span class="text-sm font-medium">${escapeHtml(a.recipient_name)}</span>
+                <span class="saved-address-tick text-gold text-xs">✓</span>
+              </span>
+              <span class="block text-[11px] text-mute font-mono mt-1">${escapeHtml(a.recipient_phone)}</span>
+              <span class="block text-xs text-mute mt-2 leading-relaxed">${escapeHtml(region)}<br />${escapeHtml(a.address)}</span>
+              <span class="block text-[11px] text-mute/70 font-mono mt-1.5">کد پستی: ${escapeHtml(a.postal_code)}</span>
+            </button>`;
+        });
+
+        cards.push(`
+            <button
+              type="button"
+              id="new-address-card"
+              role="radio"
+              aria-checked="true"
+              class="saved-address-card bg-transparent border border-dashed border-line rounded-xl p-3.5 text-sm text-mute hover:border-gold/60 hover:text-white flex items-center justify-center gap-2"
+            >
+              <span class="text-lg leading-none">+</span>
+              آدرس جدید
+            </button>`);
+
+        grid.innerHTML = cards.join("");
+
+        grid.querySelectorAll("[data-address-id]").forEach((card) =>
+          card.addEventListener("click", () =>
+            selectSavedAddress(Number(card.dataset.addressId)),
+          ),
+        );
+        document
+          .getElementById("new-address-card")
+          ?.addEventListener("click", () => {
+            clearAddressSelection();
+            document.getElementById("shipping-form")?.reset();
+            document.getElementById("city").innerHTML =
+              '<option value="" disabled selected>انتخاب شهر</option>';
+            document.getElementById("first_name")?.focus();
+          });
+      }
+
+      function markSelectedCard(addressId) {
+        document
+          .querySelectorAll("#saved-addresses [data-address-id]")
+          .forEach((card) => {
+            card.setAttribute(
+              "aria-checked",
+              Number(card.dataset.addressId) === addressId ? "true" : "false",
+            );
+          });
+        // «آدرس جدید» خودش یکی از گزینه‌های همین radiogroup است؛ وقتی هیچ
+        // آدرس ذخیره‌شده‌ای انتخاب نشده، همین گزینه فعال است.
+        document
+          .getElementById("new-address-card")
+          ?.setAttribute("aria-checked", addressId ? "false" : "true");
+      }
+
+      /* تیک «این آدرس را ذخیره کن» وقتی آدرسِ از قبل ذخیره‌شده انتخاب
+         شده بی‌معنی است، پس غیرفعال می‌شود. */
+      function setSaveCheckboxEnabled(enabled) {
+        const checkbox = document.getElementById("save_address");
+        if (!checkbox) return;
+        checkbox.disabled = !enabled;
+        if (!enabled) checkbox.checked = false;
+        checkbox.closest("label")?.classList.toggle("opacity-50", !enabled);
+      }
+
+      function clearAddressSelection() {
+        selectedAddressId = null;
+        markSelectedCard(null);
+        setSaveCheckboxEnabled(true);
+      }
+
+      async function selectSavedAddress(addressId) {
+        const address = savedAddresses.find((a) => a.id === addressId);
+        if (!address) return;
+
+        selectedAddressId = addressId;
+        markSelectedCard(addressId);
+        setSaveCheckboxEnabled(false);
+
+        fillingForm = true;
+        try {
+          // مدل فقط «نام گیرنده» را یکجا نگه می‌دارد؛ فرم سبد خرید نام و
+          // نام خانوادگی جدا می‌خواهد، پس از اولین فاصله می‌شکنیم.
+          const parts = String(address.recipient_name || "")
+            .trim()
+            .split(/\s+/);
+          const firstName = parts.shift() || "";
+          const lastName = parts.join(" ");
+
+          const setValue = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.value = value === null || value === undefined ? "" : value;
+          };
+
+          setValue("first_name", firstName);
+          setValue("last_name", lastName);
+          setValue("phone", address.recipient_phone);
+          setValue("postal_code", address.postal_code);
+          setValue("address", address.address);
+          setValue("province", address.province);
+          await loadCities(address.province, address.city);
+        } finally {
+          fillingForm = false;
+        }
+
+        showToast("آدرس انتخاب شد", "success");
+      }
+
+      /* ویرایش دستی هر فیلد یعنی کاربر دارد آدرس دیگری می‌سازد، پس
+         انتخاب آدرس ذخیره‌شده باطل می‌شود و سفارش به آدرسِ فرم می‌رود. */
+      function onShippingFieldEdited(event) {
+        if (fillingForm || !selectedAddressId) return;
+        if (event.target && event.target.name === "save_address") return;
+        clearAddressSelection();
+      }
+
+      document
+        .getElementById("shipping-form")
+        ?.addEventListener("input", onShippingFieldEdited);
+      document
+        .getElementById("shipping-form")
+        ?.addEventListener("change", onShippingFieldEdited);
 
       /* ════════════════════════════════════
    UTILITY FUNCTIONS
@@ -1890,6 +2135,11 @@
           document.querySelector('input[name="save_address"]')?.checked
             ? "true"
             : "false";
+        // اگر آدرسی از لیست ذخیره‌شده‌ها انتخاب شده باشد، سرور همان رکورد را
+        // به سفارش وصل می‌کند و آدرس تکراری نمی‌سازد.
+        document.getElementById("hf_address_id").value = selectedAddressId
+          ? String(selectedAddressId)
+          : "";
 
         const paymentMethod =
           document.querySelector('input[name="payment_method"]:checked')
@@ -1941,7 +2191,9 @@
       /* ════════════════════════════════════
    START
 ═══════════════════════════════════════ */
-      loadProvinces();
+      // loadSavedAddresses after loadProvinces: selecting a saved card sets the
+      // province <select> by value, which only sticks once its options exist.
+      loadProvinces().then(loadSavedAddresses);
       loadCart();
     </script>
 

@@ -442,6 +442,10 @@ class OrderCreateSerializer(serializers.Serializer):
     postal_code = serializers.CharField(max_length=10)
     address = serializers.CharField()
     save_address = serializers.BooleanField(default=False)
+    #: شناسه‌ی یکی از آدرس‌های ذخیره‌شده‌ی کاربر، وقتی در سبد خرید انتخاب شده باشد.
+    #: فیلدهای بالا همچنان پر می‌شوند تا اعتبارسنجی یکسان بماند، ولی سفارش به
+    #: همان رکورد آدرس وصل می‌شود و آدرس تکراری ساخته نمی‌شود.
+    address_id = serializers.IntegerField(required=False, allow_null=True)
 
     # پرداخت
     payment_method = serializers.ChoiceField(choices=['card', 'cod', 'installments'])
